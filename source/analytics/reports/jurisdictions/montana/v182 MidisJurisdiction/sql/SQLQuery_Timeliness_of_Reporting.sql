@@ -1,6 +1,7 @@
-DECLARE @date_value date = {{date_value}};
+DECLARE @date_value date = {{Enter_Date}};
+DECLARE @jurisdiction_value NVARCHAR(MAX) = {{Jurisdiction}};
 
-
+-- #todo (Upasana): Update commented column selection when new data about the report is available. 
 --Jurisdiction 
 SELECT
     I.JURISDICTION_NM AS Jurisdiction,
@@ -30,13 +31,11 @@ FROM
 WHERE 
     I.CASE_RPT_MMWR_YR = YEAR(@date_value) 
     AND I.CASE_RPT_MMWR_WK = DATEPART(WK, @date_value)
-    AND I.JURISDICTION_NM IS NOT NULL
+    AND I.JURISDICTION_NM = @jurisdiction_value
 GROUP BY
     I.JURISDICTION_NM
 
-
 UNION ALL
-
 
 --State
 SELECT
@@ -64,7 +63,6 @@ FROM
     JOIN D_INV_HIV DIH ON DIH.D_INV_HIV_KEY = FPC.D_INV_HIV_KEY
     JOIN D_INV_RISK_FACTOR DIRF ON DIRF.D_INV_RISK_FACTOR_KEY = FPC.D_INV_RISK_FACTOR_KEY 
     JOIN D_INV_TREATMENT DIT ON DIT.D_INV_TREATMENT_KEY = FPC.D_INV_TREATMENT_KEY
-    -- JOIN INVSGTN_CTE INVCTE ON INVCTE.INVESTIGATION_KEY = FPC.INVESTIGATION_KEY
 WHERE 
     I.CASE_RPT_MMWR_YR = YEAR(@date_value) 
     AND I.CASE_RPT_MMWR_WK = DATEPART(WK, @date_value)

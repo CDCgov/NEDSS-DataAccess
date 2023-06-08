@@ -1,5 +1,6 @@
 DECLARE @date_value date = {{DATE_VALUE}};
 
+-- #todo (Upasana): Update commented column selection when new data about the report is available. 
 SELECT 
     P.PATIENT_MPR_UID AS PatientId,
     I.INV_CASE_STATUS AS InvestigationStatus, 
