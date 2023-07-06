@@ -14,7 +14,7 @@ This report is built using Metabase's Query Builder feature. This feature provid
 ![query-builder](images/sr2_query_builder.png)
 
 
-The filters for this report are defined in the dashboard. The disease filter allows selection of one or more diseases. In this query, Disease_value, State_value, County_value and Date_range are variables used to filter on the disease, state, county and dates contained within PublicHealthCaseFact. To make sure we select counties that belong to the state selected, we can use the Linked filters to limit the choices available for the filter. 
+The filters for this report are defined in the dashboard. In this query, Disease_value, State_value, County_value and Date_range are variables used to filter on the disease, state, county and dates contained within PublicHealthCaseFact. To make sure we select counties that belong to the state selected, we can use the Linked filters to limit the choices available for the filter. 
 
 ![filter-viz](images/sr2_filter.png)
 

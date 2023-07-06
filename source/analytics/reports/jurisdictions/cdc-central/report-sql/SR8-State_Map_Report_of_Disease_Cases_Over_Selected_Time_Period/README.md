@@ -12,7 +12,7 @@ The full report can be found on [SR8: State Map Report of Disease Cases Over Sel
 
 This query accesses the PublicHealthCaseFact table in the ODSE database. The syntax of the query is modified to suit Metabase's Variable functionality. This functionality, depicted by the text within double curly braces {{sample_text}}, provides users with placeholder to filter on specific fields. 
 
-The filters for this report are defined in the dashboard and query. The disease filter allows selection of one or more diseases. In this query, Disease_value, State_value and Date_range are variables used to filter on the disease, state and dates contained within PublicHealthCaseFact. The state filter allows a single state to be selected and the date range filter specifies the time period of the data selection
+The filters for this report are defined in the dashboard and query. In this query, Disease_value, State_value and Date_range are variables used to filter on the disease, state and dates contained within PublicHealthCaseFact. The state filter allows a single state to be selected and the date range filter specifies the time period of the data selection. The disease filter allows selection of one or more diseases.
 
 These are defined in the WHERE clause for the query. Once the filter variables are defined, we are able to view the available data plotted on the selected state's county map. 
 
