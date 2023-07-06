@@ -2,9 +2,9 @@
 
 ## Introduction
 
-Standard report SR5 or Cases of Reportable Diseases by State reports the total number of investigations by state irrespective of case status. The goal of this report is to get a table that presents the cases reported in the current month, cumulative in the current year, cumulative in the past year, the 5 year median, median current year and the percentage change between the current year and 5 year median. 
+Standard report SR5 or Cases of Reportable Diseases by State: This report provides the total number of investigations by state irrespective of case status. The goal of this report is to get a table that presents the cases reported in the current month, cumulative in the current year, cumulative in the past year, the 5 year median, median current year and the percentage change between the current year and 5 year median. 
 
-This report has been recreated on Metabase to highlight the tool's functionality, features and capabilities. The tool's features such as SQL query editor, dashboard, Variables, filters, charts are used. 
+This report has been recreated on Metabase to highlight the tool's functionality, features and capabilities. The tool's features such as SQL query editor, dashboard, variables, filters, charts have been used to recreate the reports.
 
 The full report can be found on [SR5: Cases of Reportable Diseases by State](https://cdc-nbs.atlassian.net/wiki/spaces/NM/pages/133660834/SR5+Cases+of+Reportable+Diseases+by+State) Confluence page. 
 

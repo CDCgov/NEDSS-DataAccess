@@ -2,9 +2,9 @@
 
 ## Introduction
 
-Standard report SR8 or State Map Report of Disease Cases Over Selected Time Period aggregates the total number of investigations for a state by county-level. This is plotted over a selected state's county map. 
+Standard report SR8 or State Map Report of Disease Cases Over Selected Time Period: This report aggregates the total number of investigations for a state by county-level. This is plotted over a selected state's county map. 
 
-This report has been recreated on Metabase to highlight the tool's functionality, features and capabilities. The tool's features such as SQL query editor, dashboard, Variables, filters, charts are used. 
+This report has been recreated on Metabase to highlight the tool's functionality, features and capabilities. The tool's features such as SQL query editor, dashboard, variables, filters, charts have been used to recreate the reports.
 
 The full report can be found on [SR8: State Map Report of Disease Cases Over Selected Time Period](https://cdc-nbs.atlassian.net/wiki/spaces/NM/pages/242384948/SR8+State+Map+Report+of+Disease+Cases+Over+Selected+Time+Period) Confluence page. 
 

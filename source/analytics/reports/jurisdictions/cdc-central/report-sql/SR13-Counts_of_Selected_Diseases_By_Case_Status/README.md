@@ -2,9 +2,9 @@
 
 ## Introduction
 
-Standard report SR13 or Counts of Selected Diseases By Case Status is a pivot table that provides the case status breakdown of investigations.
+Standard report SR13 or Counts of Selected Diseases By Case Status: This report presents a pivot table that provides the breakdown of investigations by case status.
 
-This report has been recreated on Metabase to highlight the tool's functionality, features and capabilities. The tool's features such as SQL query editor, dashboard, Variables, filters, charts are used. 
+This report has been recreated on Metabase to highlight the tool's functionality, features and capabilities. The tool's features such as SQL query editor, dashboard, variables, filters, charts have been used to recreate the reports. 
 
 The full report can be found on [SR13: Counts of Selected Diseases By Case Status](https://cdc-nbs.atlassian.net/wiki/spaces/NM/pages/132251661/SR13+Counts+of+Selected+Diseases+By+Case+Status) Confluence page. 
 

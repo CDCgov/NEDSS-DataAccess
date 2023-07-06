@@ -2,9 +2,9 @@
 
 ## Introduction
 
-Standard report SR2 or Counts of Reportable Diseases by County for Selected Time frame aggregates the total number of investigations for a state and provides a county-level breakdown of each disease with a pivot table. 
+Standard report SR2 or Counts of Reportable Diseases by County for Selected Time frame: This report aggregates the total number of investigations for a state and provides county-level breakdown of each disease with a pivot table. 
 
-This report has been recreated on Metabase to highlight the tool's functionality, features and capabilities. The tool's features such as SQL query editor, dashboard, Variables, filters, charts are used. 
+This report has been recreated on Metabase to highlight the tool's functionality, features and capabilities. The tool's features such as SQL query editor, dashboard, variables, filters, charts have been used to recreate the reports. 
 
 The full report can be found on [SR2: Counts of Reportable Diseases by County for Selected Time frame](https://cdc-nbs.atlassian.net/wiki/spaces/NM/pages/248938498/SR2+Counts+of+Reportable+Diseases+by+County+for+Selected+Time+frame) Confluence page. 
 ## Query Explanation

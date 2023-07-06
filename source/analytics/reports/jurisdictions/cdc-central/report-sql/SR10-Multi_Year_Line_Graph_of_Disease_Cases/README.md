@@ -2,9 +2,9 @@
 
 ## Introduction
 
-Standard report SR10 or Multi-Year Line Graph of Disease Cases generates a multi-year line graph of a disease given its selected state and timeframe. 
+Standard report SR10 or Multi-Year Line Graph of Disease Cases: This report generates a multi-year line graph of a disease given its selected state and timeframe. 
 
-This report has been recreated on Metabase to highlight the tool's functionality, features and capabilities. The tool's features such as SQL query editor, dashboard, Variables, filters, charts are used. 
+This report has been recreated on Metabase to highlight the tool's functionality, features and capabilities. The tool's features such as SQL query editor, dashboard, variables, filters, charts have been used to recreate the reports.
 
 The full report can be found on [SR10: Multi-Year Line Graph of Disease Cases](https://cdc-nbs.atlassian.net/wiki/spaces/NM/pages/243171329/SR10+Multi-Year+Line+Graph+of+Disease+Cases) Confluence page. 
 
