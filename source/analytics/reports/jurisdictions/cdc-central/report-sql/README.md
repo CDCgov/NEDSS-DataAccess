@@ -23,6 +23,7 @@ The summary of all reports can be found on the [Standard Report](https://cdc-nbs
 
 Reports currently available on Github:
 
+* SR2: Counts of Reportable Diseases by County for Selected Time Frame
 * SR8: State Map Report of Disease Cases Over Selected Time Period
 
 
