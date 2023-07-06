@@ -2,9 +2,9 @@
 
 ## Introduction
 
-Standard report SR2 or Counts of Reportable Diseases by County for Selected Time frame aggregates the total number of investigations for a state and provides a county-level breakdown of each disease with a pivot table. 
+Standard report SR2 or Counts of Reportable Diseases by County for Selected Time frame: This report aggregates the total number of investigations for a state and provides county-level breakdown of each disease with a pivot table. 
 
-This report has been recreated on Metabase to highlight the tool's functionality, features and capabilities. The tool's features such as SQL query editor, dashboard, Variables, filters, charts are used. 
+This report has been recreated on Metabase to highlight the tool's functionality, features and capabilities. The tool's features such as SQL query editor, dashboard, variables, filters, charts have been used to recreate the reports. 
 
 The full report can be found on [SR2: Counts of Reportable Diseases by County for Selected Time frame](https://cdc-nbs.atlassian.net/wiki/spaces/NM/pages/248938498/SR2+Counts+of+Reportable+Diseases+by+County+for+Selected+Time+frame) Confluence page. 
 ## Query Explanation
@@ -14,7 +14,7 @@ This report is built using Metabase's Query Builder feature. This feature provid
 ![query-builder](images/sr2_query_builder.png)
 
 
-The filters for this report are defined in the dashboard. The disease filter allows selection of one or more diseases. In this query, Disease_value, State_value, County_value and Date_range are variables used to filter on the disease, state, county and dates contained within PublicHealthCaseFact. To make sure we select counties that belong to the state selected, we can use the Linked filters to limit the choices available for the filter. 
+The filters for this report are defined in the dashboard. In this query, Disease_value, State_value, County_value and Date_range are variables used to filter on the disease, state, county and dates contained within PublicHealthCaseFact. To make sure we select counties that belong to the state selected, we can use the Linked filters to limit the choices available for the filter. 
 
 ![filter-viz](images/sr2_filter.png)
 
