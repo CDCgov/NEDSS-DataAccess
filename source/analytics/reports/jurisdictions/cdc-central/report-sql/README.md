@@ -25,7 +25,9 @@ Reports currently available on Github:
 
 * SR2: Counts of Reportable Diseases by County for Selected Time Frame
 * SR5: Cases of Reportable Diseases by State
+* SR7: Bar Graph of Cases of Selected Diseases vs. 5-Year Median for Selected Time Period
 * SR8: State Map Report of Disease Cases Over Selected Time Period
+* SR9: Bar Graph of Selected Disease by Month
 * SR10: Multi-Year Line Graph of Disease Cases
 * SR13: Counts of Selected Diseases By Case Status
 
