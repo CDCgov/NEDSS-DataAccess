@@ -29,6 +29,7 @@ Reports currently available on Github:
 * SR8: State Map Report of Disease Cases Over Selected Time Period
 * SR9: Bar Graph of Selected Disease by Month
 * SR10: Multi-Year Line Graph of Disease Cases
+* SR12: Cases of Selected Disease By County By Year
 * SR13: Counts of Selected Diseases By Case Status
 
 
