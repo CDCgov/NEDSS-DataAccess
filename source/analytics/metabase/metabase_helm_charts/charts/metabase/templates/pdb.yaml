@@ -1,3 +1,6 @@
+# This file would help you declare the Pod Disruption Budget, for high availability of your app,
+# this will capture the min and max availability values from your values<name>.yaml file
+
 {{- if .Values.pdb.create }}
 apiVersion: policy/v1
 kind: PodDisruptionBudget

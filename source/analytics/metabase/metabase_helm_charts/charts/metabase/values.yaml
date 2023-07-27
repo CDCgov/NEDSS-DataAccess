@@ -1,7 +1,6 @@
-# Currently Metabase is not horizontly scalable. See
-# https://github.com/metabase/metabase/issues/1446 and
-# https://github.com/metabase/metabase/issues/2754
-# NOTE: Should remain 1
+# This is the example (original) values.yaml file that would be useful to pass the variables or parameters to the installation
+# Please make a copy of this for each deployment, so that we can have this clean one for reference.
+
 replicaCount: 1
 
 pdb:
@@ -23,6 +22,12 @@ image:
 ## String to fully override metabase.fullname template
 ##
 # fullnameOverride:
+
+# Override MAX Pool connections default number
+# extraenv: 
+#   app_db_max_conn_pool:
+#   jdbc_db_max_conn_pool:
+
 
 # Config Jetty web server
 listen:
@@ -96,7 +101,8 @@ emojiLogging: true
 colorLogging: true
 # javaOpts:
 # pluginsDirectory: /plugins
-# siteUrl:
+# siteHTTPS: true
+# siteUrl: https://metabase.datateam-cdc-nbs.eqsandbox.com
 
 session:
   {}

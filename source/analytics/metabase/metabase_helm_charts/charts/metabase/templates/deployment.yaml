@@ -1,3 +1,6 @@
+# This template file is used to capture all general deployment setting values and environment variables
+# from the Values<name>.yaml file and uses those values for the deployment.
+
 apiVersion: {{ template "deployment.apiVersion" . }}
 kind: Deployment
 metadata:
@@ -161,6 +164,9 @@ spec:
             value: {{ .Values.emojiLogging | quote }}
           - name: MB_COLORIZE_LOGS
             value: {{ .Values.colorLogging | quote }}
+          # lets the site requestes to HTTPS
+          - name: MB_REDIRECT_ALL_REQUESTS_TO_HTTPS
+            value: {{ .Values.siteHTTPS | quote }}          
           {{- if .Values.siteUrl }}
           - name: MB_SITE_URL
             value: {{ .Values.siteUrl | quote }}

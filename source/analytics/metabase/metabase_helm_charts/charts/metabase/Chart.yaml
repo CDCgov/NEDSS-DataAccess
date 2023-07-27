@@ -7,6 +7,7 @@ name: metabase
 version: 2.7.3
 # This is the version value from the official metabase repo
 appVersion: v0.46.4
+# Update these values as required
 maintainers:
   - name: Subba Alla
     email: sreddy@enquizit.com
