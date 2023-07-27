@@ -49,9 +49,7 @@ cluster to install and run kubernetes containers
 -   Run the below command on your terminal to connect to the eks cluster
     using the provided the role
 
-> aws eks \--region us-east-1 update-kubeconfig \--name
-> cdc-nbs-sandbox-cluster \--role-arn
-> \"arn:aws:iam::810230601623:role/cdc-terraform-user-cross-account-role\";
+> aws eks --region us-east-1 update-kubeconfig --name cdc-nbs-sandbox-cluster;
 
 ### Installing Metabase (PostgreSQL as App DB):
 
