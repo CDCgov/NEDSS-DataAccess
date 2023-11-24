@@ -1,0 +1,299 @@
+{
+  "schema": {
+    "type": "struct",
+    "fields": [
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "nbs_page_uid"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "wa_template_uid"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "form_cd"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "desc_txt"
+          },
+          {
+            "type": "bytes",
+            "optional": true,
+            "field": "jsp_payload"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "datamart_nm"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "local_id"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "bus_obj_type"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "last_chg_user_id"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "name": "io.debezium.time.Timestamp",
+            "version": 1,
+            "field": "last_chg_time"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "record_status_cd"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "name": "io.debezium.time.Timestamp",
+            "version": 1,
+            "field": "record_status_time"
+          }
+        ],
+        "optional": true,
+        "name": "test.nbs_odse.dbo.NBS_page.Value",
+        "field": "before"
+      },
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "nbs_page_uid"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "wa_template_uid"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "form_cd"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "desc_txt"
+          },
+          {
+            "type": "bytes",
+            "optional": true,
+            "field": "jsp_payload"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "datamart_nm"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "local_id"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "bus_obj_type"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "last_chg_user_id"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "name": "io.debezium.time.Timestamp",
+            "version": 1,
+            "field": "last_chg_time"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "record_status_cd"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "name": "io.debezium.time.Timestamp",
+            "version": 1,
+            "field": "record_status_time"
+          }
+        ],
+        "optional": true,
+        "name": "test.nbs_odse.dbo.NBS_page.Value",
+        "field": "after"
+      },
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "string",
+            "optional": false,
+            "field": "version"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "connector"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "name"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "ts_ms"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "name": "io.debezium.data.Enum",
+            "version": 1,
+            "parameters": {
+              "allowed": "true,last,false,incremental"
+            },
+            "default": "false",
+            "field": "snapshot"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "db"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "sequence"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "schema"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "table"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "change_lsn"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "commit_lsn"
+          },
+          {
+            "type": "int64",
+            "optional": true,
+            "field": "event_serial_no"
+          }
+        ],
+        "optional": false,
+        "name": "io.debezium.connector.sqlserver.Source",
+        "field": "source"
+      },
+      {
+        "type": "string",
+        "optional": false,
+        "field": "op"
+      },
+      {
+        "type": "int64",
+        "optional": true,
+        "field": "ts_ms"
+      },
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "string",
+            "optional": false,
+            "field": "id"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "total_order"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "data_collection_order"
+          }
+        ],
+        "optional": true,
+        "name": "event.block",
+        "version": 1,
+        "field": "transaction"
+      }
+    ],
+    "optional": false,
+    "name": "test.nbs_odse.dbo.NBS_page.Envelope",
+    "version": 1
+  },
+  "payload": {
+    "before": null,
+    "after": {
+      "nbs_page_uid": 999991,
+      "wa_template_uid": 999991,
+      "form_cd": "Test Data",
+      "desc_txt": null,
+      "jsp_payload": null,
+      "datamart_nm": null,
+      "local_id": null,
+      "bus_obj_type": "TST",
+      "last_chg_user_id": 999991,
+      "last_chg_time": 1699560874143,
+      "record_status_cd": "Test",
+      "record_status_time": 1699560874143
+    },
+    "source": {
+      "version": "2.4.0.Final",
+      "connector": "sqlserver",
+      "name": "test",
+      "ts_ms": 1699560874143,
+      "snapshot": "false",
+      "db": "nbs_odse",
+      "sequence": null,
+      "schema": "dbo",
+      "table": "NBS_page",
+      "change_lsn": "000fd2f2:00116f75:0002",
+      "commit_lsn": "000fd2f2:00116f75:0003",
+      "event_serial_no": 1
+    },
+    "op": "c",
+    "ts_ms": 1699560878593,
+    "transaction": null
+  }
+}
+
+
+
