@@ -17,6 +17,12 @@ public class KafkaStreamsService {
     @Value("#{kafkaConfig.nbsPagesTopicName()}")
     private String nbsPagesTopicName;
 
+    @Value("#{kafkaConfig.personTopicName()}")
+    private String personTopicName;
+
+    @Value("#{kafkaConfig.participationTopicName()}")
+    private String participationTopicName;
+
     private static final Serde<String> STRING_SERDE = Serdes.String();
 
     private static final String NBS_PAGES_STATE_STORE = "nbs-pages-state-store";
@@ -30,8 +36,39 @@ public class KafkaStreamsService {
                         nbsPagesTopicName,
                         Consumed.with(STRING_SERDE, STRING_SERDE));
 
+        KStream<String, String> personSourceInputKStream =
+                streamsBuilder.stream(
+                        personTopicName,
+                        Consumed.with(STRING_SERDE, STRING_SERDE));
+
+        KStream<String, String> participationSourceInputKStream =
+                streamsBuilder.stream(
+                        participationTopicName,
+                        Consumed.with(STRING_SERDE, STRING_SERDE));
+
         // Print nbs_pages stream
         nbsPagesSourceInputKStream.foreach((k, v) -> log.info(
                 "nbsPagesSourceInputKStream :: Key :: {}, Value :: {}", k, v));
+
+        personSourceInputKStream.foreach((k, v) -> log.info(
+                "personSourceInputKStream :: Key :: {}, Value :: {}", k, v));
+
+        participationSourceInputKStream.foreach((k, v) -> log.info(
+                "participationSourceInputKStream :: Key :: {}, Value :: {}", k, v));
+
+        /*ValueJoiner<String, String, String> valueJoiner = (leftValue, rightValue) -> {
+            return leftValue + rightValue;
+        };
+        KStream<String, String> joined = personSourceInputKStream.join(participationSourceInputKStream,
+                (leftValue, rightValue) -> "left=" + leftValue + ", right=" + rightValue,
+                JoinWindows.ofTimeDifferenceAndGrace(Duration.ofMinutes(1), Duration.ofSeconds(30))
+        );
+
+        //joined.to("my-kafka-stream-stream-inner-join-out");
+        joined.foreach((k, v) -> {
+            System.out.println("JOIN STREAM: KEY="+k+ ", VALUE=" + v);
+        }); */
+
+
     }
 }
