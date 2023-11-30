@@ -28,6 +28,12 @@ dependencies {
     implementation 'org.springframework.kafka:spring-kafka:3.1.0'
     // https://mvnrepository.com/artifact/org.apache.kafka/kafka-streams
     implementation 'org.apache.kafka:kafka-streams:3.6.0'
+    // https://mvnrepository.com/artifact/io.debezium/debezium-core
+    implementation 'io.debezium:debezium-core:2.4.1.Final'
+    // https://mvnrepository.com/artifact/commons-io/commons-io
+    implementation 'commons-io:commons-io:2.15.0'
+    // https://mvnrepository.com/artifact/org.apache.avro/avro
+    implementation 'org.apache.avro:avro:1.11.3'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

@@ -1,0 +1,17 @@
+{
+  "schema": {
+    "type": "struct",
+    "fields": [
+      {
+        "type": "int64",
+        "optional": false,
+        "field": "nbs_page_uid"
+      }
+    ],
+    "optional": false,
+    "name": "test.nbs_odse.dbo.NBS_page.Key"
+  },
+  "payload": {
+    "nbs_page_uid": 81913
+  }
+}

@@ -260,40 +260,50 @@
     "version": 1
   },
   "payload": {
-    "before": null,
-    "after": {
-      "nbs_page_uid": 999991,
-      "wa_template_uid": 999991,
-      "form_cd": "Test Data",
-      "desc_txt": null,
+    "before": {
+      "nbs_page_uid": 81913,
+      "wa_template_uid": 991234,
+      "form_cd": "TEST DATA NOV 28 -7.1",
+      "desc_txt": "TEST 81912",
       "jsp_payload": null,
       "datamart_nm": null,
       "local_id": null,
-      "bus_obj_type": "TST",
-      "last_chg_user_id": 999991,
-      "last_chg_time": 1699560874143,
-      "record_status_cd": "Test",
-      "record_status_time": 1699560874143
+      "bus_obj_type": "MSK",
+      "last_chg_user_id": 9914,
+      "last_chg_time": 1700242762617,
+      "record_status_cd": "TEST_81912",
+      "record_status_time": 1700242762617
+    },
+    "after": {
+      "nbs_page_uid": 81913,
+      "wa_template_uid": 991234,
+      "form_cd": "TEST DATA NOV 28 -7.2",
+      "desc_txt": "TEST 81912",
+      "jsp_payload": null,
+      "datamart_nm": null,
+      "local_id": null,
+      "bus_obj_type": "MSK",
+      "last_chg_user_id": 9914,
+      "last_chg_time": 1700242762617,
+      "record_status_cd": "TEST_81912",
+      "record_status_time": 1700242762617
     },
     "source": {
-      "version": "2.4.0.Final",
+      "version": "2.4.1.Final",
       "connector": "sqlserver",
       "name": "test",
-      "ts_ms": 1699560874143,
+      "ts_ms": 1701193932253,
       "snapshot": "false",
       "db": "nbs_odse",
       "sequence": null,
       "schema": "dbo",
       "table": "NBS_page",
-      "change_lsn": "000fd2f2:00116f75:0002",
-      "commit_lsn": "000fd2f2:00116f75:0003",
-      "event_serial_no": 1
+      "change_lsn": "000fd2f4:00094c25:0003",
+      "commit_lsn": "000fd2f4:00094c25:0004",
+      "event_serial_no": 2
     },
-    "op": "c",
-    "ts_ms": 1699560878593,
+    "op": "u",
+    "ts_ms": 1701193934019,
     "transaction": null
   }
 }
-
-
-
