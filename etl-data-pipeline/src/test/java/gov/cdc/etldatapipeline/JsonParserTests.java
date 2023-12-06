@@ -1,7 +1,7 @@
 package gov.cdc.etldatapipeline;
 
-import gov.cdc.etldatapipeline.changedata.model.NbsPage;
-import gov.cdc.etldatapipeline.changedata.model.NbsPageId;
+import gov.cdc.etldatapipeline.changedata.model.odse.NbsPage;
+import gov.cdc.etldatapipeline.changedata.model.odse.NbsPageId;
 import gov.cdc.etldatapipeline.changedata.utils.UtilHelper;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Assertions;

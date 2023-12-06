@@ -1,4 +1,4 @@
-package gov.cdc.etldatapipeline.changedata.model;
+package gov.cdc.etldatapipeline.changedata.model.odse;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
