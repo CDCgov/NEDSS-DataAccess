@@ -33,10 +33,6 @@ public class NbsPageService {
         nbsPagesSourceInputKStream.foreach((k, v) -> log.info(
                 "nbsPagesSourceInputKStream :: Key :: {}, Value :: {}", k, v));
 
-        // Print nbs_pages stream
-        nbsPagesSourceInputKStream.foreach((k, v) -> log.info(
-                "nbsPagesSourceInputKStream :: Key :: {}, Value :: {}", k, v));
-
         /*KTable<String, NbsPage> nbsPageTable
                 = nbsPagesSourceInputKStream.toTable(
                 Materialized.<String, NbsPage, KeyValueStore<Bytes, byte[]>>as(

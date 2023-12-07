@@ -10,7 +10,7 @@ import lombok.Data;
 public class DebeziumMetadata {
     @Column(name = "ts_ms")
     @JsonProperty("ts_ms")
-    private String ts_ms;
+    private Long ts_ms;
     @Column(name = "op")
     @JsonProperty("op")
     private String op;

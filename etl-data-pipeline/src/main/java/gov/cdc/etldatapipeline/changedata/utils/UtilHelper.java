@@ -40,10 +40,10 @@ public class UtilHelper {
             String jsonString, String nodeName, Class<T> type) {
         try {
             JsonNode node = objectMapper.readTree(jsonString).at(nodeName);
-            DebeziumMetadata dMetadata = objectMapper.convertValue(node, type);
-            dMetadata.setTs_ms(objectMapper.readTree(jsonString).at("/ts_ms").asText());
-            dMetadata.setOp(objectMapper.readTree(jsonString).at("/op").asText());
-            return (T) dMetadata;
+            T dMetadata = objectMapper.convertValue(node, type);
+            dMetadata.setTs_ms(objectMapper.readTree(jsonString).at("/payload/ts_ms").asLong());
+            dMetadata.setOp(objectMapper.readTree(jsonString).at("/payload/op").asText());
+            return dMetadata;
         } catch (JsonProcessingException e) {
             log.error("JsonProcessingException: ", e);
             e.printStackTrace();
