@@ -1,7 +1,7 @@
 package gov.cdc.etldatapipeline;
 
-import gov.cdc.etldatapipeline.changedata.model.NbsPage;
-import gov.cdc.etldatapipeline.changedata.model.NbsPageId;
+import gov.cdc.etldatapipeline.changedata.model.odse.NbsPage;
+import gov.cdc.etldatapipeline.changedata.model.odse.NbsPageId;
 import gov.cdc.etldatapipeline.changedata.utils.UtilHelper;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Assertions;
@@ -31,8 +31,10 @@ public class JsonParserTests {
         File file = new File("src/test/resources/OdseNbsPageUpdate.json");
         String testData = FileUtils.readFileToString(file,
                 Charset.defaultCharset());
-        NbsPage page = UtilHelper.getInstance().parseJsonNode(testData,
+        NbsPage page = UtilHelper.getInstance().deserializePayload(testData,
                 "/payload/after", NbsPage.class);
         Assertions.assertEquals(81913, page.getNbs_page_uid());
+        Assertions.assertEquals(1701193934019L, page.getTs_ms());
+        Assertions.assertEquals("u", page.getOp());
     }
 }

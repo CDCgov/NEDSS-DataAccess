@@ -3,6 +3,7 @@ package gov.cdc.etldatapipeline.changedata.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import gov.cdc.etldatapipeline.changedata.model.odse.DebeziumMetadata;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
@@ -28,6 +29,21 @@ public class UtilHelper {
         try {
             JsonNode node = objectMapper.readTree(jsonString).at(nodeName);
             return objectMapper.convertValue(node, type);
+        } catch (JsonProcessingException e) {
+            log.error("JsonProcessingException: ", e);
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public <T extends DebeziumMetadata> T deserializePayload(
+            String jsonString, String nodeName, Class<T> type) {
+        try {
+            JsonNode node = objectMapper.readTree(jsonString).at(nodeName);
+            T dMetadata = objectMapper.convertValue(node, type);
+            dMetadata.setTs_ms(objectMapper.readTree(jsonString).at("/payload/ts_ms").asLong());
+            dMetadata.setOp(objectMapper.readTree(jsonString).at("/payload/op").asText());
+            return dMetadata;
         } catch (JsonProcessingException e) {
             log.error("JsonProcessingException: ", e);
             e.printStackTrace();
