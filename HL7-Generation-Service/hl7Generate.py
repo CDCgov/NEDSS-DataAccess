@@ -21,7 +21,6 @@ import json
 # api call/jmeter
 ## UI to monitor: how many submitted, status update *for NBS
 
-
 # Snehaa's notes:
 ## This script will not run as it is still incomplete
 ## Need to assign values to every field
@@ -42,7 +41,7 @@ class HL7v2_5_1_ORU:
         # and contains information about the message sender and receiver, 
         # the date and time that the message was created. 
         # This segment is required.
-        
+
         msh1 = "msh1" # MSH.1 - Field Separator -- R
         msh2 = "msh2" # MSH.2 - Encoding Characters -- R
         msh3_1 = "msh3_1" # MSH.3.1 - Namespace Id ---- Sending Application
