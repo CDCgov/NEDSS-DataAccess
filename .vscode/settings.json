@@ -4,5 +4,6 @@
         "CFPB",
         "ISSO",
         "cybersecurity"
-    ]
+    ],
+    "java.compile.nullAnalysis.mode": "disabled"
 }

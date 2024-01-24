@@ -46,8 +46,8 @@ class HL7v2_5_1_ORU:
         msh2 = "msh2" # MSH.2 - Encoding Characters -- R
         msh3_1 = "msh3_1" # MSH.3.1 - Namespace Id ---- Sending Application
         msh3_2 = "msh3_2" # MSH.3.2 - Universal Id
-        msh3_3 = msh3_3 # MSH.3.3 - Universal Id Type
-        msh4_1 = msh4_1 # MSH.4.1 - Namespace Id ---- Sending Facility
+        msh3_3 = "msh3_3" # MSH.3.3 - Universal Id Type
+        msh4_1 = "msh4_1" # MSH.4.1 - Namespace Id ---- Sending Facility
         msh4_2 = msh4_1 # MSH.4.2 - Universal Id
         msh4_3 = msh4_3 # MSH.4.3 - Universal Id Type
         msh5_1 = msh5_1 # MSH.5.1 - Namespace Id ---- Recieving Application
@@ -89,8 +89,12 @@ class HL7v2_5_1_ORU:
         pass
 
     def PID():
-        # Using Faker to generate fake values to patient
-        fake = Faker() # initializing Faker
+        # Generating values for PID fields and sub-fields
+        
+        # Initializing Faker 
+        fake = Faker()
+
+        # Generating patient details using Faker
         firstname = fake.first_name()
         lastname = fake.last_name()
         fullname = firstname + " " + lastname
@@ -107,7 +111,7 @@ class HL7v2_5_1_ORU:
         raceCode = list(race.keys())
         patRaceCode = random.choice(raceCode)
 
-        # generating address
+        # Generating Address using Faker
         address = fake.street_address()
         building_number = fake.building_number()
         city = fake.city()
@@ -115,14 +119,13 @@ class HL7v2_5_1_ORU:
         zip_code = fake.zipcode()
         country = fake.country()
 
-        # generating other patient data
-        # incomplete
+        # Assigning values to all the PID fields 
 
         pid1 = "1"  # PID.1 - Set ID - PID
-        pid2 = ''.join([str(random.randint(0, 9)) for _ in range(7)])  # PID.2 - Patient ID
+        pid2 = "pid2"  # PID.2 - Patient ID
         pid2_1 = "pid2_1"  # PID.2.1 - Id Number
         pid2_2 = "pid2_2"  # PID.2.2 - Check Digit
-        pid2_3 = "ISO"  # PID.2.3 - Check Digit Scheme
+        pid2_3 = "pid2_3"  # PID.2.3 - Check Digit Scheme
         pid2_4 = "pid2_4"  # PID.2.4 - Assigning Authority
         pid2_5 = "pid2_5"  # PID.2.5 - Identifier Type Code
         pid2_6 = "pid2_6"  # PID.2.6 - Assigning Facility
@@ -141,32 +144,32 @@ class HL7v2_5_1_ORU:
         pid3_8 = "pid3_8"  # PID.3.8 - Expiration Date
         pid3_9 = "pid3_9"  # PID.3.9 - Assigning Jurisdiction
         pid3_10 = "pid3_10"  # PID.3.10 - Assigning Agency Or Department
-        pid4 = ""  # PID.4 - Alternate Patient ID
-        pid4_1 = ""  # PID.4.1 - Id Number
-        pid4_2 = ""  # PID.4.2 - Check Digit
-        pid4_3 = ""  # PID.4.3 - Check Digit Scheme
-        pid4_4 = ""  # PID.4.4 - Assigning Authority
-        pid4_5 = ""  # PID.4.5 - Identifier Type Code
-        pid4_6 = ""  # PID.4.6 - Assigning Facility
-        pid4_7 = ""  # PID.4.7 - Effective Date
-        pid4_8 = ""  # PID.4.8 - Expiration Date
-        pid4_9 = ""  # PID.4.9 - Assigning Jurisdiction
-        pid4_10 = ""  # PID.4.10 - Assigning Agency Or Department
-        pid5 = firstname  # PID.5 - Patient Name
-        pid5_1 = lastname  # PID.5.1 - Family Name
-        pid5_2 = fullname  # PID.5.2 - Given Name
-        pid5_3 = ""  # PID.5.3 - Second And Further Given Names Or Initials Thereof
-        pid5_4 = ""  # PID.5.4 - Suffix (e.g., Jr Or Iii)
-        pid5_5 = ""  # PID.5.5 - Prefix (e.g., Dr)
-        pid5_6 = ""  # PID.5.6 - Degree (e.g., Md)
-        pid5_7 = "B"  # PID.5.7 - Name Type Code
-        pid5_8 = "A"  # PID.5.8 - Name Representation Code
-        pid5_9 = ""  # PID.5.9 - Name Context
-        pid5_10 = ""  # PID.5.10 - Name Validity Range
-        pid5_11 = ""  # PID.5.11 - Name Assembly Order
-        pid5_12 = ""  # PID.5.12 - Effective Date
-        pid5_13 = ""  # PID.5.13 - Expiration Date
-        pid5_14 = ""  # PID.5.14 - Professional Suffix
+        pid4 = "pid4"  # PID.4 - Alternate Patient ID
+        pid4_1 = "pid4_1"  # PID.4.1 - Id Number
+        pid4_2 = "pid4_2"  # PID.4.2 - Check Digit
+        pid4_3 = "pid4_3"  # PID.4.3 - Check Digit Scheme
+        pid4_4 = "pid4_4"  # PID.4.4 - Assigning Authority
+        pid4_5 = "pid4_5"  # PID.4.5 - Identifier Type Code
+        pid4_6 = "pid4_6" # PID.4.6 - Assigning Facility
+        pid4_7 = "pid4_7" # PID.4.7 - Effective Date
+        pid4_8 = "pid4_8" # PID.4.8 - Expiration Date
+        pid4_9 = "pid4_9" # PID.4.9 - Assigning Jurisdiction
+        pid4_10 = "pid4_10" # PID.4.10 - Assigning Agency Or Department
+        pid5 = "pid5"  # PID.5 - Patient Name
+        pid5_1 = "pid5_1"  # PID.5.1 - Family Name
+        pid5_2 = "pid5_2"  # PID.5.2 - Given Name
+        pid5_3 = "pid5_3"  # PID.5.3 - Second And Further Given Names Or Initials Thereof
+        pid5_4 = "pid5_4"  # PID.5.4 - Suffix (e.g., Jr Or Iii)
+        pid5_5 = "pid5_5"  # PID.5.5 - Prefix (e.g., Dr)
+        pid5_6 = "pid5_6"  # PID.5.6 - Degree (e.g., Md)
+        pid5_7 = "pid5_7"  # PID.5.7 - Name Type Code
+        pid5_8 = "pid5_8"  # PID.5.8 - Name Representation Code
+        pid5_9 = "pid5_9"  # PID.5.9 - Name Context
+        pid5_10 = "pid5_10"  # PID.5.10 - Name Validity Range
+        pid5_11 = "pid5_11"  # PID.5.11 - Name Assembly Order
+        pid5_12 = "pid5_12"  # PID.5.12 - Effective Date
+        pid5_13 = "pid5_13"  # PID.5.13 - Expiration Date
+        pid5_14 = "pid5_14"  # PID.5.14 - Professional Suffix
         pid6 = "pid6"  # PID.6 - Mother's Maiden Name
         pid6_1 = "pid6_1"  # PID.6.1 - Family Name
         pid6_2 = "pid6_2"  # PID.6.2 - Given Name
@@ -185,7 +188,7 @@ class HL7v2_5_1_ORU:
         pid7 = "pid7"  # PID.7 - Date/Time of Birth
         pid7_1 = "pid7_1"  # PID.7.1 - Time
         pid7_2 = "pid7_2"  # PID.7.2 - Degree Of Precision
-        pid8 = random.choice(sex)  # PID.8 - Administrative Sex
+        pid8 = "pid8"  # PID.8 - Administrative Sex
         pid9 = "pid9"  # PID.9 - Patient Alias
         pid9_1 = "pid9_1"  # PID.9.1 - Family Name
         pid9_2 = "pid9_2"  # PID.9.2 - Given Name
@@ -201,22 +204,21 @@ class HL7v2_5_1_ORU:
         pid9_12 = "pid9_12"  # PID.9.12 - Effective Date
         pid9_13 = "pid9_13"  # PID.9.13 - Expiration Date
         pid9_14 = "pid9_14"  # PID.9.14 - Professional Suffix
-        pid10 = ""  # PID.10 - Race
-        pid10_1 = patRace.get(raceCode)  # PID.10.1 - Identifier
-        pid10_2 = patRace  # PID.10.2 - Text
+        pid10 = "pid10"  # PID.10 - Race
+        pid10_1 = "pid10_1"  # PID.10.1 - Identifier
+        pid10_2 = "pid10_2"  # PID.10.2 - Text
         pid10_3 = "pid10_3"  # PID.10.3 - Name Of Coding System
-        pid10_4 = "pid10_4"  # PID.10.4 - Alternate Identifier
         pid10_4 = "pid10_4"  # PID.10.4 - Alternate Identifier
         pid10_5 = "pid10_5"  # PID.10.5 - Alternate Text
         pid10_6 = "pid10_6"  # PID.10.6 - Name Of Alternate Coding System
         pid11 = "pid11"  # PID.11 - Patient Address
-        pid11_1 = address  # PID.11.1 - Street Address
-        pid11_2 = building_number  # PID.11.2 - Other Designation
-        pid11_3 = city  # PID.11.3 - City
-        pid11_4 = state_abbr  # PID.11.4 - State Or Province
-        pid11_5 = zip_code  # PID.11.5 - Zip Or Postal Code
-        pid11_6 = country  # PID.11.6 - Country
-        pid11_7 = "H" # PID.11.7 - Address Type
+        pid11_1 = "pid11_1"  # PID.11.1 - Street Address
+        pid11_2 = "pid11_2"  # PID.11.2 - Other Designation
+        pid11_3 = "pid11_3"  # PID.11.3 - City
+        pid11_4 = "pid11_4"  # PID.11.4 - State Or Province
+        pid11_5 = "pid11_5"  # PID.11.5 - Zip Or Postal Code
+        pid11_6 = "pid11_6"  # PID.11.6 - Country
+        pid11_7 = "pid11_7"  # PID.11.7 - Address Type
         pid11_8 = "pid11_8"  # PID.11.8 - Other Geographic Designation
         pid11_9 = "pid11_9"  # PID.11.9 - County/Parish Code
         pid11_10 = "pid11_10"  # PID.11.10 - Census Tract
@@ -242,7 +244,7 @@ class HL7v2_5_1_ORU:
         pid14_1 = "pid14_1"  # PID.14.1 - Telephone Number
         pid14_2 = "pid14_2"  # PID.14.2 - Telecommunication Use Code
         pid14_3 = "pid14_3"  # PID.14.3 - Telecommunication Equipment Type
-        pid14_4 = email  # PID.14.4 - Email Address
+        pid14_4 = "pid14_4"  # PID.14.4 - Email Address
         pid14_5 = "pid14_5"  # PID.14.5 - Country Code
         pid14_6 = "pid14_6"  # PID.14.6 - Area/City Code
         pid14_7 = "pid14_7"  # PID.14.7 - Local Number
@@ -289,40 +291,42 @@ class HL7v2_5_1_ORU:
         pid20_2 = "pid20_2"  # PID.20.2 - Issuing State, Province, Country
         pid20_3 = "pid20_3"  # PID.20.3 - Expiration Date
         pid21 = "pid21"  # PID.21 - Mother's Identifier
-        pid22 = "pid22"  # PID.22 - Ethnic Group
-        pid23 = "pid23"  # PID.23 - Birth Place
-        pid24 = "pid24"  # PID.24 - Multiple Birth Indicator
-        pid25 = "pid25"  # PID.25 - Birth Order
-        pid26 = "pid26"  # PID.26 - Citizenship
-        pid27 = "pid27"  # PID.27 - Veterans Military Status
-        pid28 = "pid28"  # PID.28 - Nationality
-        pid29 = "pid29"  # PID.29 - Patient Death Date and Time
-        pid30 = "pid30"  # PID.30 - Patient Death Indicator
-        pid31 = "pid31"  # PID.31 - Identity Unknown Indicator
-        pid32 = "pid32"  # PID.32 - Identity Reliability Code
-        pid33 = "pid33"  # PID.33 - Last Update Date/Time
-        pid34 = "pid34"  # PID.34 - Last Update Facility
-        pid35 = "pid35"  # PID.35 - Species Code
-        pid36 = "pid36"  # PID.36 - Breed Code
-        pid37 = "pid37"  # PID.37 - Strain
-        pid38 = "pid38"  # PID.38 - Production Class Code
-        pid39 = "pid39"  # PID.39 - Tribal Citizenship
-
+        pid22 = "pid22" # PID.22 - Ethnic Group
+        pid23 = "pid23" # PID.23 - Birth Place
+        pid24 = "pid24" # PID.24 - Multiple Birth Indicator
+        pid25 = "pid25" # PID.25 - Birth Order
+        pid26 = "pid26" # PID.26 - Citizenship
+        pid27 = "pid27" # PID.27 - Veterans Military Status
+        pid28 = "pid28" # PID.28 - Nationality
+        pid29 = "pid29" # PID.29 - Patient Death Date and Time
+        pid30 = "pid30" # PID.30 - Patient Death Indicator
+        pid31 = "pid31" # PID.31 - Identity Unknown Indicator
+        pid32 = "pid32" # PID.32 - Identity Reliability Code
+        pid33 = "pid33" # PID.33 - Last Update Date/Time
+        pid34 = "pid34" # PID.34 - Last Update Facility
+        pid35 = "pid35" # PID.35 - Species Code
+        pid36 = "pid36" # PID.36 - Breed Code
+        pid37 = "pid37" # PID.37 - Strain
+        pid38 = "pid38" # PID.38 - Production Class Code
+        pid39 = "pid39" # PID.39 - Tribal Citizenship
+        
+        # Assigning field values into a template
         PID = (
-                f"PID|"
-                f"{pid1}|{pid2_1}^{pid2_2}^{pid2_3}|{pid3}^{pid3_1}^{pid3_2}^{pid3_3}|"
-                f"{pid4}^{pid4_1}^{pid4_2}^{pid4_3}^{pid4_4}^{pid4_5}^{pid4_6}^{pid4_7}^{pid4_8}^{pid4_9}^{pid4_10}|"
-                f"{pid5}^{pid5_1}^{pid5_2}^{pid5_3}^{pid5_4}^{pid5_5}^{pid5_6}^{pid5_7}^{pid5_8}^{pid5_9}^{pid5_10}^{pid5_11}|"
-                f"{pid5_12}^{pid5_13}^{pid5_14}|{pid6}^{pid6_1}^{pid6_2}^{pid6_3}^{pid6_4}^{pid6_5}^{pid6_6}^{pid6_7}^{pid6_8}^{pid6_9}^{pid6_10}^{pid6_11}|"
-                f"{pid6_12}^{pid6_13}^{pid6_14}|{pid7}^{pid7_1}^{pid7_2}|{pid8}|{pid9}^{pid9_1}^{pid9_2}^{pid9_3}^{pid9_4}^{pid9_5}^{pid9_6}^{pid9_7}^{pid9_8}^{pid9_9}^{pid9_10}|"
-                f"{pid9_11}^{pid9_12}^{pid9_13}^{pid9_14}|{pid10}^{pid10_1}^{pid10_2}^{pid10_3}^{pid10_4}^{pid10_5}^{pid10_6}|{pid11_1}^{pid11_2}^{pid11_3}^{pid11_4}^{pid11_5}|"
-                f"{pid11_6}^{pid11_7}^{pid11_8}^{pid11_9}^{pid11_10}^{pid11_11}^{pid11_12}^{pid11_13}^{pid11_14}|{pid12}|{pid13}^{pid13_1}^{pid13_2}^{pid13_3}^{pid13_4}|"
-                f"{pid13_5}^{pid13_6}^{pid13_7}^{pid13_8}^{pid13_9}^{pid13_10}^{pid13_11}^{pid13_12}|{pid14}^{pid14_1}^{pid14_2}^{pid14_3}^{pid14_4}^{pid14_5}^{pid14_6}^{pid14_7}|"
-                f"{pid14_8}^{pid14_9}^{pid14_10}^{pid14_11}^{pid14_12}|{pid15}^{pid15_1}^{pid15_2}^{pid15_3}^{pid15_4}^{pid15_5}^{pid15_6}|{pid16}^{pid16_1}^{pid16_2}^{pid16_3}^{pid16_4}|"
-                f"{pid16_5}^{pid16_6}|{pid17}^{pid17_1}^{pid17_2}^{pid17_3}^{pid17_4}^{pid17_5}^{pid17_6}|{pid18}^{pid18_1}^{pid18_2}^{pid18_3}^{pid18_4}^{pid18_5}^{pid18_6}^{pid18_7}|"
-                f"{pid18_8}^{pid18_9}^{pid18_10}|{pid19}|{pid20}^{pid20_1}^{pid20_2}^{pid20_3}|{pid21}|{pid22}|{pid23}|{pid24}|{pid25}|{pid26}|{pid27}|{pid28}|{pid29}|{pid30}|"
-                f"{pid31}|{pid32}|{pid33}|{pid34}|{pid35}|{pid36}|{pid37}|{pid38}|{pid39}")
-
+        f"PID|"
+        f"{pid1}|{pid2_1}^{pid2_2}^{pid2_3}|{pid3}^{pid3_1}^{pid3_2}^{pid3_3}|"
+        f"{pid4}^{pid4_1}^{pid4_2}^{pid4_3}^{pid4_4}^{pid4_5}^{pid4_6}^{pid4_7}^{pid4_8}^{pid4_9}^{pid4_10}|"
+        f"{pid5}^{pid5_1}^{pid5_2}^{pid5_3}^{pid5_4}^{pid5_5}^{pid5_6}^{pid5_7}^{pid5_8}^{pid5_9}^{pid5_10}^{pid5_11}|"
+        f"{pid5_12}^{pid5_13}^{pid5_14}|{pid6}^{pid6_1}^{pid6_2}^{pid6_3}^{pid6_4}^{pid6_5}^{pid6_6}^{pid6_7}^{pid6_8}^{pid6_9}^{pid6_10}^{pid6_11}|"
+        f"{pid6_12}^{pid6_13}^{pid6_14}|{pid7}^{pid7_1}^{pid7_2}|{pid8}|{pid9}^{pid9_1}^{pid9_2}^{pid9_3}^{pid9_4}^{pid9_5}^{pid9_6}^{pid9_7}^{pid9_8}^{pid9_9}^{pid9_10}|"
+        f"{pid9_11}^{pid9_12}^{pid9_13}^{pid9_14}|{pid10}^{pid10_1}^{pid10_2}^{pid10_3}^{pid10_4}^{pid10_5}^{pid10_6}|{pid11_1}^{pid11_2}^{pid11_3}^{pid11_4}^{pid11_5}|"
+        f"{pid11_6}^{pid11_7}^{pid11_8}^{pid11_9}^{pid11_10}^{pid11_11}^{pid11_12}^{pid11_13}^{pid11_14}|{pid12}|{pid13}^{pid13_1}^{pid13_2}^{pid13_3}^{pid13_4}|"
+        f"{pid13_5}^{pid13_6}^{pid13_7}^{pid13_8}^{pid13_9}^{pid13_10}^{pid13_11}^{pid13_12}|{pid14}^{pid14_1}^{pid14_2}^{pid14_3}^{pid14_4}^{pid14_5}^{pid14_6}^{pid14_7}|"
+        f"{pid14_8}^{pid14_9}^{pid14_10}^{pid14_11}^{pid14_12}|{pid15}^{pid15_1}^{pid15_2}^{pid15_3}^{pid15_4}^{pid15_5}^{pid15_6}|{pid16}^{pid16_1}^{pid16_2}^{pid16_3}^{pid16_4}|"
+        f"{pid16_5}^{pid16_6}|{pid17}^{pid17_1}^{pid17_2}^{pid17_3}^{pid17_4}^{pid17_5}^{pid17_6}|{pid18}^{pid18_1}^{pid18_2}^{pid18_3}^{pid18_4}^{pid18_5}^{pid18_6}^{pid18_7}|"
+        f"{pid18_8}^{pid18_9}^{pid18_10}|{pid19}|{pid20}^{pid20_1}^{pid20_2}^{pid20_3}|{pid21}|{pid22}|{pid23}|{pid24}|{pid25}|{pid26}|{pid27}|{pid28}|{pid29}|{pid30}|"
+        f"{pid31}|{pid32}|{pid33}|{pid34}|{pid35}|{pid36}|{pid37}|{pid38}|{pid39}")
+        
+        # PID variable is being returned here
         return PID
 
     def PD1(self):
