@@ -31,3 +31,12 @@ These are the features for Version 1
 Ensure you have Python installed. Clone the repository and install dependencies.
 - https://www.python.org/downloads/
 - https://pypi.org/project/Faker/
+- https://pypi.org/project/boto3/
+- https://pypi.org/project/requests/
+
+## Required libraries for the deployment in AWS Lambda
+
+The following libraries should be included in the source and zipped for deployment.
+- Faker
+- boto3
+- requests
