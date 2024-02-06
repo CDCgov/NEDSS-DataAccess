@@ -20,7 +20,7 @@ import requests
 #    12. PID.7 - Date/Time of Birth
 #    13. PID.8 - Administrative Sex
 
-num_messages=10 #default size
+num_messages=0 #default size
 
 store_in_s3="" #if 'true', the generated files will be stored in S3 bucket.
 call_di_service="" #if 'true', di service will be called to ingest the hl7 message.
@@ -29,6 +29,7 @@ di_api_url=""
 auth_client_id=""
 auth_client_secret=""
 auth_token=""
+
 # For local testing uncomment the following lines. DI api and auth details are hard coded.
 # di_api_url = "https://dataingestion.int1.nbspreview.com/api/reports"
 # auth_client_id='di-keycloak-client'
@@ -90,14 +91,14 @@ def generate_unique_patient_messages(num_messages, output_folder):
         }
         #json_message = json.dumps(fake_message, indent=2)
         json_message = json.dumps(fake_message['data'], indent=2).replace('"', '').encode('UTF-8')
-        print(json_message)
-        print ("call_di_service:",call_di_service)
+        # print(json_message)
+        print ("call_di_service flag:",call_di_service)
         if call_di_service=='true':
             ingest_hl7_into_diservice(json_message)
         
         filename=family_name+given_name+"-"+todaydate+".txt"
         
-        print ("store_in_s3:",store_in_s3)
+        print ("store_in_s3 flag:",store_in_s3)
         if store_in_s3=='true':
             store_hl7files_in_s3(json_message,filename)
 
@@ -117,12 +118,40 @@ def ingest_hl7_into_diservice(hl7message):
     print("ingest_hl7_into_diservice")
     
     headers = {'msgType':'HL7','accept':'*/*','Content-Type':'text/plain','clientId':auth_client_id,
-               'clientSecret':auth_client_secret,'Authorization': f'Bearer {auth_token}'}
-    response = requests.post(di_api_url, data=hl7message, headers=headers)
-    print(response)
+               'clientSecret':auth_client_secret,'Authorization': f'Bearer {auth_token}'}   
+    
+    responseBody=''
+    try:
+        response = requests.post(di_api_url, data=hl7message, headers=headers)
+        print(response.status_code)
+        print(response.ok)
+        responseBody=response.text
+        response.raise_for_status() 
+    except requests.exceptions.RequestException as exc: 
+        print('Exception in ingest_hl7_into_diservice:',responseBody)
+        exc.add_note(responseBody)
+        raise RuntimeError(responseBody) from exc
+    
+def reset_inputparams():
+    global num_messages
+    num_messages=0
+    global store_in_s3
+    store_in_s3="" 
+    global call_di_service
+    call_di_service="" 
+    global di_api_url
+    di_api_url=""
+    global auth_client_id
+    auth_client_id=""
+    global auth_client_secret
+    auth_client_secret=""
+    global auth_token
+    auth_token=""
 
 def lambda_handler(event, context):
     # implementation
+    reset_inputparams()
+
     if "queryStringParameters" in event:
         print(event["queryStringParameters"])
         queryParams=event["queryStringParameters"]
@@ -134,11 +163,12 @@ def lambda_handler(event, context):
         if "store_in_s3" in queryParams:
             global store_in_s3
             store_in_s3=queryParams["store_in_s3"]
-            print ("store_in_s3:",store_in_s3)
+            print ("input param store_in_s3:",store_in_s3)
 
         if "call_di_service" in queryParams and queryParams["call_di_service"]=='true':
             global call_di_service
             call_di_service=queryParams["call_di_service"]
+            print('input param call_di_service: ',call_di_service)
             global di_api_url
             di_api_url=queryParams["di_api_url"]
             global auth_client_id
