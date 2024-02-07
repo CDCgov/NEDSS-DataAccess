@@ -1,0 +1,11 @@
+
+D:\wildfly-10.0.0.Final\nedssdomain\Nedss\BatchFiles>call setenvJBOSS.cmd 
+************************************************************************
+* USAGE: ELRImporter                                                *
+* This will Process ELR's in silent mode(in single threaded manner).   *
+************************************************************************
+* OR USAGE: ELRImporter DEBUG                                          *
+* Process ELR's in verbose mode(in single threaded manner).            *
+************************************************************************
+Errorjava.lang.IllegalStateException: EJBCLIENT000025: No EJB receiver available for handling [appName:nbs, moduleName:NEDSSEJB, distinctName:] combination for invocation context org.jboss.ejb.client.EJBClientInvocationContext@3514a4c0
+ELRImporter.main Method Exception thrown java.lang.IllegalStateException: EJBCLIENT000025: No EJB receiver available for handling [appName:nbs, moduleName:NEDSSEJB, distinctName:] combination for invocation context org.jboss.ejb.client.EJBClientInvocationContext@3514a4c0
