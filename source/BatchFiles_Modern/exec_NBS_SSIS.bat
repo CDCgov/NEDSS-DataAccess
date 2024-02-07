@@ -13,5 +13,5 @@ REM Where "-U nbs_rdb", replace with the SQL user name for your RDB database.
 REM Where "-P rdb", replace with the related SQL user password.
 REM Change the file path of the SSIS.log file as required for your configuration.
 
-@rem @sqlcmd -S cdc-nbs-alabama-rds-mssql.czya31goozkz.us-east-1.rds.amazonaws.com -U nbs_rdb -P rdb -d RDB_Modern -Q "Exec RDB_Modern.dbo.sp_SLD_ALL" > D:\wildfly-10.0.0.Final\nedssdomain\Nedss\report\log_modern\sp_SLD_ALL.log
-sqlcmd -S cdc-nbs-alabama-rds-mssql.czya31goozkz.us-east-1.rds.amazonaws.com -U nbs_rdb -P rdb -d RDB_Modern -Q "Exec RDB_Modern.dbo.sp_SLD_ALL_Hep" > D:\wildfly-10.0.0.Final\nedssdomain\Nedss\report\log_modern\sp_SLD_ALL_Hep.log
+@rem @sqlcmd -S <db_server> -U nbs_rdb -P rdb -d RDB_Modern -Q "Exec RDB_Modern.dbo.sp_SLD_ALL" > D:\wildfly-10.0.0.Final\nedssdomain\Nedss\report\log_modern\sp_SLD_ALL.log
+sqlcmd -S <db_server> -U nbs_rdb -P rdb -d RDB_Modern -Q "Exec RDB_Modern.dbo.sp_SLD_ALL_Hep" > D:\wildfly-10.0.0.Final\nedssdomain\Nedss\report\log_modern\sp_SLD_ALL_Hep.log
