@@ -1,0 +1,434 @@
+1                                                          The SAS System                          16:23 Thursday, December 14, 2023
+
+NOTE: Unable to open SASUSER.REGSTRY. WORK.REGSTRY will be opened instead.
+NOTE: All registry changes will be lost at the end of the session.
+
+WARNING: Unable to copy SASUSER registry to WORK registry. Because of this, you will not see registry customizations during this 
+         session.
+NOTE: Unable to open SASUSER.PROFILE. WORK.PROFILE will be opened instead.
+NOTE: All profile changes will be lost at the end of the session.
+NOTE: Copyright (c) 2002-2010 by SAS Institute Inc., Cary, NC, USA. 
+NOTE: SAS (r) Proprietary Software 9.3 (TS1M2) 
+      Licensed to GENERAL DYNAMICS IT INC/CDC NEDSS 2, Site 70238317.
+NOTE: This session is executing on the X64_DSRV12  platform.
+
+
+
+NOTE: Enhanced analytical products:
+
+SAS/ETS 12.1
+
+NOTE: SAS initialization used:
+      real time           0.44 seconds
+      cpu time            0.38 seconds
+      
+
+NOTE: AUTOEXEC processing beginning; file is 
+      D:\wildfly-10.0.0.Final\nedssdomain\Nedss\report\autoexec.sas.
+
+NOTE: Libref RDBDATA was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: D:\wildfly-10.0.0.Final\nedssdomain\Nedss\report\dw\etl\rdbdata
+NOTE: Libref NBSFMT was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: D:\wildfly-10.0.0.Final\nedssdomain\Nedss\report\format
+NOTE: The V6 engine on this host is limited to read-only access of SAS data files without index 
+      optimization.  V6 data files cannot be created or updated and V6 catalogs cannot be read.
+NOTE: Libref LIBRARY was successfully assigned as follows: 
+      Engine:        V6 
+      Physical Name: D:\wildfly-10.0.0.Final\nedssdomain\Nedss\report\metadata
+NOTE: Libref RDBDATAM was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: D:\wildfly-10.0.0.Final\nedssdomain\Nedss\report\dw\etl\rdbdata_modern
+
+NOTE: AUTOEXEC processing completed.
+
+1          /*----------------------------------------------------
+2          
+3           	CODESET TABLE
+4          	This program should be part of the setup
+5          	and needs to run only once before all other
+6          	porgrams
+7          
+8          ------------------------------------------------------*/
+9          %macro loadCodeSet;
+10         /*Check to see if the libref has been assigned. If a libref is not assigned
+11         then execute the macro called etllib defined in either autoexec.sas or etldevenv.sas*/
+2                                           The SAS System           16:23 Thursday, December 14, 2023
+
+12         %if %SYSFUNC(LIBREF(nbs_ods)) NE 0 or
+13         	%SYSFUNC(LIBREF(nbs_srt)) NE 0 or
+14         	%SYSFUNC(LIBREF(nbs_rdb)) NE 0 or
+15         	%SYSFUNC(LIBREF(nbs_cdc)) NE 0 or
+16         	%SYSFUNC(LIBREF(nbs_rdbm)) NE 0
+17         %then %do;
+18         %etllib;
+19         %include etlpgm(etlmacro.sas);
+20         %end;
+21         
+22         
+23         /* totalidm.XLS
+24         SELECT     	[Unique ID],
+25         			[SRT Reference],
+26         			format,
+27         			label
+28         FROM  imdbo.tblTOTALIDM
+29         WHERE     (Status = 'Active') and [Unique ID] NOT IN ('------', '******')
+30         ORDER BY [Unique ID]
+31         */
+32         /* Load the codeset data sets from Excel */
+33         
+34         
+35         /*Proc Import datafile="&SAS_REPORT_HOME\metadata\totalidm.XLS" Replace Out=nbsfmt.totalidm
+35       ! ;   Run;*/
+36         
+37         
+38         Proc SQL;
+39          Create table nbsfmt.totalidm as
+40         	select
+41         	unique_cd as unique_id 'unique_id',
+42         	SRT_reference as SRT_reference 'SRT_reference',
+43         	format as format 'format',
+44         	label as label 'label'
+45         	from nbs_srt.totalidm;
+46         Quit;
+47         
+48         /*
+49         %macro importfact (sheet, DSout);
+50         	Proc Import datafile="&SAS_REPORT_HOME\metadata\imRDBmapping.xls" Replace Out=&DSout;
+51         
+52         	Sheet=&sheet;
+53          Run;
+54         %mend importfact;
+55         
+56         %importfact ('bmird',BMIRDcodeset);
+57         %importfact ('sumcase',SUMcodeset);
+58         %importfact ('labobs',LABcodeset);
+59         %importfact ('morbidity',MORBcodeset);
+60         %importfact ('treatment',TREATcodeset);
+61         %importfact ('vaccination',VACCcodeset);
+62         %importfact ('rubella',RUBcodeset);
+63         %importfact ('pertussis',PERTcodeset);
+64         %importfact ('crs',CRScodeset);
+3                                           The SAS System           16:23 Thursday, December 14, 2023
+
+65         %importfact ('measles',MEAcodeset);
+66         %importfact ('hepatitis',HEPcodeset);
+67         %importfact ('person',PERScodeset);
+68         %importfact ('org',ORGcodeset);
+69         %importfact ('notification',NOTcodeset);
+70         %importfact ('investigation',INVcodeset);
+71         */
+72         
+73         Proc SQL;
+74          Create table rdbdatam.imrdbmapping as
+75         	select unique_cd as UNIQUE_ID 'UNIQUE_ID',
+76         	unique_name as unique_name 'unique_name',
+77         	description as description 'description',
+78         	DB_table as DB_table 'DB_table',
+79         	DB_field as DB_field 'DB_field',
+80         	RDB_table as RDB_table 'RDB_table',
+81         	RDB_attribute as RDB_attribute 'RDB_attribute',
+82         	other_attributes as other_attributes 'other_attributes',
+83         	condition_cd as condition_cd 'condition_cd'
+84         from nbs_srt.imrdbmapping;
+85         Quit;
+86         
+87         
+88         
+89         /* append all codeset data sets */
+90         Data ALLcodeset;
+91          /*if a unique id has > 7, it may cuase the extra char lost*/
+92          format Unique_ID $7. RDB_Attribute $32.;
+93          Set rdbdatam.imrdbmapping;
+94          Rename RDB_Table=TBL_NM RDB_Attribute=COL_NM;
+95          Drop Unique_Name Description DB_Table DB_Field Other_Attributes;
+96         Run;
+97         
+98         Proc Sort Data=ALLcodeset;
+99          By Unique_ID;
+100        Run;
+101        Proc Sort Data=nbsfmt.totalidm out=totalidm;
+102         By Unique_ID;
+103        Run;
+104        
+105        /*NBS inserted RUB91a instead of RUB091a, we can change imRDBmapping and totalIDM,
+106        or add  change here to chnge the unique_ID from RUB091a to RUB91a
+107        for ALLcodeset and totalidm before joining the datasets*/
+108        
+109        
+110        /* join totalidm to rdbcodeset to get Code_Set_Nm */
+111        Data RDBCodeset;
+112         Merge
+113        		totalidm (rename=(srt_reference=code_set_nm) drop=format)
+114        		ALLcodeset (in=B);
+115         By Unique_ID;
+116         if B;
+117         Rename Unique_ID=CD;
+118         format cd_desc $300.;
+4                                           The SAS System           16:23 Thursday, December 14, 2023
+
+119         cd_desc = label;
+120         drop label;
+121        Run;
+122        
+123        /*get Code_Set information (system, version, etc.) from Srt */
+124        Data SRTcodeset;
+125         Set nbs_srt.Codeset (KEEP=code_set_nm code_set_desc_txt source_version_txt);
+126         Rename code_set_desc_txt=CD_DESC
+127                source_version_txt=CD_SYS_VER;
+128         /* always select first entry */
+129         DROP seq_num;
+130        Run;
+131        
+132        Proc Sort Data=SRTcodeset;
+133          By code_set_nm;
+134        Run;
+135        
+136        Proc Sort Data=RDBcodeset;
+137          By code_set_nm;
+138        Run;
+139        
+140        /* Join RDBCodeset and SRTCodeset */
+141        Data rdbdatam.Codeset;
+142         Merge RDBCodeset(in=a) SRTcodeset;
+143         By code_set_nm;
+144         If a;
+145        Run;
+146        
+147        
+148        
+149        
+150        /**************************************/
+151        /* CODE_VALUE_GENERAL TABLE */
+152        
+153        /* join Codeset and Code_Value_General on Code_Set_Nm */
+154        
+155        Proc SQL;
+156         Create table rdbdatam.code_val_general as
+157          select a.cd, b.code as CODE_VAL,
+158                 b.code_short_desc_txt as CODE_DESC,
+159                 b.code_system_cd as CODE_SYS_CD,
+160                 b.code_system_desc_txt as CODE_SYS_CD_DESC,
+161                 b.effective_from_time as CODE_EFF_DT,
+162        		 b.effective_to_time as CODE_END_DT
+163           from rdbdatam.Codeset a, nbs_srt.Code_Value_General b
+164           where a.code_set_nm = b.code_set_nm;
+165        Quit;
+166        
+167        data rdbdatam.code_val_general;
+168        set rdbdatam.code_val_general;
+169        	code_key = _n_;
+170        run;
+171        
+172        
+5                                           The SAS System           16:23 Thursday, December 14, 2023
+
+173        
+174        Data _null_;
+175        if 0 then set rdbdatam.codeset nobs=n_codeset;
+176        if 0 then set rdbdatam.code_val_general nobs=n_cvg;
+177        call symput('n_codeset',put(n_codeset, 8.));
+178        call symput('n_cvg',put(n_cvg, 8.));
+179        stop;
+180        run;
+181        %put &n_codeset;
+182        
+183        
+184        %if &n_codeset ~= 0 and &n_cvg ~= 0 %then %do;
+185        	%dbdelete(code_val_general);
+186        	%dbdelete(codeset);
+187        	%dbload(codeset, rdbdatam.codeset);
+188        	%dbload(code_val_general, rdbdatam.code_val_general);
+189        	%end;
+190        %else
+191        	%put Check these two files: totalIDM.xls and imRDBmapping.xls.;
+192        %mend loadCodeSet;
+193        %loadCodeSet;
+NOTE: Libref NBS_ODS was successfully assigned as follows: 
+      Engine:        ODBC 
+      Physical Name: nedss1
+NOTE: Libref NBS_SRT was successfully assigned as follows: 
+      Engine:        ODBC 
+      Physical Name: nbs_srt
+NOTE: Libref NBS_RDB was successfully assigned as follows: 
+      Engine:        ODBC 
+      Physical Name: nbs_rdb
+NOTE: Libref NBS_CDC was successfully assigned as follows: 
+      Engine:        ODBC 
+      Physical Name: nbs_changedata
+NOTE: Libref NBS_RDBM was successfully assigned as follows: 
+      Engine:        ODBC 
+      Physical Name: nbs_rdb_modern
+NOTE: Table NBSFMT.TOTALIDM created, with 3725 rows and 4 columns.
+
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.04 seconds
+      cpu time            0.03 seconds
+      
+
+NOTE: Table RDBDATAM.IMRDBMAPPING created, with 1171 rows and 9 columns.
+
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.04 seconds
+      cpu time            0.01 seconds
+      
+
+
+WARNING: Multiple lengths were specified for the variable Unique_ID by input data set(s). This may 
+         cause truncation of data.
+WARNING: Multiple lengths were specified for the variable RDB_Attribute by input data set(s). This 
+6                                           The SAS System           16:23 Thursday, December 14, 2023
+
+         may cause truncation of data.
+NOTE: There were 1171 observations read from the data set RDBDATAM.IMRDBMAPPING.
+NOTE: The data set WORK.ALLCODESET has 1171 observations and 4 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1171 observations read from the data set WORK.ALLCODESET.
+NOTE: The data set WORK.ALLCODESET has 1171 observations and 4 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+
+NOTE: There were 3725 observations read from the data set NBSFMT.TOTALIDM.
+NOTE: The data set WORK.TOTALIDM has 3725 observations and 4 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 3725 observations read from the data set WORK.TOTALIDM.
+NOTE: There were 1171 observations read from the data set WORK.ALLCODESET.
+NOTE: The data set WORK.RDBCODESET has 1171 observations and 6 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.02 seconds
+      cpu time            0.01 seconds
+      
+
+
+WARNING: The variable seq_num in the DROP, KEEP, or RENAME list has never been referenced.
+NOTE: There were 1256 observations read from the data set NBS_SRT.Codeset.
+NOTE: The data set WORK.SRTCODESET has 1256 observations and 3 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1256 observations read from the data set WORK.SRTCODESET.
+NOTE: The data set WORK.SRTCODESET has 1256 observations and 3 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1171 observations read from the data set WORK.RDBCODESET.
+NOTE: The data set WORK.RDBCODESET has 1171 observations and 6 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+7                                           The SAS System           16:23 Thursday, December 14, 2023
+
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+
+
+WARNING: Multiple lengths were specified for the BY variable code_set_nm by input data sets. This may 
+         cause unexpected results.
+WARNING: Multiple lengths were specified for the variable cd_desc by input data set(s). This may 
+         cause truncation of data.
+NOTE: There were 1171 observations read from the data set WORK.RDBCODESET.
+NOTE: There were 1256 observations read from the data set WORK.SRTCODESET.
+NOTE: The data set RDBDATAM.CODESET has 1171 observations and 7 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Table RDBDATAM.CODE_VAL_GENERAL created, with 10131 rows and 7 columns.
+
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.10 seconds
+      cpu time            0.04 seconds
+      
+
+
+NOTE: There were 10131 observations read from the data set RDBDATAM.CODE_VAL_GENERAL.
+NOTE: The data set RDBDATAM.CODE_VAL_GENERAL has 10131 observations and 8 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+1171
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.05 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: Appending RDBDATAM.CODESET to NBS_RDB.codeset.
+WARNING: Variable condition_cd was not found on BASE file. The variable will not be added to the BASE 
+         file.
+WARNING: Variable CD has different lengths on BASE and DATA files (BASE 20 DATA 255).
+8                                           The SAS System           16:23 Thursday, December 14, 2023
+
+WARNING: Variable TBL_NM has different lengths on BASE and DATA files (BASE 32 DATA 255).
+WARNING: Variable DATA_TYPE was not found on DATA file.
+WARNING: Variable DATA_LENGTH was not found on DATA file.
+WARNING: Variable CODE_SET_NM has different lengths on BASE and DATA files (BASE 256 DATA 255).
+NOTE: FORCE is specified, so dropping/truncating will occur.
+NOTE: There were 1171 observations read from the data set RDBDATAM.CODESET.
+NOTE: 1171 observations added.
+NOTE: The data set NBS_RDB.codeset has . observations and 8 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.76 seconds
+      cpu time            0.07 seconds
+      
+
+
+NOTE: Appending RDBDATAM.CODE_VAL_GENERAL to NBS_RDB.code_val_general.
+WARNING: Variable CODE_VAL has different lengths on BASE and DATA files (BASE 50 DATA 20).
+WARNING: Variable CODE_DESC has different lengths on BASE and DATA files (BASE 300 DATA 100).
+WARNING: Variable CODE_SYS_CD has different lengths on BASE and DATA files (BASE 50 DATA 300).
+WARNING: Variable CODE_SYS_CD_DESC has different lengths on BASE and DATA files (BASE 50 DATA 100).
+WARNING: Variable CD has different lengths on BASE and DATA files (BASE 20 DATA 255).
+NOTE: FORCE is specified, so dropping/truncating will occur.
+NOTE: There were 10131 observations read from the data set RDBDATAM.CODE_VAL_GENERAL.
+NOTE: 10131 observations added.
+NOTE: The data set NBS_RDB.code_val_general has . observations and 8 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           6.78 seconds
+      cpu time            0.36 seconds
+      
+
+2834       
+2835       
+2836       
+2837       
+2838       
+
+NOTE: SAS Institute Inc., SAS Campus Drive, Cary, NC USA 27513-2414
+NOTE: The SAS System used:
+      real time           8.60 seconds
+      cpu time            1.07 seconds
+      
