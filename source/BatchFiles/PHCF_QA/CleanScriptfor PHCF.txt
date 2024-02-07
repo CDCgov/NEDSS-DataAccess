@@ -1,0 +1,28 @@
+/* This script is used to prepare the audit/log tables for PHCMartETL Full load */
+
+ 
+
+DELETE FROM  job_flow_log where batch_id in (select batch_id from job_batch_log where type_code='PHCMartETL');
+
+ 
+
+DELETE FROM  job_batch_log where type_code='PHCMartETL';
+
+ 
+
+INSERT INTO [dbo].[job_batch_log]
+           ([batch_id]
+           ,[batch_start_dttm]
+           ,[batch_end_dttm]
+           ,[Status_Type]
+               ,[type_code]
+               ,[type_description]
+           )
+VALUES
+           (1
+           ,'01/01/1990'
+           ,'01/01/1990'
+           ,'complete'
+               ,'PHCMartETL'
+               ,'PHCMartETL Process'
+           );

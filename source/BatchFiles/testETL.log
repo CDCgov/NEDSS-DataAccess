@@ -1,0 +1,178 @@
+1                                           The SAS System           12:42 Thursday, December 14, 2023
+
+NOTE: Copyright (c) 2002-2010 by SAS Institute Inc., Cary, NC, USA. 
+NOTE: SAS (r) Proprietary Software 9.3 (TS1M2) 
+      Licensed to GENERAL DYNAMICS IT INC/CDC NEDSS 2, Site 70238317.
+NOTE: This session is executing on the X64_DSRV12  platform.
+
+
+
+NOTE: Enhanced analytical products:
+
+SAS/ETS 12.1
+
+NOTE: SAS initialization used:
+      real time           2.68 seconds
+      cpu time            0.35 seconds
+      
+1          %etllib;
+           _
+           180
+WARNING: Apparent invocation of macro ETLLIB not resolved.
+
+ERROR 180-322: Statement is not valid or it is used out of proper order.
+
+2          OPTIONS COMPRESS=YES;
+3          options fmtsearch=(nbsfmt);
+4          %include etlpgm (etlmacro.sas);
+ERROR: Physical file does not exist, D:\wildfly-10.0.0.Final\nedssdomain\Nedss\BatchFiles\etlpgm.
+ERROR: Unable to access the aggregate ETLPGM and therefore unable to %INCLUDE the member 
+       (etlmacro.sas).
+5          %global etlerr;
+6          %let etlerr=0;
+7          
+8          %macro etlinit;
+9          proc datasets lib=rdbdata nolist;
+10         	delete 	
+11         		condition
+12         		codeset
+13         	;
+14         run;
+15         quit;
+16         %mend etlinit;
+17         %etlinit;
+ERROR: Libname RDBDATA is not assigned.
+
+NOTE: Statements not processed because of errors noted above.
+NOTE: PROCEDURE DATASETS used (Total process time):
+      real time           0.40 seconds
+      cpu time            0.00 seconds
+      
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: SAS set option OBS=0 and will continue to check statements. 
+      This might cause NOTE: No observations in data set.
+18         %macro checkerr;
+19         	%if &syserr > 4 %then %let etlerr=%eval(&etlerr+1);
+20         	%put syserr=&syserr;
+2                                           The SAS System           12:42 Thursday, December 14, 2023
+
+21         	%if &etlerr !=0 %then %do;
+22         		%put dataset=&syslast;
+23         		%put syserr=&syserr;
+24         	%end;
+25         %mend checkerr;
+26         
+27         
+28         %macro MasterEtl;
+29         
+30         
+31         %if  %SYSFUNC(LIBREF(nbs_ods)) NE 0 %then %goto liberr;
+32         %if  %SYSFUNC(LIBREF(nbs_srt)) NE 0 %then %goto liberr;
+33         %if  %SYSFUNC(LIBREF(nbs_rdb)) NE 0 %then %goto liberr;
+34         %if  %SYSFUNC(LIBREF(nbsfmt)) NE 0 %then %goto liberr;
+35         
+36         data rdbdata.codeset;
+37         set nbs_rdb.codeset;
+38         run;
+39         data _null_;
+40         if 0 then set rdbdata.codeset nobs=codeset_nobs;
+41         call symput('codeset_nobs', put(codeset_nobs,22.));
+42         stop;
+43         run;
+44         %if &codeset_nobs =0 %then %do;
+45         %put &codeset_nobs;
+46         
+47         Data _Null_;
+48         	format Time Datetime20.;
+49         	Time=datetime();
+50         	put '	Start Time:   ' Time   Datetime20.;
+51         	put '*****The Start codeset*********';
+52         run;
+53         %include etlpgm (codeset.sas);
+54         %end;
+55         Data _Null_;
+56         	format Time1 Datetime20.;
+57         	Time1=datetime();
+58         	put '	End Time:   ' Time1   Datetime20.;
+59         	put '*****The End codeset*********';
+60         run;
+61         Data _Null_;
+62         	format Time Datetime20.;
+63         	Time=datetime();
+64         	put '	Start Time:   ' Time   Datetime20.;
+65         	put '*****The Start etlformat*********';
+66         run;
+67         %include etlpgm (etlformat.sas);
+68         Data _Null_;
+69         	format Time1 Datetime20.;
+70         	Time1=datetime();
+71         	put '	End Time:   ' Time1   Datetime20.;
+72         	put '*****The End etlformat*********';
+73         run;
+74         
+3                                           The SAS System           12:42 Thursday, December 14, 2023
+
+75         
+76         %include "&SAS_REPORT_HOME/custom/Custom_controller.sas";
+77         
+78         %goto finish;
+79         
+80         %liberr:
+81         	%put Libname statement error &syslibrc &SYSMSG ;
+82         	%let etlerr=1;	
+83         
+84         %finish:
+85         
+86         /*need to put more checking here*/
+87         Data _Null_;
+88         	length Etlmsg $20.;
+89         	if  &etlerr = 0
+90         		then Etlmsg='Successful';
+91         		else  Etlmsg='Incomplete';
+92         	put 'ETL Process Status: '  Etlmsg $char20.;
+93         
+94         	format Start_Time End_Time Datetime20. Total_Time TOD8.;
+95         	Start_Time=input("&SYSDATE9"||' '||"&SYSTIME",DATETIME20.);
+96         	End_Time=datetime();
+97         	Total_Time=End_Time-Start_time;
+98         	put 'ETL Processing Time:';
+99         	put '	Start Time: ' Start_Time Datetime20.;
+100        	put '	End Time:   ' End_Time   Datetime20.;
+101        	put '	Total Time: ' Total_Time time8.;
+102        	put '*****The End*********';
+103        run;
+104        
+105        data rdbdata.etlstatus;
+106        format etlendtime datetime20.;
+107        etlendtime=datetime();
+108        run;
+109        %mend MasterEtl;
+110        %MasterEtl;
+Libname statement error 0
+
+
+
+NOTE: DATA statement used (Total process time):
+      real time           0.20 seconds
+      cpu time            0.00 seconds
+      
+
+
+ERROR: Libname RDBDATA is not assigned.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+
+111        
+112        %put &etlerr;
+4                                           The SAS System           12:42 Thursday, December 14, 2023
+
+1
+ERROR: Errors printed on pages 1,3.
+
+NOTE: SAS Institute Inc., SAS Campus Drive, Cary, NC USA 27513-2414
+NOTE: The SAS System used:
+      real time           3.63 seconds
+      cpu time            0.37 seconds
+      

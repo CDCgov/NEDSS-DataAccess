@@ -1,0 +1,2898 @@
+1                                           The SAS System          12:41 Wednesday, December 13, 2023
+
+NOTE: Copyright (c) 2002-2010 by SAS Institute Inc., Cary, NC, USA. 
+NOTE: SAS (r) Proprietary Software 9.3 (TS1M2) 
+      Licensed to GENERAL DYNAMICS IT INC/CDC NEDSS 2, Site 70238317.
+NOTE: This session is executing on the X64_DSRV12  platform.
+
+
+
+NOTE: Enhanced analytical products:
+
+SAS/ETS 12.1
+
+NOTE: SAS initialization used:
+      real time           0.42 seconds
+      cpu time            0.31 seconds
+      
+
+NOTE: AUTOEXEC processing beginning; file is 
+      D:\wildfly-10.0.0.Final\nedssdomain\Nedss\report\autoexec.sas.
+
+NOTE: Libref RDBDATA was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: D:\wildfly-10.0.0.Final\nedssdomain\Nedss\report\dw\etl\rdbdata
+NOTE: Libref NBSFMT was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: D:\wildfly-10.0.0.Final\nedssdomain\Nedss\report\format
+NOTE: The V6 engine on this host is limited to read-only access of SAS data files without index 
+      optimization.  V6 data files cannot be created or updated and V6 catalogs cannot be read.
+NOTE: Libref LIBRARY was successfully assigned as follows: 
+      Engine:        V6 
+      Physical Name: D:\wildfly-10.0.0.Final\nedssdomain\Nedss\report\metadata
+
+NOTE: AUTOEXEC processing completed.
+
+1          %etllib;
+NOTE: Libref NBS_ODS was successfully assigned as follows: 
+      Engine:        ODBC 
+      Physical Name: nedss1
+NOTE: Libref NBS_SRT was successfully assigned as follows: 
+      Engine:        ODBC 
+      Physical Name: nbs_srt
+NOTE: Libref NBS_RDB was successfully assigned as follows: 
+      Engine:        ODBC 
+      Physical Name: nbs_rdb
+2          OPTIONS COMPRESS=YES;
+3          options fmtsearch=(nbsfmt);
+4          %include etlpgm(etlmacro.sas);
+2645       %global etlerr;
+2646       %let etlerr=0;
+2647       
+2648       %macro etlinit;
+2649       proc datasets lib=rdbdata nolist;
+2650       	delete 	
+2651       		condition
+2652       	
+2                                           The SAS System          12:41 Wednesday, December 13, 2023
+
+2653       	;
+2654       run;
+2655       quit;
+2656       %mend etlinit;
+2657       %etlinit;
+
+NOTE: Deleting RDBDATA.CONDITION (memtype=DATA).
+
+NOTE: PROCEDURE DATASETS used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.03 seconds
+      
+
+2658       %macro checkerr;
+2659       	%if &syserr > 4 %then %let etlerr=%eval(&etlerr+1);
+2660       	%put syserr=&syserr;
+2661       	%if &etlerr !=0 %then %do;
+2662       		%put dataset=&syslast;
+2663       		%put syserr=&syserr;
+2664       	%end;
+2665       %mend checkerr;
+2666       
+2667       
+2668       %macro MasterEtl;
+2669       
+2670       
+2671       %if  %SYSFUNC(LIBREF(nbs_ods)) NE 0 %then %goto liberr;
+2672       %if  %SYSFUNC(LIBREF(nbs_srt)) NE 0 %then %goto liberr;
+2673       %if  %SYSFUNC(LIBREF(nbs_rdb)) NE 0 %then %goto liberr;
+2674       %if  %SYSFUNC(LIBREF(nbsfmt)) NE 0 %then %goto liberr;
+2675       
+2676       data rdbdata.codeset;
+2677       set nbs_rdb.codeset;
+2678       run;
+2679       data _null_;
+2680       if 0 then set rdbdata.codeset nobs=codeset_nobs;
+2681       call symput('codeset_nobs', put(codeset_nobs,22.));
+2682       stop;
+2683       run;
+2684       %if &codeset_nobs =0 %then %do;
+2685       %put &codeset_nobs;
+2686       
+2687       Data _Null_;
+2688       	format Time Datetime20.;
+2689       	Time=datetime();
+2690       	put '	Start Time:   ' Time   Datetime20.;
+2691       	put '*****The Start codeset*********';
+2692       run;
+2693       %include etlpgm (codeset.sas);
+2694       %end;
+2695       Data _Null_;
+2696       	format Time1 Datetime20.;
+2697       	Time1=datetime();
+2698       	put '	End Time:   ' Time1   Datetime20.;
+3                                           The SAS System          12:41 Wednesday, December 13, 2023
+
+2699       	put '*****The End codeset*********';
+2700       run;
+2701       Data _Null_;
+2702       	format Time Datetime20.;
+2703       	Time=datetime();
+2704       	put '	Start Time:   ' Time   Datetime20.;
+2705       	put '*****The Start etlformat*********';
+2706       run;
+2707       %include etlpgm(etlformat.sas);
+2708       Data _Null_;
+2709       	format Time1 Datetime20.;
+2710       	Time1=datetime();
+2711       	put '	End Time:   ' Time1   Datetime20.;
+2712       	put '*****The End etlformat*********';
+2713       run;
+2714       Data _Null_;
+2715       	format Time Datetime20.;
+2716       	Time=datetime();
+2717       	put '	Start Time:   ' Time   Datetime20.;
+2718       	put '*****The Start ConditionDim*********';
+2719       run;
+2720       %include etlpgm(ConditionDim.sas);
+2721       Data _Null_;
+2722       	format Time1 Datetime20.;
+2723       	Time1=datetime();
+2724       	put '	End Time:   ' Time1   Datetime20.;
+2725       	put '*****The End ConditionDim*********';
+2726       run;
+2727       
+2728       
+2729       %include "&SAS_REPORT_HOME/custom/Custom_controller.sas";
+2730       
+2731       %goto finish;
+2732       
+2733       %liberr:
+2734       	%put Libname statement error &syslibrc &SYSMSG ;
+2735       	%let etlerr=1;	
+2736       
+2737       %finish:
+2738       
+2739       /*need to put more checking here*/
+2740       Data _Null_;
+2741       	length Etlmsg $20.;
+2742       	if  &etlerr = 0
+2743       		then Etlmsg='Successful';
+2744       		else  Etlmsg='Incomplete';
+2745       	put 'ETL Process Status: '  Etlmsg $char20.;
+2746       
+2747       	format Start_Time End_Time Datetime20. Total_Time TOD8.;
+2748       	Start_Time=input("&SYSDATE9"||' '||"&SYSTIME",DATETIME20.);
+2749       	End_Time=datetime();
+2750       	Total_Time=End_Time-Start_time;
+2751       	put 'ETL Processing Time:';
+2752       	put '	Start Time: ' Start_Time Datetime20.;
+4                                           The SAS System          12:41 Wednesday, December 13, 2023
+
+2753       	put '	End Time:   ' End_Time   Datetime20.;
+2754       	put '	Total Time: ' Total_Time time8.;
+2755       	put '*****The End*********';
+2756       run;
+2757       
+2758       data rdbdata.etlstatus;
+2759       format etlendtime datetime20.;
+2760       etlendtime=datetime();
+2761       run;
+2762       %mend MasterEtl;
+2763       %MasterEtl;
+
+NOTE: There were 1171 observations read from the data set NBS_RDB.codeset.
+NOTE: The data set RDBDATA.CODESET has 1171 observations and 8 variables.
+NOTE: Compressing data set RDBDATA.CODESET decreased size by 82.69 percent. 
+      Compressed is 9 pages; un-compressed would require 52 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+
+
+	End Time:     13DEC2023:12:41:29
+*****The End codeset*********
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+	Start Time:     13DEC2023:12:41:29
+*****The Start etlformat*********
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1171 observations read from the data set RDBDATA.CODESET.
+NOTE: The data set WORK.CD2COL has 1171 observations and 4 variables.
+NOTE: Compressing data set WORK.CD2COL decreased size by 11.11 percent. 
+      Compressed is 16 pages; un-compressed would require 18 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Format $COL_NM is already on the library.
+5                                           The SAS System          12:41 Wednesday, December 13, 2023
+
+NOTE: Format $COL_NM has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+NOTE: There were 1171 observations read from the data set WORK.CD2COL.
+
+
+NOTE: There were 567 observations read from the data set RDBDATA.CODESET.
+      WHERE code_set_nm not = ' ';
+NOTE: The data set WORK.CD2CODESET has 567 observations and 5 variables.
+NOTE: Compressing data set WORK.CD2CODESET decreased size by 75.00 percent. 
+      Compressed is 3 pages; un-compressed would require 12 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Format $TYPEFMT is already on the library.
+NOTE: Format $TYPEFMT has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.02 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 567 observations read from the data set WORK.CD2CODESET.
+
+WARNING: Extraneous text on %MEND statement ignored for macro definition REVERSE_PROCESS_FORMAT.
+
+NOTE: There were 27 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='PRVDR_DIAGNOSIS_STD';
+NOTE: The data set WORK.REV_PRVDR_DIAGNOSIS_STD has 27 observations and 4 variables.
+NOTE: Compressing data set WORK.REV_PRVDR_DIAGNOSIS_STD increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $R_NBS166F is already on the library.
+NOTE: Format $R_NBS166F has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 27 observations read from the data set WORK.REV_PRVDR_DIAGNOSIS_STD.
+
+NOTE: Compressing data set WORK.CVG decreased size by 83.36 percent. 
+      Compressed is 102 pages; un-compressed would require 613 pages.
+NOTE: Table WORK.CVG created, with 26346 rows and 3 columns.
+
+NOTE: PROCEDURE SQL used (Total process time):
+6                                           The SAS System          12:41 Wednesday, December 13, 2023
+
+      real time           0.12 seconds
+      cpu time            0.09 seconds
+      
+
+
+NOTE: There were 26346 observations read from the data set WORK.CVG.
+NOTE: 0 observations with duplicate key values were deleted.
+NOTE: The data set WORK.CVG has 26346 observations and 3 variables.
+NOTE: Compressing data set WORK.CVG decreased size by 83.36 percent. 
+      Compressed is 102 pages; un-compressed would require 613 pages.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.09 seconds
+      cpu time            0.09 seconds
+      
+
+NOTE: The "<>" operator is interpreted as "not equals".
+NOTE: Compressing data set WORK.CVGFMT decreased size by 69.41 percent. 
+      Compressed is 26 pages; un-compressed would require 85 pages.
+NOTE: Table WORK.CVGFMT created, with 5409 rows and 4 columns.
+
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.04 seconds
+      cpu time            0.03 seconds
+      
+
+NOTE: Format $BMD100F is already on the library.
+NOTE: Format $BMD100F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD103F is already on the library.
+NOTE: Format $BMD103F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD105F is already on the library.
+NOTE: Format $BMD105F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD107F is already on the library.
+NOTE: Format $BMD107F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD109F is already on the library.
+NOTE: Format $BMD109F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD111F is already on the library.
+NOTE: Format $BMD111F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD112F is already on the library.
+NOTE: Format $BMD112F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD113F is already on the library.
+NOTE: Format $BMD113F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD118F is already on the library.
+NOTE: Format $BMD118F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD120F is already on the library.
+NOTE: Format $BMD120F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD121F is already on the library.
+NOTE: Format $BMD121F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD122F is already on the library.
+NOTE: Format $BMD122F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD125F is already on the library.
+NOTE: Format $BMD125F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD126F is already on the library.
+NOTE: Format $BMD126F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD127F is already on the library.
+7                                           The SAS System          12:41 Wednesday, December 13, 2023
+
+NOTE: Format $BMD127F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD131F is already on the library.
+NOTE: Format $BMD131F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD132F is already on the library.
+NOTE: Format $BMD132F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD133F is already on the library.
+NOTE: Format $BMD133F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD135F is already on the library.
+NOTE: Format $BMD135F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD137F is already on the library.
+NOTE: Format $BMD137F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD138F is already on the library.
+NOTE: Format $BMD138F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD139F is already on the library.
+NOTE: Format $BMD139F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD140F is already on the library.
+NOTE: Format $BMD140F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD142F is already on the library.
+NOTE: Format $BMD142F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD144F is already on the library.
+NOTE: Format $BMD144F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD145F is already on the library.
+NOTE: Format $BMD145F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD147F is already on the library.
+NOTE: Format $BMD147F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD149F is already on the library.
+NOTE: Format $BMD149F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD150F is already on the library.
+NOTE: Format $BMD150F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD151F is already on the library.
+NOTE: Format $BMD151F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD161F is already on the library.
+NOTE: Format $BMD161F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD164F is already on the library.
+NOTE: Format $BMD164F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD165F is already on the library.
+NOTE: Format $BMD165F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD166F is already on the library.
+NOTE: Format $BMD166F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD169F is already on the library.
+NOTE: Format $BMD169F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD171F is already on the library.
+NOTE: Format $BMD171F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD175F is already on the library.
+NOTE: Format $BMD175F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD177F is already on the library.
+NOTE: Format $BMD177F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD208F is already on the library.
+NOTE: Format $BMD208F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD210F is already on the library.
+NOTE: Format $BMD210F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD212F is already on the library.
+NOTE: Format $BMD212F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD213F is already on the library.
+8                                           The SAS System          12:41 Wednesday, December 13, 2023
+
+NOTE: Format $BMD213F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD214F is already on the library.
+NOTE: Format $BMD214F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD215F is already on the library.
+NOTE: Format $BMD215F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD217F is already on the library.
+NOTE: Format $BMD217F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD218F is already on the library.
+NOTE: Format $BMD218F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD221F is already on the library.
+NOTE: Format $BMD221F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD223F is already on the library.
+NOTE: Format $BMD223F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD230F is already on the library.
+NOTE: Format $BMD230F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD232F is already on the library.
+NOTE: Format $BMD232F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD233F is already on the library.
+NOTE: Format $BMD233F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD234F is already on the library.
+NOTE: Format $BMD234F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD235F is already on the library.
+NOTE: Format $BMD235F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD236F is already on the library.
+NOTE: Format $BMD236F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD238F is already on the library.
+NOTE: Format $BMD238F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD239F is already on the library.
+NOTE: Format $BMD239F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD244F is already on the library.
+NOTE: Format $BMD244F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD245F is already on the library.
+NOTE: Format $BMD245F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD246F is already on the library.
+NOTE: Format $BMD246F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD248F is already on the library.
+NOTE: Format $BMD248F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD249F is already on the library.
+NOTE: Format $BMD249F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD251F is already on the library.
+NOTE: Format $BMD251F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD252F is already on the library.
+NOTE: Format $BMD252F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD253F is already on the library.
+NOTE: Format $BMD253F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD255F is already on the library.
+NOTE: Format $BMD255F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD256F is already on the library.
+NOTE: Format $BMD256F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD257F is already on the library.
+NOTE: Format $BMD257F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD258F is already on the library.
+NOTE: Format $BMD258F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD260F is already on the library.
+9                                           The SAS System          12:41 Wednesday, December 13, 2023
+
+NOTE: Format $BMD260F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD261F is already on the library.
+NOTE: Format $BMD261F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD266F is already on the library.
+NOTE: Format $BMD266F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD269F is already on the library.
+NOTE: Format $BMD269F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD271F is already on the library.
+NOTE: Format $BMD271F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD272F is already on the library.
+NOTE: Format $BMD272F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD274F is already on the library.
+NOTE: Format $BMD274F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD275F is already on the library.
+NOTE: Format $BMD275F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD278F is already on the library.
+NOTE: Format $BMD278F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD280F is already on the library.
+NOTE: Format $BMD280F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD282F is already on the library.
+NOTE: Format $BMD282F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD284F is already on the library.
+NOTE: Format $BMD284F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD292F is already on the library.
+NOTE: Format $BMD292F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD295F is already on the library.
+NOTE: Format $BMD295F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD300F is already on the library.
+NOTE: Format $BMD300F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD308F is already on the library.
+NOTE: Format $BMD308F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD312F is already on the library.
+NOTE: Format $BMD312F has been written to NBSFMT.FORMATS.
+NOTE: Format $BMD313F is already on the library.
+NOTE: Format $BMD313F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS007F is already on the library.
+NOTE: Format $CRS007F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS011AF is already on the library.
+NOTE: Format $CRS011AF has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS014F is already on the library.
+NOTE: Format $CRS014F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS015F is already on the library.
+NOTE: Format $CRS015F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS016F is already on the library.
+NOTE: Format $CRS016F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS017F is already on the library.
+NOTE: Format $CRS017F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS018F is already on the library.
+NOTE: Format $CRS018F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS019F is already on the library.
+NOTE: Format $CRS019F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS020F is already on the library.
+NOTE: Format $CRS020F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS022F is already on the library.
+10                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+NOTE: Format $CRS022F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS024F is already on the library.
+NOTE: Format $CRS024F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS027F is already on the library.
+NOTE: Format $CRS027F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS028F is already on the library.
+NOTE: Format $CRS028F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS030F is already on the library.
+NOTE: Format $CRS030F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS031F is already on the library.
+NOTE: Format $CRS031F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS032F is already on the library.
+NOTE: Format $CRS032F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS033F is already on the library.
+NOTE: Format $CRS033F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS034F is already on the library.
+NOTE: Format $CRS034F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS035F is already on the library.
+NOTE: Format $CRS035F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS036F is already on the library.
+NOTE: Format $CRS036F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS037F is already on the library.
+NOTE: Format $CRS037F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS038F is already on the library.
+NOTE: Format $CRS038F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS039F is already on the library.
+NOTE: Format $CRS039F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS040F is already on the library.
+NOTE: Format $CRS040F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS041F is already on the library.
+NOTE: Format $CRS041F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS042F is already on the library.
+NOTE: Format $CRS042F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS049F is already on the library.
+NOTE: Format $CRS049F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS050F is already on the library.
+NOTE: Format $CRS050F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS052F is already on the library.
+NOTE: Format $CRS052F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS053F is already on the library.
+NOTE: Format $CRS053F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS055F is already on the library.
+NOTE: Format $CRS055F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS056F is already on the library.
+NOTE: Format $CRS056F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS059F is already on the library.
+NOTE: Format $CRS059F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS060F is already on the library.
+NOTE: Format $CRS060F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS062F is already on the library.
+NOTE: Format $CRS062F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS064F is already on the library.
+NOTE: Format $CRS064F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS065F is already on the library.
+11                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+NOTE: Format $CRS065F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS067F is already on the library.
+NOTE: Format $CRS067F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS069F is already on the library.
+NOTE: Format $CRS069F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS070F is already on the library.
+NOTE: Format $CRS070F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS072F is already on the library.
+NOTE: Format $CRS072F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS073F is already on the library.
+NOTE: Format $CRS073F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS074F is already on the library.
+NOTE: Format $CRS074F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS077F is already on the library.
+NOTE: Format $CRS077F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS085F is already on the library.
+NOTE: Format $CRS085F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS087F is already on the library.
+NOTE: Format $CRS087F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS088F is already on the library.
+NOTE: Format $CRS088F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS090F is already on the library.
+NOTE: Format $CRS090F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS091F is already on the library.
+NOTE: Format $CRS091F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS093F is already on the library.
+NOTE: Format $CRS093F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS095F is already on the library.
+NOTE: Format $CRS095F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS096F is already on the library.
+NOTE: Format $CRS096F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS097F is already on the library.
+NOTE: Format $CRS097F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS100F is already on the library.
+NOTE: Format $CRS100F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS105F is already on the library.
+NOTE: Format $CRS105F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS106F is already on the library.
+NOTE: Format $CRS106F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS139F is already on the library.
+NOTE: Format $CRS139F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS140F is already on the library.
+NOTE: Format $CRS140F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS142F is already on the library.
+NOTE: Format $CRS142F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS147F is already on the library.
+NOTE: Format $CRS147F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS149F is already on the library.
+NOTE: Format $CRS149F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS151F is already on the library.
+NOTE: Format $CRS151F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS153F is already on the library.
+NOTE: Format $CRS153F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS161F is already on the library.
+12                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+NOTE: Format $CRS161F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS172F is already on the library.
+NOTE: Format $CRS172F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS175F is already on the library.
+NOTE: Format $CRS175F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS176F is already on the library.
+NOTE: Format $CRS176F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS177F is already on the library.
+NOTE: Format $CRS177F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS178F is already on the library.
+NOTE: Format $CRS178F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS179F is already on the library.
+NOTE: Format $CRS179F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS180F is already on the library.
+NOTE: Format $CRS180F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS182F is already on the library.
+NOTE: Format $CRS182F has been written to NBSFMT.FORMATS.
+NOTE: Format $CRS183F is already on the library.
+NOTE: Format $CRS183F has been written to NBSFMT.FORMATS.
+NOTE: Format $DEM100F is already on the library.
+NOTE: Format $DEM100F has been written to NBSFMT.FORMATS.
+NOTE: Format $DEM101F is already on the library.
+NOTE: Format $DEM101F has been written to NBSFMT.FORMATS.
+NOTE: Format $DEM107F is already on the library.
+NOTE: Format $DEM107F has been written to NBSFMT.FORMATS.
+NOTE: Format $DEM108F is already on the library.
+NOTE: Format $DEM108F has been written to NBSFMT.FORMATS.
+NOTE: Format $DEM113F is already on the library.
+NOTE: Format $DEM113F has been written to NBSFMT.FORMATS.
+NOTE: Format $DEM114F is already on the library.
+NOTE: Format $DEM114F has been written to NBSFMT.FORMATS.
+NOTE: Format $DEM116F is already on the library.
+NOTE: Format $DEM116F has been written to NBSFMT.FORMATS.
+NOTE: Format $DEM127F is already on the library.
+NOTE: Format $DEM127F has been written to NBSFMT.FORMATS.
+NOTE: Format $DEM137F is already on the library.
+NOTE: Format $DEM137F has been written to NBSFMT.FORMATS.
+NOTE: Format $DEM140F is already on the library.
+NOTE: Format $DEM140F has been written to NBSFMT.FORMATS.
+NOTE: Format $DEM144F is already on the library.
+NOTE: Format $DEM144F has been written to NBSFMT.FORMATS.
+NOTE: Format $DEM146F is already on the library.
+NOTE: Format $DEM146F has been written to NBSFMT.FORMATS.
+NOTE: Format $DEM155F is already on the library.
+NOTE: Format $DEM155F has been written to NBSFMT.FORMATS.
+NOTE: Format $DEM156F is already on the library.
+NOTE: Format $DEM156F has been written to NBSFMT.FORMATS.
+NOTE: Format $DEM158F is already on the library.
+NOTE: Format $DEM158F has been written to NBSFMT.FORMATS.
+NOTE: Format $DEM164F is already on the library.
+NOTE: Format $DEM164F has been written to NBSFMT.FORMATS.
+NOTE: Format $DEM176F is already on the library.
+NOTE: Format $DEM176F has been written to NBSFMT.FORMATS.
+NOTE: Format $DEM178F is already on the library.
+13                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+NOTE: Format $DEM178F has been written to NBSFMT.FORMATS.
+NOTE: Format $DEM218F is already on the library.
+NOTE: Format $DEM218F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP100F is already on the library.
+NOTE: Format $HEP100F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP102F is already on the library.
+NOTE: Format $HEP102F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP104F is already on the library.
+NOTE: Format $HEP104F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP106F is already on the library.
+NOTE: Format $HEP106F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP108F is already on the library.
+NOTE: Format $HEP108F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP110F is already on the library.
+NOTE: Format $HEP110F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP111F is already on the library.
+NOTE: Format $HEP111F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP112F is already on the library.
+NOTE: Format $HEP112F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP113F is already on the library.
+NOTE: Format $HEP113F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP114F is already on the library.
+NOTE: Format $HEP114F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP115F is already on the library.
+NOTE: Format $HEP115F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP117F is already on the library.
+NOTE: Format $HEP117F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP118F is already on the library.
+NOTE: Format $HEP118F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP119F is already on the library.
+NOTE: Format $HEP119F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP120F is already on the library.
+NOTE: Format $HEP120F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP127F is already on the library.
+NOTE: Format $HEP127F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP129F is already on the library.
+NOTE: Format $HEP129F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP130F is already on the library.
+NOTE: Format $HEP130F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP132F is already on the library.
+NOTE: Format $HEP132F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP133F is already on the library.
+NOTE: Format $HEP133F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP134F is already on the library.
+NOTE: Format $HEP134F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP135F is already on the library.
+NOTE: Format $HEP135F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP136F is already on the library.
+NOTE: Format $HEP136F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP137F is already on the library.
+NOTE: Format $HEP137F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP138F is already on the library.
+NOTE: Format $HEP138F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP139F is already on the library.
+14                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+NOTE: Format $HEP139F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP141F is already on the library.
+NOTE: Format $HEP141F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP143F is already on the library.
+NOTE: Format $HEP143F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP144F is already on the library.
+NOTE: Format $HEP144F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP146F is already on the library.
+NOTE: Format $HEP146F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP147F is already on the library.
+NOTE: Format $HEP147F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP148F is already on the library.
+NOTE: Format $HEP148F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP150F is already on the library.
+NOTE: Format $HEP150F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP152F is already on the library.
+NOTE: Format $HEP152F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP153F is already on the library.
+NOTE: Format $HEP153F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP155F is already on the library.
+NOTE: Format $HEP155F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP156F is already on the library.
+NOTE: Format $HEP156F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP157F is already on the library.
+NOTE: Format $HEP157F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP159F is already on the library.
+NOTE: Format $HEP159F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP160F is already on the library.
+NOTE: Format $HEP160F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP161F is already on the library.
+NOTE: Format $HEP161F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP162F is already on the library.
+NOTE: Format $HEP162F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP163F is already on the library.
+NOTE: Format $HEP163F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP165F is already on the library.
+NOTE: Format $HEP165F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP167F is already on the library.
+NOTE: Format $HEP167F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP168F is already on the library.
+NOTE: Format $HEP168F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP169F is already on the library.
+NOTE: Format $HEP169F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP170F is already on the library.
+NOTE: Format $HEP170F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP171F is already on the library.
+NOTE: Format $HEP171F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP172F is already on the library.
+NOTE: Format $HEP172F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP174F is already on the library.
+NOTE: Format $HEP174F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP175F is already on the library.
+NOTE: Format $HEP175F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP177F is already on the library.
+15                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+NOTE: Format $HEP177F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP178F is already on the library.
+NOTE: Format $HEP178F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP179F is already on the library.
+NOTE: Format $HEP179F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP180F is already on the library.
+NOTE: Format $HEP180F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP181F is already on the library.
+NOTE: Format $HEP181F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP182F is already on the library.
+NOTE: Format $HEP182F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP183F is already on the library.
+NOTE: Format $HEP183F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP186F is already on the library.
+NOTE: Format $HEP186F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP187F is already on the library.
+NOTE: Format $HEP187F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP188F is already on the library.
+NOTE: Format $HEP188F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP190F is already on the library.
+NOTE: Format $HEP190F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP191F is already on the library.
+NOTE: Format $HEP191F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP192F is already on the library.
+NOTE: Format $HEP192F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP193F is already on the library.
+NOTE: Format $HEP193F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP195F is already on the library.
+NOTE: Format $HEP195F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP196F is already on the library.
+NOTE: Format $HEP196F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP197F is already on the library.
+NOTE: Format $HEP197F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP199F is already on the library.
+NOTE: Format $HEP199F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP200F is already on the library.
+NOTE: Format $HEP200F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP201F is already on the library.
+NOTE: Format $HEP201F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP202F is already on the library.
+NOTE: Format $HEP202F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP203F is already on the library.
+NOTE: Format $HEP203F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP204F is already on the library.
+NOTE: Format $HEP204F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP206F is already on the library.
+NOTE: Format $HEP206F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP207F is already on the library.
+NOTE: Format $HEP207F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP209F is already on the library.
+NOTE: Format $HEP209F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP210F is already on the library.
+NOTE: Format $HEP210F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP211F is already on the library.
+16                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+NOTE: Format $HEP211F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP212F is already on the library.
+NOTE: Format $HEP212F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP213F is already on the library.
+NOTE: Format $HEP213F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP215F is already on the library.
+NOTE: Format $HEP215F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP217F is already on the library.
+NOTE: Format $HEP217F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP218F is already on the library.
+NOTE: Format $HEP218F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP219F is already on the library.
+NOTE: Format $HEP219F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP220F is already on the library.
+NOTE: Format $HEP220F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP221F is already on the library.
+NOTE: Format $HEP221F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP222F is already on the library.
+NOTE: Format $HEP222F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP223F is already on the library.
+NOTE: Format $HEP223F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP226F is already on the library.
+NOTE: Format $HEP226F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP227F is already on the library.
+NOTE: Format $HEP227F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP228F is already on the library.
+NOTE: Format $HEP228F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP229F is already on the library.
+NOTE: Format $HEP229F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP230F is already on the library.
+NOTE: Format $HEP230F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP231F is already on the library.
+NOTE: Format $HEP231F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP233F is already on the library.
+NOTE: Format $HEP233F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP234F is already on the library.
+NOTE: Format $HEP234F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP235F is already on the library.
+NOTE: Format $HEP235F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP236F is already on the library.
+NOTE: Format $HEP236F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP238F is already on the library.
+NOTE: Format $HEP238F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP240F is already on the library.
+NOTE: Format $HEP240F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP241F is already on the library.
+NOTE: Format $HEP241F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP243F is already on the library.
+NOTE: Format $HEP243F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP244F is already on the library.
+NOTE: Format $HEP244F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP246F is already on the library.
+NOTE: Format $HEP246F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP250F is already on the library.
+17                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+NOTE: Format $HEP250F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP252F is already on the library.
+NOTE: Format $HEP252F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP253F is already on the library.
+NOTE: Format $HEP253F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP257F is already on the library.
+NOTE: Format $HEP257F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP263F is already on the library.
+NOTE: Format $HEP263F has been written to NBSFMT.FORMATS.
+NOTE: Format $HEP264F is already on the library.
+NOTE: Format $HEP264F has been written to NBSFMT.FORMATS.
+NOTE: Format $INV109F is already on the library.
+NOTE: Format $INV109F has been written to NBSFMT.FORMATS.
+NOTE: Format $INV112F is already on the library.
+NOTE: Format $INV112F has been written to NBSFMT.FORMATS.
+NOTE: Format $INV128NF is already on the library.
+NOTE: Format $INV128NF has been written to NBSFMT.FORMATS.
+NOTE: Format $INV128F is already on the library.
+NOTE: Format $INV128F has been written to NBSFMT.FORMATS.
+NOTE: Format $INV131F is already on the library.
+NOTE: Format $INV131F has been written to NBSFMT.FORMATS.
+NOTE: Format $INV140F is already on the library.
+NOTE: Format $INV140F has been written to NBSFMT.FORMATS.
+NOTE: Format $INV144NF is already on the library.
+NOTE: Format $INV144NF has been written to NBSFMT.FORMATS.
+NOTE: Format $INV144F is already on the library.
+NOTE: Format $INV144F has been written to NBSFMT.FORMATS.
+NOTE: Format $INV145NF is already on the library.
+NOTE: Format $INV145NF has been written to NBSFMT.FORMATS.
+NOTE: Format $INV145F is already on the library.
+NOTE: Format $INV145F has been written to NBSFMT.FORMATS.
+NOTE: Format $INV148NF is already on the library.
+NOTE: Format $INV148NF has been written to NBSFMT.FORMATS.
+NOTE: Format $INV148F is already on the library.
+NOTE: Format $INV148F has been written to NBSFMT.FORMATS.
+NOTE: Format $INV149NF is already on the library.
+NOTE: Format $INV149NF has been written to NBSFMT.FORMATS.
+NOTE: Format $INV149F is already on the library.
+NOTE: Format $INV149F has been written to NBSFMT.FORMATS.
+NOTE: Format $INV150F is already on the library.
+NOTE: Format $INV150F has been written to NBSFMT.FORMATS.
+NOTE: Format $INV151F is already on the library.
+NOTE: Format $INV151F has been written to NBSFMT.FORMATS.
+NOTE: Format $INV152F is already on the library.
+NOTE: Format $INV152F has been written to NBSFMT.FORMATS.
+NOTE: Format $INV153NF is already on the library.
+NOTE: Format $INV153NF has been written to NBSFMT.FORMATS.
+NOTE: Format $INV154NF is already on the library.
+NOTE: Format $INV154NF has been written to NBSFMT.FORMATS.
+NOTE: Format $INV157F is already on the library.
+NOTE: Format $INV157F has been written to NBSFMT.FORMATS.
+NOTE: Format $INV159F is already on the library.
+NOTE: Format $INV159F has been written to NBSFMT.FORMATS.
+NOTE: Format $INV161F is already on the library.
+18                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+NOTE: Format $INV161F has been written to NBSFMT.FORMATS.
+NOTE: Format $INV163F is already on the library.
+NOTE: Format $INV163F has been written to NBSFMT.FORMATS.
+NOTE: Format $INV174F is already on the library.
+NOTE: Format $INV174F has been written to NBSFMT.FORMATS.
+NOTE: Format $INV178NF is already on the library.
+NOTE: Format $INV178NF has been written to NBSFMT.FORMATS.
+NOTE: Format $INV178F is already on the library.
+NOTE: Format $INV178F has been written to NBSFMT.FORMATS.
+NOTE: Format $INV179F is already on the library.
+NOTE: Format $INV179F has been written to NBSFMT.FORMATS.
+NOTE: Format $LAB115F is already on the library.
+NOTE: Format $LAB115F has been written to NBSFMT.FORMATS.
+NOTE: Format $LAB118F is already on the library.
+NOTE: Format $LAB118F has been written to NBSFMT.FORMATS.
+NOTE: Format $LAB165F is already on the library.
+NOTE: Format $LAB165F has been written to NBSFMT.FORMATS.
+NOTE: Format $LAB166F is already on the library.
+NOTE: Format $LAB166F has been written to NBSFMT.FORMATS.
+NOTE: Format $LAB189F is already on the library.
+NOTE: Format $LAB189F has been written to NBSFMT.FORMATS.
+NOTE: Format $LAB196F is already on the library.
+NOTE: Format $LAB196F has been written to NBSFMT.FORMATS.
+NOTE: Format $LAB207F is already on the library.
+NOTE: Format $LAB207F has been written to NBSFMT.FORMATS.
+NOTE: Format $LAB222F is already on the library.
+NOTE: Format $LAB222F has been written to NBSFMT.FORMATS.
+NOTE: Format $MAT100F is already on the library.
+NOTE: Format $MAT100F has been written to NBSFMT.FORMATS.
+NOTE: Format $MAT103F is already on the library.
+NOTE: Format $MAT103F has been written to NBSFMT.FORMATS.
+NOTE: Format $MAT107F is already on the library.
+NOTE: Format $MAT107F has been written to NBSFMT.FORMATS.
+NOTE: Format $MAT110F is already on the library.
+NOTE: Format $MAT110F has been written to NBSFMT.FORMATS.
+NOTE: Format $MAT112F is already on the library.
+NOTE: Format $MAT112F has been written to NBSFMT.FORMATS.
+NOTE: Format $MAT114F is already on the library.
+NOTE: Format $MAT114F has been written to NBSFMT.FORMATS.
+NOTE: Format $MAT125F is already on the library.
+NOTE: Format $MAT125F has been written to NBSFMT.FORMATS.
+NOTE: Format $MAT127F is already on the library.
+NOTE: Format $MAT127F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA001F is already on the library.
+NOTE: Format $MEA001F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA004F is already on the library.
+NOTE: Format $MEA004F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA005F is already on the library.
+NOTE: Format $MEA005F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA007F is already on the library.
+NOTE: Format $MEA007F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA008F is already on the library.
+NOTE: Format $MEA008F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA009F is already on the library.
+19                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+NOTE: Format $MEA009F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA010F is already on the library.
+NOTE: Format $MEA010F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA011F is already on the library.
+NOTE: Format $MEA011F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA012F is already on the library.
+NOTE: Format $MEA012F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA013F is already on the library.
+NOTE: Format $MEA013F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA014F is already on the library.
+NOTE: Format $MEA014F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA015F is already on the library.
+NOTE: Format $MEA015F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA016F is already on the library.
+NOTE: Format $MEA016F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA017F is already on the library.
+NOTE: Format $MEA017F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA018F is already on the library.
+NOTE: Format $MEA018F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA027F is already on the library.
+NOTE: Format $MEA027F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA029F is already on the library.
+NOTE: Format $MEA029F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA032F is already on the library.
+NOTE: Format $MEA032F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA033F is already on the library.
+NOTE: Format $MEA033F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA038F is already on the library.
+NOTE: Format $MEA038F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA039F is already on the library.
+NOTE: Format $MEA039F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA040F is already on the library.
+NOTE: Format $MEA040F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA044F is already on the library.
+NOTE: Format $MEA044F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA045F is already on the library.
+NOTE: Format $MEA045F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA057F is already on the library.
+NOTE: Format $MEA057F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA059F is already on the library.
+NOTE: Format $MEA059F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA060F is already on the library.
+NOTE: Format $MEA060F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA067F is already on the library.
+NOTE: Format $MEA067F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA068F is already on the library.
+NOTE: Format $MEA068F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA069F is already on the library.
+NOTE: Format $MEA069F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA070F is already on the library.
+NOTE: Format $MEA070F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA073F is already on the library.
+NOTE: Format $MEA073F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA074F is already on the library.
+20                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+NOTE: Format $MEA074F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA075F is already on the library.
+NOTE: Format $MEA075F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA078F is already on the library.
+NOTE: Format $MEA078F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA079F is already on the library.
+NOTE: Format $MEA079F has been written to NBSFMT.FORMATS.
+NOTE: Format $MEA080F is already on the library.
+NOTE: Format $MEA080F has been written to NBSFMT.FORMATS.
+NOTE: Format $MRB100F is already on the library.
+NOTE: Format $MRB100F has been written to NBSFMT.FORMATS.
+NOTE: Format $MRB129F is already on the library.
+NOTE: Format $MRB129F has been written to NBSFMT.FORMATS.
+NOTE: Format $MRB130F is already on the library.
+NOTE: Format $MRB130F has been written to NBSFMT.FORMATS.
+NOTE: Format $MRB142F is already on the library.
+NOTE: Format $MRB142F has been written to NBSFMT.FORMATS.
+NOTE: Format $MRB161F is already on the library.
+NOTE: Format $MRB161F has been written to NBSFMT.FORMATS.
+NOTE: Format $MRB168F is already on the library.
+NOTE: Format $MRB168F has been written to NBSFMT.FORMATS.
+NOTE: Format $ORD101F is already on the library.
+NOTE: Format $ORD101F has been written to NBSFMT.FORMATS.
+NOTE: Format $ORD104F is already on the library.
+NOTE: Format $ORD104F has been written to NBSFMT.FORMATS.
+NOTE: Format $ORD107F is already on the library.
+NOTE: Format $ORD107F has been written to NBSFMT.FORMATS.
+NOTE: Format $ORD108F is already on the library.
+NOTE: Format $ORD108F has been written to NBSFMT.FORMATS.
+NOTE: Format $ORD109F is already on the library.
+NOTE: Format $ORD109F has been written to NBSFMT.FORMATS.
+NOTE: Format $ORD118F is already on the library.
+NOTE: Format $ORD118F has been written to NBSFMT.FORMATS.
+NOTE: Format $ORD119F is already on the library.
+NOTE: Format $ORD119F has been written to NBSFMT.FORMATS.
+NOTE: Format $ORD127F is already on the library.
+NOTE: Format $ORD127F has been written to NBSFMT.FORMATS.
+NOTE: Format $ORD131F is already on the library.
+NOTE: Format $ORD131F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT001F is already on the library.
+NOTE: Format $PRT001F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT003F is already on the library.
+NOTE: Format $PRT003F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT004F is already on the library.
+NOTE: Format $PRT004F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT005F is already on the library.
+NOTE: Format $PRT005F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT006F is already on the library.
+NOTE: Format $PRT006F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT008F is already on the library.
+NOTE: Format $PRT008F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT011F is already on the library.
+NOTE: Format $PRT011F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT012F is already on the library.
+21                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+NOTE: Format $PRT012F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT013F is already on the library.
+NOTE: Format $PRT013F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT020F is already on the library.
+NOTE: Format $PRT020F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT021F is already on the library.
+NOTE: Format $PRT021F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT029F is already on the library.
+NOTE: Format $PRT029F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT031F is already on the library.
+NOTE: Format $PRT031F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT034F is already on the library.
+NOTE: Format $PRT034F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT038F is already on the library.
+NOTE: Format $PRT038F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT041F is already on the library.
+NOTE: Format $PRT041F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT044F is already on the library.
+NOTE: Format $PRT044F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT046F is already on the library.
+NOTE: Format $PRT046F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT047F is already on the library.
+NOTE: Format $PRT047F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT060F is already on the library.
+NOTE: Format $PRT060F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT062F is already on the library.
+NOTE: Format $PRT062F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT065F is already on the library.
+NOTE: Format $PRT065F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT067F is already on the library.
+NOTE: Format $PRT067F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT068F is already on the library.
+NOTE: Format $PRT068F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT070F is already on the library.
+NOTE: Format $PRT070F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT075F is already on the library.
+NOTE: Format $PRT075F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT076F is already on the library.
+NOTE: Format $PRT076F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT077F is already on the library.
+NOTE: Format $PRT077F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT081F is already on the library.
+NOTE: Format $PRT081F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT085F is already on the library.
+NOTE: Format $PRT085F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT087F is already on the library.
+NOTE: Format $PRT087F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT089F is already on the library.
+NOTE: Format $PRT089F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT090F is already on the library.
+NOTE: Format $PRT090F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT091F is already on the library.
+NOTE: Format $PRT091F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT092F is already on the library.
+22                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+NOTE: Format $PRT092F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT093F is already on the library.
+NOTE: Format $PRT093F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT096F is already on the library.
+NOTE: Format $PRT096F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT098F is already on the library.
+NOTE: Format $PRT098F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT100F is already on the library.
+NOTE: Format $PRT100F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT103F is already on the library.
+NOTE: Format $PRT103F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT104F is already on the library.
+NOTE: Format $PRT104F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT105F is already on the library.
+NOTE: Format $PRT105F has been written to NBSFMT.FORMATS.
+NOTE: Format $PRT107F is already on the library.
+NOTE: Format $PRT107F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB003F is already on the library.
+NOTE: Format $RUB003F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB006F is already on the library.
+NOTE: Format $RUB006F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB008F is already on the library.
+NOTE: Format $RUB008F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB009F is already on the library.
+NOTE: Format $RUB009F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB010F is already on the library.
+NOTE: Format $RUB010F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB011F is already on the library.
+NOTE: Format $RUB011F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB019F is already on the library.
+NOTE: Format $RUB019F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB020F is already on the library.
+NOTE: Format $RUB020F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB021F is already on the library.
+NOTE: Format $RUB021F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB033F is already on the library.
+NOTE: Format $RUB033F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB034F is already on the library.
+NOTE: Format $RUB034F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB036F is already on the library.
+NOTE: Format $RUB036F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB037F is already on the library.
+NOTE: Format $RUB037F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB039F is already on the library.
+NOTE: Format $RUB039F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB040F is already on the library.
+NOTE: Format $RUB040F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB043F is already on the library.
+NOTE: Format $RUB043F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB044F is already on the library.
+NOTE: Format $RUB044F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB046F is already on the library.
+NOTE: Format $RUB046F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB048F is already on the library.
+23                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+NOTE: Format $RUB048F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB049F is already on the library.
+NOTE: Format $RUB049F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB051F is already on the library.
+NOTE: Format $RUB051F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB053F is already on the library.
+NOTE: Format $RUB053F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB054F is already on the library.
+NOTE: Format $RUB054F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB056F is already on the library.
+NOTE: Format $RUB056F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB058F is already on the library.
+NOTE: Format $RUB058F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB059F is already on the library.
+NOTE: Format $RUB059F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB062F is already on the library.
+NOTE: Format $RUB062F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB063F is already on the library.
+NOTE: Format $RUB063F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB066F is already on the library.
+NOTE: Format $RUB066F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB067F is already on the library.
+NOTE: Format $RUB067F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB070F is already on the library.
+NOTE: Format $RUB070F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB071F is already on the library.
+NOTE: Format $RUB071F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB073F is already on the library.
+NOTE: Format $RUB073F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB075F is already on the library.
+NOTE: Format $RUB075F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB076F is already on the library.
+NOTE: Format $RUB076F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB078F is already on the library.
+NOTE: Format $RUB078F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB079F is already on the library.
+NOTE: Format $RUB079F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB080F is already on the library.
+NOTE: Format $RUB080F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB083F is already on the library.
+NOTE: Format $RUB083F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB084F is already on the library.
+NOTE: Format $RUB084F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB086F is already on the library.
+NOTE: Format $RUB086F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB087F is already on the library.
+NOTE: Format $RUB087F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB088F is already on the library.
+NOTE: Format $RUB088F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB091F is already on the library.
+NOTE: Format $RUB091F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB093F is already on the library.
+NOTE: Format $RUB093F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB094F is already on the library.
+24                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+NOTE: Format $RUB094F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB108F is already on the library.
+NOTE: Format $RUB108F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB112F is already on the library.
+NOTE: Format $RUB112F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB117F is already on the library.
+NOTE: Format $RUB117F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB121F is already on the library.
+NOTE: Format $RUB121F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB122F is already on the library.
+NOTE: Format $RUB122F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB123F is already on the library.
+NOTE: Format $RUB123F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB126F is already on the library.
+NOTE: Format $RUB126F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB127F is already on the library.
+NOTE: Format $RUB127F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB130F is already on the library.
+NOTE: Format $RUB130F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB132F is already on the library.
+NOTE: Format $RUB132F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB133F is already on the library.
+NOTE: Format $RUB133F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB135F is already on the library.
+NOTE: Format $RUB135F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB137F is already on the library.
+NOTE: Format $RUB137F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB147F is already on the library.
+NOTE: Format $RUB147F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB159F is already on the library.
+NOTE: Format $RUB159F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB160F is already on the library.
+NOTE: Format $RUB160F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB161F is already on the library.
+NOTE: Format $RUB161F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB162F is already on the library.
+NOTE: Format $RUB162F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB163F is already on the library.
+NOTE: Format $RUB163F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB164F is already on the library.
+NOTE: Format $RUB164F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB165F is already on the library.
+NOTE: Format $RUB165F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB166F is already on the library.
+NOTE: Format $RUB166F has been written to NBSFMT.FORMATS.
+NOTE: Format $RUB91AF is already on the library.
+NOTE: Format $RUB91AF has been written to NBSFMT.FORMATS.
+NOTE: Format $SUM103F is already on the library.
+NOTE: Format $SUM103F has been written to NBSFMT.FORMATS.
+NOTE: Format $SUM115F is already on the library.
+NOTE: Format $SUM115F has been written to NBSFMT.FORMATS.
+NOTE: Format $TRT101F is already on the library.
+NOTE: Format $TRT101F has been written to NBSFMT.FORMATS.
+NOTE: Format $TRT102F is already on the library.
+25                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+NOTE: Format $TRT102F has been written to NBSFMT.FORMATS.
+NOTE: Format $TRT104F is already on the library.
+NOTE: Format $TRT104F has been written to NBSFMT.FORMATS.
+NOTE: Format $TRT105F is already on the library.
+NOTE: Format $TRT105F has been written to NBSFMT.FORMATS.
+NOTE: Format $TRT108F is already on the library.
+NOTE: Format $TRT108F has been written to NBSFMT.FORMATS.
+NOTE: Format $TRT110F is already on the library.
+NOTE: Format $TRT110F has been written to NBSFMT.FORMATS.
+NOTE: Format $VAC101F is already on the library.
+NOTE: Format $VAC101F has been written to NBSFMT.FORMATS.
+NOTE: Format $VAC104F is already on the library.
+NOTE: Format $VAC104F has been written to NBSFMT.FORMATS.
+NOTE: Format $VAC106F is already on the library.
+NOTE: Format $VAC106F has been written to NBSFMT.FORMATS.
+NOTE: Format $VAC107F is already on the library.
+NOTE: Format $VAC107F has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.07 seconds
+      cpu time            0.06 seconds
+      
+NOTE: There were 5409 observations read from the data set WORK.CVGFMT.
+
+NOTE: Compressing data set RDBDATA.CD_CODE_NOT_IN_CVG increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: Table RDBDATA.CD_CODE_NOT_IN_CVG created, with 35 rows and 3 columns.
+
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.03 seconds
+      
+
+NOTE: The PROCEDURE SQL printed page 1.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 239 observations read from the data set NBS_SRT.country_code.
+NOTE: The data set WORK.COUNTRY_CODE has 239 observations and 3 variables.
+NOTE: Compressing data set WORK.COUNTRY_CODE decreased size by 0.00 percent. 
+      Compressed is 3 pages; un-compressed would require 3 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $COUNTRY is already on the library.
+NOTE: Format $COUNTRY has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+26                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+      cpu time            0.00 seconds
+      
+NOTE: There were 239 observations read from the data set WORK.COUNTRY_CODE.
+
+
+NOTE: There were 59 observations read from the data set NBS_SRT.state_code.
+NOTE: The data set WORK.STATE_CODE has 59 observations and 3 variables.
+NOTE: Compressing data set WORK.STATE_CODE increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.04 seconds
+      cpu time            0.04 seconds
+      
+
+NOTE: Format $ST_CCD is already on the library.
+NOTE: Format $ST_CCD has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 59 observations read from the data set WORK.STATE_CODE.
+
+
+NOTE: There were 3383 observations read from the data set NBS_SRT.state_county_code_value.
+NOTE: The data set WORK.STATE_COUNTY_CODE_VALUE has 3383 observations and 3 variables.
+NOTE: Compressing data set WORK.STATE_COUNTY_CODE_VALUE decreased size by 82.28 percent. 
+      Compressed is 14 pages; un-compressed would require 79 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.04 seconds
+      cpu time            0.03 seconds
+      
+
+NOTE: Format $CNTYCCD is already on the library.
+NOTE: Format $CNTYCCD has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+NOTE: There were 3383 observations read from the data set WORK.STATE_COUNTY_CODE_VALUE.
+
+
+NOTE: There were 76 observations read from the data set NBS_SRT.Jurisdiction_code.
+NOTE: The data set WORK.JURISDICTION_CODE has 76 observations and 3 variables.
+NOTE: Compressing data set WORK.JURISDICTION_CODE increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.04 seconds
+      cpu time            0.03 seconds
+      
+
+NOTE: Format $JURCODE is already on the library.
+NOTE: Format $JURCODE has been written to NBSFMT.FORMATS.
+27                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.02 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 76 observations read from the data set WORK.JURISDICTION_CODE.
+
+
+NOTE: There were 264 observations read from the data set NBS_SRT.Condition_code.
+NOTE: The data set WORK.CONDITION_CODE has 264 observations and 3 variables.
+NOTE: Compressing data set WORK.CONDITION_CODE decreased size by 0.00 percent. 
+      Compressed is 3 pages; un-compressed would require 3 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $DISEASE is already on the library.
+NOTE: Format $DISEASE has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 264 observations read from the data set WORK.CONDITION_CODE.
+
+
+NOTE: There were 16 observations read from the data set NBS_SRT.Program_area_code.
+NOTE: The data set WORK.PROGRAM_AREA_CODE has 16 observations and 3 variables.
+NOTE: Compressing data set WORK.PROGRAM_AREA_CODE increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $PAMCODE is already on the library.
+NOTE: Format $PAMCODE has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 16 observations read from the data set WORK.PROGRAM_AREA_CODE.
+
+
+NOTE: There were 316 observations read from the data set NBS_SRT.Treatment_code.
+NOTE: The data set WORK.TREATMENT_CODE has 316 observations and 3 variables.
+NOTE: Compressing data set WORK.TREATMENT_CODE decreased size by 57.14 percent. 
+      Compressed is 3 pages; un-compressed would require 7 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+28                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+
+NOTE: Format $RXDRUG is already on the library.
+NOTE: Format $RXDRUG has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+NOTE: There were 316 observations read from the data set WORK.TREATMENT_CODE.
+
+
+NOTE: There were 437 observations read from the data set NBS_SRT.Language_code.
+NOTE: The data set WORK.LANGUAGE_CODE has 437 observations and 3 variables.
+NOTE: Compressing data set WORK.LANGUAGE_CODE decreased size by 20.00 percent. 
+      Compressed is 4 pages; un-compressed would require 5 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $P_LANG is already on the library.
+NOTE: Format $P_LANG has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 437 observations read from the data set WORK.LANGUAGE_CODE.
+
+
+NOTE: There were 694 observations read from the data set NBS_SRT.Occupation_code.
+NOTE: The data set WORK.OCCUPATION_CODE has 694 observations and 3 variables.
+NOTE: Compressing data set WORK.OCCUPATION_CODE decreased size by 41.67 percent. 
+      Compressed is 7 pages; un-compressed would require 12 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $P_OCCUP is already on the library.
+NOTE: Format $P_OCCUP has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 694 observations read from the data set WORK.OCCUPATION_CODE.
+
+
+NOTE: There were 1810 observations read from the data set NBS_SRT.Naics_industry_code.
+NOTE: The data set WORK.PAT_OCCUPATION_CODE has 1810 observations and 3 variables.
+NOTE: Compressing data set WORK.PAT_OCCUPATION_CODE decreased size by 11.11 percent. 
+      Compressed is 16 pages; un-compressed would require 18 pages.
+NOTE: DATA statement used (Total process time):
+29                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+      real time           0.03 seconds
+      cpu time            0.03 seconds
+      
+
+NOTE: Format $PT_OCUP is already on the library.
+NOTE: Format $PT_OCUP has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 1810 observations read from the data set WORK.PAT_OCCUPATION_CODE.
+
+
+NOTE: There were 854 observations read from the data set NBS_SRT.Race_code.
+NOTE: The data set WORK.RACE_CODE has 854 observations and 3 variables.
+NOTE: Compressing data set WORK.RACE_CODE decreased size by 33.33 percent. 
+      Compressed is 6 pages; un-compressed would require 9 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $P_RACE is already on the library.
+NOTE: Format $P_RACE has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+NOTE: There were 854 observations read from the data set WORK.RACE_CODE.
+
+
+NOTE: There were 10614 observations read from the data set NBS_SRT.Lab_result.
+NOTE: 9482 observations with duplicate key values were deleted.
+NOTE: The data set WORK.LAB_RESULT has 1132 observations and 2 variables.
+NOTE: Compressing data set WORK.LAB_RESULT decreased size by 25.00 percent. 
+      Compressed is 15 pages; un-compressed would require 20 pages.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.07 seconds
+      cpu time            0.04 seconds
+      
+
+
+NOTE: There were 1130 observations read from the data set WORK.LAB_RESULT.
+      WHERE Lab_result_cd not in ('HIGH', 'LOW');
+NOTE: The data set WORK.LAB_RESULT has 1130 observations and 3 variables.
+NOTE: Compressing data set WORK.LAB_RESULT decreased size by 16.67 percent. 
+      Compressed is 10 pages; un-compressed would require 12 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+30                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+NOTE: Format $LABRSLT is already on the library.
+NOTE: Format $LABRSLT has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 1130 observations read from the data set WORK.LAB_RESULT.
+
+
+NOTE: There were 254 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm in ('EI_TYPE', 'EL_TYPE', 'RL_TYPE');
+NOTE: The data set WORK.EI_RL_EL_TYPE has 254 observations and 5 variables.
+NOTE: Compressing data set WORK.EI_RL_EL_TYPE decreased size by 70.00 percent. 
+      Compressed is 3 pages; un-compressed would require 10 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.03 seconds
+      
+
+NOTE: Format $EI_TYPE is already on the library.
+NOTE: Format $EI_TYPE has been written to NBSFMT.FORMATS.
+NOTE: Format $EL_TYPE is already on the library.
+NOTE: Format $EL_TYPE has been written to NBSFMT.FORMATS.
+NOTE: Format $RL_TYPE is already on the library.
+NOTE: Format $RL_TYPE has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 254 observations read from the data set WORK.EI_RL_EL_TYPE.
+
+
+NOTE: There were 82 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='RL_CLASS';
+NOTE: The data set WORK.RL_CLASS has 82 observations and 5 variables.
+NOTE: Compressing data set WORK.RL_CLASS decreased size by 50.00 percent. 
+      Compressed is 2 pages; un-compressed would require 4 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $RLCLASS is already on the library.
+NOTE: Format $RLCLASS has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 82 observations read from the data set WORK.RL_CLASS.
+
+
+31                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+NOTE: There were 76 observations read from the data set NBS_SRT.jurisdiction_code.
+      WHERE code_set_nm='S_JURDIC_C';
+NOTE: The data set WORK.S_JURDIC_C has 76 observations and 4 variables.
+NOTE: Compressing data set WORK.S_JURDIC_C decreased size by 33.33 percent. 
+      Compressed is 2 pages; un-compressed would require 3 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Format $JURD_CD is already on the library.
+NOTE: Format $JURD_CD has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 76 observations read from the data set WORK.S_JURDIC_C.
+
+
+NOTE: There were 16 observations read from the data set NBS_SRT.program_area_code.
+NOTE: The data set WORK.S_PROGRA_C has 16 observations and 4 variables.
+NOTE: Compressing data set WORK.S_PROGRA_C increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $PRG_AR is already on the library.
+NOTE: Format $PRG_AR has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 16 observations read from the data set WORK.S_PROGRA_C.
+
+
+NOTE: There were 3 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='YNU';
+NOTE: The data set WORK.YNU has 3 observations and 4 variables.
+NOTE: Compressing data set WORK.YNU increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Format $C_YNU is already on the library.
+NOTE: Format $C_YNU has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+32                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+      cpu time            0.01 seconds
+      
+NOTE: There were 3 observations read from the data set WORK.YNU.
+
+
+NOTE: There were 2 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='YN';
+NOTE: The data set WORK.YN has 2 observations and 4 variables.
+NOTE: Compressing data set WORK.YN increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $C_YN is already on the library.
+NOTE: Format $C_YN has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+NOTE: There were 2 observations read from the data set WORK.YN.
+
+
+NOTE: There were 8 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='STD_CONTACT_RCD_PROCESSING_DECISION';
+NOTE: The data set WORK.STD_CONTACT_RCD_PROCESSING_DEC has 8 observations and 4 variables.
+NOTE: Compressing data set WORK.STD_CONTACT_RCD_PROCESSING_DEC increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $C_STD_P is already on the library.
+NOTE: Format $C_STD_P has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 8 observations read from the data set WORK.STD_CONTACT_RCD_PROCESSING_DEC.
+
+
+NOTE: There were 2 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='PHC_IN_STS';
+NOTE: The data set WORK.PHC_IN_STS has 2 observations and 4 variables.
+NOTE: Compressing data set WORK.PHC_IN_STS increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.03 seconds
+      
+33                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+
+NOTE: Format $C_PH_ST is already on the library.
+NOTE: Format $C_PH_ST has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+NOTE: There were 2 observations read from the data set WORK.PHC_IN_STS.
+
+
+NOTE: There were 26 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='NBS_RELATIONSHIP';
+NOTE: The data set WORK.NBS_RELATIONSHIP has 26 observations and 4 variables.
+NOTE: Compressing data set WORK.NBS_RELATIONSHIP increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.03 seconds
+      
+
+NOTE: Format $C_RLTN is already on the library.
+NOTE: Format $C_RLTN has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 26 observations read from the data set WORK.NBS_RELATIONSHIP.
+
+
+NOTE: There were 4 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='NBS_PRIORITY';
+NOTE: The data set WORK.NBS_PRIORITY has 4 observations and 5 variables.
+NOTE: Compressing data set WORK.NBS_PRIORITY increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $C_PRTY is already on the library.
+NOTE: Format $C_PRTY has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 4 observations read from the data set WORK.NBS_PRIORITY.
+
+
+NOTE: There were 13 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='NBS_NO_TRTMNT_REAS';
+NOTE: The data set WORK.NBS_NO_TRTMNT_REAS has 13 observations and 4 variables.
+34                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+NOTE: Compressing data set WORK.NBS_NO_TRTMNT_REAS increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $C_NT_RS is already on the library.
+NOTE: Format $C_NT_RS has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 13 observations read from the data set WORK.NBS_NO_TRTMNT_REAS.
+
+
+NOTE: There were 12 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='NBS_HEALTH_STATUS';
+NOTE: The data set WORK.NBS_HEALTH_STATUS has 12 observations and 4 variables.
+NOTE: Compressing data set WORK.NBS_HEALTH_STATUS increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $C_H_STS is already on the library.
+NOTE: Format $C_H_STS has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 12 observations read from the data set WORK.NBS_HEALTH_STATUS.
+
+
+NOTE: There were 33 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm in ('FIELD_FOLLOWUP_DISPOSITION_STD', 'NBS_DISPO');
+NOTE: The data set WORK.C_DISPO has 33 observations and 4 variables.
+NOTE: Compressing data set WORK.C_DISPO increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Format $C_DISPO is already on the library.
+NOTE: Format $C_DISPO has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+35                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+NOTE: There were 33 observations read from the data set WORK.C_DISPO.
+
+
+NOTE: There were 4 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='NBS_INTERVIEW_TYPE_STDHIV';
+NOTE: The data set WORK.INT_TYPE has 4 observations and 4 variables.
+NOTE: Compressing data set WORK.INT_TYPE increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $ITYPE is already on the library.
+NOTE: Format $ITYPE has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 4 observations read from the data set WORK.INT_TYPE.
+
+
+NOTE: There were 11 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm in ('NBS_INTVW_LOC', 'NBS_INTVW_LOC_STDHIV');
+NOTE: The data set WORK.INT_LOC has 11 observations and 4 variables.
+NOTE: Compressing data set WORK.INT_LOC increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $ILOC is already on the library.
+NOTE: Format $ILOC has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 11 observations read from the data set WORK.INT_LOC.
+
+
+NOTE: There were 4 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='NBS_INTVW_STATUS';
+NOTE: The data set WORK.INTERVIEW_STATUS has 4 observations and 4 variables.
+NOTE: Compressing data set WORK.INTERVIEW_STATUS increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $ISTATUS is already on the library.
+36                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+NOTE: Format $ISTATUS has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+NOTE: There were 4 observations read from the data set WORK.INTERVIEW_STATUS.
+
+
+NOTE: There were 5 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='NBS_INTVWEE_ROLE';
+NOTE: The data set WORK.INTVWEE_ROLE has 5 observations and 4 variables.
+NOTE: Compressing data set WORK.INTVWEE_ROLE increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $IROLE is already on the library.
+NOTE: Format $IROLE has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+NOTE: There were 5 observations read from the data set WORK.INTVWEE_ROLE.
+
+
+NOTE: There were 22 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='FIELD_FOLLOWUP_DISPOSITION_STDHIV';
+NOTE: The data set WORK.FIELD_FOLLOWUP_DISPOSITION_SH has 22 observations and 4 variables.
+NOTE: Compressing data set WORK.FIELD_FOLLOWUP_DISPOSITION_SH increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $NBS173F is already on the library.
+NOTE: Format $NBS173F has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 22 observations read from the data set WORK.FIELD_FOLLOWUP_DISPOSITION_SH.
+
+
+NOTE: There were 4 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='INITIATING_AGENCY';
+NOTE: The data set WORK.INITIATING_AGENCY has 4 observations and 4 variables.
+NOTE: Compressing data set WORK.INITIATING_AGENCY increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+37                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $CM_I_AG is already on the library.
+NOTE: Format $CM_I_AG has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 4 observations read from the data set WORK.INITIATING_AGENCY.
+
+
+NOTE: There were 7 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='INTERNET_FOLLOWUP_OUTCOME';
+NOTE: The data set WORK.INTERNET_FOLLOWUP_OUTCOME has 7 observations and 4 variables.
+NOTE: Compressing data set WORK.INTERNET_FOLLOWUP_OUTCOME increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $CM_I_OC is already on the library.
+NOTE: Format $CM_I_OC has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 7 observations read from the data set WORK.INTERNET_FOLLOWUP_OUTCOME.
+
+
+NOTE: There were 7 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='NOTIFIABLE';
+NOTE: The data set WORK.NOTIFIABLE has 7 observations and 4 variables.
+NOTE: Compressing data set WORK.NOTIFIABLE increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $CM_NOTF is already on the library.
+NOTE: Format $CM_NOTF has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 7 observations read from the data set WORK.NOTIFIABLE.
+
+38                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+
+NOTE: There were 5 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='NOTIFICATION_ACTUAL_METHOD_STD';
+NOTE: The data set WORK.NOTIFICATION_ACTUAL_METHOD_STD has 5 observations and 4 variables.
+NOTE: Compressing data set WORK.NOTIFICATION_ACTUAL_METHOD_STD increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $CM_N_MTD is already on the library.
+NOTE: Format $CM_N_MTD has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 5 observations read from the data set WORK.NOTIFICATION_ACTUAL_METHOD_STD.
+
+
+NOTE: There were 5 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='NOTIFICATION_PLAN';
+NOTE: The data set WORK.NOTIFICATION_PLAN has 5 observations and 4 variables.
+NOTE: Compressing data set WORK.NOTIFICATION_PLAN increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Format $CM_NP is already on the library.
+NOTE: Format $CM_NP has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 5 observations read from the data set WORK.NOTIFICATION_PLAN.
+
+
+NOTE: There were 3 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='OOJ_AGENCY';
+NOTE: The data set WORK.OOJ_AGENCY has 3 observations and 4 variables.
+NOTE: Compressing data set WORK.OOJ_AGENCY increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $CM_OOJA is already on the library.
+NOTE: Format $CM_OOJA has been written to NBSFMT.FORMATS.
+
+39                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 3 observations read from the data set WORK.OOJ_AGENCY.
+
+
+NOTE: There were 70 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='OOJ_AGENCY_LOCAL';
+NOTE: The data set WORK.OOJ_AGENCY_LOCAL has 70 observations and 4 variables.
+NOTE: Compressing data set WORK.OOJ_AGENCY_LOCAL decreased size by 0.00 percent. 
+      Compressed is 2 pages; un-compressed would require 2 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $CM_OOJL is already on the library.
+NOTE: Format $CM_OOJL has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 70 observations read from the data set WORK.OOJ_AGENCY_LOCAL.
+
+
+NOTE: There were 10 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='PAT_INTVW_STATUS';
+NOTE: The data set WORK.PAT_INTVW_STATUS has 10 observations and 4 variables.
+NOTE: Compressing data set WORK.PAT_INTVW_STATUS increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $CM_INTS is already on the library.
+NOTE: Format $CM_INTS has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 10 observations read from the data set WORK.PAT_INTVW_STATUS.
+
+
+NOTE: There were 5 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='PRVDR_CONTACT_OUTCOME';
+NOTE: The data set WORK.PRVDR_CONTACT_OUTCOME has 5 observations and 4 variables.
+NOTE: Compressing data set WORK.PRVDR_CONTACT_OUTCOME increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+40                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+      cpu time            0.00 seconds
+      
+
+NOTE: Format $CM_P_OC is already on the library.
+NOTE: Format $CM_P_OC has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 5 observations read from the data set WORK.PRVDR_CONTACT_OUTCOME.
+
+
+NOTE: There were 27 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='PRVDR_DIAGNOSIS_STD';
+NOTE: The data set WORK.PRVDR_DIAGNOSIS_STD has 27 observations and 4 variables.
+NOTE: Compressing data set WORK.PRVDR_DIAGNOSIS_STD increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $NBS166F is already on the library.
+NOTE: Format $NBS166F has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 27 observations read from the data set WORK.PRVDR_DIAGNOSIS_STD.
+
+
+NOTE: There were 10 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='PRVDR_EXAM_REASON';
+NOTE: The data set WORK.PRVDR_EXAM_REASON has 10 observations and 4 variables.
+NOTE: Compressing data set WORK.PRVDR_EXAM_REASON increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.03 seconds
+      
+
+NOTE: Format $CM_P_RS is already on the library.
+NOTE: Format $CM_P_RS has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+NOTE: There were 10 observations read from the data set WORK.PRVDR_EXAM_REASON.
+
+
+NOTE: There were 7 observations read from the data set NBS_SRT.code_value_general.
+41                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+      WHERE code_set_nm='STATUS_900';
+NOTE: The data set WORK.STATUS_900 has 7 observations and 4 variables.
+NOTE: Compressing data set WORK.STATUS_900 increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $CM_900S is already on the library.
+NOTE: Format $CM_900S has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 7 observations read from the data set WORK.STATUS_900.
+
+
+NOTE: There were 8 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='STD_CREATE_INV_LABMORB_NONSYPHILIS_PROC_DECISION';
+NOTE: The data set WORK.SCILN_PROC_DECISION has 8 observations and 4 variables.
+NOTE: Compressing data set WORK.SCILN_PROC_DECISION increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $CM_CIND is already on the library.
+NOTE: Format $CM_CIND has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 8 observations read from the data set WORK.SCILN_PROC_DECISION.
+
+
+NOTE: There were 8 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='SURVEILLANCE_PATIENT_FOLLOWUP';
+NOTE: The data set WORK.SURVEILLANCE_PATIENT_FOLLOWUP has 8 observations and 4 variables.
+NOTE: Compressing data set WORK.SURVEILLANCE_PATIENT_FOLLOWUP increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $CM_S_PF is already on the library.
+NOTE: Format $CM_S_PF has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+42                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+      cpu time            0.00 seconds
+      
+NOTE: There were 8 observations read from the data set WORK.SURVEILLANCE_PATIENT_FOLLOWUP.
+
+
+NOTE: There were 2 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='YN';
+NOTE: The data set WORK.YN has 2 observations and 4 variables.
+NOTE: Compressing data set WORK.YN increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Format $YN is already on the library.
+NOTE: Format $YN has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 2 observations read from the data set WORK.YN.
+
+
+NOTE: There were 25 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='PLACE_TYPE';
+NOTE: The data set WORK.PLACE_TYPE has 25 observations and 4 variables.
+NOTE: Compressing data set WORK.PLACE_TYPE increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $PL_TPE is already on the library.
+NOTE: Format $PL_TPE has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 25 observations read from the data set WORK.PLACE_TYPE.
+
+
+NOTE: There were 5 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='NBS_CONSYPH_VITAL';
+NOTE: The data set WORK.NBS_CONSYPH_VITAL has 5 observations and 4 variables.
+NOTE: Compressing data set WORK.NBS_CONSYPH_VITAL increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+43                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+
+NOTE: Format $CSRT_VT is already on the library.
+NOTE: Format $CSRT_VT has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 5 observations read from the data set WORK.NBS_CONSYPH_VITAL.
+
+
+NOTE: There were 0 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='NBS_CONSYPH_CLASS';
+NOTE: The data set WORK.NBS_CONSYPH_CLASS has 0 observations and 4 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.03 seconds
+      
+
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 0 observations read from the data set WORK.NBS_CONSYPH_CLASS.
+
+
+NOTE: There were 2 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='P_ETHN_UNK_REASON';
+NOTE: The data set WORK.P_ETHN_UNK_REASON has 2 observations and 4 variables.
+NOTE: Compressing data set WORK.P_ETHN_UNK_REASON increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.03 seconds
+      
+
+NOTE: Format $ETHN_UN is already on the library.
+NOTE: Format $ETHN_UN has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+NOTE: There were 2 observations read from the data set WORK.P_ETHN_UNK_REASON.
+
+
+NOTE: There were 2 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='SEX_UNK_REASON';
+NOTE: The data set WORK.SEX_UNK_REASON has 2 observations and 4 variables.
+NOTE: Compressing data set WORK.SEX_UNK_REASON increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+44                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+      cpu time            0.00 seconds
+      
+
+NOTE: Format $UNK_SEX is already on the library.
+NOTE: Format $UNK_SEX has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 2 observations read from the data set WORK.SEX_UNK_REASON.
+
+
+NOTE: There were 11 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='NBS_STD_GENDER_PARPT';
+NOTE: The data set WORK.NBS_STD_GENDER_PARPT has 11 observations and 4 variables.
+NOTE: Compressing data set WORK.NBS_STD_GENDER_PARPT increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $GENPARPT is already on the library.
+NOTE: Format $GENPARPT has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 11 observations read from the data set WORK.NBS_STD_GENDER_PARPT.
+
+
+NOTE: There were 3 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='YNU';
+NOTE: The data set WORK.YNU has 3 observations and 4 variables.
+NOTE: Compressing data set WORK.YNU increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Format $YNU is already on the library.
+NOTE: Format $YNU has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+NOTE: There were 3 observations read from the data set WORK.YNU.
+
+
+NOTE: There were 6 observations read from the data set NBS_SRT.code_value_general.
+45                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+      WHERE code_set_nm='CM_PROCESS_STAGE';
+NOTE: The data set WORK.CM_PROCESS_STAGE has 6 observations and 4 variables.
+NOTE: Compressing data set WORK.CM_PROCESS_STAGE increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $NBS115NF is already on the library.
+NOTE: Format $NBS115NF has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 6 observations read from the data set WORK.CM_PROCESS_STAGE.
+
+
+NOTE: There were 20 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='REFERRAL_BASIS';
+NOTE: The data set WORK.REFERRAL_BASIS has 20 observations and 4 variables.
+NOTE: Compressing data set WORK.REFERRAL_BASIS increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Format $NBS110NF is already on the library.
+NOTE: Format $NBS110NF has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 20 observations read from the data set WORK.REFERRAL_BASIS.
+
+
+NOTE: There were 13 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='STD_NBS_PROCESSING_DECISION_ALL';
+NOTE: The data set WORK.STD_NBS_PROCESSING_DECISION_ALL has 13 observations and 4 variables.
+NOTE: Compressing data set WORK.STD_NBS_PROCESSING_DECISION_ALL increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $APROCDNF is already on the library.
+NOTE: Format $APROCDNF has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+46                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+      cpu time            0.00 seconds
+      
+NOTE: There were 13 observations read from the data set WORK.STD_NBS_PROCESSING_DECISION_ALL.
+
+
+NOTE: There were 0 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='NBS_GROUP_NM';
+NOTE: The data set WORK.NBS_GROUP_NM has 0 observations and 4 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 0 observations read from the data set WORK.NBS_GROUP_NM.
+
+
+NOTE: There were 12 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='PHVS_VACCINEEVENTINFORMATIONSOURCE_NND';
+NOTE: The data set WORK.VAC147F has 12 observations and 4 variables.
+NOTE: Compressing data set WORK.VAC147F increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Format $VAC147F is already on the library.
+NOTE: Format $VAC147F has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 12 observations read from the data set WORK.VAC147F.
+
+
+NOTE: There were 7 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='AGE_UNIT';
+NOTE: The data set WORK.AGE_UNIT has 7 observations and 4 variables.
+NOTE: Compressing data set WORK.AGE_UNIT increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $VAC106F is already on the library.
+NOTE: Format $VAC106F has been written to NBSFMT.FORMATS.
+
+47                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 7 observations read from the data set WORK.AGE_UNIT.
+
+
+NOTE: There were 18 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='NIP_ANATOMIC_ST';
+NOTE: The data set WORK.NIP_ANATOMIC_ST has 18 observations and 4 variables.
+NOTE: Compressing data set WORK.NIP_ANATOMIC_ST increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.03 seconds
+      
+
+NOTE: Format $VAC104F is already on the library.
+NOTE: Format $VAC104F has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 18 observations read from the data set WORK.NIP_ANATOMIC_ST.
+
+
+NOTE: There were 219 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='VAC_NM';
+NOTE: The data set WORK.VAC_NM has 219 observations and 4 variables.
+NOTE: Compressing data set WORK.VAC_NM decreased size by 66.67 percent. 
+      Compressed is 2 pages; un-compressed would require 6 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.04 seconds
+      cpu time            0.04 seconds
+      
+
+NOTE: Format $VAC101F is already on the library.
+NOTE: Format $VAC101F has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 219 observations read from the data set WORK.VAC_NM.
+
+
+NOTE: There were 87 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='VAC_MFGR';
+NOTE: The data set WORK.VAC_MFGR has 87 observations and 4 variables.
+NOTE: Compressing data set WORK.VAC_MFGR decreased size by 33.33 percent. 
+      Compressed is 2 pages; un-compressed would require 3 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+48                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $VAC107F is already on the library.
+NOTE: Format $VAC107F has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 87 observations read from the data set WORK.VAC_MFGR.
+
+
+NOTE: There were 27 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='PRVDR_DIAGNOSIS_STD';
+NOTE: The data set WORK.REV_PRVDR_DIAGNOSIS_STD has 27 observations and 4 variables.
+NOTE: Compressing data set WORK.REV_PRVDR_DIAGNOSIS_STD increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Format $R_NBS166F is already on the library.
+NOTE: Format $R_NBS166F has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 27 observations read from the data set WORK.REV_PRVDR_DIAGNOSIS_STD.
+
+
+NOTE: There were 27 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='CASE_DIAGNOSIS';
+NOTE: The data set WORK.CASE_DIAGNOSIS has 27 observations and 4 variables.
+NOTE: Compressing data set WORK.CASE_DIAGNOSIS increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $R_NBS136F is already on the library.
+NOTE: Format $R_NBS136F has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 27 observations read from the data set WORK.CASE_DIAGNOSIS.
+
+
+NOTE: There were 2 observations read from the data set NBS_SRT.code_value_general.
+49                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+      WHERE code_set_nm='YN';
+NOTE: The data set WORK.YN has 2 observations and 4 variables.
+NOTE: Compressing data set WORK.YN increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Format $R_YNF is already on the library.
+NOTE: Format $R_YNF has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+NOTE: There were 2 observations read from the data set WORK.YN.
+
+
+NOTE: There were 1 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='EL_USE_TELE_PLC';
+NOTE: The data set WORK.EL_USE_TELE_PLC has 1 observations and 4 variables.
+NOTE: Compressing data set WORK.EL_USE_TELE_PLC increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Format $U_TEL_PLC is already on the library.
+NOTE: Format $U_TEL_PLC has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+NOTE: There were 1 observations read from the data set WORK.EL_USE_TELE_PLC.
+
+
+NOTE: There were 7 observations read from the data set NBS_SRT.code_value_general.
+      WHERE code_set_nm='EL_TYPE_TELE_PLC';
+NOTE: The data set WORK.EL_TYPE_TELE_PLC has 7 observations and 4 variables.
+NOTE: Compressing data set WORK.EL_TYPE_TELE_PLC increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.02 seconds
+      cpu time            0.03 seconds
+      
+
+NOTE: Format $T_TEL_PLC is already on the library.
+NOTE: Format $T_TEL_PLC has been written to NBSFMT.FORMATS.
+
+NOTE: PROCEDURE FORMAT used (Total process time):
+      real time           0.00 seconds
+50                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+      cpu time            0.00 seconds
+      
+NOTE: There were 7 observations read from the data set WORK.EL_TYPE_TELE_PLC.
+
+	End Time:     13DEC2023:12:41:33
+*****The End etlformat*********
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+	Start Time:     13DEC2023:12:41:33
+*****The Start ConditionDim*********
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Compressing data set WORK.CONDITION decreased size by 75.00 percent. 
+      Compressed is 5 pages; un-compressed would require 20 pages.
+NOTE: Table WORK.CONDITION created, with 264 rows and 12 columns.
+
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.04 seconds
+      cpu time            0.01 seconds
+      
+
+
+NOTE: There were 264 observations read from the data set WORK.CONDITION.
+NOTE: The data set RDBDATA.CONDITION has 264 observations and 14 variables.
+NOTE: Compressing data set RDBDATA.CONDITION decreased size by 71.43 percent. 
+      Compressed is 6 pages; un-compressed would require 21 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Compressing data set WORK.PAMONLY increased size by 100.00 percent. 
+      Compressed is 2 pages; un-compressed would require 1 pages.
+NOTE: Table WORK.PAMONLY created, with 15 rows and 2 columns.
+
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: Appending WORK.PAMONLY to RDBDATA.CONDITION.
+WARNING: Variable disease_grp_cd was not found on DATA file.
+WARNING: Variable disease_grp_desc was not found on DATA file.
+WARNING: Variable condition_cd was not found on DATA file.
+WARNING: Variable condition_desc was not found on DATA file.
+WARNING: Variable condition_short_nm was not found on DATA file.
+51                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+WARNING: Variable condition_cd_eff_dt was not found on DATA file.
+WARNING: Variable condition_cd_end_dt was not found on DATA file.
+WARNING: Variable nnd_ind was not found on DATA file.
+WARNING: Variable condition_cd_sys_cd was not found on DATA file.
+WARNING: Variable condition_cd_sys_cd_nm was not found on DATA file.
+WARNING: Variable assigning_authority_cd was not found on DATA file.
+WARNING: Variable assigning_authority_desc was not found on DATA file.
+NOTE: There were 15 observations read from the data set WORK.PAMONLY.
+NOTE: 15 observations added.
+NOTE: The data set RDBDATA.CONDITION has 279 observations and 14 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 279 observations read from the data set RDBDATA.CONDITION.
+NOTE: The data set RDBDATA.CONDITION has 280 observations and 15 variables.
+NOTE: Compressing data set RDBDATA.CONDITION decreased size by 75.00 percent. 
+      Compressed is 6 pages; un-compressed would require 24 pages.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+
+
+NOTE: Appending RDBDATA.CONDITION to NBS_RDB.Condition.
+WARNING: Variable CONDITION_CD has different lengths on BASE and DATA files (BASE 50 DATA 20).
+WARNING: Variable NND_IND has different lengths on BASE and DATA files (BASE 50 DATA 1).
+WARNING: Variable PROGRAM_AREA_DESC has different lengths on BASE and DATA files (BASE 100 DATA 49).
+WARNING: Variable CONDITION_CD_SYS_CD has different lengths on BASE and DATA files (BASE 50 DATA 300).
+NOTE: FORCE is specified, so dropping/truncating will occur.
+NOTE: There were 1 observations read from the data set RDBDATA.CONDITION.
+NOTE: 0 observations added.
+NOTE: The data set NBS_RDB.Condition has . observations and 15 variables.
+ERROR: CLI execute error: [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Violation of PRIMARY 
+       KEY constraint 'PK__CONDITIO__B34A9ABBF67F007B'. Cannot insert duplicate key in object 
+       'dbo.CONDITION'. The duplicate key value is (1). : [Microsoft][ODBC Driver 17 for SQL 
+       Server][SQL Server]The statement has been terminated.
+NOTE: Statements not processed because of errors noted above.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.05 seconds
+      cpu time            0.01 seconds
+      
+NOTE: The SAS System stopped processing this step because of errors.
+
+
+
+NOTE: Deleting WORK.PAMONLY (memtype=DATA).
+
+NOTE: PROCEDURE DATASETS used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+52                                          The SAS System          12:41 Wednesday, December 13, 2023
+
+
+
+	End Time:     13DEC2023:12:41:33
+*****The End ConditionDim*********
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+ETL Process Status: Successful          
+ETL Processing Time:
+	Start Time:   13DEC2023:12:41:00
+	End Time:     13DEC2023:12:41:33
+	Total Time:  0:00:33
+*****The End*********
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: Compression was disabled for data set RDBDATA.ETLSTATUS because compression overhead would 
+      increase the size of the data set.
+NOTE: The data set RDBDATA.ETLSTATUS has 1 observations and 1 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+
+3495       
+3496       %put &etlerr;
+0
+ERROR: Errors printed on page 51.
+
+NOTE: SAS Institute Inc., SAS Campus Drive, Cary, NC USA 27513-2414
+NOTE: The SAS System used:
+      real time           4.65 seconds
+      cpu time            2.20 seconds
+      

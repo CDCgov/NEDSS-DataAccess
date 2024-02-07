@@ -1,0 +1,68 @@
+Changed database context to 'rdb'.
+
+(5 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(4 rows affected)
+
+(4 rows affected)
+
+(2 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(230052 rows affected)
+
+(311 rows affected)
+
+(1526 rows affected)
+
+(22647 rows affected)
+
+(640 rows affected)
+
+(638 rows affected)
+
+(22647 rows affected)
+0
+D_contact_record
+Return Value
+------------
+           0
+
+(1 rows affected)
+0
+D_INTERVIEW
+Return Value
+------------
+           0
+
+(1 rows affected)
+0
+D_VACCINATION
+Return Value
+------------
+           0
+
+(1 rows affected)
+
+(1 rows affected)
+
+(1 rows affected)
+Return Value TEST 
+------------------
+                -1
+
+(1 rows affected)
+                  
+------------------
+no more processing
+
+(1 rows affected)

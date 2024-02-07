@@ -1,0 +1,915 @@
+Changed database context to 'rdb'.
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(230052 rows affected)
+
+(311 rows affected)
+
+(1526 rows affected)
+
+(22647 rows affected)
+
+(640 rows affected)
+
+(638 rows affected)
+
+(22647 rows affected)
+0
+D_contact_record
+Return Value
+------------
+           0
+
+(1 rows affected)
+0
+D_INTERVIEW
+Return Value
+------------
+           0
+
+(1 rows affected)
+0
+D_VACCINATION
+Return Value
+------------
+           0
+
+(1 rows affected)
+
+(1 rows affected)
+
+(1 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+                                                                             
+-------------------------------------- --------------------------------------
+           2023-11-20 16:48:20.3530000            2024-01-07 15:53:40.9670000
+
+(1 rows affected)
+                                                                             
+-------------------------------------- --------------------------------------
+           2023-11-20 16:48:20.3530000            2024-01-07 15:53:40.9670000
+
+(1 rows affected)
+
+(4 rows affected)
+
+(1 rows affected)
+
+(4 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+Return Value TEST 
+------------------
+                 0
+
+(1 rows affected)
+
+(1 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+240107155340
+
+(1 rows affected)
+
+(1 rows affected)
+
+(1 rows affected)
+
+(1 rows affected)
+
+(1 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(1 rows affected)
+
+(1 rows affected)
+
+(1 rows affected)
+
+(1 rows affected)
+
+(1 rows affected)
+
+(1 rows affected)
+Warning: Null value is eliminated by an aggregate or other SET operation.
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(1 rows affected)
+
+(1 rows affected)
+
+(1 rows affected)
+
+(1 rows affected)
+
+(4 rows affected)
+
+(2 rows affected)
+
+(1 rows affected)
+
+(1 rows affected)
+
+(1 rows affected)
+
+(1 rows affected)
+UPDATED_OBSERVATION_LIST Jan  7 2024  3:59:57:400PM
+
+(0 rows affected)
+UPDATED_LAB_TEST_LIST Jan  7 2024  3:59:57:407PM
+
+(2 rows affected)
+LAB_TEST_RESULT Jan  7 2024  4:00:00:523PM
+
+(1 rows affected)
+
+(2 rows affected)
+TEST_RESULT_GROUPING Jan  7 2024  4:00:09:890PM
+
+(2 rows affected)
+LAB_RESULT_COMMENT Jan  7 2024  4:00:12:023PM
+
+(2 rows affected)
+RESULT_COMMENT_GROUP Jan  7 2024  4:00:13:230PM
+
+(2 rows affected)
+LAB_RPT_USER_COMMENT Jan  7 2024  4:00:22:897PM
+
+(1 rows affected)
+LAB_TEST Jan  7 2024  4:00:23:400PM
+
+(2 rows affected)
+UPDATED_LAB_TEST_LIST Jan  7 2024  4:01:04:900PM
+
+(2 rows affected)
+UPDATED_LAB_TEST_LIST Jan  7 2024  4:01:08:667PM
+
+(1 rows affected)
+done!! Jan  7 2024  4:04:12:050PM
+
+(1 rows affected)
+
+(0 rows affected)
+240107155340
+
+(1 rows affected)
+
+(5 rows affected)
+
+(1 rows affected)
+
+(5 rows affected)
+
+(1 rows affected)
+
+(5 rows affected)
+
+(5 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(5 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(5 rows affected)
+
+(3 rows affected)
+
+(5 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(3 rows affected)
+
+(5 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(2 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(1 rows affected)
+
+(5 rows affected)
+
+(1 rows affected)
+
+(5 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(5 rows affected)
+
+(5 rows affected)
+
+(5 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(5 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(5 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(5 rows affected)
+
+(5 rows affected)
+
+(5 rows affected)
+
+(5 rows affected)
+
+(5 rows affected)
+
+(1 rows affected)
+
+(5 rows affected)
+
+(1 rows affected)
+
+(5 rows affected)
+
+(5 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(5 rows affected)
+
+(1 rows affected)
+
+(5 rows affected)
+
+(1 rows affected)
+
+(5 rows affected)
+
+(5 rows affected)
+
+(5 rows affected)
+
+(5 rows affected)
+
+(1 rows affected)
+
+(1 rows affected)
+
+(1 rows affected)
+
+(5 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(5 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(5 rows affected)
+
+(1 rows affected)
+
+(5 rows affected)
+
+(3 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(2 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(5 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(5 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(5 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(5 rows affected)
+
+(1 rows affected)
+
+(1 rows affected)
+
+(43 rows affected)
+240107155340
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(1 rows affected)
+
+(21 rows affected)
+240107155340
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(1 rows affected)
+240107155340
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(8 rows affected)
+
+(1 rows affected)
+
+(8 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(7930822 rows affected)
+
+(1 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+240107155340
+CLEAR_USER_PROFILE CALLED
+
+(1 rows affected)
+
+(1 rows affected)
+USER_PROFILE CALLED
+
+(1 rows affected)
+
+(4 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(4 rows affected)
+
+(4 rows affected)
+
+(4 rows affected)
+
+(1 rows affected)
+
+(4 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)
+
+(4 rows affected)
+
+(1 rows affected)
+
+(1 rows affected)
+
+(0 rows affected)

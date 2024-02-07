@@ -1,0 +1,1 @@
+%SAS_HOME%\sas.exe -sysin D:\wildfly-10.0.0.Final\nedssdomain\Nedss\report\dw\etl\src\codeset1.sas -nosyntaxcheck -print D:\wildfly-10.0.0.Final\nedssdomain\Nedss\report\log\test_etl_temp1.lst -log D:\wildfly-10.0.0.Final\nedssdomain\Nedss\report\log\testetl_temp1.log -config %SAS_HOME%\SASV9.CFG -autoexec D:\wildfly-10.0.0.Final\nedssdomain\Nedss\report\autoexec.sas

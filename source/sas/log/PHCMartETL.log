@@ -1,0 +1,2 @@
+Msg 916, Level 14, State 2, Server EC2AMAZ-75BE948, Line 1
+The server principal "nbs_ods" is not able to access the database "nbs_classic" under the current security context.
