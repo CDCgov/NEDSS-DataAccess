@@ -452,627 +452,627 @@ class HL7v2_5_1_ORU:
         pass        
     #This segment is used to transmit information specific to an order for a diagnostic study or observation, physical exam, or assessment.
     def OBR():
-        #obr_1 - Set ID - OBR
-        #obr_2 - Placer Order Number
-        #obr_2_1 - Entity Identifier
-        #obr_2_2 - Namespace Id
-        #obr_2_3 - Universal Id
-        #obr_2_4 - Universal Id Type
-        #obr_3 - Filler Order Number
-        #obr_3.1 - Entity Identifier
-        #obr_3.2 - Namespace Id
-        #obr_3.3 - Universal Id
-        #obr_3.4 - Universal Id Type
-        #obr_4 - Universal Service Identifier
-        #obr_4.1 - Identifier
-        #obr_4.2 - Text
-        #obr_4.3 - Name Of Coding System
-        #obr_4.4 - Alternate Identifier
-        #obr_4.5 - Alternate Text
-        #obr_4.6 - Name Of Alternate Coding System
-        #obr_5 - Priority - OBR
-        #obr_6 - Requested Date/Time
-        #obr_6.1 - Time
-        #obr_6.2 - Degree Of Precision
-        #obr_7 - Observation Date/Time
-        #obr_7.1 - Time
-        #obr_7.2 - Degree Of Precision
-        #obr_8 - Observation End Date/Time
-        #obr_8.1 - Time
-        #obr_8.2 - Degree Of Precision
-        #obr_9 - Collection Volume
-        #obr_9.1 - Quantity
-        #obr_9.2 - Units
-        #obr_10 - Collector Identifier
-        #obr_10.1 - Id Number
-        #obr_10.2 - Family Name
-        #obr_10.2.1 - Surname
-        #obr_10.2.2 - Own Surname Prefix
-        #obr_10.2.3 - Own Surname
-        #obr_10.2.4 - Surname Prefix From Partner/Spouse
-        #obr_10.2.5 - Surname From Partner/Spouse
-        #obr_10.3 - Given Name
-        #obr_10.4 - Second And Further Given Names Or Initials Thereof
-        #obr_10.5 - Suffix (e.g., Jr Or Iii)
-        #obr_10.6 - Prefix (e.g., Dr)
-        #obr_10.7 - Degree (e.g., Md)
-        #obr_10.8 - Source Table
-        #obr_10.9 - Assigning Authority
-        #obr_10.9.1 - Namespace Id
-        #obr_10.9.2 - Universal Id
-        #obr_10.9.3 - Universal Id Type
-        #obr_10.10 - Name Type Code
-        #obr_10.11 - Identifier Check Digit
-        #obr_10.12 - Check Digit Scheme
-        #obr_10.13 - Identifier Type Code
-        #obr_10.14 - Assigning Facility
-        #obr_10.14.1 - Namespace Id
-        #obr_10.14.2 - Universal Id
-        #obr_10.14.3 - Universal Id Type
-        #obr_10.15 - Name Representation Code
-        #obr_10.16 - Name Context
-        #obr_10.16.1 - Identifier
-        #obr_10.16.2 - Text
-        #obr_10.16.3 - Name Of Coding System
-        #obr_10.16.4 - Alternate Identifier
-        #obr_10.16.5 - Alternate Text
-        #obr_10.16.6 - Name Of Alternate Coding System
-        #obr_10.17 - Name Validity Range
-        #obr_10.17.1 - Range Start Date/Time
-        #obr_10.17.1.1 - Time
-        #obr_10.17.1.2 - Degree Of Precision
-        #obr_10.17.2 - Range End Date/Time
-        #obr_10.17.2.1 - Time
-        #obr_10.17.2.2 - Degree Of Precision
-        #obr_10.18 - Name Assembly Order
-        #obr_10.19 - Effective Date
-        #obr_10.19.1 - Time
-        #obr_10.19.2 - Degree Of Precision
-        #obr_10.20 - Expiration Date
-        #obr_10.20.1 - Time
-        #obr_10.20.2 - Degree Of Precision
-        #obr_10.21 - Professional Suffix
-        #obr_10.22 - Assigning Jurisdiction
-        #obr_10.22.1 - Identifier
-        #obr_10.22.2 - Text
-        #obr_10.22.3 - Name Of Coding System
-        #obr_10.22.4 - Alternate Identifier
-        #obr_10.22.5 - Alternate Text
-        #obr_10.22.6 - Name Of Alternate Coding System
-        #obr_10.22.7 - Coding System Version Id
-        #obr_10.22.8 - Alternate Coding System Version Id
-        #obr_10.22.9 - Original Text
-        #obr_10.23 - Assigning Agency Or Department
-        #obr_10.23.1 - Identifier
-        #obr_10.23.2 - Text
-        #obr_10.23.3 - Name Of Coding System
-        #obr_10.23.4 - Alternate Identifier
-        #obr_10.23.5 - Alternate Text
-        #obr_10.23.6 - Name Of Alternate Coding System
-        #obr_10.23.7 - Coding System Version Id
-        #obr_10.23.8 - Alternate Coding System Version Id
-        #obr_10.23.9 - Original Text
-        #obr_11 - Specimen Action Code
-        #obr_12 - Danger Code
-        #obr_12.1 - Identifier
-        #obr_12.2 - Text
-        #obr_12.3 - Name Of Coding System
-        #obr_12.4 - Alternate Identifier
-        #obr_12.5 - Alternate Text
-        #obr_12.6 - Name Of Alternate Coding System
-        #obr_13 - Relevant Clinical Information
-        #obr_14 - Specimen Received Date/Time
-        #obr_14.1 - Time
-        #obr_14.2 - Degree Of Precision
-        #obr_15 - Specimen Source
-        #obr_15.1 - Specimen Source Name Or Code
-        #obr_15.1.1 - Identifier
-        #obr_15.1.2 - Text
-        #obr_15.1.3 - Name Of Coding System
-        #obr_15.1.4 - Alternate Identifier
-        #obr_15.1.5 - Alternate Text
-        #obr_15.1.6 - Name Of Alternate Coding System
-        #obr_15.1.7 - Coding System Version Id
-        #obr_15.1.8 - Alternate Coding System Version Id
-        #obr_15.1.9 - Original Text
-        #obr_15.2 - Additives
-        #obr_15.2.1 - Identifier
-        #obr_15.2.2 - Text
-        #obr_15.2.3 - Name Of Coding System
-        #obr_15.2.4 - Alternate Identifier
-        #obr_15.2.5 - Alternate Text
-        #obr_15.2.6 - Name Of Alternate Coding System
-        #obr_15.2.7 - Coding System Version Id
-        #obr_15.2.8 - Alternate Coding System Version Id
-        #obr_15.2.9 - Original Text
-        #obr_15.3 - Specimen Collection Method
-        #obr_15.4 - Body Site
-        #obr_15.4.1 - Identifier
-        #obr_15.4.2 - Text
-        #obr_15.4.3 - Name Of Coding System
-        #obr_15.4.4 - Alternate Identifier
-        #obr_15.4.5 - Alternate Text
-        #obr_15.4.6 - Name Of Alternate Coding System
-        #obr_15.4.7 - Coding System Version Id
-        #obr_15.4.8 - Alternate Coding System Version Id
-        #obr_15.4.9 - Original Text
-        #obr_15.5 - Site Modifier
-        #obr_15.5.1 - Identifier
-        #obr_15.5.2 - Text
-        #obr_15.5.3 - Name Of Coding System
-        #obr_15.5.4 - Alternate Identifier
-        #obr_15.5.5 - Alternate Text
-        #obr_15.5.6 - Name Of Alternate Coding System
-        #obr_15.5.7 - Coding System Version Id
-        #obr_15.5.8 - Alternate Coding System Version Id
-        #obr_15.5.9 - Original Text
-        #obr_15.6 - Collection Method Modifier Code
-        #obr_15.6.1 - Identifier
-        #obr_15.6.2 - Text
-        #obr_15.6.3 - Name Of Coding System
-        #obr_15.6.4 - Alternate Identifier
-        #obr_15.6.5 - Alternate Text
-        #obr_15.6.6 - Name Of Alternate Coding System
-        #obr_15.6.7 - Coding System Version Id
-        #obr_15.6.8 - Alternate Coding System Version Id
-        #obr_15.6.9 - Original Text
-        #obr_15.7 - Specimen Role
-        #obr_15.7.1 - Identifier
-        #obr_15.7.2 - Text
-        #obr_15.7.3 - Name Of Coding System
-        #obr_15.7.4 - Alternate Identifier
-        #obr_15.7.5 - Alternate Text
-        #obr_15.7.6 - Name Of Alternate Coding System
-        #obr_15.7.7 - Coding System Version Id
-        #obr_15.7.8 - Alternate Coding System Version Id
-        #obr_15.7.9 - Original Text
-        #obr_16 - Ordering Provider
-        #obr_16.1 - Id Number
-        #obr_16.2 - Family Name
-        #obr_16.2.1 - Surname
-        #obr_16.2.2 - Own Surname Prefix
-        #obr_16.2.3 - Own Surname
-        #obr_16.2.4 - Surname Prefix From Partner/Spouse
-        #obr_16.2.5 - Surname From Partner/Spouse
-        #obr_16.3 - Given Name
-        #obr_16.4 - Second And Further Given Names Or Initials Thereof
-        #obr_16.5 - Suffix (e.g., Jr Or Iii)
-        #obr_16.6 - Prefix (e.g., Dr)
-        #obr_16.7 - Degree (e.g., Md)
-        #obr_16.8 - Source Table
-        #obr_16.9 - Assigning Authority
-        #obr_16.9.1 - Namespace Id
-        #obr_16.9.2 - Universal Id
-        #obr_16.9.3 - Universal Id Type
-        #obr_16.10 - Name Type Code
-        #obr_16.11 - Identifier Check Digit
-        #obr_16.12 - Check Digit Scheme
-        #obr_16.13 - Identifier Type Code
-        #obr_16.14 - Assigning Facility
-        #obr_16.14.1 - Namespace Id
-        #obr_16.14.2 - Universal Id
-        #obr_16.14.3 - Universal Id Type
-        #obr_16.15 - Name Representation Code
-        #obr_16.16 - Name Context
-        #obr_16.16.1 - Identifier
-        #obr_16.16.2 - Text
-        #obr_16.16.3 - Name Of Coding System
-        #obr_16.16.4 - Alternate Identifier
-        #obr_16.16.5 - Alternate Text
-        #obr_16.16.6 - Name Of Alternate Coding System
-        #obr_16.17 - Name Validity Range
-        #obr_16.17.1 - Range Start Date/Time
-        #obr_16.17.1.1 - Time
-        #obr_16.17.1.2 - Degree Of Precision
-        #obr_16.17.2 - Range End Date/Time
-        #obr_16.17.2.1 - Time
-        #obr_16.17.2.2 - Degree Of Precision
-        #obr_16.18 - Name Assembly Order
-        #obr_16.19 - Effective Date
-        #obr_16.19.1 - Time
-        #obr_16.19.1 - Degree Of Precision
-        #obr_16.20 - Expiration Date
-        #obr_16.20.1 - Time
-        #obr_16.20.1 - Degree Of Precision        
-        #obr_16.21 - Professional Suffix
-        #obr_16.22 - Assigning Jurisdiction
-        #obr_16.22.1 - Identifier
-        #obr_16.22.2 - Text
-        #obr_16.22.3 - Name Of Coding System
-        #obr_16.22.4 - Alternate Identifier
-        #obr_16.22.5 - Alternate Text
-        #obr_16.22.6 - Name Of Alternate Coding System
-        #obr_16.22.7 - Coding System Version Id
-        #obr_16.22.8 - Alternate Coding System Version Id
-        #obr_16.22.9 - Original Text
-        #obr_16.23 - Assigning Agency Or Department
-        #obr_16.23.1 - Identifier
-        #obr_16.23.2 - Text
-        #obr_16.23.3 - Name Of Coding System
-        #obr_16.23.4 - Alternate Identifier
-        #obr_16.23.5 - Alternate Text
-        #obr_16.23.6 - Name Of Alternate Coding System
-        #obr_16.23.7 - Coding System Version Id
-        #obr_16.23.8 - Alternate Coding System Version Id
-        #obr_16.23.9 - Original Text
-        #obr_17 - Order Callback Phone Number
-        #obr_17.1 - Telephone Number
-        #obr_17.2 - Telecommunication Use Code
-        #obr_17.3 - Telecommunication Equipment Type
-        #obr_17.4 - Email Address
-        #obr_17.5 - Country Code
-        #obr_17.6 - Area/City Code
-        #obr_17.7 - Local Number
-        #obr_17.8 - Extension
-        #obr_17.9 - Any Text
-        #obr_17.10 - Extension Prefix
-        #obr_17.11 - Speed Dial Code
-        #obr_17.12 - Unformatted Telephone Number
-        #obr_18 - Placer Field 1
-        #obr_19 - Placer Field 2
-        #obr_20 - Filler Field 1
-        #obr_21 - Filler Field 2
-        #obr_22 - Results Rpt/Status Chng - Date/Time
-        #obr_22.1 - Time
-        #obr_22.1 - Degree Of Precision
-        #obr_23 - Charge to Practice
-        #obr_23.1 - Monetary Amount
-        #obr_23.1.1 - Quantity
-        #obr_23.1.2 - Denomination
-        #obr_23.2 - Charge Code
-        #obr_23.2.1 - Identifier
-        #obr_23.2.2 - Text
-        #obr_23.2.3 - Name Of Coding System
-        #obr_23.2.4 - Alternate Identifier
-        #obr_23.2.5 - Alternate Text
-        #obr_23.2.6 - Name Of Alternate Coding System
-        #obr_24 - Diagnostic Serv Sect ID
-        #obr_25 - Result Status
-        #obr_26 - Parent Result
-        #obr_26.1 - Parent Observation Identifier
-        #obr_26.1.1 - Identifier
-        #obr_26.1.2 - Text
-        #obr_26.1.3 - Name Of Coding System
-        #obr_26.1.4 - Alternate Identifier
-        #obr_26.1.5 - Alternate Text
-        #obr_26.1.6 - Name Of Alternate Coding System
-        #obr_26.2 - Parent Observation Sub-identifier
-        #obr_26.3 - Parent Observation Value Descriptor
-        #obr_27 - Quantity/Timing
-        #obr_27.1 - Quantity
-        #obr_27.1.1 - Quantity
-        #obr_27.1.2 - Units
-        #obr_27.1.1 - Identifier
-        #obr_27.1.2 - Text
-        #obr_27.1.3 - Name Of Coding System
-        #obr_27.1.4 - Alternate Identifier
-        #obr_27.1.5 - Alternate Text
-        #obr_27.1.6 - Name Of Alternate Coding System
-        #obr_27.2 - Interval
-        #obr_27.2.1 - Repeat Pattern
-        #obr_27.2.2 - Explicit Time Interval
-        #obr_27.3 - Duration
-        #obr_27.4 - Start Date/Time
-        #obr_27.4.1 - Time
-        #obr_27.4.2 - Degree Of Precision
-        #obr_27.5 - End Date/Time
-        #obr_27.5.1 - Time
-        #obr_27.5.2 - Degree Of Precision
-        #obr_27.6 - Priority
-        #obr_27.7 - Condition
-        #obr_27.8 - Text
-        #obr_27.9 - Conjunction
-        #obr_27.10 - Order Sequencing
-        #obr_27.10.1 - Sequence/Results Flag
-        #obr_27.10.2 - Placer Order Number: Entity Identifier
-        #obr_27.10.3 - Placer Order Number: Namespace Id
-        #obr_27.10.4 - Filler Order Number: Entity Identifier
-        #obr_27.10.5 - Filler Order Number: Namespace Id
-        #obr_27.10.6 - Sequence Condition Value
-        #obr_27.10.7 - Maximum Number Of Repeats
-        #obr_27.10.8 - Placer Order Number: Universal Id
-        #obr_27.10.9 - Placer Order Number: Universal Id Type
-        #obr_27.10.10 - Filler Order Number: Universal Id
-        #obr_27.10.11 - Filler Order Number: Universal Id Type
-        #obr_27.11 - Occurrence Duration
-        #obr_27.11.1 - Identifier
-        #obr_27.11.2 - Text
-        #obr_27.11.3 - Name Of Coding System
-        #obr_27.11.4 - Alternate Identifier
-        #obr_27.11.5 - Alternate Text
-        #obr_27.11.6 - Name Of Alternate Coding System
-        #obr_27.12 - Total Occurrences
-        #obr_28 - Result Copies To
-        #obr_28.1 - Id Number
-        #obr_28.2 - Family Name
-        #obr_28.2.1 - Surname
-        #obr_28.2.2 - Own Surname Prefix
-        #obr_28.2.3 - Own Surname
-        #obr_28.2.4 - Surname Prefix From Partner/Spouse
-        #obr_28.2.5 - Surname From Partner/Spouse
-        #obr_28.3 - Given Name
-        #obr_28.4 - Second And Further Given Names Or Initials Thereof
-        #obr_28.5 - Suffix (e.g., Jr Or Iii)
-        #obr_28.6 - Prefix (e.g., Dr)
-        #obr_28.7 - Degree (e.g., Md)
-        #obr_28.8 - Source Table
-        #obr_28.9 - Assigning Authority
-        #obr_28.9.1 - Namespace Id
-        #obr_28.9.2 - Universal Id
-        #obr_28.9.3 - Universal Id Type
-        #obr_28.10 - Name Type Code
-        #obr_28.11 - Identifier Check Digit
-        #obr_28.12 - Check Digit Scheme
-        #obr_28.13 - Identifier Type Code
-        #obr_28.14 - Assigning Facility
-        #obr_28.14.1 - Namespace Id
-        #obr_28.14.2 - Universal Id
-        #obr_28.14.3 - Universal Id Type
-        #obr_28.15 - Name Representation Code
-        #obr_28.16 - Name Context
-        #obr_28.16.1 - Identifier
-        #obr_28.16.2 - Text
-        #obr_28.16.3 - Name Of Coding System
-        #obr_28.16.4 - Alternate Identifier
-        #obr_28.16.5 - Alternate Text
-        #obr_28.16.6 - Name Of Alternate Coding System
-        #obr_28.17 - Name Validity Range
-        #obr_28.17.1 - Range Start Date/Time
-        #obr_28.17.1.1 - Time
-        #obr_28.17.1.2 - Degree Of Precision
-        #obr_28.17.2 - Range End Date/Time
-        #obr_28.17.2.1 - Time
-        #obr_28.17.2.2 - Degree Of Precision
-        #obr_28.18 - Name Assembly Order
-        #obr_28.19 - Effective Date
-        #obr_28.19.1 - Time
-        #obr_28.19.2 - Degree Of Precision
-        #obr_28.20 - Expiration Date
-        #obr_28.20.1 - Time
-        #obr_28.20.2 - Degree Of Precision
-        #obr_28.21 - Professional Suffix
-        #obr_28.22 - Assigning Jurisdiction
-        #obr_28.22.1 - Identifier
-        #obr_28.22.2 - Text
-        #obr_28.22.3 - Name Of Coding System
-        #obr_28.22.4 - Alternate Identifier
-        #obr_28.22.5 - Alternate Text
-        #obr_28.22.6 - Name Of Alternate Coding System
-        #obr_28.22.7 - Coding System Version Id
-        #obr_28.22.8 - Alternate Coding System Version Id
-        #obr_28.22.9 - Original Text
-        #obr_28.23 - Assigning Agency Or Department
-        #obr_28.23.1 - Identifier
-        #obr_28.23.2 - Text
-        #obr_28.23.3 - Name Of Coding System
-        #obr_28.23.4 - Alternate Identifier
-        #obr_28.23.5 - Alternate Text
-        #obr_28.23.6 - Name Of Alternate Coding System
-        #obr_28.23.7 - Coding System Version Id
-        #obr_28.23.8 - Alternate Coding System Version Id
-        #obr_28.23.9 - Original Text
-        #obr_29 - Parent
-        #obr_29.1 - Placer Assigned Identifier
-        #obr_29.1.1 - Entity Identifier
-        #obr_29.1.2 - Namespace Id
-        #obr_29.1.3 - Universal Id
-        #obr_29.1.4 - Universal Id Type
-        #obr_29.2 - Filler Assigned Identifier
-        #obr_29.2.1 - Entity Identifier
-        #obr_29.2.2 - Namespace Id
-        #obr_29.2.3 - Universal Id
-        #obr_29.2.4 - Universal Id Type
-        #obr_30 - Transportation Mode
-        #obr_31 - Reason for Study
-        #obr_31.1 - Identifier
-        #obr_31.2 - Text
-        #obr_31.3 - Name Of Coding System
-        #obr_31.4 - Alternate Identifier
-        #obr_31.5 - Alternate Text
-        #obr_31.6 - Name Of Alternate Coding System
-        #obr_32 - Principal Result Interpreter
-        #obr_32.1 - Name
-        #obr_32.1.1 - Id Number
-        #obr_32.1.2 - Family Name
-        #obr_32.1.3 - Given Name
-        #obr_32.1.4 - Second And Further Given Names Or Initials Thereof
-        #obr_32.1.5 - Suffix
-        #obr_32.1.6 - Prefix
-        #obr_32.1.7 - Degree
-        #obr_32.1.8 - Source Table
-        #obr_32.1.9 - Assigning Authority - Namespace Id
-        #obr_32.1.10 - Assigning Authority- Universal Id
-        #obr_32.1.11 - Assigning Authority - Universal Id Type
-        #obr_32.2 - Start Date/Time
-        #obr_32.2.1 - Time
-        #obr_32.2.2 - Degree Of Precision
-        #obr_32.3 - End Date/Time
-        #obr_32.3.1 - Time
-        #obr_32.3.2 - Degree Of Precision
-        #obr_32.4 - Point Of Care
-        #obr_32.5 - Room
-        #obr_32.6 - Bed
-        #obr_32.7 - Facility
-        #obr_32.7.1 - Namespace Id
-        #obr_32.7.2 - Universal Id
-        #obr_32.7.3 - Universal Id Type
-        #obr_32.8 - Location Status
-        #obr_32.9 - Patient Location Type
-        #obr_32.10 - Building
-        #obr_32.11 - Floor
-        #obr_33 - Assistant Result Interpreter
-        #obr_33.1 - Name
-        #obr_33.1.1 - Id Number
-        #obr_33.1.2 - Family Name
-        #obr_33.1.3 - Given Name
-        #obr_33.1.4 - Second And Further Given Names Or Initials Thereof
-        #obr_33.1.5 - Suffix
-        #obr_33.1.6 - Prefix
-        #obr_33.1.7 - Degree
-        #obr_33.1.8 - Source Table
-        #obr_33.1.9 - Assigning Authority - Namespace Id
-        #obr_33.1.10 - Assigning Authority- Universal Id
-        #obr_33.1.11 - Assigning Authority - Universal Id Type
-        #obr_33.2 - Start Date/Time
-        #obr_33.2.1 - Time
-        #obr_33.2.2 - Degree Of Precision
-        #obr_33.3 - End Date/Time
-        #obr_33.3.1 - Time
-        #obr_33.3.2 - Degree Of Precision
-        #obr_33.4 - Point Of Care
-        #obr_33.5 - Room
-        #obr_33.6 - Bed
-        #obr_33.7 - Facility
-        #obr_33.7.1 - Namespace Id
-        #obr_33.7.2 - Universal Id
-        #obr_33.7.3 - Universal Id Type
-        #obr_33.8 - Location Status
-        #obr_33.9 - Patient Location Type
-        #obr_33.10 - Building
-        #obr_33.11 - Floor
-        #obr_34 - Technician
-        #obr_34.1 - Name
-        #obr_34.1.1 - Id Number
-        #obr_34.1.2 - Family Name
-        #obr_34.1.3 - Given Name
-        #obr_34.1.4 - Second And Further Given Names Or Initials Thereof
-        #obr_34.1.5 - Suffix
-        #obr_34.1.6 - Prefix
-        #obr_34.1.7 - Degree
-        #obr_34.1.8 - Source Table
-        #obr_34.1.9 - Assigning Authority - Namespace Id
-        #obr_34.1.10 - Assigning Authority- Universal Id
-        #obr_34.1.11 - Assigning Authority - Universal Id Type
-        #obr_34.2 - Start Date/Time
-        #obr_34.2.1 - Time
-        #obr_34.2.2 - Degree Of Precision
-        #obr_34.3 - End Date/Time
-        #obr_34.3.1 - Time
-        #obr_34.3.2 - Degree Of Precision
-        #obr_34.4 - Point Of Care
-        #obr_34.5 - Room
-        #obr_34.6 - Bed
-        #obr_34.7 - Facility
-        #obr_34.7.1 - Namespace Id
-        #obr_34.7.2 - Universal Id
-        #obr_34.7.3 - Universal Id Type
-        #obr_34.8 - Location Status
-        #obr_34.9 - Patient Location Type
-        #obr_34.10 - Building
-        #obr_34.11 - Floor
-        #obr_35 - Transcriptionist
-        #obr_35.1 - Name
-        #obr_35.1.1 - Id Number
-        #obr_35.1.2 - Family Name
-        #obr_35.1.3 - Given Name
-        #obr_35.1.4 - Second And Further Given Names Or Initials Thereof
-        #obr_35.1.5 - Suffix
-        #obr_35.1.6 - Prefix
-        #obr_35.1.7 - Degree
-        #obr_35.1.8 - Source Table
-        #obr_35.1.9 - Assigning Authority - Namespace Id
-        #obr_35.1.10 - Assigning Authority- Universal Id
-        #obr_35.1.11 - Assigning Authority - Universal Id Type
-        #obr_35.2 - Start Date/Time
-        #obr_35.2.1 - Time
-        #obr_35.2.2 - Degree Of Precision
-        #obr_35.3 - End Date/Time
-        #obr_35.3.1 - Time
-        #obr_35.3.2 - Degree Of Precision
-        #obr_35.4 - Point Of Care
-        #obr_35.5 - Room
-        #obr_35.6 - Bed
-        #obr_35.7 - Facility
-        #obr_35.7.1 - Namespace Id
-        #obr_35.7.2 - Universal Id
-        #obr_35.7.3 - Universal Id Type
-        #obr_35.8 - Location Status
-        #obr_35.9 - Patient Location Type
-        #obr_35.10 - Building
-        #obr_35.11 - Floor
-        #obr_36 - Scheduled Date/Time
-        #obr_36.1 - Time
-        #obr_36.2 - Degree Of Precision
-        #obr_37 - Number of Sample Containers
-        #obr_38 - Transport Logistics of Collected Sample
-        #obr_38.1 - Identifier
-        #obr_38.2 - Text
-        #obr_38.3 - Name Of Coding System
-        #obr_38.4 - Alternate Identifier
-        #obr_38.5 - Alternate Text
-        #obr_38.6 - Name Of Alternate Coding System
-        #obr_39 - Collector's Comment
-        #obr_39.1 - Identifier
-        #obr_39.2 - Text
-        #obr_39.3 - Name Of Coding System
-        #obr_39.4 - Alternate Identifier
-        #obr_39.5 - Alternate Text
-        #obr_39.6 - Name Of Alternate Coding System
-        #obr_40 - Transport Arrangement Responsibility
-        #obr_40.1 - Identifier
-        #obr_40.2 - Text
-        #obr_40.3 - Name Of Coding System
-        #obr_40.4 - Alternate Identifier
-        #obr_40.5 - Alternate Text
-        #obr_40.6 - Name Of Alternate Coding System
-        #obr_41 - Transport Arranged
-        #obr_42 - Escort Required
-        #obr_43 - Planned Patient Transport Comment
-        #obr_43.1 - Identifier
-        #obr_43.2 - Text
-        #obr_43.3 - Name Of Coding System
-        #obr_43.4 - Alternate Identifier
-        #obr_43.5 - Alternate Text
-        #obr_43.6 - Name Of Alternate Coding System
-        #obr_44 - Procedure Code
-        #obr_44.1 - Identifier
-        #obr_44.2 - Text
-        #obr_44.3 - Name Of Coding System
-        #obr_44.4 - Alternate Identifier
-        #obr_44.5 - Alternate Text
-        #obr_44.6 - Name Of Alternate Coding System
-        #obr_45 - Procedure Code Modifier
-        #obr_45.1 - Identifier
-        #obr_45.2 - Text
-        #obr_45.3 - Name Of Coding System
-        #obr_45.4 - Alternate Identifier
-        #obr_45.5 - Alternate Text
-        #obr_45.6 - Name Of Alternate Coding System
-        #obr_46 - Placer Supplemental Service Information
-        #obr_46.1 - Identifier
-        #obr_46.2 - Text
-        #obr_46.3 - Name Of Coding System
-        #obr_46.4 - Alternate Identifier
-        #obr_46.5 - Alternate Text
-        #obr_46.6 - Name Of Alternate Coding System
-        #obr_47 - Filler Supplemental Service Information
-        #obr_47.1 - Identifier
-        #obr_47.2 - Text
-        #obr_47.3 - Name Of Coding System
-        #obr_47.4 - Alternate Identifier
-        #obr_47.5 - Alternate Text
-        #obr_47.6 - Name Of Alternate Coding System
-        #obr_48 - Medically Necessary Duplicate Procedure Reason.
-        #obr_48.1 - Identifier
-        #obr_48.2 - Text
-        #obr_48.3 - Name Of Coding System
-        #obr_48.4 - Alternate Identifier
-        #obr_48.5 - Alternate Text
-        #obr_48.6 - Name Of Alternate Coding System
-        #obr_48.7 - Coding System Version Id
-        #obr_48.8 - Alternate Coding System Version Id
-        #obr_48.9 - Original Text
-        #obr_49 - Result Handling
-        #obr_50 - Parent Universal Service Identifier
-        #obr_50.1 - Identifier
-        #obr_50.2 - Text
-        #obr_50.3 - Name Of Coding System
-        #obr_50.4 - Alternate Identifier
-        #obr_50.5 - Alternate Text
-        #obr_50.6 - Name Of Alternate Coding System
-        #obr_50.7 - Coding System Version Id
-        #obr_50.8 - Alternate Coding System Version Id
-        #obr_50.9 - Original Text
+        obr_1 = obr_1  # OBR.1 - Set ID - OBR
+        obr_2 = obr_2  # OBR.2 - Placer Order Number
+        obr_2_1 = obr_2_1  # OBR.2.1 - Entity Identifier
+        obr_2_2 = obr_2_2  # OBR.2.2 - Namespace Id
+        obr_2_3 = obr_2_3  # OBR.2.3 - Universal Id
+        obr_2_4 = obr_2_4  # OBR.2.4 - Universal Id Type
+        obr_3 = obr_3  # OBR.3 - Filler Order Number
+        obr_3_1 = obr_3_1  # OBR.3.1 - Entity Identifier
+        obr_3_2 = obr_3_2  # OBR.3.2 - Namespace Id
+        obr_3_3 = obr_3_3  # OBR.3.3 - Universal Id
+        obr_3_4 = obr_3_4  # OBR.3.4 - Universal Id Type
+        obr_4 = obr_4  # OBR.4 - Universal Service Identifier
+        obr_4_1 = obr_4_1  # OBR.4.1 - Identifier
+        obr_4_2 = obr_4_2  # OBR.4.2 - Text
+        obr_4_3 = obr_4_3  # OBR.4.3 - Name Of Coding System
+        obr_4_4 = obr_4_4  # OBR.4.4 - Alternate Identifier
+        obr_4_5 = obr_4_5  # OBR.4.5 - Alternate Text
+        obr_4_6 = obr_4_6  # OBR.4.6 - Name Of Alternate Coding System
+        obr_5 = obr_5  # OBR.5 - Priority
+        obr_6 = obr_6  # OBR.6 - Requested Date/Time
+        obr_6_1 = obr_6_1  # OBR.6.1 - Time
+        obr_6_2 = obr_6_2  # OBR.6.2 - Degree Of Precision
+        obr_7 = obr_7  # OBR.7 - Observation Date/Time
+        obr_7_1 = obr_7_1  # OBR.7.1 - Time
+        obr_7_2 = obr_7_2  # OBR.7.2 - Degree Of Precision
+        obr_8 = obr_8  # OBR.8 - Observation End Date/Time
+        obr_8_1 = obr_8_1  # OBR.8.1 - Time
+        obr_8_2 = obr_8_2  # OBR.8.2 - Degree Of Precision
+        obr_9 = obr_9  # OBR.9 - Collection Volume
+        obr_9_1 = obr_9_1  # OBR.9.1 - Quantity
+        obr_9_2 = obr_9_2  # OBR.9.2 - Units
+        obr_10 = obr_10  # OBR.10 - Collector Identifier
+        obr_10_1 = obr_10_1  # OBR.10.1 - Id Number
+        obr_10_2 = obr_10_2  # OBR.10.2 - Family Name
+        obr_10_2_1 = obr_10_2_1  # OBR.10.2.1 - Surname
+        obr_10_2_2 = obr_10_2_2  # OBR.10.2.2 - Own Surname Prefix
+        obr_10_2_3 = obr_10_2_3  # OBR.10.2.3 - Own Surname
+        obr_10_2_4 = obr_10_2_4  # OBR.10.2.4 - Surname Prefix From Partner/Spouse
+        obr_10_2_5 = obr_10_2_5  # OBR.10.2.5 - Surname From Partner/Spouse
+        obr_10_3 = obr_10_3  # OBR.10.3 - Given Name
+        obr_10_4 = obr_10_4  # OBR.10.4 - Second And Further Given Names Or Initials Thereof
+        obr_10_5 = obr_10_5  # OBR.10.5 - Suffix (e.g., Jr Or Iii)
+        obr_10_6 = obr_10_6  # OBR.10.6 - Prefix (e.g., Dr)
+        obr_10_7 = obr_10_7  # OBR.10.7 - Degree (e.g., Md)
+        obr_10_8 = obr_10_8  # OBR.10.8 - Source Table
+        obr_10_9 = obr_10_9  # OBR.10.9 - Assigning Authority
+        obr_10_9_1 = obr_10_9_1  # OBR.10.9.1 - Namespace Id
+        obr_10_9_2 = obr_10_9_2  # OBR.10.9.2 - Universal Id
+        obr_10_9_3 = obr_10_9_3  # OBR.10.9.3 - Universal Id Type
+        obr_10_10 = obr_10_10  # OBR.10.10 - Name Type Code
+        obr_10_11 = obr_10_11  # OBR.10.11 - Identifier Check Digit
+        obr_10_12 = obr_10_12  # OBR.10.12 - Check Digit Scheme
+        obr_10_13 = obr_10_13  # OBR.10.13 - Identifier Type Code
+        obr_10_14 = obr_10_14  # OBR.10.14 - Assigning Facility
+        obr_10_14_1 = obr_10_14_1  # OBR.10.14.1 - Namespace Id
+        obr_10_14_2 = obr_10_14_2  # OBR.10.14.2 - Universal Id
+        obr_10_14_3 = obr_10_14_3  # OBR.10.14.3 - Universal Id Type
+        obr_10_15 = obr_10_15  # OBR.10.15 - Name Representation Code
+        obr_10_16 = obr_10_16  # OBR.10.16 - Name Context
+        obr_10_16_1 = obr_10_16_1  # OBR.10.16.1 - Identifier
+        obr_10_16_2 = obr_10_16_2  # OBR.10.16.2 - Text
+        obr_10_16_3 = obr_10_16_3  # OBR.10.16.3 - Name Of Coding System
+        obr_10_16_4 = obr_10_16_4  # OBR.10.16.4 - Alternate Identifier
+        obr_10_16_5 = obr_10_16_5  # OBR.10.16.5 - Alternate Text
+        obr_10_16_6 = obr_10_16_6  # OBR.10.16.6 - Name Of Alternate Coding System
+        obr_10_17 = obr_10_17  # OBR.10.17 - Name Validity Range
+        obr_10_17_1 = obr_10_17_1  # OBR.10.17.1 - Range Start Date/Time
+        obr_10_17_1_1 = obr_10_17_1_1  # OBR.10.17.1.1 - Time
+        obr_10_17_1_2 = obr_10_17_1_2  # OBR.10.17.1.2 - Degree Of Precision
+        obr_10_17_2 = obr_10_17_2  # OBR.10.17.2 - Range End Date/Time
+        obr_10_17_2_1 = obr_10_17_2_1  # OBR.10.17.2.1 - Time
+        obr_10_17_2_2 = obr_10_17_2_2  # OBR.10.17.2.2 - Degree Of Precision
+        obr_10_18 = obr_10_18  # OBR.10.18 - Name Assembly Order
+        obr_10_19 = obr_10_19  # OBR.10.19 - Effective Date
+        obr_10_19_1 = obr_10_19_1  # OBR.10.19.1 - Time
+        obr_10_19_2 = obr_10_19_2  # OBR.10.19.2 - Degree Of Precision
+        obr_10_20 = obr_10_20  # OBR.10.20 - Expiration Date
+        obr_10_20_1 = obr_10_20_1  # OBR.10.20.1 - Time
+        obr_10_20_2 = obr_10_20_2  # OBR.10.20.2 - Degree Of Precision
+        obr_10_21 = obr_10_21  # OBR.10.21 - Professional Suffix
+        obr_10_22 = obr_10_22  # OBR.10.22 - Assigning Jurisdiction
+        obr_10_22_1 = obr_10_22_1  # OBR.10.22.1 - Identifier
+        obr_10_22_2 = obr_10_22_2  # OBR.10.22.2 - Text
+        obr_10_22_3 = obr_10_22_3  # OBR.10.22.3 - Name Of Coding System
+        obr_10_22_4 = obr_10_22_4  # OBR.10.22.4 - Alternate Identifier
+        obr_10_22_5 = obr_10_22_5  # OBR.10.22.5 - Alternate Text
+        obr_10_22_6 = obr_10_22_6  # OBR.10.22.6 - Name Of Alternate Coding System
+        obr_10_22_7 = obr_10_22_7  # OBR.10.22.7 - Coding System Version Id
+        obr_10_22_8 = obr_10_22_8  # OBR.10.22.8 - Alternate Coding System Version Id
+        obr_10_22_9 = obr_10_22_9  # OBR.10.22.9 - Original Text
+        obr_10_23 = obr_10_23  # OBR.10.23 - Assigning Agency Or Department
+        obr_10_23_1 = obr_10_23_1  # OBR.10.23.1 - Identifier
+        obr_10_23_2 = obr_10_23_2  # OBR.10.23.2 - Text
+        obr_10_23_3 = obr_10_23_3  # OBR.10.23.3 - Name Of Coding System
+        obr_10_23_4 = obr_10_23_4  # OBR.10.23.4 - Alternate Identifier
+        obr_10_23_5 = obr_10_23_5  # OBR.10.23.5 - Alternate Text
+        obr_10_23_6 = obr_10_23_6  # OBR.10.23.6 - Name Of Alternate Coding System
+        obr_10_23_7 = obr_10_23_7  # OBR.10.23.7 - Coding System Version Id
+        obr_10_23_8 = obr_10_23_8  # OBR.10.23.8 - Alternate Coding System Version Id
+        obr_10_23_9 = obr_10_23_9  # OBR.10.23.9 - Original Text
+        obr_11 = obr_11  # OBR.11 - Specimen Action Code
+        obr_12 = obr_12  # OBR.12 - Danger Code
+        obr_12_1 = obr_12_1  # OBR.12.1 - Identifier
+        obr_12_2 = obr_12_2  # OBR.12.2 - Text
+        obr_12_3 = obr_12_3  # OBR.12.3 - Name Of Coding System
+        obr_12_4 = obr_12_4  # OBR.12.4 - Alternate Identifier
+        obr_12_5 = obr_12_5  # OBR.12.5 - Alternate Text
+        obr_12_6 = obr_12_6  # OBR.12.6 - Name Of Alternate Coding System
+        obr_13 = obr_13  # OBR.13 - Relevant Clinical Information
+        obr_14 = obr_14  # OBR.14 - Specimen Received Date/Time
+        obr_14_1 = obr_14_1  # OBR.14.1 - Time
+        obr_14_2 = obr_14_2  # OBR.14.2 - Degree Of Precision
+        obr_15 = obr_15  # OBR.15 - Specimen Source
+        obr_15_1 = obr_15_1  # OBR.15.1 - Specimen Source Name Or Code
+        obr_15_1_1 = obr_15_1_1  # OBR.15.1.1 - Identifier
+        obr_15_1_2 = obr_15_1_2  # OBR.15.1.2 - Text
+        obr_15_1_3 = obr_15_1_3  # OBR.15.1.3 - Name Of Coding System
+        obr_15_1_4 = obr_15_1_4  # OBR.15.1.4 - Alternate Identifier
+        obr_15_1_5 = obr_15_1_5  # OBR.15.1.5 - Alternate Text
+        obr_15_1_6 = obr_15_1_6  # OBR.15.1.6 - Name Of Alternate Coding System
+        obr_15_1_7 = obr_15_1_7  # OBR.15.1.7 - Coding System Version Id
+        obr_15_1_8 = obr_15_1_8  # OBR.15.1.8 - Alternate Coding System Version Id
+        obr_15_1_9 = obr_15_1_9  # OBR.15.1.9 - Original Text
+        obr_15_2 = obr_15_2  # OBR.15.2 - Additives
+        obr_15_2_1 = obr_15_2_1  # OBR.15.2.1 - Identifier
+        obr_15_2_2 = obr_15_2_2  # OBR.15.2.2 - Text
+        obr_15_2_3 = obr_15_2_3  # OBR.15.2.3 - Name Of Coding System
+        obr_15_2_4 = obr_15_2_4  # OBR.15.2.4 - Alternate Identifier
+        obr_15_2_5 = obr_15_2_5  # OBR.15.2.5 - Alternate Text
+        obr_15_2_6 = obr_15_2_6  # OBR.15.2.6 - Name Of Alternate Coding System
+        obr_15_2_7 = obr_15_2_7  # OBR.15.2.7 - Coding System Version Id
+        obr_15_2_8 = obr_15_2_8  # OBR.15.2.8 - Alternate Coding System Version Id
+        obr_15_2_9 = obr_15_2_9  # OBR.15.2.9 - Original Text
+        obr_15_3 = obr_15_3  # OBR.15.3 - Specimen Collection Method
+        obr_15_4 = obr_15_4  # OBR.15.4 - Body Site
+        obr_15_4_1 = obr_15_4_1  # OBR.15.4.1 - Identifier
+        obr_15_4_2 = obr_15_4_2  # OBR.15.4.2 - Text
+        obr_15_4_3 = obr_15_4_3  # OBR.15.4.3 - Name Of Coding System
+        obr_15_4_4 = obr_15_4_4  # OBR.15.4.4 - Alternate Identifier
+        obr_15_4_5 = obr_15_4_5  # OBR.15.4.5 - Alternate Text
+        obr_15_4_6 = obr_15_4_6  # OBR.15.4.6 - Name Of Alternate Coding System
+        obr_15_4_7 = obr_15_4_7  # OBR.15.4.7 - Coding System Version Id
+        obr_15_4_8 = obr_15_4_8  # OBR.15.4.8 - Alternate Coding System Version Id
+        obr_15_4_9 = obr_15_4_9  # OBR.15.4.9 - Original Text
+        obr_15_5 = obr_15_5  # OBR.15.5 - Site Modifier
+        obr_15_5_1 = obr_15_5_1  # OBR.15.5.1 - Identifier
+        obr_15_5_2 = obr_15_5_2  # OBR.15.5.2 - Text
+        obr_15_5_3 = obr_15_5_3  # OBR.15.5.3 - Name Of Coding System
+        obr_15_5_4 = obr_15_5_4  # OBR.15.5.4 - Alternate Identifier
+        obr_15_5_5 = obr_15_5_5  # OBR.15.5.5 - Alternate Text
+        obr_15_5_6 = obr_15_5_6  # OBR.15.5.6 - Name Of Alternate Coding System
+        obr_15_5_7 = obr_15_5_7  # OBR.15.5.7 - Coding System Version Id
+        obr_15_5_8 = obr_15_5_8  # OBR.15.5.8 - Alternate Coding System Version Id
+        obr_15_5_9 = obr_15_5_9  # OBR.15.5.9 - Original Text
+        obr_15_6 = obr_15_6  # OBR.15.6 - Collection Method Modifier Code
+        obr_15_6_1 = obr_15_6_1  # OBR.15.6.1 - Identifier
+        obr_15_6_2 = obr_15_6_2  # OBR.15.6.2 - Text
+        obr_15_6_3 = obr_15_6_3  # OBR.15.6.3 - Name Of Coding System
+        obr_15_6_4 = obr_15_6_4  # OBR.15.6.4 - Alternate Identifier
+        obr_15_6_5 = obr_15_6_5  # OBR.15.6.5 - Alternate Text
+        obr_15_6_6 = obr_15_6_6  # OBR.15.6.6 - Name Of Alternate Coding System
+        obr_15_6_7 = obr_15_6_7  # OBR.15.6.7 - Coding System Version Id
+        obr_15_6_8 = obr_15_6_8  # OBR.15.6.8 - Alternate Coding System Version Id
+        obr_15_6_9 = obr_15_6_9  # OBR.15.6.9 - Original Text
+        obr_15_7 = obr_15_7  # OBR.15.7 - Specimen Role
+        obr_15_7_1 = obr_15_7_1  # OBR.15.7.1 - Identifier
+        obr_15_7_2 = obr_15_7_2  # OBR.15.7.2 - Text
+        obr_15_7_3 = obr_15_7_3  # OBR.15.7.3 - Name Of Coding System
+        obr_15_7_4 = obr_15_7_4  # OBR.15.7.4 - Alternate Identifier
+        obr_15_7_5 = obr_15_7_5  # OBR.15.7.5 - Alternate Text
+        obr_15_7_6 = obr_15_7_6  # OBR.15.7.6 - Name Of Alternate Coding System
+        obr_15_7_7 = obr_15_7_7  # OBR.15.7.7 - Coding System Version Id
+        obr_15_7_8 = obr_15_7_8  # OBR.15.7.8 - Alternate Coding System Version Id
+        obr_15_7_9 = obr_15_7_9  # OBR.15.7.9 - Original Text
+        obr_16 = obr_16  # OBR.16 - Ordering Provider
+        obr_16_1 = obr_16_1  # OBR.16.1 - Id Number
+        obr_16_2 = obr_16_2  # OBR.16.2 - Family Name
+        obr_16_2_1 = obr_16_2_1  # OBR.16.2.1 - Surname
+        obr_16_2_2 = obr_16_2_2  # OBR.16.2.2 - Own Surname Prefix
+        obr_16_2_3 = obr_16_2_3  # OBR.16.2.3 - Own Surname
+        obr_16_2_4 = obr_16_2_4  # OBR.16.2.4 - Surname Prefix From Partner/Spouse
+        obr_16_2_5 = obr_16_2_5  # OBR.16.2.5 - Surname From Partner/Spouse
+        obr_16_3 = obr_16_3  # OBR.16.3 - Given Name
+        obr_16_4 = obr_16_4  # OBR.16.4 - Second And Further Given Names Or Initials Thereof
+        obr_16_5 = obr_16_5  # OBR.16.5 - Suffix (e.g., Jr Or Iii)
+        obr_16_6 = obr_16_6  # OBR.16.6 - Prefix (e.g., Dr)
+        obr_16_7 = obr_16_7  # OBR.16.7 - Degree (e.g., Md)
+        obr_16_8 = obr_16_8  # OBR.16.8 - Source Table
+        obr_16_9 = obr_16_9  # OBR.16.9 - Assigning Authority
+        obr_16_9_1 = obr_16_9_1  # OBR.16.9.1 - Namespace Id
+        obr_16_9_2 = obr_16_9_2  # OBR.16.9.2 - Universal Id
+        obr_16_9_3 = obr_16_9_3  # OBR.16.9.3 - Universal Id Type
+        obr_16_10 = obr_16_10  # OBR.16.10 - Name Type Code
+        obr_16_11 = obr_16_11  # OBR.16.11 - Identifier Check Digit
+        obr_16_12 = obr_16_12  # OBR.16.12 - Check Digit Scheme
+        obr_16_13 = obr_16_13  # OBR.16.13 - Identifier Type Code
+        obr_16_14 = obr_16_14  # OBR.16.14 - Assigning Facility
+        obr_16_14_1 = obr_16_14_1  # OBR.16.14.1 - Namespace Id
+        obr_16_14_2 = obr_16_14_2  # OBR.16.14.2 - Universal Id
+        obr_16_14_3 = obr_16_14_3  # OBR.16.14.3 - Universal Id Type
+        obr_16_15 = obr_16_15  # OBR.16.15 - Name Representation Code
+        obr_16_16 = obr_16_16  # OBR.16.16 - Name Context
+        obr_16_16_1 = obr_16_16_1  # OBR.16.16.1 - Identifier
+        obr_16_16_2 = obr_16_16_2  # OBR.16.16.2 - Text
+        obr_16_16_3 = obr_16_16_3  # OBR.16.16.3 - Name Of Coding System
+        obr_16_16_4 = obr_16_16_4  # OBR.16.16.4 - Alternate Identifier
+        obr_16_16_5 = obr_16_16_5  # OBR.16.16.5 - Alternate Text
+        obr_16_16_6 = obr_16_16_6  # OBR.16.16.6 - Name Of Alternate Coding System
+        obr_16_17 = obr_16_17  # OBR.16.17 - Name Validity Range
+        obr_16_17_1 = obr_16_17_1  # OBR.16.17.1 - Range Start Date/Time
+        obr_16_17_1_1 = obr_16_17_1_1  # OBR.16.17.1.1 - Time
+        obr_16_17_1_2 = obr_16_17_1_2  # OBR.16.17.1.2 - Degree Of Precision
+        obr_16_17_2 = obr_16_17_2  # OBR.16.17.2 - Range End Date/Time
+        obr_16_17_2_1 = obr_16_17_2_1  # OBR.16.17.2.1 - Time
+        obr_16_17_2_2 = obr_16_17_2_2  # OBR.16.17.2.2 - Degree Of Precision
+        obr_16_18 = obr_16_18  # OBR.16.18 - Name Assembly Order
+        obr_16_19 = obr_16_19  # OBR.16.19 - Effective Date
+        obr_16_19_1 = obr_16_19_1  # OBR.16.19.1 - Time
+        obr_16_19_1 = obr_16_19_1  # OBR.16.19.1 - Degree Of Precision
+        obr_16_20 = obr_16_20  # OBR.16.20 - Expiration Date
+        obr_16_20_1 = obr_16_20_1  # OBR.16.20.1 - Time
+        obr_16_20_1 = obr_16_20_1  # OBR.16.20.1 - Degree Of Precision
+        obr_16_21 = obr_16_21  # OBR.16.21 - Professional Suffix
+        obr_16_22 = obr_16_22  # OBR.16.22 - Assigning Jurisdiction
+        obr_16_22_1 = obr_16_22_1  # OBR.16.22.1 - Identifier
+        obr_16_22_2 = obr_16_22_2  # OBR.16.22.2 - Text
+        obr_16_22_3 = obr_16_22_3  # OBR.16.22.3 - Name Of Coding System
+        obr_16_22_4 = obr_16_22_4  # OBR.16.22.4 - Alternate Identifier
+        obr_16_22_5 = obr_16_22_5  # OBR.16.22.5 - Alternate Text
+        obr_16_22_6 = obr_16_22_6  # OBR.16.22.6 - Name Of Alternate Coding System
+        obr_16_22_7 = obr_16_22_7  # OBR.16.22.7 - Coding System Version Id
+        obr_16_22_8 = obr_16_22_8  # OBR.16.22.8 - Alternate Coding System Version Id
+        obr_16_22_9 = obr_16_22_9  # OBR.16.22.9 - Original Text
+        obr_16_23 = obr_16_23  # OBR.16.23 - Assigning Agency Or Department
+        obr_16_23_1 = obr_16_23_1  # OBR.16.23.1 - Identifier
+        obr_16_23_2 = obr_16_23_2  # OBR.16.23.2 - Text
+        obr_16_23_3 = obr_16_23_3  # OBR.16.23.3 - Name Of Coding System
+        obr_16_23_4 = obr_16_23_4  # OBR.16.23.4 - Alternate Identifier
+        obr_16_23_5 = obr_16_23_5  # OBR.16.23.5 - Alternate Text
+        obr_16_23_6 = obr_16_23_6  # OBR.16.23.6 - Name Of Alternate Coding System
+        obr_16_23_7 = obr_16_23_7  # OBR.16.23.7 - Coding System Version Id
+        obr_16_23_8 = obr_16_23_8  # OBR.16.23.8 - Alternate Coding System Version Id
+        obr_16_23_9 = obr_16_23_9  # OBR.16.23.9 - Original Text
+        obr_17 = obr_17  # OBR.17 - Order Callback Phone Number
+        obr_17_1 = obr_17_1  # OBR.17.1 - Telephone Number
+        obr_17_2 = obr_17_2  # OBR.17.2 - Telecommunication Use Code
+        obr_17_3 = obr_17_3  # OBR.17.3 - Telecommunication Equipment Type
+        obr_17_4 = obr_17_4  # OBR.17.4 - Email Address
+        obr_17_5 = obr_17_5  # OBR.17.5 - Country Code
+        obr_17_6 = obr_17_6  # OBR.17.6 - Area/City Code
+        obr_17_7 = obr_17_7  # OBR.17.7 - Local Number
+        obr_17_8 = obr_17_8  # OBR.17.8 - Extension
+        obr_17_9 = obr_17_9  # OBR.17.9 - Any Text
+        obr_17_10 = obr_17_10  # OBR.17.10 - Extension Prefix
+        obr_17_11 = obr_17_11  # OBR.17.11 - Speed Dial Code
+        obr_17_12 = obr_17_12  # OBR.17.12 - Unformatted Telephone Number
+        obr_18 = obr_18  # OBR.18 - Placer Field 1
+        obr_19 = obr_19  # OBR.19 - Placer Field 2
+        obr_20 = obr_20  # OBR.20 - Filler Field 1
+        obr_21 = obr_21  # OBR.21 - Filler Field 2
+        obr_22 = obr_22  # OBR.22 - Results Rpt/Status Chng
+        obr_22_1 = obr_22_1  # OBR.22.1 - Time
+        obr_22_1 = obr_22_1  # OBR.22.1 - Degree Of Precision
+        obr_23 = obr_23  # OBR.23 - Charge to Practice
+        obr_23_1 = obr_23_1  # OBR.23.1 - Monetary Amount
+        obr_23_1_1 = obr_23_1_1  # OBR.23.1.1 - Quantity
+        obr_23_1_2 = obr_23_1_2  # OBR.23.1.2 - Denomination
+        obr_23_2 = obr_23_2  # OBR.23.2 - Charge Code
+        obr_23_2_1 = obr_23_2_1  # OBR.23.2.1 - Identifier
+        obr_23_2_2 = obr_23_2_2  # OBR.23.2.2 - Text
+        obr_23_2_3 = obr_23_2_3  # OBR.23.2.3 - Name Of Coding System
+        obr_23_2_4 = obr_23_2_4  # OBR.23.2.4 - Alternate Identifier
+        obr_23_2_5 = obr_23_2_5  # OBR.23.2.5 - Alternate Text
+        obr_23_2_6 = obr_23_2_6  # OBR.23.2.6 - Name Of Alternate Coding System
+        obr_24 = obr_24  # OBR.24 - Diagnostic Serv Sect ID
+        obr_25 = obr_25  # OBR.25 - Result Status
+        obr_26 = obr_26  # OBR.26 - Parent Result
+        obr_26_1 = obr_26_1  # OBR.26.1 - Parent Observation Identifier
+        obr_26_1_1 = obr_26_1_1  # OBR.26.1.1 - Identifier
+        obr_26_1_2 = obr_26_1_2  # OBR.26.1.2 - Text
+        obr_26_1_3 = obr_26_1_3  # OBR.26.1.3 - Name Of Coding System
+        obr_26_1_4 = obr_26_1_4  # OBR.26.1.4 - Alternate Identifier
+        obr_26_1_5 = obr_26_1_5  # OBR.26.1.5 - Alternate Text
+        obr_26_1_6 = obr_26_1_6  # OBR.26.1.6 - Name Of Alternate Coding System
+        obr_26_2 = obr_26_2  # OBR.26.2 - Parent Observation Sub
+        obr_26_3 = obr_26_3  # OBR.26.3 - Parent Observation Value Descriptor
+        obr_27 = obr_27  # OBR.27 - Quantity/Timing
+        obr_27_1 = obr_27_1  # OBR.27.1 - Quantity
+        obr_27_1_1 = obr_27_1_1  # OBR.27.1.1 - Quantity
+        obr_27_1_2 = obr_27_1_2  # OBR.27.1.2 - Units
+        obr_27_1_1 = obr_27_1_1  # OBR.27.1.1 - Identifier
+        obr_27_1_2 = obr_27_1_2  # OBR.27.1.2 - Text
+        obr_27_1_3 = obr_27_1_3  # OBR.27.1.3 - Name Of Coding System
+        obr_27_1_4 = obr_27_1_4  # OBR.27.1.4 - Alternate Identifier
+        obr_27_1_5 = obr_27_1_5  # OBR.27.1.5 - Alternate Text
+        obr_27_1_6 = obr_27_1_6  # OBR.27.1.6 - Name Of Alternate Coding System
+        obr_27_2 = obr_27_2  # OBR.27.2 - Interval
+        obr_27_2_1 = obr_27_2_1  # OBR.27.2.1 - Repeat Pattern
+        obr_27_2_2 = obr_27_2_2  # OBR.27.2.2 - Explicit Time Interval
+        obr_27_3 = obr_27_3  # OBR.27.3 - Duration
+        obr_27_4 = obr_27_4  # OBR.27.4 - Start Date/Time
+        obr_27_4_1 = obr_27_4_1  # OBR.27.4.1 - Time
+        obr_27_4_2 = obr_27_4_2  # OBR.27.4.2 - Degree Of Precision
+        obr_27_5 = obr_27_5  # OBR.27.5 - End Date/Time
+        obr_27_5_1 = obr_27_5_1  # OBR.27.5.1 - Time
+        obr_27_5_2 = obr_27_5_2  # OBR.27.5.2 - Degree Of Precision
+        obr_27_6 = obr_27_6  # OBR.27.6 - Priority
+        obr_27_7 = obr_27_7  # OBR.27.7 - Condition
+        obr_27_8 = obr_27_8  # OBR.27.8 - Text
+        obr_27_9 = obr_27_9  # OBR.27.9 - Conjunction
+        obr_27_10 = obr_27_10  # OBR.27.10 - Order Sequencing
+        obr_27_10_1 = obr_27_10_1  # OBR.27.10.1 - Sequence/Results Flag
+        obr_27_10_2 = obr_27_10_2  # OBR.27.10.2 - Placer Order Number: Entity Identifier
+        obr_27_10_3 = obr_27_10_3  # OBR.27.10.3 - Placer Order Number: Namespace Id
+        obr_27_10_4 = obr_27_10_4  # OBR.27.10.4 - Filler Order Number: Entity Identifier
+        obr_27_10_5 = obr_27_10_5  # OBR.27.10.5 - Filler Order Number: Namespace Id
+        obr_27_10_6 = obr_27_10_6  # OBR.27.10.6 - Sequence Condition Value
+        obr_27_10_7 = obr_27_10_7  # OBR.27.10.7 - Maximum Number Of Repeats
+        obr_27_10_8 = obr_27_10_8  # OBR.27.10.8 - Placer Order Number: Universal Id
+        obr_27_10_9 = obr_27_10_9  # OBR.27.10.9 - Placer Order Number: Universal Id Type
+        obr_27_10_10 = obr_27_10_10  # OBR.27.10.10 - Filler Order Number: Universal Id
+        obr_27_10_11 = obr_27_10_11  # OBR.27.10.11 - Filler Order Number: Universal Id Type
+        obr_27_11 = obr_27_11  # OBR.27.11 - Occurrence Duration
+        obr_27_11_1 = obr_27_11_1  # OBR.27.11.1 - Identifier
+        obr_27_11_2 = obr_27_11_2  # OBR.27.11.2 - Text
+        obr_27_11_3 = obr_27_11_3  # OBR.27.11.3 - Name Of Coding System
+        obr_27_11_4 = obr_27_11_4  # OBR.27.11.4 - Alternate Identifier
+        obr_27_11_5 = obr_27_11_5  # OBR.27.11.5 - Alternate Text
+        obr_27_11_6 = obr_27_11_6  # OBR.27.11.6 - Name Of Alternate Coding System
+        obr_27_12 = obr_27_12  # OBR.27.12 - Total Occurrences
+        obr_28 = obr_28  # OBR.28 - Result Copies To
+        obr_28_1 = obr_28_1  # OBR.28.1 - Id Number
+        obr_28_2 = obr_28_2  # OBR.28.2 - Family Name
+        obr_28_2_1 = obr_28_2_1  # OBR.28.2.1 - Surname
+        obr_28_2_2 = obr_28_2_2  # OBR.28.2.2 - Own Surname Prefix
+        obr_28_2_3 = obr_28_2_3  # OBR.28.2.3 - Own Surname
+        obr_28_2_4 = obr_28_2_4  # OBR.28.2.4 - Surname Prefix From Partner/Spouse
+        obr_28_2_5 = obr_28_2_5  # OBR.28.2.5 - Surname From Partner/Spouse
+        obr_28_3 = obr_28_3  # OBR.28.3 - Given Name
+        obr_28_4 = obr_28_4  # OBR.28.4 - Second And Further Given Names Or Initials Thereof
+        obr_28_5 = obr_28_5  # OBR.28.5 - Suffix (e.g., Jr Or Iii)
+        obr_28_6 = obr_28_6  # OBR.28.6 - Prefix (e.g., Dr)
+        obr_28_7 = obr_28_7  # OBR.28.7 - Degree (e.g., Md)
+        obr_28_8 = obr_28_8  # OBR.28.8 - Source Table
+        obr_28_9 = obr_28_9  # OBR.28.9 - Assigning Authority
+        obr_28_9_1 = obr_28_9_1  # OBR.28.9.1 - Namespace Id
+        obr_28_9_2 = obr_28_9_2  # OBR.28.9.2 - Universal Id
+        obr_28_9_3 = obr_28_9_3  # OBR.28.9.3 - Universal Id Type
+        obr_28_10 = obr_28_10  # OBR.28.10 - Name Type Code
+        obr_28_11 = obr_28_11  # OBR.28.11 - Identifier Check Digit
+        obr_28_12 = obr_28_12  # OBR.28.12 - Check Digit Scheme
+        obr_28_13 = obr_28_13  # OBR.28.13 - Identifier Type Code
+        obr_28_14 = obr_28_14  # OBR.28.14 - Assigning Facility
+        obr_28_14_1 = obr_28_14_1  # OBR.28.14.1 - Namespace Id
+        obr_28_14_2 = obr_28_14_2  # OBR.28.14.2 - Universal Id
+        obr_28_14_3 = obr_28_14_3  # OBR.28.14.3 - Universal Id Type
+        obr_28_15 = obr_28_15  # OBR.28.15 - Name Representation Code
+        obr_28_16 = obr_28_16  # OBR.28.16 - Name Context
+        obr_28_16_1 = obr_28_16_1  # OBR.28.16.1 - Identifier
+        obr_28_16_2 = obr_28_16_2  # OBR.28.16.2 - Text
+        obr_28_16_3 = obr_28_16_3  # OBR.28.16.3 - Name Of Coding System
+        obr_28_16_4 = obr_28_16_4  # OBR.28.16.4 - Alternate Identifier
+        obr_28_16_5 = obr_28_16_5  # OBR.28.16.5 - Alternate Text
+        obr_28_16_6 = obr_28_16_6  # OBR.28.16.6 - Name Of Alternate Coding System
+        obr_28_17 = obr_28_17  # OBR.28.17 - Name Validity Range
+        obr_28_17_1 = obr_28_17_1  # OBR.28.17.1 - Range Start Date/Time
+        obr_28_17_1_1 = obr_28_17_1_1  # OBR.28.17.1.1 - Time
+        obr_28_17_1_2 = obr_28_17_1_2  # OBR.28.17.1.2 - Degree Of Precision
+        obr_28_17_2 = obr_28_17_2  # OBR.28.17.2 - Range End Date/Time
+        obr_28_17_2_1 = obr_28_17_2_1  # OBR.28.17.2.1 - Time
+        obr_28_17_2_2 = obr_28_17_2_2  # OBR.28.17.2.2 - Degree Of Precision
+        obr_28_18 = obr_28_18  # OBR.28.18 - Name Assembly Order
+        obr_28_19 = obr_28_19  # OBR.28.19 - Effective Date
+        obr_28_19_1 = obr_28_19_1  # OBR.28.19.1 - Time
+        obr_28_19_2 = obr_28_19_2  # OBR.28.19.2 - Degree Of Precision
+        obr_28_20 = obr_28_20  # OBR.28.20 - Expiration Date
+        obr_28_20_1 = obr_28_20_1  # OBR.28.20.1 - Time
+        obr_28_20_2 = obr_28_20_2  # OBR.28.20.2 - Degree Of Precision
+        obr_28_21 = obr_28_21  # OBR.28.21 - Professional Suffix
+        obr_28_22 = obr_28_22  # OBR.28.22 - Assigning Jurisdiction
+        obr_28_22_1 = obr_28_22_1  # OBR.28.22.1 - Identifier
+        obr_28_22_2 = obr_28_22_2  # OBR.28.22.2 - Text
+        obr_28_22_3 = obr_28_22_3  # OBR.28.22.3 - Name Of Coding System
+        obr_28_22_4 = obr_28_22_4  # OBR.28.22.4 - Alternate Identifier
+        obr_28_22_5 = obr_28_22_5  # OBR.28.22.5 - Alternate Text
+        obr_28_22_6 = obr_28_22_6  # OBR.28.22.6 - Name Of Alternate Coding System
+        obr_28_22_7 = obr_28_22_7  # OBR.28.22.7 - Coding System Version Id
+        obr_28_22_8 = obr_28_22_8  # OBR.28.22.8 - Alternate Coding System Version Id
+        obr_28_22_9 = obr_28_22_9  # OBR.28.22.9 - Original Text
+        obr_28_23 = obr_28_23  # OBR.28.23 - Assigning Agency Or Department
+        obr_28_23_1 = obr_28_23_1  # OBR.28.23.1 - Identifier
+        obr_28_23_2 = obr_28_23_2  # OBR.28.23.2 - Text
+        obr_28_23_3 = obr_28_23_3  # OBR.28.23.3 - Name Of Coding System
+        obr_28_23_4 = obr_28_23_4  # OBR.28.23.4 - Alternate Identifier
+        obr_28_23_5 = obr_28_23_5  # OBR.28.23.5 - Alternate Text
+        obr_28_23_6 = obr_28_23_6  # OBR.28.23.6 - Name Of Alternate Coding System
+        obr_28_23_7 = obr_28_23_7  # OBR.28.23.7 - Coding System Version Id
+        obr_28_23_8 = obr_28_23_8  # OBR.28.23.8 - Alternate Coding System Version Id
+        obr_28_23_9 = obr_28_23_9  # OBR.28.23.9 - Original Text
+        obr_29 = obr_29  # OBR.29 - Parent
+        obr_29_1 = obr_29_1  # OBR.29.1 - Placer Assigned Identifier
+        obr_29_1_1 = obr_29_1_1  # OBR.29.1.1 - Entity Identifier
+        obr_29_1_2 = obr_29_1_2  # OBR.29.1.2 - Namespace Id
+        obr_29_1_3 = obr_29_1_3  # OBR.29.1.3 - Universal Id
+        obr_29_1_4 = obr_29_1_4  # OBR.29.1.4 - Universal Id Type
+        obr_29_2 = obr_29_2  # OBR.29.2 - Filler Assigned Identifier
+        obr_29_2_1 = obr_29_2_1  # OBR.29.2.1 - Entity Identifier
+        obr_29_2_2 = obr_29_2_2  # OBR.29.2.2 - Namespace Id
+        obr_29_2_3 = obr_29_2_3  # OBR.29.2.3 - Universal Id
+        obr_29_2_4 = obr_29_2_4  # OBR.29.2.4 - Universal Id Type
+        obr_30 = obr_30  # OBR.30 - Transportation Mode
+        obr_31 = obr_31  # OBR.31 - Reason for Study
+        obr_31_1 = obr_31_1  # OBR.31.1 - Identifier
+        obr_31_2 = obr_31_2  # OBR.31.2 - Text
+        obr_31_3 = obr_31_3  # OBR.31.3 - Name Of Coding System
+        obr_31_4 = obr_31_4  # OBR.31.4 - Alternate Identifier
+        obr_31_5 = obr_31_5  # OBR.31.5 - Alternate Text
+        obr_31_6 = obr_31_6  # OBR.31.6 - Name Of Alternate Coding System
+        obr_32 = obr_32  # OBR.32 - Principal Result Interpreter
+        obr_32_1 = obr_32_1  # OBR.32.1 - Name
+        obr_32_1_1 = obr_32_1_1  # OBR.32.1.1 - Id Number
+        obr_32_1_2 = obr_32_1_2  # OBR.32.1.2 - Family Name
+        obr_32_1_3 = obr_32_1_3  # OBR.32.1.3 - Given Name
+        obr_32_1_4 = obr_32_1_4  # OBR.32.1.4 - Second And Further Given Names Or Initials Thereof
+        obr_32_1_5 = obr_32_1_5  # OBR.32.1.5 - Suffix
+        obr_32_1_6 = obr_32_1_6  # OBR.32.1.6 - Prefix
+        obr_32_1_7 = obr_32_1_7  # OBR.32.1.7 - Degree
+        obr_32_1_8 = obr_32_1_8  # OBR.32.1.8 - Source Table
+        obr_32_1_9 = obr_32_1_9  # OBR.32.1.9 - Assigning Authority
+        obr_32_1_10 = obr_32_1_10  # OBR.32.1.10 - Assigning Authority
+        obr_32_1_11 = obr_32_1_11  # OBR.32.1.11 - Assigning Authority
+        obr_32_2 = obr_32_2  # OBR.32.2 - Start Date/Time
+        obr_32_2_1 = obr_32_2_1  # OBR.32.2.1 - Time
+        obr_32_2_2 = obr_32_2_2  # OBR.32.2.2 - Degree Of Precision
+        obr_32_3 = obr_32_3  # OBR.32.3 - End Date/Time
+        obr_32_3_1 = obr_32_3_1  # OBR.32.3.1 - Time
+        obr_32_3_2 = obr_32_3_2  # OBR.32.3.2 - Degree Of Precision
+        obr_32_4 = obr_32_4  # OBR.32.4 - Point Of Care
+        obr_32_5 = obr_32_5  # OBR.32.5 - Room
+        obr_32_6 = obr_32_6  # OBR.32.6 - Bed
+        obr_32_7 = obr_32_7  # OBR.32.7 - Facility
+        obr_32_7_1 = obr_32_7_1  # OBR.32.7.1 - Namespace Id
+        obr_32_7_2 = obr_32_7_2  # OBR.32.7.2 - Universal Id
+        obr_32_7_3 = obr_32_7_3  # OBR.32.7.3 - Universal Id Type
+        obr_32_8 = obr_32_8  # OBR.32.8 - Location Status
+        obr_32_9 = obr_32_9  # OBR.32.9 - Patient Location Type
+        obr_32_10 = obr_32_10  # OBR.32.10 - Building
+        obr_32_11 = obr_32_11  # OBR.32.11 - Floor
+        obr_33 = obr_33  # OBR.33 - Assistant Result Interpreter
+        obr_33_1 = obr_33_1  # OBR.33.1 - Name
+        obr_33_1_1 = obr_33_1_1  # OBR.33.1.1 - Id Number
+        obr_33_1_2 = obr_33_1_2  # OBR.33.1.2 - Family Name
+        obr_33_1_3 = obr_33_1_3  # OBR.33.1.3 - Given Name
+        obr_33_1_4 = obr_33_1_4  # OBR.33.1.4 - Second And Further Given Names Or Initials Thereof
+        obr_33_1_5 = obr_33_1_5  # OBR.33.1.5 - Suffix
+        obr_33_1_6 = obr_33_1_6  # OBR.33.1.6 - Prefix
+        obr_33_1_7 = obr_33_1_7  # OBR.33.1.7 - Degree
+        obr_33_1_8 = obr_33_1_8  # OBR.33.1.8 - Source Table
+        obr_33_1_9 = obr_33_1_9  # OBR.33.1.9 - Assigning Authority
+        obr_33_1_10 = obr_33_1_10  # OBR.33.1.10 - Assigning Authority
+        obr_33_1_11 = obr_33_1_11  # OBR.33.1.11 - Assigning Authority
+        obr_33_2 = obr_33_2  # OBR.33.2 - Start Date/Time
+        obr_33_2_1 = obr_33_2_1  # OBR.33.2.1 - Time
+        obr_33_2_2 = obr_33_2_2  # OBR.33.2.2 - Degree Of Precision
+        obr_33_3 = obr_33_3  # OBR.33.3 - End Date/Time
+        obr_33_3_1 = obr_33_3_1  # OBR.33.3.1 - Time
+        obr_33_3_2 = obr_33_3_2  # OBR.33.3.2 - Degree Of Precision
+        obr_33_4 = obr_33_4  # OBR.33.4 - Point Of Care
+        obr_33_5 = obr_33_5  # OBR.33.5 - Room
+        obr_33_6 = obr_33_6  # OBR.33.6 - Bed
+        obr_33_7 = obr_33_7  # OBR.33.7 - Facility
+        obr_33_7_1 = obr_33_7_1  # OBR.33.7.1 - Namespace Id
+        obr_33_7_2 = obr_33_7_2  # OBR.33.7.2 - Universal Id
+        obr_33_7_3 = obr_33_7_3  # OBR.33.7.3 - Universal Id Type
+        obr_33_8 = obr_33_8  # OBR.33.8 - Location Status
+        obr_33_9 = obr_33_9  # OBR.33.9 - Patient Location Type
+        obr_33_10 = obr_33_10  # OBR.33.10 - Building
+        obr_33_11 = obr_33_11  # OBR.33.11 - Floor
+        obr_34 = obr_34  # OBR.34 - Technician
+        obr_34_1 = obr_34_1  # OBR.34.1 - Name
+        obr_34_1_1 = obr_34_1_1  # OBR.34.1.1 - Id Number
+        obr_34_1_2 = obr_34_1_2  # OBR.34.1.2 - Family Name
+        obr_34_1_3 = obr_34_1_3  # OBR.34.1.3 - Given Name
+        obr_34_1_4 = obr_34_1_4  # OBR.34.1.4 - Second And Further Given Names Or Initials Thereof
+        obr_34_1_5 = obr_34_1_5  # OBR.34.1.5 - Suffix
+        obr_34_1_6 = obr_34_1_6  # OBR.34.1.6 - Prefix
+        obr_34_1_7 = obr_34_1_7  # OBR.34.1.7 - Degree
+        obr_34_1_8 = obr_34_1_8  # OBR.34.1.8 - Source Table
+        obr_34_1_9 = obr_34_1_9  # OBR.34.1.9 - Assigning Authority
+        obr_34_1_10 = obr_34_1_10  # OBR.34.1.10 - Assigning Authority
+        obr_34_1_11 = obr_34_1_11  # OBR.34.1.11 - Assigning Authority
+        obr_34_2 = obr_34_2  # OBR.34.2 - Start Date/Time
+        obr_34_2_1 = obr_34_2_1  # OBR.34.2.1 - Time
+        obr_34_2_2 = obr_34_2_2  # OBR.34.2.2 - Degree Of Precision
+        obr_34_3 = obr_34_3  # OBR.34.3 - End Date/Time
+        obr_34_3_1 = obr_34_3_1  # OBR.34.3.1 - Time
+        obr_34_3_2 = obr_34_3_2  # OBR.34.3.2 - Degree Of Precision
+        obr_34_4 = obr_34_4  # OBR.34.4 - Point Of Care
+        obr_34_5 = obr_34_5  # OBR.34.5 - Room
+        obr_34_6 = obr_34_6  # OBR.34.6 - Bed
+        obr_34_7 = obr_34_7  # OBR.34.7 - Facility
+        obr_34_7_1 = obr_34_7_1  # OBR.34.7.1 - Namespace Id
+        obr_34_7_2 = obr_34_7_2  # OBR.34.7.2 - Universal Id
+        obr_34_7_3 = obr_34_7_3  # OBR.34.7.3 - Universal Id Type
+        obr_34_8 = obr_34_8  # OBR.34.8 - Location Status
+        obr_34_9 = obr_34_9  # OBR.34.9 - Patient Location Type
+        obr_34_10 = obr_34_10  # OBR.34.10 - Building
+        obr_34_11 = obr_34_11  # OBR.34.11 - Floor
+        obr_35 = obr_35  # OBR.35 - Transcriptionist
+        obr_35_1 = obr_35_1  # OBR.35.1 - Name
+        obr_35_1_1 = obr_35_1_1  # OBR.35.1.1 - Id Number
+        obr_35_1_2 = obr_35_1_2  # OBR.35.1.2 - Family Name
+        obr_35_1_3 = obr_35_1_3  # OBR.35.1.3 - Given Name
+        obr_35_1_4 = obr_35_1_4  # OBR.35.1.4 - Second And Further Given Names Or Initials Thereof
+        obr_35_1_5 = obr_35_1_5  # OBR.35.1.5 - Suffix
+        obr_35_1_6 = obr_35_1_6  # OBR.35.1.6 - Prefix
+        obr_35_1_7 = obr_35_1_7  # OBR.35.1.7 - Degree
+        obr_35_1_8 = obr_35_1_8  # OBR.35.1.8 - Source Table
+        obr_35_1_9 = obr_35_1_9  # OBR.35.1.9 - Assigning Authority
+        obr_35_1_10 = obr_35_1_10  # OBR.35.1.10 - Assigning Authority
+        obr_35_1_11 = obr_35_1_11  # OBR.35.1.11 - Assigning Authority
+        obr_35_2 = obr_35_2  # OBR.35.2 - Start Date/Time
+        obr_35_2_1 = obr_35_2_1  # OBR.35.2.1 - Time
+        obr_35_2_2 = obr_35_2_2  # OBR.35.2.2 - Degree Of Precision
+        obr_35_3 = obr_35_3  # OBR.35.3 - End Date/Time
+        obr_35_3_1 = obr_35_3_1  # OBR.35.3.1 - Time
+        obr_35_3_2 = obr_35_3_2  # OBR.35.3.2 - Degree Of Precision
+        obr_35_4 = obr_35_4  # OBR.35.4 - Point Of Care
+        obr_35_5 = obr_35_5  # OBR.35.5 - Room
+        obr_35_6 = obr_35_6  # OBR.35.6 - Bed
+        obr_35_7 = obr_35_7  # OBR.35.7 - Facility
+        obr_35_7_1 = obr_35_7_1  # OBR.35.7.1 - Namespace Id
+        obr_35_7_2 = obr_35_7_2  # OBR.35.7.2 - Universal Id
+        obr_35_7_3 = obr_35_7_3  # OBR.35.7.3 - Universal Id Type
+        obr_35_8 = obr_35_8  # OBR.35.8 - Location Status
+        obr_35_9 = obr_35_9  # OBR.35.9 - Patient Location Type
+        obr_35_10 = obr_35_10  # OBR.35.10 - Building
+        obr_35_11 = obr_35_11  # OBR.35.11 - Floor
+        obr_36 = obr_36  # OBR.36 - Scheduled Date/Time
+        obr_36_1 = obr_36_1  # OBR.36.1 - Time
+        obr_36_2 = obr_36_2  # OBR.36.2 - Degree Of Precision
+        obr_37 = obr_37  # OBR.37 - Number of Sample Containers
+        obr_38 = obr_38  # OBR.38 - Transport Logistics of Collected Sample
+        obr_38_1 = obr_38_1  # OBR.38.1 - Identifier
+        obr_38_2 = obr_38_2  # OBR.38.2 - Text
+        obr_38_3 = obr_38_3  # OBR.38.3 - Name Of Coding System
+        obr_38_4 = obr_38_4  # OBR.38.4 - Alternate Identifier
+        obr_38_5 = obr_38_5  # OBR.38.5 - Alternate Text
+        obr_38_6 = obr_38_6  # OBR.38.6 - Name Of Alternate Coding System
+        obr_39 = obr_39  # OBR.39 - Collector's Comment
+        obr_39_1 = obr_39_1  # OBR.39.1 - Identifier
+        obr_39_2 = obr_39_2  # OBR.39.2 - Text
+        obr_39_3 = obr_39_3  # OBR.39.3 - Name Of Coding System
+        obr_39_4 = obr_39_4  # OBR.39.4 - Alternate Identifier
+        obr_39_5 = obr_39_5  # OBR.39.5 - Alternate Text
+        obr_39_6 = obr_39_6  # OBR.39.6 - Name Of Alternate Coding System
+        obr_40 = obr_40  # OBR.40 - Transport Arrangement Responsibility
+        obr_40_1 = obr_40_1  # OBR.40.1 - Identifier
+        obr_40_2 = obr_40_2  # OBR.40.2 - Text
+        obr_40_3 = obr_40_3  # OBR.40.3 - Name Of Coding System
+        obr_40_4 = obr_40_4  # OBR.40.4 - Alternate Identifier
+        obr_40_5 = obr_40_5  # OBR.40.5 - Alternate Text
+        obr_40_6 = obr_40_6  # OBR.40.6 - Name Of Alternate Coding System
+        obr_41 = obr_41  # OBR.41 - Transport Arranged
+        obr_42 = obr_42  # OBR.42 - Escort Required
+        obr_43 = obr_43  # OBR.43 - Planned Patient Transport Comment
+        obr_43_1 = obr_43_1  # OBR.43.1 - Identifier
+        obr_43_2 = obr_43_2  # OBR.43.2 - Text
+        obr_43_3 = obr_43_3  # OBR.43.3 - Name Of Coding System
+        obr_43_4 = obr_43_4  # OBR.43.4 - Alternate Identifier
+        obr_43_5 = obr_43_5  # OBR.43.5 - Alternate Text
+        obr_43_6 = obr_43_6  # OBR.43.6 - Name Of Alternate Coding System
+        obr_44 = obr_44  # OBR.44 - Procedure Code
+        obr_44_1 = obr_44_1  # OBR.44.1 - Identifier
+        obr_44_2 = obr_44_2  # OBR.44.2 - Text
+        obr_44_3 = obr_44_3  # OBR.44.3 - Name Of Coding System
+        obr_44_4 = obr_44_4  # OBR.44.4 - Alternate Identifier
+        obr_44_5 = obr_44_5  # OBR.44.5 - Alternate Text
+        obr_44_6 = obr_44_6  # OBR.44.6 - Name Of Alternate Coding System
+        obr_45 = obr_45  # OBR.45 - Procedure Code Modifier
+        obr_45_1 = obr_45_1  # OBR.45.1 - Identifier
+        obr_45_2 = obr_45_2  # OBR.45.2 - Text
+        obr_45_3 = obr_45_3  # OBR.45.3 - Name Of Coding System
+        obr_45_4 = obr_45_4  # OBR.45.4 - Alternate Identifier
+        obr_45_5 = obr_45_5  # OBR.45.5 - Alternate Text
+        obr_45_6 = obr_45_6  # OBR.45.6 - Name Of Alternate Coding System
+        obr_46 = obr_46  # OBR.46 - Placer Supplemental Service Information
+        obr_46_1 = obr_46_1  # OBR.46.1 - Identifier
+        obr_46_2 = obr_46_2  # OBR.46.2 - Text
+        obr_46_3 = obr_46_3  # OBR.46.3 - Name Of Coding System
+        obr_46_4 = obr_46_4  # OBR.46.4 - Alternate Identifier
+        obr_46_5 = obr_46_5  # OBR.46.5 - Alternate Text
+        obr_46_6 = obr_46_6  # OBR.46.6 - Name Of Alternate Coding System
+        obr_47 = obr_47  # OBR.47 - Filler Supplemental Service Information
+        obr_47_1 = obr_47_1  # OBR.47.1 - Identifier
+        obr_47_2 = obr_47_2  # OBR.47.2 - Text
+        obr_47_3 = obr_47_3  # OBR.47.3 - Name Of Coding System
+        obr_47_4 = obr_47_4  # OBR.47.4 - Alternate Identifier
+        obr_47_5 = obr_47_5  # OBR.47.5 - Alternate Text
+        obr_47_6 = obr_47_6  # OBR.47.6 - Name Of Alternate Coding System
+        obr_48 = obr_48  # OBR.48 - Medically Necessary Duplicate Procedure Reason.
+        obr_48_1 = obr_48_1  # OBR.48.1 - Identifier
+        obr_48_2 = obr_48_2  # OBR.48.2 - Text
+        obr_48_3 = obr_48_3  # OBR.48.3 - Name Of Coding System
+        obr_48_4 = obr_48_4  # OBR.48.4 - Alternate Identifier
+        obr_48_5 = obr_48_5  # OBR.48.5 - Alternate Text
+        obr_48_6 = obr_48_6  # OBR.48.6 - Name Of Alternate Coding System
+        obr_48_7 = obr_48_7  # OBR.48.7 - Coding System Version Id
+        obr_48_8 = obr_48_8  # OBR.48.8 - Alternate Coding System Version Id
+        obr_48_9 = obr_48_9  # OBR.48.9 - Original Text
+        obr_49 = obr_49  # OBR.49 - Result Handling
+        obr_50 = obr_50  # OBR.50 - Parent Universal Service Identifier
+        obr_50_1 = obr_50_1  # OBR.50.1 - Identifier
+        obr_50_2 = obr_50_2  # OBR.50.2 - Text
+        obr_50_3 = obr_50_3  # OBR.50.3 - Name Of Coding System
+        obr_50_4 = obr_50_4  # OBR.50.4 - Alternate Identifier
+        obr_50_5 = obr_50_5  # OBR.50.5 - Alternate Text
+        obr_50_6 = obr_50_6  # OBR.50.6 - Name Of Alternate Coding System
+        obr_50_7 = obr_50_7  # OBR.50.7 - Coding System Version Id
+        obr_50_8 = obr_50_8  # OBR.50.8 - Alternate Coding System Version Id
+        obr_50_9 = obr_50_9  # OBR.50.9 - Original Text
 
         OBR = ()
         return OBR
