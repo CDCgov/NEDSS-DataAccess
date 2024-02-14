@@ -1,5 +1,6 @@
 package gov.cdc.etldatapipeline.changedata.config;
 
+import lombok.Getter;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -7,9 +8,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.TopicBuilder;
 
 @Configuration
+@Getter
 public class KafkaConfig {
     @Value("${spring.kafka.stream.input.nbs-pages.topic-name}")
     private String nbsPagesTopicName;
+    @Value("${spring.kafka.stream.input.provider.topic-name}")
+    private String providerTopicName;
+    @Value("${spring.kafka.stream.input.provider.output-topic-name}")
+    private String providerAggregateTopicName;
     @Value("${spring.kafka.stream.input.person.topic-name}")
     private String personTopicName;
     @Value("${spring.kafka.stream.input.participation.topic-name}")
@@ -23,22 +29,12 @@ public class KafkaConfig {
     }
 
     @Bean
-    public String getNbsPagesTopicName() {
-        return nbsPagesTopicName;
+    public NewTopic createProviderTopicName() {
+        return TopicBuilder.name(providerTopicName).build();
     }
 
     @Bean
-    public String getPersonTopicName() {
-        return personTopicName;
-    }
-
-    @Bean
-    public String getParticipationTopicName() {
-        return participationTopicName;
-    }
-
-    @Bean
-    public String getCtContactTopicName() {
-        return ctContactTopicName;
+    public NewTopic createAggregateProviderTopicName() {
+        return TopicBuilder.name(providerAggregateTopicName).build();
     }
 }
