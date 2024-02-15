@@ -23,7 +23,7 @@ public class KafkaStreamsService {
     private String nbsPagesTopicName;
     @Value("#{kafkaConfig.getProviderTopicName()}")
     private String providerTopicName;
-    @Value("#{kafkaConfig.providerAggregateTopicName()}")
+    @Value("#{kafkaConfig.getProviderAggregateTopicName()}")
     private String providerOutputTopicName;
     @Value("#{kafkaConfig.getPersonTopicName()}")
     private String personTopicName;
