@@ -1,4 +1,4 @@
-package gov.cdc.etldatapipeline.changedata.model.rdb;
+package gov.cdc.etldatapipeline.changedata.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import gov.cdc.etldatapipeline.changedata.model.odse.CtContact;

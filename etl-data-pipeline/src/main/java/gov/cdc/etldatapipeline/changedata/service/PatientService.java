@@ -3,7 +3,7 @@ package gov.cdc.etldatapipeline.changedata.service;
 import gov.cdc.etldatapipeline.changedata.model.odse.CtContact;
 import gov.cdc.etldatapipeline.changedata.model.odse.Participation;
 import gov.cdc.etldatapipeline.changedata.model.odse.Person;
-import gov.cdc.etldatapipeline.changedata.model.rdb.InitPatient;
+import gov.cdc.etldatapipeline.changedata.model.dto.InitPatient;
 import gov.cdc.etldatapipeline.changedata.repository.PatientRepository;
 import gov.cdc.etldatapipeline.changedata.utils.StreamsSerdes;
 import gov.cdc.etldatapipeline.changedata.utils.UtilHelper;
