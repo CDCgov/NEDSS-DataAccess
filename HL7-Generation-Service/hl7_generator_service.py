@@ -42,8 +42,8 @@ auth_token=""
 # auth_client_secret='fcidpwabdQzUrPqEWkSzuGNX6EV4BJ7H1123432'
 # auth_token=""
 
-headers = {'msgType':'HL7','accept':'*/*','Content-Type':'text/plain','clientId':auth_client_id,
-               'clientSecret':auth_client_secret,'Authorization': f'Bearer {auth_token}'} 
+auth_headers ={}
+
 ################    
 # S3 bucket 
 s3_client=None
@@ -57,7 +57,6 @@ async def generate_unique_patient_messages(num_messages, output_folder):
     print ("call_di_service flag:",call_di_service)
     print ("store_in_s3 flag:",store_in_s3)
 
-    #######
     # Create a zip file in-memory and store it in S3 bukcet.
     if store_in_s3=='true':
         global s3bucket_name
@@ -66,7 +65,11 @@ async def generate_unique_patient_messages(num_messages, output_folder):
         s3_client = boto3.client('s3')
         zip_buffer = io.BytesIO()
         zipf=zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED)
-    #######
+    
+    global auth_headers
+    auth_headers = {'msgType':'HL7','accept':'*/*','Content-Type':'text/plain','clientId':auth_client_id,
+               'clientSecret':auth_client_secret,'Authorization': f'Bearer {auth_token}'} 
+    
     async with aiohttp.ClientSession() as session:
         for _ in range(num_messages):
             id_number = fake.random_int(min=10000, max=99999)
@@ -138,8 +141,9 @@ async def generate_unique_patient_messages(num_messages, output_folder):
                 raise cex
 
 async def ingest_hl7_into_diservice(session,hl7message):
-    async with session.post(di_api_url, data=hl7message, headers=headers,ssl=False,raise_for_status=custom_error_handler) as response:
-        print('response:', response.status)
+    async with session.post(di_api_url, data=hl7message, headers=auth_headers,ssl=False,raise_for_status=custom_error_handler) as response:
+        text = await response.text()
+        print(f'Response from di service status: {response.status} ID: {text} ')
 
 async def custom_error_handler(response):
     if response.status >=400:
@@ -191,13 +195,14 @@ def lambda_handler(event, context):
             auth_client_secret=queryParams["auth_client_secret"]
             global auth_token
             auth_token=queryParams["auth_token"]
-    
-    generate_unique_patient_messages(num_messages,"")
+    ## For Async call.        
+    loop = asyncio.get_event_loop()    
+    result = loop.run_until_complete(generate_unique_patient_messages(num_messages,""))
     return {
         'statusCode': 200,
         'body': json.dumps('Process complete!')
     }
 # Uncomment the following lines for the local development.
-if __name__ == "__main__":
-    asyncio.run(generate_unique_patient_messages(5, ""))
-    print("--- %s seconds ---" % (time.time() - start_time))
+# if __name__ == "__main__":
+#     asyncio.run(generate_unique_patient_messages(5, ""))
+#     print("--- %s seconds ---" % (time.time() - start_time))
