@@ -7,7 +7,6 @@ import datetime
 import requests
 import aiohttp
 import asyncio
-import time
 import zipfile
 import io
 
@@ -49,7 +48,6 @@ auth_headers ={}
 s3_client=None
 s3bucket_name="" 
 
-start_time = time.time()
 async def generate_unique_patient_messages(num_messages, output_folder):
     fake = Faker()
     # os.makedirs(output_folder, exist_ok=True)
@@ -148,7 +146,7 @@ async def ingest_hl7_into_diservice(session,hl7message):
 async def custom_error_handler(response):
     if response.status >=400:
         text = await response.text()
-        raise RuntimeError('adding text '+text)
+        raise RuntimeError(text)
 
 def reset_inputparams():
     global num_messages
@@ -169,6 +167,7 @@ def reset_inputparams():
 # AWS Lambda invokes the function lambda_handler.
 def lambda_handler(event, context):
     
+    #reset the input values on each request.
     reset_inputparams()
 
     if "queryStringParameters" in event:
@@ -205,4 +204,3 @@ def lambda_handler(event, context):
 # Uncomment the following lines for the local development.
 # if __name__ == "__main__":
 #     asyncio.run(generate_unique_patient_messages(5, ""))
-#     print("--- %s seconds ---" % (time.time() - start_time))
