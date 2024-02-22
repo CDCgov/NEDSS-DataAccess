@@ -1,21 +1,20 @@
 package gov.cdc.etldatapipeline.changedata.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.cdc.etldatapipeline.changedata.config.KafkaStreamsConfig;
 import gov.cdc.etldatapipeline.changedata.service.DataPipelineStatusService;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
 public class DataPipelineController {
-    private static final Logger LOG = LoggerFactory.getLogger(DataPipelineController.class);
 
     DataPipelineStatusService dataPipelineStatusSvc;
 
@@ -29,18 +28,18 @@ public class DataPipelineController {
 
     @GetMapping("/data-pipeline-status")
     @ResponseBody
-    public ResponseEntity<String> getDataPipelineStatusHealth(){
-       return this.dataPipelineStatusSvc.getHealthStatus();
+    public ResponseEntity<String> getDataPipelineStatusHealth() {
+        return this.dataPipelineStatusSvc.getHealthStatus();
     }
 
     @PostMapping(value = "/provider", consumes = "application/json", produces = "application/json")
     @ResponseBody
-    public ResponseEntity<String> postProvider(@RequestBody List<String> providerUids){
-        KafkaProducer<String,List<String>> producer = new KafkaProducer<>(
+    public ResponseEntity<String> postProvider(@RequestBody String payLoad) throws JsonProcessingException {
+        KafkaProducer<String, JsonNode> producer = new KafkaProducer<>(
                 kafkaStreamsConfig.kStreamsConfigs().asProperties());
         producer.send(new ProducerRecord<>("cdc.nbs_odse.dbo.Provider",
-                UUID.randomUUID().toString(), providerUids));
+                UUID.randomUUID().toString(), new ObjectMapper().readTree(payLoad)));
         producer.close();
-        return ResponseEntity.ok("Produced : " + providerUids);
+        return ResponseEntity.ok("Produced : " + payLoad);
     }
 }
