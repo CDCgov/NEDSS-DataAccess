@@ -13,12 +13,12 @@ BEGIN
     BEGIN TRY
 
         BEGIN TRANSACTION;
-
+        SET NOCOUNT ON;
         SET @PROC_STEP_NO = 2;
         SET @PROC_STEP_NAME = ' GENERATING TMP_S_PROVIDER_INIT';
 
-        IF OBJECT_ID('dbo.TMP_S_PROVIDER_INIT', 'U') IS NOT NULL
-            drop table dbo.TMP_S_PROVIDER_INIT;
+        IF OBJECT_ID('NBS_ODSE.dbo.TMP_S_PROVIDER_INIT', 'U') IS NOT NULL
+            drop table NBS_ODSE.dbo.TMP_S_PROVIDER_INIT;
 
 
         SELECT PERSON.PERSON_UID        'PROVIDER_UID',
@@ -31,7 +31,7 @@ BEGIN
                PERSON.RECORD_STATUS_CD  'PROVIDER_RECORD_STATUS',
                PERSON.ADD_USER_ID,
                PERSON.LAST_CHG_USER_ID
-        into dbo.TMP_S_PROVIDER_INIT
+        into NBS_ODSE.dbo.TMP_S_PROVIDER_INIT
         FROM NBS_ODSE.dbo.Person PERSON with (nolock)
         WHERE PERSON.CD = 'PRV'
           and person_uid in (SELECT value FROM STRING_SPLIT(@user_id_list, ','));
@@ -42,18 +42,21 @@ BEGIN
         (BATCH_ID, [DATAFLOW_NAME], [PACKAGE_NAME], [STATUS_TYPE], [STEP_NUMBER], [STEP_NAME], [ROW_COUNT])
         VALUES (@BATCH_ID, 'D_PROVIDER', 'D_PROVIDER', 'START', @PROC_STEP_NO, @PROC_STEP_NAME, @ROWCOUNT_NO);
 
+        COMMIT TRANSACTION;
+
+        BEGIN TRANSACTION ;
         --CREATE TABLE PROVIDER_UID_COLL AS
 
         SET @PROC_STEP_NO = 3;
         SET @PROC_STEP_NAME = ' GENERATING TMP_PROVIDER_UID_COLL';
 
-        IF OBJECT_ID('dbo.TMP_PROVIDER_UID_COLL', 'U') IS NOT NULL
-            drop table dbo.TMP_PROVIDER_UID_COLL;
+        IF OBJECT_ID('NBS_ODSE.dbo.TMP_PROVIDER_UID_COLL', 'U') IS NOT NULL
+            drop table NBS_ODSE.dbo.TMP_PROVIDER_UID_COLL;
 
 
         SELECT PROVIDER_UID
-        into dbo.TMP_PROVIDER_UID_COLL
-        FROM dbo.TMP_S_PROVIDER_INIT with (nolock);
+        into NBS_ODSE.dbo.TMP_PROVIDER_UID_COLL
+        FROM NBS_ODSE.dbo.TMP_S_PROVIDER_INIT with (nolock);
 
         SELECT @ROWCOUNT_NO = @@ROWCOUNT;
 
@@ -61,14 +64,14 @@ BEGIN
         (BATCH_ID, [DATAFLOW_NAME], [PACKAGE_NAME], [STATUS_TYPE], [STEP_NUMBER], [STEP_NAME], [ROW_COUNT])
         VALUES (@BATCH_ID, 'D_PROVIDER', 'D_PROVIDER', 'START', @PROC_STEP_NO, @PROC_STEP_NAME, @ROWCOUNT_NO);
 
-
+        COMMIT TRANSACTION;
+        BEGIN TRANSACTION ;
         -- CREATE TABLE  S_INITPROVIDER AS
-
         SET @PROC_STEP_NO = 4;
         SET @PROC_STEP_NAME = ' GENERATING TMP_S_INITPROVIDER';
 
-        IF OBJECT_ID('dbo.TMP_S_INITPROVIDER', 'U') IS NOT NULL
-            drop table dbo.TMP_S_INITPROVIDER;
+        IF OBJECT_ID('NBS_ODSE.dbo.TMP_S_INITPROVIDER', 'U') IS NOT NULL
+            drop table NBS_ODSE.dbo.TMP_S_INITPROVIDER;
 
         SELECT A.*,
                B.user_first_nm             AS 'ADD_USER_FIRST_NAME',
@@ -77,18 +80,20 @@ BEGIN
                C.user_last_nm              AS 'CHG_USER_LAST_NAME',
                Cast(null as [varchar](50)) as PROVIDER_ADDED_BY,
                Cast(null as [varchar](50)) as PROVIDER_LAST_UPDATED_BY
-        into dbo.TMP_S_INITPROVIDER
-        FROM dbo.TMP_S_PROVIDER_INIT A with (nolock)
+        into NBS_ODSE.dbo.TMP_S_INITPROVIDER
+        FROM NBS_ODSE.dbo.TMP_S_PROVIDER_INIT A with (nolock)
                  LEFT OUTER JOIN NBS_ODSE.dbo.Auth_user B with (nolock) ON A.ADD_USER_ID = B.NEDSS_ENTRY_ID
                  LEFT OUTER JOIN NBS_ODSE.dbo.Auth_user C with (nolock) ON A.ADD_USER_ID = C.NEDSS_ENTRY_ID;
 
-        update dbo.TMP_S_INITPROVIDER set PROVIDER_RECORD_STATUS = 'ACTIVE' where PROVIDER_RECORD_STATUS = '';
-        update dbo.TMP_S_INITPROVIDER
+        update NBS_ODSE.dbo.TMP_S_INITPROVIDER set PROVIDER_RECORD_STATUS = 'ACTIVE' where PROVIDER_RECORD_STATUS = '';
+        update NBS_ODSE.dbo.TMP_S_INITPROVIDER
         set PROVIDER_RECORD_STATUS = 'INACTIVE'
         where PROVIDER_RECORD_STATUS = 'SUPERCEDED';
-        update dbo.TMP_S_INITPROVIDER set PROVIDER_RECORD_STATUS = 'INACTIVE' where PROVIDER_RECORD_STATUS = 'LOG_DEL';
+        update NBS_ODSE.dbo.TMP_S_INITPROVIDER
+        set PROVIDER_RECORD_STATUS = 'INACTIVE'
+        where PROVIDER_RECORD_STATUS = 'LOG_DEL';
 
-        update dbo.TMP_S_INITPROVIDER
+        update NBS_ODSE.dbo.TMP_S_INITPROVIDER
         set PROVIDER_ADDED_BY = CAST((Case
                                           when len(rtrim(ADD_USER_FIRST_NAME)) > 0 and
                                                len(rtrim(ADD_USER_LAST_NAME)) > 0
@@ -101,7 +106,7 @@ BEGIN
             END
             ) as varchar(50));
 
-        update dbo.TMP_S_INITPROVIDER
+        update NBS_ODSE.dbo.TMP_S_INITPROVIDER
         set PROVIDER_LAST_UPDATED_BY = CAST((Case
                                                  when len(rtrim(CHG_USER_FIRST_NAME)) > 0 and
                                                       len(rtrim(CHG_USER_LAST_NAME)) > 0
@@ -128,8 +133,8 @@ BEGIN
         SET @PROC_STEP_NO = 5;
         SET @PROC_STEP_NAME = ' GENERATING TMP_S_PROVIDER_NAME';
 
-        IF OBJECT_ID('dbo.TMP_S_PROVIDER_NAME', 'U') IS NOT NULL
-            drop table dbo.TMP_S_PROVIDER_NAME;
+        IF OBJECT_ID('NBS_ODSE.dbo.TMP_S_PROVIDER_NAME', 'U') IS NOT NULL
+            drop table NBS_ODSE.dbo.TMP_S_PROVIDER_NAME;
 
 
         SELECT FIRST_NM,
@@ -147,24 +152,24 @@ BEGIN
                Cast(null as [varchar](50)) PROVIDER_NAME_SUFFIX,
                Cast(null as [varchar](50)) PROVIDER_NAME_PREFIX,
                Cast(null as [varchar](50)) PROVIDER_NAME_DEGREE
-        into dbo.TMP_S_PROVIDER_NAME
-        FROM dbo.TMP_PROVIDER_UID_COLL tpuc WITH (NOLOCK)
+        into NBS_ODSE.dbo.TMP_S_PROVIDER_NAME
+        FROM NBS_ODSE.dbo.TMP_PROVIDER_UID_COLL tpuc WITH (NOLOCK)
                  INNER JOIN NBS_ODSE.dbo.PERSON_NAME pn WITH (NOLOCK) ON tpuc.PROVIDER_UID = pn.PERSON_UID
         WHERE NM_USE_CD = 'L';
 
 
-        update [dbo].TMP_S_PROVIDER_NAME
+        update NBS_ODSE.[dbo].TMP_S_PROVIDER_NAME
         SET PROVIDER_FIRST_NAME=FIRST_NM,
             PROVIDER_LAST_NAME=LAST_NM,
             PROVIDER_MIDDLE_NAME=MIDDLE_NM
         where NM_USE_CD = 'L';
 
-        update dbo.[TMP_S_PROVIDER_NAME]
-        set dbo.[TMP_S_PROVIDER_NAME].PROVIDER_NAME_SUFFIX = SUBSTRING(cvg.[code_short_desc_txt], 1, 50)
+        update NBS_ODSE.dbo.[TMP_S_PROVIDER_NAME]
+        set NBS_ODSE.dbo.[TMP_S_PROVIDER_NAME].PROVIDER_NAME_SUFFIX = SUBSTRING(cvg.[code_short_desc_txt], 1, 50)
         FROM nbs_odse.dbo.NBS_question nq with (nolock),
              [NBS_SRTE].dbo.[Codeset] cd with (nolock),
              [NBS_SRTE].dbo.[Code_value_general] cvg with (nolock),
-             dbo.[TMP_S_PROVIDER_NAME] sir
+             NBS_ODSE.dbo.[TMP_S_PROVIDER_NAME] sir
         where nq.question_identifier = ('DEM107')
           and cd.code_set_group_id = nq.code_set_group_id
           and cvg.code_set_nm = cd.code_set_nm
@@ -172,20 +177,20 @@ BEGIN
           and sir.NM_SUFFIX is not null;
 
 
-        update dbo.[TMP_S_PROVIDER_NAME]
-        set dbo.[TMP_S_PROVIDER_NAME].PROVIDER_NAME_PREFIX = SUBSTRING(cvg.[code_short_desc_txt], 1, 50)
+        update NBS_ODSE.dbo.[TMP_S_PROVIDER_NAME]
+        set NBS_ODSE.dbo.[TMP_S_PROVIDER_NAME].PROVIDER_NAME_PREFIX = SUBSTRING(cvg.[code_short_desc_txt], 1, 50)
         FROM nbs_odse.dbo.NBS_question nq with (nolock),
              [NBS_SRTE].dbo.[Codeset] cd with (nolock),
              [NBS_SRTE].dbo.[Code_value_general] cvg with (nolock),
-             dbo.[TMP_S_PROVIDER_NAME] sir
+             NBS_ODSE.dbo.[TMP_S_PROVIDER_NAME] sir
         where nq.question_identifier = ('DEM101')
           and cd.code_set_group_id = nq.code_set_group_id
           and cvg.code_set_nm = cd.code_set_nm
           and sir.NM_PREFIX = cvg.code
           and sir.NM_PREFIX is not null;
 
-        update dbo.[TMP_S_PROVIDER_NAME]
-        set dbo.[TMP_S_PROVIDER_NAME].PROVIDER_NAME_DEGREE = NM_DEGREE
+        update NBS_ODSE.dbo.[TMP_S_PROVIDER_NAME]
+        set NBS_ODSE.dbo.[TMP_S_PROVIDER_NAME].PROVIDER_NAME_DEGREE = NM_DEGREE
         where NM_DEGREE is not null;
 
         SELECT @ROWCOUNT_NO = @@ROWCOUNT;
@@ -194,17 +199,21 @@ BEGIN
         (BATCH_ID, [DATAFLOW_NAME], [PACKAGE_NAME], [STATUS_TYPE], [STEP_NUMBER], [STEP_NAME], [ROW_COUNT])
         VALUES (@BATCH_ID, 'D_PROVIDER', 'D_PROVIDER', 'START', @PROC_STEP_NO, @PROC_STEP_NAME, @ROWCOUNT_NO);
 
+        COMMIT TRANSACTION;
+
+        BEGIN TRANSACTION ;
         SET @PROC_STEP_NO = 6;
         SET @PROC_STEP_NAME = ' GENERATING TMP_S_PROVIDER_WITH_NM';
 
-        IF OBJECT_ID('dbo.TMP_S_PROVIDER_WITH_NM', 'U') IS NOT NULL
-            drop table dbo.TMP_S_PROVIDER_WITH_NM;
+        IF OBJECT_ID('NBS_ODSE.dbo.TMP_S_PROVIDER_WITH_NM', 'U') IS NOT NULL
+            drop table NBS_ODSE.dbo.TMP_S_PROVIDER_WITH_NM;
 
 
         SELECT si.*, spn.*
-        into dbo.TMP_S_PROVIDER_WITH_NM
-        FROM dbo.TMP_S_INITPROVIDER si
-                 LEFT OUTER JOIN dbo.TMP_S_PROVIDER_NAME spn with (nolock) ON si.PROVIDER_UID = spn.PROVIDER_UID_NAME;
+        into NBS_ODSE.dbo.TMP_S_PROVIDER_WITH_NM
+        FROM NBS_ODSE.dbo.TMP_S_INITPROVIDER si
+                 LEFT OUTER JOIN NBS_ODSE.dbo.TMP_S_PROVIDER_NAME spn with (nolock)
+                                 ON si.PROVIDER_UID = spn.PROVIDER_UID_NAME;
 
 
         SELECT @ROWCOUNT_NO = @@ROWCOUNT;
@@ -213,12 +222,15 @@ BEGIN
         (BATCH_ID, [DATAFLOW_NAME], [PACKAGE_NAME], [STATUS_TYPE], [STEP_NUMBER], [STEP_NAME], [ROW_COUNT])
         VALUES (@BATCH_ID, 'D_PROVIDER', 'D_PROVIDER', 'START', @PROC_STEP_NO, @PROC_STEP_NAME, @ROWCOUNT_NO);
 
+        COMMIT TRANSACTION;
+
+        BEGIN TRANSACTION ;
 
         SET @PROC_STEP_NO = 7;
         SET @PROC_STEP_NAME = ' GENERATING TMP_S_PROVIDER_POSTAL_LOCATOR';
 
-        IF OBJECT_ID('dbo.TMP_S_PROVIDER_POSTAL_LOCATOR', 'U') IS NOT NULL
-            drop table dbo.TMP_S_PROVIDER_POSTAL_LOCATOR;
+        IF OBJECT_ID('NBS_ODSE.dbo.TMP_S_PROVIDER_POSTAL_LOCATOR', 'U') IS NOT NULL
+            drop table NBS_ODSE.dbo.TMP_S_PROVIDER_POSTAL_LOCATOR;
 
         with lst as (SELECT distinct pl.CITY_DESC_TXT                    AS 'PROVIDER_CITY',
                                      pl.CNTRY_CD                         AS 'PROVIDER_COUNTRY',
@@ -240,7 +252,7 @@ BEGIN
                                          ORDER BY pl.POSTAL_LOCATOR_UID DESC
                                          )                               AS [ROWNO]
 
-                     FROM dbo.TMP_PROVIDER_UID_COLL puc
+                     FROM NBS_ODSE.dbo.TMP_PROVIDER_UID_COLL puc
                               LEFT OUTER JOIN NBS_ODSE.dbo.ENTITY_LOCATOR_PARTICIPATION elp with (nolock)
                                               ON puc.PROVIDER_UID = elp.ENTITY_UID and elp.record_status_cd = 'ACTIVE'
                               LEFT OUTER JOIN NBS_ODSE.dbo.POSTAL_LOCATOR pl with (nolock)
@@ -253,27 +265,27 @@ BEGIN
                        AND elp.CD = 'O'
                        AND elp.CLASS_CD = 'PST')
         select *
-        into dbo.TMP_S_PROVIDER_POSTAL_LOCATOR
+        into NBS_ODSE.dbo.TMP_S_PROVIDER_POSTAL_LOCATOR
         from lst
         where rowno = 1;
 
 
-        alter table dbo.TMP_S_PROVIDER_POSTAL_LOCATOR
+        alter table NBS_ODSE.dbo.TMP_S_PROVIDER_POSTAL_LOCATOR
             drop column ROWNO;
 
-        ALTER TABLE dbo.TMP_S_PROVIDER_POSTAL_LOCATOR
+        ALTER TABLE NBS_ODSE.dbo.TMP_S_PROVIDER_POSTAL_LOCATOR
             ALTER COLUMN PROVIDER_COUNTRY VARCHAR(50) NULL;
-        ALTER TABLE dbo.TMP_S_PROVIDER_POSTAL_LOCATOR
+        ALTER TABLE NBS_ODSE.dbo.TMP_S_PROVIDER_POSTAL_LOCATOR
             ALTER COLUMN PROVIDER_COUNTY_DESC VARCHAR(50) NULL;
 
 
-        update dbo.TMP_S_PROVIDER_POSTAL_LOCATOR
+        update NBS_ODSE.dbo.TMP_S_PROVIDER_POSTAL_LOCATOR
         set PROVIDER_STATE=PROVIDER_STATE_DESC
         where len(rtrim(PROVIDER_STATE_DESC)) >= 1;
-        update dbo.TMP_S_PROVIDER_POSTAL_LOCATOR
+        update NBS_ODSE.dbo.TMP_S_PROVIDER_POSTAL_LOCATOR
         set PROVIDER_COUNTY=PROVIDER_COUNTY_DESC
         where len(rtrim(PROVIDER_COUNTY_DESC)) >= 1;
-        update dbo.TMP_S_PROVIDER_POSTAL_LOCATOR
+        update NBS_ODSE.dbo.TMP_S_PROVIDER_POSTAL_LOCATOR
         set PROVIDER_COUNTRY=PROVIDER_COUNTRY_DESC
         where len(rtrim(PROVIDER_COUNTRY_DESC)) >= 1;
 
@@ -286,13 +298,17 @@ BEGIN
         VALUES (@BATCH_ID, 'D_PROVIDER', 'D_PROVIDER', 'START', @PROC_STEP_NO, @PROC_STEP_NAME, @ROWCOUNT_NO);
 
 
+        COMMIT TRANSACTION;
+
+        BEGIN TRANSACTION ;
+
         -- CREATE TABLE S_PROVIDER_TELE_LOCATOR_OFFICE AS
 
         SET @PROC_STEP_NO = 8;
         SET @PROC_STEP_NAME = ' GENERATING TMP_S_PROVIDER_TELE_LOCATOR_OFFICE';
 
-        IF OBJECT_ID('dbo.TMP_S_PROVIDER_TELE_LOCATOR_OFFICE', 'U') IS NOT NULL
-            drop table dbo.TMP_S_PROVIDER_TELE_LOCATOR_OFFICE;
+        IF OBJECT_ID('NBS_ODSE.dbo.TMP_S_PROVIDER_TELE_LOCATOR_OFFICE', 'U') IS NOT NULL
+            drop table NBS_ODSE.dbo.TMP_S_PROVIDER_TELE_LOCATOR_OFFICE;
 
 
         with lst as (SELECT DISTINCT elp.ENTITY_UID       as ENTITY_UID_OFFICE,
@@ -305,10 +321,11 @@ BEGIN
                                          PARTITION BY elp.ENTITY_UID
                                          ORDER BY tl.TELE_LOCATOR_UID DESC
                                          )                AS [ROWNO]
-                     FROM dbo.TMP_PROVIDER_UID_COLL puc
+                     FROM NBS_ODSE.dbo.TMP_PROVIDER_UID_COLL puc
                               INNER JOIN NBS_ODSE.dbo.ENTITY_LOCATOR_PARTICIPATION elp with (nolock)
                                          ON puc.PROVIDER_UID = elp.ENTITY_UID and elp.record_status_cd = 'ACTIVE'
-                              INNER JOIN NBS_ODSE.dbo.TELE_LOCATOR tl with (nolock) ON elp.LOCATOR_UID = tl.TELE_LOCATOR_UID
+                              INNER JOIN NBS_ODSE.dbo.TELE_LOCATOR tl with (nolock)
+                                         ON elp.LOCATOR_UID = tl.TELE_LOCATOR_UID
                      WHERE elp.USE_CD = 'WP'
                        AND elp.CD = 'O'
                        AND elp.CLASS_CD = 'TELE'
@@ -318,7 +335,7 @@ BEGIN
                PROVIDER_PHONE_WORK,
                PROVIDER_EMAIL_WORK,
                PROVIDER_PHONE_COMMENTS
-        into dbo.TMP_S_PROVIDER_TELE_LOCATOR_OFFICE
+        into NBS_ODSE.dbo.TMP_S_PROVIDER_TELE_LOCATOR_OFFICE
         from lst
         where rowno = 1;
 
@@ -334,12 +351,15 @@ BEGIN
         VALUES (@BATCH_ID, 'D_PROVIDER', 'D_PROVIDER', 'START', @PROC_STEP_NO, @PROC_STEP_NAME, @ROWCOUNT_NO);
 
 
+        COMMIT TRANSACTION;
 
-        SET @PROC_STEP_NO = 4;
+        BEGIN TRANSACTION ;
+
+        SET @PROC_STEP_NO = 9;
         SET @PROC_STEP_NAME = ' GENERATING TMP_S_PROVIDER_TELE_LOCATOR_CELL';
 
-        IF OBJECT_ID('dbo.TMP_S_PROVIDER_TELE_LOCATOR_CELL', 'U') IS NOT NULL
-            drop table dbo.TMP_S_PROVIDER_TELE_LOCATOR_CELL;
+        IF OBJECT_ID('NBS_ODSE.dbo.TMP_S_PROVIDER_TELE_LOCATOR_CELL', 'U') IS NOT NULL
+            drop table NBS_ODSE.dbo.TMP_S_PROVIDER_TELE_LOCATOR_CELL;
 
 
         with lst as (SELECT DISTINCT elp.ENTITY_UID   as ENTITY_UID_CELL,
@@ -349,19 +369,20 @@ BEGIN
                                          PARTITION BY elp.ENTITY_UID
                                          ORDER BY tl.TELE_LOCATOR_UID DESC
                                          )            AS [ROWNO]
-                     FROM dbo.TMP_PROVIDER_UID_COLL puc with (nolock)
+                     FROM NBS_ODSE.dbo.TMP_PROVIDER_UID_COLL puc with (nolock)
                               INNER JOIN NBS_ODSE.dbo.ENTITY_LOCATOR_PARTICIPATION elp with (nolock)
                                          ON puc.PROVIDER_UID = elp.ENTITY_UID
-                              INNER JOIN NBS_ODSE.dbo.TELE_LOCATOR tl with (nolock) ON elp.LOCATOR_UID = tl.TELE_LOCATOR_UID
+                              INNER JOIN NBS_ODSE.dbo.TELE_LOCATOR tl with (nolock)
+                                         ON elp.LOCATOR_UID = tl.TELE_LOCATOR_UID
                      WHERE elp.CD = 'CP'
                        AND elp.CLASS_CD = 'TELE')
         select *
-        into dbo.TMP_S_PROVIDER_TELE_LOCATOR_CELL
+        into NBS_ODSE.dbo.TMP_S_PROVIDER_TELE_LOCATOR_CELL
         from lst
         where rowno = 1;
 
 
-        alter table dbo.TMP_S_PROVIDER_TELE_LOCATOR_CELL
+        alter table NBS_ODSE.dbo.TMP_S_PROVIDER_TELE_LOCATOR_CELL
             drop column ROWNO;
 
 
@@ -374,21 +395,28 @@ BEGIN
         VALUES (@BATCH_ID, 'D_PROVIDER', 'D_PROVIDER', 'START', @PROC_STEP_NO, @PROC_STEP_NAME, @ROWCOUNT_NO);
 
 
+        COMMIT TRANSACTION;
+
+        BEGIN TRANSACTION ;
+
         --		CREATE TABLE S_PROVIDER_LOCATOR AS
 
-        SET @PROC_STEP_NO = 7;
+        SET @PROC_STEP_NO = 10;
         SET @PROC_STEP_NAME = ' GENERATING TMP_S_PROVIDER_LOCATOR';
 
-        IF OBJECT_ID('dbo.TMP_S_PROVIDER_LOCATOR', 'U') IS NOT NULL
-            drop table dbo.TMP_S_PROVIDER_LOCATOR;
+        IF OBJECT_ID('NBS_ODSE.dbo.TMP_S_PROVIDER_LOCATOR', 'U') IS NOT NULL
+            drop table NBS_ODSE.dbo.TMP_S_PROVIDER_LOCATOR;
 
 
         SELECT S_pl.*, tlo.*, tlc.*, puc.PROVIDER_UID as PROVIDER_UID_LOCATOR
-        into dbo.TMP_S_PROVIDER_LOCATOR
-        FROM dbo.TMP_PROVIDER_UID_COLL puc
-                 LEFT OUTER JOIN dbo.TMP_S_PROVIDER_TELE_LOCATOR_OFFICE tlo ON puc.PROVIDER_UID = tlo.ENTITY_UID_OFFICE
-                 LEFT OUTER JOIN dbo.TMP_S_PROVIDER_TELE_LOCATOR_CELL tlc ON puc.PROVIDER_UID = tlc.ENTITY_UID_CELL
-                 LEFT OUTER JOIN dbo.TMP_S_PROVIDER_POSTAL_LOCATOR S_pl ON puc.PROVIDER_UID = S_pl.ENTITY_UID_POSTAL;
+        into NBS_ODSE.dbo.TMP_S_PROVIDER_LOCATOR
+        FROM NBS_ODSE.dbo.TMP_PROVIDER_UID_COLL puc
+                 LEFT OUTER JOIN NBS_ODSE.dbo.TMP_S_PROVIDER_TELE_LOCATOR_OFFICE tlo
+                                 ON puc.PROVIDER_UID = tlo.ENTITY_UID_OFFICE
+                 LEFT OUTER JOIN NBS_ODSE.dbo.TMP_S_PROVIDER_TELE_LOCATOR_CELL tlc
+                                 ON puc.PROVIDER_UID = tlc.ENTITY_UID_CELL
+                 LEFT OUTER JOIN NBS_ODSE.dbo.TMP_S_PROVIDER_POSTAL_LOCATOR S_pl
+                                 ON puc.PROVIDER_UID = S_pl.ENTITY_UID_POSTAL;
 
 
         /*
@@ -403,21 +431,25 @@ BEGIN
         VALUES (@BATCH_ID, 'D_PROVIDER', 'D_PROVIDER', 'START', @PROC_STEP_NO, @PROC_STEP_NAME, @ROWCOUNT_NO);
 
 
+        COMMIT TRANSACTION;
+
+        BEGIN TRANSACTION ;
+
         --CREATE TABLE QEC_ENTITY_ID AS
 
 
-        SET @PROC_STEP_NO = 8;
+        SET @PROC_STEP_NO = 11;
         SET @PROC_STEP_NAME = ' GENERATING TMP_S_PROVIDER_QEC_ENTITY_ID';
 
-        IF OBJECT_ID('dbo.TMP_S_PROVIDER_QEC_ENTITY_ID', 'U') IS NOT NULL
-            drop table dbo.TMP_S_PROVIDER_QEC_ENTITY_ID;
+        IF OBJECT_ID('NBS_ODSE.dbo.TMP_S_PROVIDER_QEC_ENTITY_ID', 'U') IS NOT NULL
+            drop table NBS_ODSE.dbo.TMP_S_PROVIDER_QEC_ENTITY_ID;
 
 
         SELECT DISTINCT PROVIDER_UID as PROVIDER_UID_QEC,
                         ROOT_EXTENSION_TXT,
                         ASSIGNING_AUTHORITY_CD
-        into dbo.TMP_S_PROVIDER_QEC_ENTITY_ID
-        FROM dbo.TMP_PROVIDER_UID_COLL puc
+        into NBS_ODSE.dbo.TMP_S_PROVIDER_QEC_ENTITY_ID
+        FROM NBS_ODSE.dbo.TMP_PROVIDER_UID_COLL puc
                  LEFT OUTER JOIN NBS_ODSE.dbo.ENTITY_ID with (nolock)
                                  ON puc.PROVIDER_UID = ENTITY_ID.ENTITY_UID and Entity_id.record_status_cd = 'ACTIVE'
                                      AND ENTITY_ID.TYPE_CD = 'QEC';
@@ -432,13 +464,17 @@ BEGIN
         VALUES (@BATCH_ID, 'D_PROVIDER', 'D_PROVIDER', 'START', @PROC_STEP_NO, @PROC_STEP_NAME, @ROWCOUNT_NO);
 
 
+        COMMIT TRANSACTION;
+
+        BEGIN TRANSACTION ;
+
         -- CREATE TABLE PRN_ENTITY_ID AS
 
-        SET @PROC_STEP_NO = 9;
+        SET @PROC_STEP_NO = 12;
         SET @PROC_STEP_NAME = ' GENERATING TMP_PRN_ENTITY_ID';
 
-        IF OBJECT_ID('dbo.TMP_PRN_ENTITY_ID', 'U') IS NOT NULL
-            drop table dbo.TMP_PRN_ENTITY_ID;
+        IF OBJECT_ID('NBS_ODSE.dbo.TMP_PRN_ENTITY_ID', 'U') IS NOT NULL
+            drop table NBS_ODSE.dbo.TMP_PRN_ENTITY_ID;
 
         with lst as (SELECT DISTINCT PROVIDER_UID as PROVIDER_UID_PRN,
                                      ROOT_EXTENSION_TXT,
@@ -449,15 +485,16 @@ BEGIN
                                          ORDER BY entity_id_seq DESC
                                          )        AS [ROWNO]
 
-                     FROM dbo.TMP_PROVIDER_UID_COLL puc
-                              LEFT OUTER JOIN NBS_ODSE.dbo.ENTITY_ID with (nolock) ON puc.PROVIDER_UID = ENTITY_ID.ENTITY_UID and
-                                                                                      ENTITY_ID.record_status_cd = 'ACTIVE'
-                         AND ENTITY_ID.TYPE_CD = 'PRN')
+                     FROM NBS_ODSE.dbo.TMP_PROVIDER_UID_COLL puc
+                              LEFT OUTER JOIN NBS_ODSE.dbo.ENTITY_ID with (nolock)
+                                              ON puc.PROVIDER_UID = ENTITY_ID.ENTITY_UID and
+                                                 ENTITY_ID.record_status_cd = 'ACTIVE'
+                                                  AND ENTITY_ID.TYPE_CD = 'PRN')
 
         select PROVIDER_UID_PRN,
                ROOT_EXTENSION_TXT,
                ASSIGNING_AUTHORITY_CD
-        into dbo.TMP_PRN_ENTITY_ID
+        into NBS_ODSE.dbo.TMP_PRN_ENTITY_ID
         from lst
         where rowno = 1;
 
@@ -470,13 +507,17 @@ BEGIN
         VALUES (@BATCH_ID, 'D_PROVIDER', 'D_PROVIDER', 'START', @PROC_STEP_NO, @PROC_STEP_NAME, @ROWCOUNT_NO);
 
 
+        COMMIT TRANSACTION;
+
+        BEGIN TRANSACTION ;
+
         --CREATE TABLE S_PROVIDER_FINAL AS
 
-        SET @PROC_STEP_NO = 10;
+        SET @PROC_STEP_NO = 14;
         SET @PROC_STEP_NAME = ' GENERATING TMP_S_PROVIDER_FINAL';
 
-        IF OBJECT_ID('dbo.TMP_S_PROVIDER_FINAL', 'U') IS NOT NULL
-            drop table dbo.TMP_S_PROVIDER_FINAL;
+        IF OBJECT_ID('NBS_ODSE.dbo.TMP_S_PROVIDER_FINAL', 'U') IS NOT NULL
+            drop table NBS_ODSE.dbo.TMP_S_PROVIDER_FINAL;
 
 
         SELECT distinct pwm.*,
@@ -484,38 +525,38 @@ BEGIN
                         qe.ROOT_EXTENSION_TXT     AS 'PROVIDER_QUICK_CODE',
                         pe.ROOT_EXTENSION_TXT     AS 'PROVIDER_REGISTRATION_NUM',
                         pe.ASSIGNING_AUTHORITY_CD AS 'PROVIDER_REGISRATION_NUM_AUTH'
-        into dbo.TMP_S_PROVIDER_FINAL
-        FROM dbo.TMP_S_PROVIDER_WITH_NM pwm
-                 LEFT OUTER JOIN dbo.TMP_S_PROVIDER_LOCATOR spl ON pwm.PROVIDER_UID = spl.PROVIDER_UID_LOCATOR
-                 LEFT OUTER JOIN dbo.TMP_S_PROVIDER_QEC_ENTITY_ID qe ON pwm.PROVIDER_UID = qe.PROVIDER_UID_QEC
-                 LEFT OUTER JOIN dbo.TMP_PRN_ENTITY_ID pe ON pwm.PROVIDER_UID = pe.PROVIDER_UID_PRN;
+        into NBS_ODSE.dbo.TMP_S_PROVIDER_FINAL
+        FROM NBS_ODSE.dbo.TMP_S_PROVIDER_WITH_NM pwm
+                 LEFT OUTER JOIN NBS_ODSE.dbo.TMP_S_PROVIDER_LOCATOR spl ON pwm.PROVIDER_UID = spl.PROVIDER_UID_LOCATOR
+                 LEFT OUTER JOIN NBS_ODSE.dbo.TMP_S_PROVIDER_QEC_ENTITY_ID qe ON pwm.PROVIDER_UID = qe.PROVIDER_UID_QEC
+                 LEFT OUTER JOIN NBS_ODSE.dbo.TMP_PRN_ENTITY_ID pe ON pwm.PROVIDER_UID = pe.PROVIDER_UID_PRN;
 
-        update dbo.TMP_S_PROVIDER_FINAL
+        update NBS_ODSE.dbo.TMP_S_PROVIDER_FINAL
         set PROVIDER_QUICK_CODE= null
         where rtrim(ltrim(PROVIDER_QUICK_CODE)) = ''
 
-        update dbo.TMP_S_PROVIDER_FINAL
+        update NBS_ODSE.dbo.TMP_S_PROVIDER_FINAL
         set PROVIDER_REGISRATION_NUM_AUTH= null
         where rtrim(ltrim(PROVIDER_REGISRATION_NUM_AUTH)) = ''
-        update dbo.TMP_S_PROVIDER_FINAL
+        update NBS_ODSE.dbo.TMP_S_PROVIDER_FINAL
         set PROVIDER_STREET_ADDRESS_1= null
         where rtrim(ltrim(PROVIDER_STREET_ADDRESS_1)) = ''
-        update dbo.TMP_S_PROVIDER_FINAL
+        update NBS_ODSE.dbo.TMP_S_PROVIDER_FINAL
         set PROVIDER_STREET_ADDRESS_2= null
         where rtrim(ltrim(PROVIDER_STREET_ADDRESS_2)) = ''
-        update dbo.TMP_S_PROVIDER_FINAL
+        update NBS_ODSE.dbo.TMP_S_PROVIDER_FINAL
         set PROVIDER_COUNTY_CODE= null
         where rtrim(ltrim(PROVIDER_COUNTY_CODE)) = ''
-        update dbo.TMP_S_PROVIDER_FINAL
+        update NBS_ODSE.dbo.TMP_S_PROVIDER_FINAL
         set PROVIDER_ADDRESS_COMMENTS= null
         where rtrim(ltrim(PROVIDER_ADDRESS_COMMENTS)) = ''
-        update dbo.TMP_S_PROVIDER_FINAL
+        update NBS_ODSE.dbo.TMP_S_PROVIDER_FINAL
         set PROVIDER_PHONE_WORK= null
         where rtrim(ltrim(PROVIDER_PHONE_WORK)) = ''
-        update dbo.TMP_S_PROVIDER_FINAL
+        update NBS_ODSE.dbo.TMP_S_PROVIDER_FINAL
         set PROVIDER_PHONE_EXT_WORK= null
         where rtrim(ltrim(PROVIDER_PHONE_EXT_WORK)) = ''
-        update dbo.TMP_S_PROVIDER_FINAL
+        update NBS_ODSE.dbo.TMP_S_PROVIDER_FINAL
         set PROVIDER_PHONE_COMMENTS= null
         where rtrim(ltrim(PROVIDER_PHONE_COMMENTS)) = ''
 
@@ -530,58 +571,43 @@ BEGIN
         VALUES (@BATCH_ID, 'D_PROVIDER', 'D_PROVIDER', 'START', @PROC_STEP_NO, @PROC_STEP_NAME, @ROWCOUNT_NO);
 
 
-
         --PROC DATASETS LIBRARY = WORK NOLIST;DELETE L_PROVIDER_E L_PROVIDER_N D_PROVIDER_E D_PROVIDER_N S_PROVIDER_FINAL;RUN;
 
 
-        IF OBJECT_ID('dbo.TMP_S_PROVIDER_INIT', 'U') IS NOT NULL
-            drop table dbo.TMP_S_PROVIDER_INIT;
+        IF OBJECT_ID('NBS_ODSE.dbo.TMP_S_PROVIDER_INIT', 'U') IS NOT NULL
+            drop table NBS_ODSE.dbo.TMP_S_PROVIDER_INIT;
 
-        IF OBJECT_ID('dbo.TMP_PROVIDER_UID_COLL', 'U') IS NOT NULL
-            drop table dbo.TMP_PROVIDER_UID_COLL;
+        IF OBJECT_ID('NBS_ODSE.dbo.TMP_PROVIDER_UID_COLL', 'U') IS NOT NULL
+            drop table NBS_ODSE.dbo.TMP_PROVIDER_UID_COLL;
 
-        IF OBJECT_ID('dbo.TMP_S_INITPROVIDER', 'U') IS NOT NULL
-            drop table dbo.TMP_S_INITPROVIDER;
+        IF OBJECT_ID('NBS_ODSE.dbo.TMP_S_INITPROVIDER', 'U') IS NOT NULL
+            drop table NBS_ODSE.dbo.TMP_S_INITPROVIDER;
 
-        IF OBJECT_ID('dbo.TMP_S_PROVIDER_NAME', 'U') IS NOT NULL
-            drop table dbo.TMP_S_PROVIDER_NAME;
+        IF OBJECT_ID('NBS_ODSE.dbo.TMP_S_PROVIDER_NAME', 'U') IS NOT NULL
+            drop table NBS_ODSE.dbo.TMP_S_PROVIDER_NAME;
 
-        IF OBJECT_ID('dbo.TMP_S_PROVIDER_WITH_NM', 'U') IS NOT NULL
-            drop table dbo.TMP_S_PROVIDER_WITH_NM;
+        IF OBJECT_ID('NBS_ODSE.dbo.TMP_S_PROVIDER_WITH_NM', 'U') IS NOT NULL
+            drop table NBS_ODSE.dbo.TMP_S_PROVIDER_WITH_NM;
 
-        IF OBJECT_ID('dbo.TMP_S_PROVIDER_POSTAL_LOCATOR', 'U') IS NOT NULL
-            drop table dbo.TMP_S_PROVIDER_POSTAL_LOCATOR;
+        IF OBJECT_ID('NBS_ODSE.dbo.TMP_S_PROVIDER_POSTAL_LOCATOR', 'U') IS NOT NULL
+            drop table NBS_ODSE.dbo.TMP_S_PROVIDER_POSTAL_LOCATOR;
 
-        IF OBJECT_ID('dbo.TMP_S_PROVIDER_TELE_LOCATOR_OFFICE', 'U') IS NOT NULL
-            drop table dbo.TMP_S_PROVIDER_TELE_LOCATOR_OFFICE;
+        IF OBJECT_ID('NBS_ODSE.dbo.TMP_S_PROVIDER_TELE_LOCATOR_OFFICE', 'U') IS NOT NULL
+            drop table NBS_ODSE.dbo.TMP_S_PROVIDER_TELE_LOCATOR_OFFICE;
 
-        IF OBJECT_ID('dbo.TMP_S_PROVIDER_TELE_LOCATOR_CELL', 'U') IS NOT NULL
-            drop table dbo.TMP_S_PROVIDER_TELE_LOCATOR_CELL;
+        IF OBJECT_ID('NBS_ODSE.dbo.TMP_S_PROVIDER_TELE_LOCATOR_CELL', 'U') IS NOT NULL
+            drop table NBS_ODSE.dbo.TMP_S_PROVIDER_TELE_LOCATOR_CELL;
 
-        IF OBJECT_ID('dbo.TMP_S_PROVIDER_LOCATOR', 'U') IS NOT NULL
-            drop table dbo.TMP_S_PROVIDER_LOCATOR;
+        IF OBJECT_ID('NBS_ODSE.dbo.TMP_S_PROVIDER_LOCATOR', 'U') IS NOT NULL
+            drop table NBS_ODSE.dbo.TMP_S_PROVIDER_LOCATOR;
 
-        IF OBJECT_ID('dbo.TMP_S_PROVIDER_QEC_ENTITY_ID', 'U') IS NOT NULL
-            drop table dbo.TMP_S_PROVIDER_QEC_ENTITY_ID;
-
-        IF OBJECT_ID('dbo.TMP_PRN_ENTITY_ID', 'U') IS NOT NULL
-            drop table dbo.TMP_PRN_ENTITY_ID;
-
-
-        IF OBJECT_ID('dbo.TMP_L_PROVIDER_N', 'U') IS NOT NULL
-            drop table dbo.TMP_L_PROVIDER_N;
-
-        IF OBJECT_ID('dbo.TMP_L_PROVIDER_E', 'U') IS NOT NULL
-            drop table dbo.TMP_L_PROVIDER_E;
-
-        IF OBJECT_ID('dbo.TMP_D_PROVIDER_N', 'U') IS NOT NULL
-            drop table dbo.TMP_D_PROVIDER_N;
-
-        IF OBJECT_ID('dbo.TMP_D_PROVIDER_E', 'U') IS NOT NULL
-            drop table dbo.TMP_D_PROVIDER_E;
+        IF OBJECT_ID('NBS_ODSE.dbo.TMP_S_PROVIDER_QEC_ENTITY_ID', 'U') IS NOT NULL
+            drop table NBS_ODSE.dbo.TMP_S_PROVIDER_QEC_ENTITY_ID;
 
 
         COMMIT TRANSACTION;
+        SET NOCOUNT OFF;
+
         select distinct [PROVIDER_UID]
                       , [PROVIDER_LOCAL_ID]
                       , [PROVIDER_RECORD_STATUS]
@@ -615,10 +641,7 @@ BEGIN
                       , [PROVIDER_ADD_TIME]
                       , [PROVIDER_ADDED_BY]
                       , [PROVIDER_LAST_UPDATED_BY]
-        from dbo.TMP_S_PROVIDER_FINAL;
-
-        IF OBJECT_ID('dbo.TMP_S_PROVIDER_FINAL', 'U') IS NOT NULL
-            drop table dbo.TMP_D_PROVIDER_N;
+        from NBS_ODSE.dbo.TMP_S_PROVIDER_FINAL;
 
     END TRY
     BEGIN CATCH
@@ -655,8 +678,6 @@ BEGIN
         return -1;
 
     END CATCH
-
-
 END ;
 go
 

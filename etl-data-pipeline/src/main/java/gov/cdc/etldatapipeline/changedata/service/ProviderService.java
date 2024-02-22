@@ -1,8 +1,7 @@
 package gov.cdc.etldatapipeline.changedata.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.CollectionType;
 import gov.cdc.etldatapipeline.changedata.model.dto.Provider;
+import gov.cdc.etldatapipeline.changedata.model.odse.Person;
 import gov.cdc.etldatapipeline.changedata.repository.ProviderRepository;
 import gov.cdc.etldatapipeline.changedata.utils.StreamsSerdes;
 import gov.cdc.etldatapipeline.changedata.utils.UtilHelper;
@@ -16,15 +15,11 @@ import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Produced;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Slf4j
 public class ProviderService {
-
-    private static final String PROVIDER_STORE = "provider-store";
 
     private static final Serde<String> STRING_SERDE = Serdes.String();
 
@@ -34,35 +29,40 @@ public class ProviderService {
     private final String providerOutputTopicName;
     private final ProviderRepository providerRepository;
 
+    /**
+     * @param streamsBuilder
+     * From incoming Provider related topic capture the changes
+     * Compute the aggregated Provider data
+     * Publish the Provider data to aggregated Kafka output topic
+     * Steps:
+     * 1. Capture the `Provider` topic as Kafka Stream - KStream<String,String>
+     * 2. Transform to KStream<String, Person>
+     * 3. For each Person call the `sp_provider_event` stored proc &
+     *      transform the results to KStream<String,List<Provider>
+     * 4. Transform the above result to KStream<Provider.UID,Provider>
+     * 5. Write the consolidated `Provider` data to aggregated `Provider` Kafka topic
+     */
 
     public void processProviderData(StreamsBuilder streamsBuilder) {
-        CollectionType stringListJavaType = new ObjectMapper().getTypeFactory()
-                .constructCollectionType(List.class, String.class);
-        KStream<String, List<String>> personInputKStream =
-                streamsBuilder.stream(
-                                providerTopicName,
-                                Consumed.with(STRING_SERDE, STRING_SERDE))
-                        .map((k, v) -> new KeyValue<>(
-                                k,
-                                utilHelper.deserializePayload(v,
-                                        stringListJavaType)));
+        KStream<String, Person> personKStream
+                = streamsBuilder.stream(providerTopicName, Consumed.with(STRING_SERDE, STRING_SERDE))
+                .map((k, v) -> new KeyValue<>(
+                        k,
+                        utilHelper.deserializePayload(v, "/payload/after", Person.class)))
+                // KStream<String, Person>
+                .peek((key, value) -> log.info("Calling the Provider Repository for " + value.getPersonUid()));
 
-        log.info("Calling the Provider Repository.");
-        List<Provider> providerList = new ArrayList<>();
-        personInputKStream.foreach((k, v) -> providerList.addAll(
-                providerRepository.getAllProviders(String.join(",", v))));
+        KStream<String, Provider> consolidatedProviderStream = personKStream
+                .mapValues(v -> providerRepository.computeAllProviders(v.getPersonUid()))
+                //KStream<String, List<Provider>>
+                .flatMap((k, v) -> v.stream()
+                        .map(p -> KeyValue.pair(p.getProviderUid(), p))
+                        .collect(Collectors.toSet()))
+                // KStream<String, Provider>
+                .peek((key, value) -> log.info("Provider Info : {}", value.toString()));
 
-        KStream<String, Provider> consolidatedProviderStream
-                = personInputKStream.flatMap((k, v) -> providerRepository
-                .getAllProviders(String.join(",", v))
-                .stream().map(p -> KeyValue.pair(p.getProviderUid(), p))
-                .collect(Collectors.toSet()));
-
-        consolidatedProviderStream.foreach((k,v) -> log.info("Provider Info : ", v.toString()));
         consolidatedProviderStream.to(providerOutputTopicName,
                 Produced.with(Serdes.String(), StreamsSerdes.ProviderSerde()));
-
-        //personTable.toStream().foreach((k,v) -> providerRepository.save(v));
     }
 }
 
