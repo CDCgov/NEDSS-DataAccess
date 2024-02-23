@@ -29,8 +29,8 @@ public class KafkaConfig {
     }
 
     @Bean
-    public NewTopic createProviderTopicName() {
-        return TopicBuilder.name(providerTopicName).build();
+    public NewTopic createPersonTopicName() {
+        return TopicBuilder.name(personTopicName).build();
     }
 
     @Bean

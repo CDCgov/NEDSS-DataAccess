@@ -3,6 +3,7 @@ package gov.cdc.etldatapipeline.changedata.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import gov.cdc.etldatapipeline.changedata.config.KafkaConfig;
 import gov.cdc.etldatapipeline.changedata.config.KafkaStreamsConfig;
 import gov.cdc.etldatapipeline.changedata.service.DataPipelineStatusService;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -21,6 +22,9 @@ public class DataPipelineController {
     @Autowired
     private KafkaStreamsConfig kafkaStreamsConfig;
 
+    @Autowired
+    private KafkaConfig kafkaConfig;
+
     public DataPipelineController(DataPipelineStatusService dataPipelineStatusSvc) {
         this.dataPipelineStatusSvc = dataPipelineStatusSvc;
     }
@@ -37,7 +41,7 @@ public class DataPipelineController {
     public ResponseEntity<String> postProvider(@RequestBody String payLoad) throws JsonProcessingException {
         KafkaProducer<String, JsonNode> producer = new KafkaProducer<>(
                 kafkaStreamsConfig.kStreamsConfigs().asProperties());
-        producer.send(new ProducerRecord<>("cdc.nbs_odse.dbo.Provider",
+        producer.send(new ProducerRecord<>(kafkaConfig.getPersonTopicName(),
                 UUID.randomUUID().toString(), new ObjectMapper().readTree(payLoad)));
         producer.close();
         return ResponseEntity.ok("Produced : " + payLoad);
