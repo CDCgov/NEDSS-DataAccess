@@ -25,7 +25,7 @@ public class ProviderService {
 
     private final UtilHelper utilHelper = UtilHelper.getInstance();
 
-    private final String providerTopicName;
+    private final String personTopicName;
     private final String providerOutputTopicName;
     private final ProviderRepository providerRepository;
 
@@ -45,7 +45,7 @@ public class ProviderService {
 
     public void processProviderData(StreamsBuilder streamsBuilder) {
         KStream<String, Person> personKStream
-                = streamsBuilder.stream(providerTopicName, Consumed.with(STRING_SERDE, STRING_SERDE))
+                = streamsBuilder.stream(personTopicName, Consumed.with(STRING_SERDE, STRING_SERDE))
                 .map((k, v) -> new KeyValue<>(
                         k,
                         utilHelper.deserializePayload(v, "/payload/after", Person.class)))
