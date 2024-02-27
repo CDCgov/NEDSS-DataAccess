@@ -42,7 +42,7 @@ public class KafkaStreamsService {
     public void processMessage(StreamsBuilder streamsBuilder) {
 
         ProviderService providerService = new ProviderService(
-                providerTopicName,
+                personTopicName,
                 providerOutputTopicName,
                 providerRepository);
         providerService.processProviderData(streamsBuilder);
