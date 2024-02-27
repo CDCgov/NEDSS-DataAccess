@@ -1,15 +1,37 @@
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
+
+buildscript {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "gradle.plugin.com.github.johnrengelman:shadow:7.1.2"
+    }
+}
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.1.5'
     id 'io.spring.dependency-management' version '1.1.3'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
-group = 'com.example'
+//apply plugin: 'org.owasp.dependencycheck'
+
+group = 'gov.cdc.eltdatapipeline'
 version = '0.0.1-SNAPSHOT'
 
 java {
-    sourceCompatibility = '17'
+    sourceCompatibility = JavaVersion.VERSION_17
 }
+
+ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
+
+tasks.withType(Jar).all { duplicatesStrategy = DuplicatesStrategy.EXCLUDE }
 
 configurations {
     compileOnly {
@@ -18,6 +40,7 @@ configurations {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
@@ -40,6 +63,8 @@ dependencies {
     implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
     // https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc
     implementation 'com.microsoft.sqlserver:mssql-jdbc:12.3.0.jre17-preview'
+    implementation 'ch.qos.logback:logback-classic'
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -47,4 +72,17 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'gov.cdc.etldatapipeline.EtlDataPipelineApplication'
+        )
+    }
+    zip64 true
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    // Gather all runtime dependencies
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
 }
