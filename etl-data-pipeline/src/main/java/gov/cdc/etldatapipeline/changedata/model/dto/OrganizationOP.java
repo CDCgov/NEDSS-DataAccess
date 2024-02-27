@@ -62,8 +62,6 @@ public class OrganizationOP extends DebeziumMetadata {
     private String organizationEmail;
     @Column(name = "ORGANIZATION_PHONE_COMMENTS")
     private String organizationPhoneComments;
-    @Column(name = "ORGANIZATION_PHONE_CELL")
-    private String organizationPhoneCell;
     @Column(name = "ORGANIZATION_LAST_CHANGE_TIME")
     private String organizationLastChangeTime;
     @Column(name = "ORGANIZATION_ADD_TIME")
