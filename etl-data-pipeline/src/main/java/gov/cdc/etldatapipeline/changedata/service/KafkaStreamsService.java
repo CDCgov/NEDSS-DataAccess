@@ -3,6 +3,7 @@ package gov.cdc.etldatapipeline.changedata.service;
 import gov.cdc.etldatapipeline.changedata.repository.PageRepository;
 import gov.cdc.etldatapipeline.changedata.repository.PatientRepository;
 import gov.cdc.etldatapipeline.changedata.repository.ProviderRepository;
+import gov.cdc.etldatapipeline.changedata.repository.OrganizationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.streams.StreamsBuilder;
@@ -19,6 +20,7 @@ public class KafkaStreamsService {
     private final PatientRepository patientRepository;
     private final PageRepository pageRepository;
     private final ProviderRepository providerRepository;
+    private final OrganizationRepository organizationRepository;
     @Value("#{kafkaConfig.getNbsPagesTopicName()}")
     private String nbsPagesTopicName;
     @Value("#{kafkaConfig.getProviderTopicName()}")
@@ -31,6 +33,10 @@ public class KafkaStreamsService {
     private String participationTopicName;
     @Value("#{kafkaConfig.getCtContactTopicName()}")
     private String ctContactTopicName;
+    @Value("#{kafkaConfig.getOrganizationTopicName()}")
+    private String organizationTopicName;
+    @Value("#{kafkaConfig.getOrganizationAggregateTopicName()}")
+    private String organizationOutputTopicName;
 
     @Autowired
     public void processMessage(StreamsBuilder streamsBuilder) {
@@ -40,6 +46,12 @@ public class KafkaStreamsService {
                 providerOutputTopicName,
                 providerRepository);
         providerService.processProviderData(streamsBuilder);
+
+        OrganizationService organizationService = new OrganizationService(
+                organizationTopicName,
+                organizationOutputTopicName,
+                organizationRepository);
+        organizationService.processOrganizationData(streamsBuilder);
 
              /* PatientService patientService = new PatientService(
                 personTopicName,

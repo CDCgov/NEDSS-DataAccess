@@ -22,6 +22,10 @@ public class KafkaConfig {
     private String participationTopicName;
     @Value("${spring.kafka.stream.input.ct-contact.topic-name}")
     private String ctContactTopicName;
+    @Value("${spring.kafka.stream.input.organization.topic-name}")
+    private String organizationTopicName;
+    @Value("${spring.kafka.stream.input.organization.output-topic-name}")
+    private String organizationAggregateTopicName;
 
     @Bean
     public NewTopic createNbsPagesTopicName() {
@@ -37,4 +41,11 @@ public class KafkaConfig {
     public NewTopic createAggregateProviderTopicName() {
         return TopicBuilder.name(providerAggregateTopicName).build();
     }
+
+    @Bean
+    public NewTopic createOrganizationTopicName() {
+        return TopicBuilder.name(organizationTopicName).build();
+    }
 }
+
+
