@@ -24,10 +24,11 @@ spring:
   datasource:
     password: ${DB_PASSWORD:fake.fake.fake.1234}
     username: ${DB_USERNAME:sa}
-    url: ${DB_URL:jdbc:sqlserver://localhost:1433;databaseName=NBS_ODSE;encrypt=true;trustServerCertificate=true;}
+    url: jdbc:sqlserver://${DB_URL:localhost}:1433;databaseName=NBS_ODSE;encrypt=true;trustServerCertificate=true;
 logging:
   #  Only one config can be active at a time
   config: classpath:logback-config.xml
-LOG_PATH: ${DI_LOG_PATH:/tmp/etl-data-pipeline/}
+  file:
+    path: ${DA_LOG_PATH:/tmp/}
 server:
   port: '8090'
