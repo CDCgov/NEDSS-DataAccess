@@ -8,6 +8,9 @@ spring:
         provider:
           topic-name: cdc.nbs_odse.dbo.Provider
           output-topic-name: cdc.nbs_odse.dbo.Provider.output
+        organization:
+          topic-name: cdc.nbs_odse.dbo.Organization
+          output-topic-name: cdc.nbs_odse.dbo.Organization.output
         ct-contact:
           topic-name: cdc.nbs_odse.dbo.CT_contact
         participation:

@@ -33,6 +33,7 @@ Ensure you have Python installed. Clone the repository and install dependencies.
 - https://pypi.org/project/Faker/
 - https://pypi.org/project/boto3/
 - https://pypi.org/project/requests/
+- https://pypi.org/project/aiohttp/
 
 ## Required libraries for the deployment in AWS Lambda
 
@@ -40,3 +41,4 @@ The following libraries should be included in the source and zipped for deployme
 - Faker
 - boto3
 - requests
+- aiohttp
