@@ -1,15 +1,22 @@
 databaseChangeLog:
   - changeSet:
-      id:  1
-      author:  liquibase
-      changes:
-        - sqlFile:
-            path: db/routines/provider/sp_provider.sql
-            splitStatements: false
-  - changeSet:
-      id: 2
+      id: 1
       author: liquibase
       changes:
         - sqlFile:
-            path: db/routines/organization/sp_organization.sql
+            path: src/main/resources/db/db-general-001.sql
+            splitStatements: false
+  - changeSet:
+      id:  2
+      author:  liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/sp-provider-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 3
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/sp-organization-001.sql
             splitStatements: false

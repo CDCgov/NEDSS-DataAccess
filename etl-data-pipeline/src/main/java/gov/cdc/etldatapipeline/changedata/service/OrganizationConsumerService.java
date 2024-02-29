@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Slf4j
-public class OrganizationService {
+public class OrganizationConsumerService {
 
     private static final Serde<String> STRING_SERDE = Serdes.String();
 

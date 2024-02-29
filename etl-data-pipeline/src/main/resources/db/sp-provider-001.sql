@@ -1,5 +1,3 @@
-use NBS_ODSE
-go;
 Create or Alter PROCEDURE [dbo].[sp_PROVIDER_EVENT] @user_id_list varchar(max)
 as
 BEGIN
@@ -535,5 +533,5 @@ BEGIN
         return -1;
     END CATCH
 END ;
-go
+
 

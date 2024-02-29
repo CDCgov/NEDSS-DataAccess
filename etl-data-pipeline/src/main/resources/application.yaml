@@ -35,4 +35,4 @@ logging:
   config: classpath:logback-config.xml
 LOG_PATH: ${DA_LOG_PATH:/tmp/}
 server:
-  port: '8091'
+  port: '8090'

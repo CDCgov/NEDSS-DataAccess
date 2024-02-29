@@ -1,4 +1,4 @@
-CREATE PROCEDURE [dbo].[sp_Organization]
+CREATE or Alter PROCEDURE [dbo].[sp_Organization]
 	@org_id_list varchar(max)
 
 AS

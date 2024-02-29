@@ -41,17 +41,17 @@ public class KafkaStreamsService {
     @Autowired
     public void processMessage(StreamsBuilder streamsBuilder) {
 
-        ProviderService providerService = new ProviderService(
+        ProviderConsumerService providerConsumerService = new ProviderConsumerService(
                 personTopicName,
                 providerOutputTopicName,
                 providerRepository);
-        providerService.processProviderData(streamsBuilder);
+        providerConsumerService.processProviderData(streamsBuilder);
 
-        OrganizationService organizationService = new OrganizationService(
+        OrganizationConsumerService organizationConsumerService = new OrganizationConsumerService(
                 organizationTopicName,
                 organizationOutputTopicName,
                 organizationRepository);
-        organizationService.processOrganizationData(streamsBuilder);
+        organizationConsumerService.processOrganizationData(streamsBuilder);
 
              /* PatientService patientService = new PatientService(
                 personTopicName,

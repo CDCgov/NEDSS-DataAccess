@@ -12,7 +12,7 @@ import org.apache.kafka.streams.kstream.*;
 
 @RequiredArgsConstructor
 @Slf4j
-public class NbsPageService {
+public class NbsPageConsumerService {
     private final String nbsPagesTopicName;
     private final PageRepository pageRepository;
 

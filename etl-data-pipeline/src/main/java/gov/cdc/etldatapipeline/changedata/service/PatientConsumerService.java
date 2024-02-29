@@ -25,7 +25,7 @@ import java.time.Duration;
 
 @RequiredArgsConstructor
 @Slf4j
-public class PatientService {
+public class PatientConsumerService {
 
     private static final Serde<String> STRING_SERDE = Serdes.String();
 

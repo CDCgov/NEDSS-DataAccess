@@ -33,7 +33,7 @@ docker-compose -f $BASE/docker-compose.yml up etl-data-pipeline --build -d
 
 echo "**** NEDSS DataAccess ETL Data Pipeline build complete ****"
 echo "Health Check"
-echo "http://localhost:8080/data-pipeline-status"
+echo "http://localhost:8090/data-pipeline-status"
 echo ""
 echo "Database: localhost:1433"
 echo "DB user: sa"
