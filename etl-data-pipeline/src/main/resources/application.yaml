@@ -28,9 +28,11 @@ spring:
     password: ${DB_PASSWORD:fake.fake.fake.1234}
     username: ${DB_USERNAME:sa}
     url: jdbc:sqlserver://${DB_URL:localhost}:1433;databaseName=NBS_ODSE;encrypt=true;trustServerCertificate=true;
+  liquibase:
+    change-log: db/changelog/db.changelog-master.yaml
 logging:
   #  Only one config can be active at a time
   config: classpath:logback-config.xml
 LOG_PATH: ${DA_LOG_PATH:/tmp/}
 server:
-  port: '8090'
+  port: '8091'
