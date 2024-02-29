@@ -52,7 +52,7 @@ services:
       context: ./
       dockerfile: ./Dockerfile
     ports:
-      - "8083:8083"
+      - "8090:8090"
     depends_on:
       - broker
     container_name: etl-data-pipeline

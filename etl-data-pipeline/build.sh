@@ -3,17 +3,18 @@ set -e
 
 BASE="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
-PATH=$BASE/nedss-dataaccess/builder/etl-data-pipeline
-VERSION=master
+#DA_PATH=$BASE/nedss-dataaccess/builder/ #Uncomment for copying from github repo
 
 # Clone NEDSSDev
-rm -rf $PATH
-cp -r $HOME/GitPrj/NEDSS-DataAccess/ $PATH
-#git clone -b $VERSION git@github.com:cdcent/NEDSS-DataAccess.git $PATH
+#rm -rf $DA_PATH
+#cp -r $HOME/'GitPrj/NEDSS-DataAccess/etl-data-pipeline/' $DA_PATH
+
+#VERSION=master
+#git clone -b $VERSION git@github.com:cdcent/NEDSS-DataAccess.git $DA_PATH
 
 # Build and deploy database containers
 echo "Building SQL Server database"
-docker-compose -f $BASE/docker-compose.yml up nbs-mssql --build -d
+docker-compose -f $BASE/docker-compose.yml up nbs-dataaccess-mssql --build -d
 
 # Build and deploy Zookeeper container
 echo "Building Zookeeper"
@@ -28,7 +29,7 @@ echo "Building ETL Data Pipeline"
 docker-compose -f $BASE/docker-compose.yml up etl-data-pipeline --build -d
 
 # Cleanup 
-rm -rf $PATH
+#rm -rf $DA_PATH
 
 echo "**** NEDSS DataAccess ETL Data Pipeline build complete ****"
 echo "Health Check"
