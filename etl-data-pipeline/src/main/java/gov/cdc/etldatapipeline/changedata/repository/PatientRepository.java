@@ -10,7 +10,7 @@ import java.util.List;
 
 @Repository
 public interface PatientRepository extends JpaRepository<PatientOP, String>  {
-    @Query(nativeQuery = true, value = "execute sp_Patient :person_uids")
+    @Query(nativeQuery = true, value = "execute sp_Patient_Info :person_uids")
     List<PatientOP> computeAllPatients(@Param("person_uids") String person_uids);
 
 }
