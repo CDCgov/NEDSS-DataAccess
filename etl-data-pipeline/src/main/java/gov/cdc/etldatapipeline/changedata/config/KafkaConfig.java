@@ -26,6 +26,8 @@ public class KafkaConfig {
     private String organizationTopicName;
     @Value("${spring.kafka.stream.input.organization.output-topic-name}")
     private String organizationAggregateTopicName;
+    @Value("${spring.kafka.stream.input.person.output-topic-name}")
+    private String patientAggregateTopicName;
 
     @Bean
     public NewTopic createNbsPagesTopicName() {
@@ -46,6 +48,13 @@ public class KafkaConfig {
     public NewTopic createOrganizationTopicName() {
         return TopicBuilder.name(organizationTopicName).build();
     }
+
+    @Bean
+    public NewTopic createAggregatePatientTopicName() {
+        return TopicBuilder.name(patientAggregateTopicName).build();
+    }
+
+
 }
 
 

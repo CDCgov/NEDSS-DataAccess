@@ -3,25 +3,13 @@ package gov.cdc.etldatapipeline.changedata.service;
 import gov.cdc.etldatapipeline.changedata.model.odse.CtContact;
 import gov.cdc.etldatapipeline.changedata.model.odse.Participation;
 import gov.cdc.etldatapipeline.changedata.model.odse.Person;
-import gov.cdc.etldatapipeline.changedata.model.dto.InitPatient;
 import gov.cdc.etldatapipeline.changedata.repository.PatientRepository;
 import gov.cdc.etldatapipeline.changedata.utils.StreamsSerdes;
 import gov.cdc.etldatapipeline.changedata.utils.UtilHelper;
-import io.debezium.serde.json.JsonSerde;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.common.utils.Bytes;
-import org.apache.kafka.streams.KeyValue;
-import org.apache.kafka.streams.StreamsBuilder;
-import org.apache.kafka.streams.kstream.Consumed;
-import org.apache.kafka.streams.kstream.KStream;
-import org.apache.kafka.streams.kstream.KTable;
-import org.apache.kafka.streams.kstream.Materialized;
-import org.apache.kafka.streams.state.KeyValueStore;
-
-import java.time.Duration;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -49,6 +37,7 @@ public class PatientService {
     private final PatientRepository patientRepository;
 
 
+    /*
     public void processPatientData(StreamsBuilder streamsBuilder) {
         KStream<String, Person> personInputKStream =
                 streamsBuilder.stream(
@@ -140,5 +129,5 @@ public class PatientService {
         initPatientKTable.toStream().foreach((k, v) -> log.info(
                 "initPatientKTable :: Key :: {}, Value :: {}", k, v));
         initPatientKTable.toStream().foreach((k,v) -> patientRepository.save(v));
-    }
+    } */
 }

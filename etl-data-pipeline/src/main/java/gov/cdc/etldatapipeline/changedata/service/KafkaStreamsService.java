@@ -29,6 +29,8 @@ public class KafkaStreamsService {
     private String providerOutputTopicName;
     @Value("#{kafkaConfig.getPersonTopicName()}")
     private String personTopicName;
+    @Value("#{kafkaConfig.getPatientAggregateTopicName()}")
+    private String patientOutputTopicName;
     @Value("#{kafkaConfig.getParticipationTopicName()}")
     private String participationTopicName;
     @Value("#{kafkaConfig.getCtContactTopicName()}")
@@ -52,6 +54,12 @@ public class KafkaStreamsService {
                 organizationOutputTopicName,
                 organizationRepository);
         organizationService.processOrganizationData(streamsBuilder);
+
+        PatientInfoService patientService = new PatientInfoService(
+                personTopicName,
+                patientOutputTopicName,
+                patientRepository);
+        patientService.processPatientData(streamsBuilder);
 
              /* PatientService patientService = new PatientService(
                 personTopicName,

@@ -2,8 +2,7 @@ package gov.cdc.etldatapipeline.changedata.utils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import gov.cdc.etldatapipeline.changedata.model.odse.*;
-import gov.cdc.etldatapipeline.changedata.model.dto.Provider;
-import gov.cdc.etldatapipeline.changedata.model.dto.OrganizationOP;
+import gov.cdc.etldatapipeline.changedata.model.dto.*;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
@@ -19,6 +18,10 @@ public class StreamsSerdes extends Serdes {
 
     public static Serde<Person> PersonSerde() {
         return new PersonSerde();
+    }
+
+    public static Serde<PatientOP> PatientSerde() {
+        return new PatientSerde();
     }
 
     public static Serde<Provider> ProviderSerde() {
@@ -85,6 +88,13 @@ public class StreamsSerdes extends Serdes {
         public OrganizationSerde() {
             super(new JsonSerializer<>(),
                     new JsonDeserializer<>(OrganizationOP.class, false));
+        }
+    }
+
+    public static final class PatientSerde extends WrapperSerde<PatientOP> {
+        public PatientSerde() {
+            super(new JsonSerializer<>(),
+                    new JsonDeserializer<>(PatientOP.class, false));
         }
     }
 }

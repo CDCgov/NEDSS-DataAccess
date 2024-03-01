@@ -58,4 +58,15 @@ public class DataPipelineController {
         return ResponseEntity.ok("Produced : " + payLoad);
     }
 
+    @PostMapping(value = "/patient", consumes = "application/json", produces = "application/json")
+    @ResponseBody
+    public ResponseEntity<String> postPatient(@RequestBody String payLoad) throws JsonProcessingException {
+        KafkaProducer<String, JsonNode> producer = new KafkaProducer<>(
+                kafkaStreamsConfig.kStreamsConfigs().asProperties());
+        producer.send(new ProducerRecord<>(kafkaConfig.getPersonTopicName(),
+                UUID.randomUUID().toString(), new ObjectMapper().readTree(payLoad)));
+        producer.close();
+        return ResponseEntity.ok("Produced : " + payLoad);
+    }
+
 }

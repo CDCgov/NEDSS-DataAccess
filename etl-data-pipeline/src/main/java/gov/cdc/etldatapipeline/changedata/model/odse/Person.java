@@ -11,15 +11,27 @@ public class Person extends DebeziumMetadata {
     @Column(name = "person_uid")
     @JsonProperty("person_uid")
     private String personUid;
-    @Column(name = "local_id")
-    @JsonProperty("local_id")
-    private String localId;
+    @Column(name = "add_reason_cd")
+    @JsonProperty("add_reason_cd")
+    private String addReasonCd;
+    @Column(name = "add_time")
+    @JsonProperty("add_time")
+    private String addTime;
+    @Column(name = "add_user_id")
+    @JsonProperty("add_user_id")
+    private String addUserId;
     @Column(name = "age_reported")
     @JsonProperty("age_reported")
     private String ageReported;
     @Column(name = "age_reported_unit_cd")
     @JsonProperty("age_reported_unit_cd")
     private String ageReportedUnitCd;
+    @Column(name = "additional_gender_cd")
+    @JsonProperty("additional_gender_cd")
+    private String additionalGenderCd;
+    @Column(name = "local_id")
+    @JsonProperty("local_id")
+    private String localId;
     @Column(name = "birth_gender_cd")
     @JsonProperty("birth_gender_cd")
     private String birthGenderCd;
@@ -32,18 +44,12 @@ public class Person extends DebeziumMetadata {
     @Column(name = "deceased_ind_cd")
     @JsonProperty("deceased_ind_cd")
     private String deceasedIndCd;
-    @Column(name = "add_user_id")
-    @JsonProperty("add_user_id")
-    private String addUserId;
     @Column(name = "last_chg_user_id")
     @JsonProperty("last_chg_user_id")
     private String lastChgUserId;
     @Column(name = "speaks_english_cd")
     @JsonProperty("speaks_english_cd")
     private String speaksEnglishCd;
-    @Column(name = "additional_gender_cd")
-    @JsonProperty("additional_gender_cd")
-    private String additionalGenderCd;
     @Column(name = "ethnic_unk_reason_cd")
     @JsonProperty("ethnic_unk_reason_cd")
     private String ethnicUnkReasonCd;
@@ -74,9 +80,6 @@ public class Person extends DebeziumMetadata {
     @Column(name = "last_chg_time")
     @JsonProperty("last_chg_time")
     private String lastChgTime;
-    @Column(name = "add_time")
-    @JsonProperty("add_time")
-    private String addTime;
     @Column(name = "record_status_cd")
     @JsonProperty("record_status_cd")
     private String recordStatusCd;
