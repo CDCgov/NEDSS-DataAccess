@@ -1,6 +1,5 @@
 package gov.cdc.etldatapipeline.changedata.service;
 
-import gov.cdc.etldatapipeline.changedata.repository.PageRepository;
 import gov.cdc.etldatapipeline.changedata.repository.PatientRepository;
 import gov.cdc.etldatapipeline.changedata.repository.ProviderRepository;
 import gov.cdc.etldatapipeline.changedata.repository.OrganizationRepository;
@@ -18,21 +17,12 @@ import org.springframework.stereotype.Service;
 public class KafkaStreamsService {
 
     private final PatientRepository patientRepository;
-    private final PageRepository pageRepository;
     private final ProviderRepository providerRepository;
     private final OrganizationRepository organizationRepository;
-    @Value("#{kafkaConfig.getNbsPagesTopicName()}")
-    private String nbsPagesTopicName;
-    @Value("#{kafkaConfig.getProviderTopicName()}")
-    private String providerTopicName;
     @Value("#{kafkaConfig.getProviderAggregateTopicName()}")
     private String providerOutputTopicName;
     @Value("#{kafkaConfig.getPersonTopicName()}")
     private String personTopicName;
-    @Value("#{kafkaConfig.getParticipationTopicName()}")
-    private String participationTopicName;
-    @Value("#{kafkaConfig.getCtContactTopicName()}")
-    private String ctContactTopicName;
     @Value("#{kafkaConfig.getOrganizationTopicName()}")
     private String organizationTopicName;
     @Value("#{kafkaConfig.getOrganizationAggregateTopicName()}")

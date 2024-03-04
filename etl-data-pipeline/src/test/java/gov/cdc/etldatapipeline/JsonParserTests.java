@@ -1,7 +1,6 @@
 package gov.cdc.etldatapipeline;
 
-import gov.cdc.etldatapipeline.changedata.model.odse.NbsPage;
-import gov.cdc.etldatapipeline.changedata.model.odse.NbsPageId;
+import gov.cdc.etldatapipeline.changedata.model.odse.Person;
 import gov.cdc.etldatapipeline.changedata.utils.UtilHelper;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Assertions;
@@ -13,28 +12,27 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 
 @SpringBootTest
-
 public class JsonParserTests {
 
     @Test
     public void parseDebeziumPrimaryKeyNodeTest() throws IOException {
-        File file = new File("src/test/resources/NbsPageId81913.json");
+        File file = new File("src/test/resources/Person.json");
         String testData = FileUtils.readFileToString(file,
                 Charset.defaultCharset());
-        NbsPageId pageId = UtilHelper.getInstance().parseJsonNode(testData,
-                "/payload", NbsPageId.class);
-        Assertions.assertEquals(81913, pageId.getNbs_page_uid());
+        Person personId = UtilHelper.getInstance().parseJsonNode(testData,
+                "/payload", Person.class);
+        Assertions.assertEquals("10000001", personId.getPersonUid());
     }
 
     @Test
     public void parseDebeziumValueTest() throws IOException {
-        File file = new File("src/test/resources/OdseNbsPageUpdate.json");
+        File file = new File("src/test/resources/Person_ChangeData.json");
         String testData = FileUtils.readFileToString(file,
                 Charset.defaultCharset());
-        NbsPage page = UtilHelper.getInstance().deserializePayload(testData,
-                "/payload/after", NbsPage.class);
-        Assertions.assertEquals(81913, page.getNbs_page_uid());
-        Assertions.assertEquals(1701193934019L, page.getTs_ms());
-        Assertions.assertEquals("u", page.getOp());
+        Person person = UtilHelper.getInstance().deserializePayload(testData,
+                "/payload/after", Person.class);
+        Assertions.assertEquals("9005400", person.getPersonUid());
+        Assertions.assertEquals(1708702633619L, person.getTs_ms());
+        Assertions.assertEquals("u", person.getOp());
     }
 }

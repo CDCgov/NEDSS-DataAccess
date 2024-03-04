@@ -10,27 +10,14 @@ import org.springframework.kafka.config.TopicBuilder;
 @Configuration
 @Getter
 public class KafkaConfig {
-    @Value("${spring.kafka.stream.input.nbs-pages.topic-name}")
-    private String nbsPagesTopicName;
-    @Value("${spring.kafka.stream.input.provider.topic-name}")
-    private String providerTopicName;
     @Value("${spring.kafka.stream.input.provider.output-topic-name}")
     private String providerAggregateTopicName;
     @Value("${spring.kafka.stream.input.person.topic-name}")
     private String personTopicName;
-    @Value("${spring.kafka.stream.input.participation.topic-name}")
-    private String participationTopicName;
-    @Value("${spring.kafka.stream.input.ct-contact.topic-name}")
-    private String ctContactTopicName;
     @Value("${spring.kafka.stream.input.organization.topic-name}")
     private String organizationTopicName;
     @Value("${spring.kafka.stream.input.organization.output-topic-name}")
     private String organizationAggregateTopicName;
-
-    @Bean
-    public NewTopic createNbsPagesTopicName() {
-        return TopicBuilder.name(nbsPagesTopicName).build();
-    }
 
     @Bean
     public NewTopic createPersonTopicName() {
