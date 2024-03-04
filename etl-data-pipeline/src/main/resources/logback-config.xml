@@ -16,7 +16,7 @@
     </appender>
 
     <appender name="DYNAMIC_FILE" class="gov.cdc.etldatapipeline.changedata.config.LogDynamicFileAppenderConfig">
-        <logFilePath>${LOG_PATH}/kafka_dlt_error-%d{yyyy-MM-dd_HH-mm-ss}.log</logFilePath>
+        <logFilePath>${LOG_PATH}/kafka_da_error-%d{yyyy-MM-dd_HH-mm-ss}.log</logFilePath>
         <append>true</append>
         <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
@@ -25,7 +25,7 @@
             <onMismatch>DENY</onMismatch>
         </filter>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_PATH}/kafka_dlt_error-%d{yyyy-MM-dd_HH-mm-ss}.log</fileNamePattern>
+            <fileNamePattern>${LOG_PATH}/kafka_da_error-%d{yyyy-MM-dd_HH-mm-ss}.log</fileNamePattern>
             <maxFileSize>100MB</maxFileSize> <!-- Maximum size of each log file -->
             <maxHistory>30</maxHistory> <!-- Number of old log files to keep -->
             <totalSizeCap>1GB</totalSizeCap> <!-- Maximum total size of log files -->
