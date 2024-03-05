@@ -1,24 +1,17 @@
 FROM amazoncorretto:17 as builder
-
-
 #Copy project config
-COPY etl-data-pipeline/gradle /usr/src/datapipeline/gradle
-COPY etl-data-pipeline/gradlew /usr/src/datapipeline/gradlew
-COPY etl-data-pipeline/build.gradle /usr/src/datapipeline/build.gradle
-COPY etl-data-pipeline/settings.gradle /usr/src/datapipeline/settings.gradle
-
+COPY gradle /usr/src/etldatapipeline/gradle
+COPY gradlew /usr/src/etldatapipeline/gradlew
+COPY build.gradle /usr/src/etldatapipeline/build.gradle
+COPY settings.gradle /usr/src/etldatapipeline/settings.gradle
 #Copy sources
-COPY etl-data-pipeline /usr/src/datapipeline/etl-data-pipeline
-
-WORKDIR /usr/src/datapipeline
-
+COPY . /usr/src/etldatapipeline/etl-data-pipeline
+#COPY . /usr/src/etldatapipeline
+WORKDIR /usr/src/etldatapipeline/etl-data-pipeline
 #Build ETL service along with any required libraries
-RUN ./gradlew :etl-data-pipeline:buildNeeded -x test --no-daemon
-
+RUN ./gradlew buildNeeded -x test --no-daemon
 FROM amazoncorretto:17
-
-COPY --from=builder /usr/src/datapipeline/etl-data-pipeline/build/libs/etl-data-pipeline*.jar etl-data-pipeline.jar
-
+COPY --from=builder /usr/src/etldatapipeline/etl-data-pipeline/build/libs/etl-data-pipeline*.jar etl-data-pipeline.jar
 # Run jar
 ENTRYPOINT ["java", "-jar", "etl-data-pipeline.jar"]
 CMD ["java", "-jar", "etl-data-pipeline.jar"]
