@@ -4,7 +4,7 @@
       <env name="DA_LOG_PATH" value="logs" />
       <env name="DB_ODSE" value="nbs_odse" />
       <env name="DB_PASSWORD" value="" />
-      <env name="DB_URL" value="cdc-nbs-legacy-rds-mssql.czya31goozkz.us-east-1.rds.amazonaws.com" />
+      <env name="DB_URL" value="" />
       <env name="DB_USERNAME" value="nbs_ods" />
     </envs>
     <module name="etl-data-pipeline.main" />
