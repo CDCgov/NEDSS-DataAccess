@@ -1,0 +1,22 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="EtlDataPipelineApplication-RDS" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <envs>
+      <env name="DA_LOG_PATH" value="logs" />
+      <env name="DB_ODSE" value="nbs_odse" />
+      <env name="DB_PASSWORD" value="" />
+      <env name="DB_URL" value="" />
+      <env name="DB_USERNAME" value="nbs_ods" />
+    </envs>
+    <module name="etl-data-pipeline.main" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="gov.cdc.etldatapipeline.EtlDataPipelineApplication" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="gov.cdc.etldatapipeline.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
