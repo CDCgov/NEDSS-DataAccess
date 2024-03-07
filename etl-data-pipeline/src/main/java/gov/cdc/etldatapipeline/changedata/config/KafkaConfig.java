@@ -9,7 +9,8 @@ import org.springframework.kafka.config.TopicBuilder;
 
 @Configuration
 @Getter
-public class KafkaConfig {
+public class
+KafkaConfig {
     @Value("${spring.kafka.stream.input.nbs-pages.topic-name}")
     private String nbsPagesTopicName;
     @Value("${spring.kafka.stream.input.provider.topic-name}")

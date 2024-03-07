@@ -55,7 +55,7 @@ public class KafkaStreamsService {
                 organizationRepository);
         organizationConsumerService.processOrganizationData(streamsBuilder);
 
-        PatientInfoService patientService = new PatientInfoService(
+        PatientConsumerService patientService = new PatientConsumerService(
                 personTopicName,
                 patientOutputTopicName,
                 patientRepository);
