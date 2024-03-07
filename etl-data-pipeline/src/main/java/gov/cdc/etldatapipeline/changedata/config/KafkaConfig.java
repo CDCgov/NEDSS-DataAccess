@@ -10,13 +10,15 @@ import org.springframework.kafka.config.TopicBuilder;
 @Configuration
 @Getter
 public class KafkaConfig {
-    @Value("${spring.kafka.stream.input.provider.output-topic-name}")
-    private String providerAggregateTopicName;
     @Value("${spring.kafka.stream.input.person.topic-name}")
     private String personTopicName;
     @Value("${spring.kafka.stream.input.organization.topic-name}")
     private String organizationTopicName;
-    @Value("${spring.kafka.stream.input.organization.output-topic-name}")
+    @Value("${spring.kafka.stream.output.provider.topic-name}")
+    private String providerAggregateTopicName;
+    @Value("${spring.kafka.stream.output.patient.topic-name}")
+    private String patientAggregateTopicName;
+    @Value("${spring.kafka.stream.output.organization.topic-name}")
     private String organizationAggregateTopicName;
 
     @Bean
@@ -33,6 +35,18 @@ public class KafkaConfig {
     public NewTopic createOrganizationTopicName() {
         return TopicBuilder.name(organizationTopicName).build();
     }
+
+    @Bean
+    public NewTopic createAggregateOrganizationTopicName() {
+        return TopicBuilder.name(organizationAggregateTopicName).build();
+    }
+
+    @Bean
+    public NewTopic createAggregatePatientTopicName() {
+        return TopicBuilder.name(patientAggregateTopicName).build();
+    }
+
+
 }
 
 
