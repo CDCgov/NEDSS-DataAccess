@@ -13,10 +13,6 @@ import java.util.List;
 
 public class StreamsSerdes extends Serdes {
 
-    public static Serde<NbsPage> NbsPageSerde() {
-        return new NbsPageSerde();
-    }
-
     public static Serde<Person> PersonSerde() {
         return new PersonSerde();
     }
@@ -38,13 +34,6 @@ public class StreamsSerdes extends Serdes {
     }
 
     public static Serde<OrganizationOP> OrganizationSerde() {return new OrganizationSerde();}
-
-    public static final class NbsPageSerde extends WrapperSerde<NbsPage> {
-        public NbsPageSerde() {
-            super(new JsonSerializer<>(),
-                    new JsonDeserializer<>(NbsPage.class, false));
-        }
-    }
 
     public static final class PersonSerde extends WrapperSerde<Person> {
         public PersonSerde() {

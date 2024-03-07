@@ -6,33 +6,28 @@ spring:
     stream:
       input:
         provider:
-          topic-name: cdc.nbs_odse.dbo.Provider
           output-topic-name: cdc.nbs_odse.dbo.Provider.output
         organization:
-          topic-name: cdc.nbs_odse.dbo.Organization
+          topic-name: cdc.NBS_ODSE.dbo.Organization
           output-topic-name: cdc.nbs_odse.dbo.Organization.output
-        ct-contact:
-          topic-name: cdc.nbs_odse.dbo.CT_contact
-        participation:
-          topic-name: cdc.nbs_odse.dbo.Participation
         person:
-          topic-name: cdc.nbs_odse.dbo.Person
-        nbs-pages:
-          topic-name: cdc.nbs_odse.dbo.NBS_page
+          topic-name: cdc.NBS_ODSE.dbo.Person
     streams:
       application-id: debezium-cdc-consumer-app-1
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:localhost:9092}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:-localhost:9092}
   application:
     name: etl-data-pipeline
   datasource:
-    password: ${DB_PASSWORD:fake.fake.fake.1234}
-    username: ${DB_USERNAME:sa}
-    url: jdbc:sqlserver://${DB_URL:localhost}:1433;databaseName=NBS_ODSE;encrypt=true;trustServerCertificate=true;
+    password: ${DB_PASSWORD:-fake.fake.fake.1234}
+    username: ${DB_USERNAME:-sa}
+    url: jdbc:sqlserver://${DB_URL:localhost}:1433;databaseName=${DB_ODSE:-NBS_ODSE};encrypt=true;trustServerCertificate=true;
   liquibase:
     change-log: db/changelog/db.changelog-master.yaml
 logging:
   #  Only one config can be active at a time
   config: classpath:logback-config.xml
-LOG_PATH: ${DA_LOG_PATH:/tmp/}
+  file:
+    name: PersonService.log
+    path: ${DA_LOG_PATH:-logs}
 server:
   port: '8090'
