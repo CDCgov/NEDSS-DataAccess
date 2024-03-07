@@ -37,6 +37,7 @@ services:
     links:
       - zookeeper
     environment:
+      KAFKA_BROKER_ID: 1.1
       KAFKA_LISTENERS: 'INTERNAL://broker:29092,EXTERNAL://broker:9092'
       KAFKA_ADVERTISED_LISTENERS: 'INTERNAL://broker:29092,EXTERNAL://localhost:9092'
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT'
@@ -91,27 +92,12 @@ services:
       - CONNECT_TOPIC_PREFIX=cdc
       - CONNECT_TABLE_INCLUDE_LIST=nbs-dataaccess-mssql.dbo.Person,nbs-dataaccess-mssql.dbo.NBS_page
       - CONNECT_SCHEMA_HISTORY_INTERNAL_KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVER:-broker:29092}
+      - CONNECT_TOPIC_CREATION_DEFAULT_REPLICATION_FACTOR=1
+      - CONNECT_TOPIC_CREATION_DEFAULT_PARTITIONS=1
       - |
         KAFKA_CONNECT_CONFIGURATION=
         key.converter=org.apache.kafka.connect.json.JsonConverter
         value.converter=org.apache.kafka.connect.json.JsonConverter
-        table.include.list=dbo.Person,dbo.NBS_page
-        topic.creation.enable=true
-        include.schema.changes=true
-        topic.prefix=cdc
-        schema.history.internal.kafka.bootstrap.servers=${KAFKA_BOOTSTRAP_SERVER:-broker:29092}
-        schema.history.internal.kafka.topic=odse-schema-history
-        database.user=${DB_USERNAME:-sa}
-        database.dbname=${DB_ODSE:-NBS_ODSE}
-        database.names=${DB_ODSE:-NBS_ODSE}
-        database.port=1433
-        key.converter.schemas.enable=true
-        database.hostname=${DB_URL:-host.docker.internal}
-        database.password=${DB_PASSWORD:-fake.fake.fake.1234}
-        value.converter.schemas.enable=true
-        database.trustServerCertificate=true
-        snapshot.mode=schema_only
-        database.server.name=odse
     networks:
       - etldatapipeline
 
