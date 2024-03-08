@@ -42,7 +42,7 @@ public class PatientConsumerService {
                 .mapValues(v -> patientRepository.computeAllPatients(v.getPersonUid()))
                 //KStream<String, List<Patient>>
                 .flatMap((k, v) -> v.stream()
-                        .map(p -> KeyValue.pair(p.getPatientUid(), p))
+                        .map(p -> KeyValue.pair(p.getPatientUid(), p.processPatient()))
                         .collect(Collectors.toSet()))
                 // KStream<String, Patient>
                 .peek((key, value) -> log.info("Patient Info : {}", value.toString()));

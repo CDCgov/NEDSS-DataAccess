@@ -1,0 +1,18 @@
+[
+  {
+    "entity_uid": 242790990,
+    "typeCd": "MR",
+    "recordStatusCd": "ACTIVE",
+    "rootExtensionTxt": "1113111",
+    "entity_id_seq": 1,
+    "ASSIGNING_AUTHORITY_CD": "2.16.840.1.113883.3.1147.1.1001"
+  },
+  {
+    "entity_uid": 242790990,
+    "typeCd": "AN",
+    "recordStatusCd": "ACTIVE",
+    "rootExtensionTxt": "313431144414",
+    "entity_id_seq": 2,
+    "ASSIGNING_AUTHORITY_CD": "SSA"
+  }
+]

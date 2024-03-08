@@ -1,0 +1,44 @@
+[
+  {
+    "telephoneNbr": "4562323422",
+    "extensionTxt": "201",
+    "use_cd": "H",
+    "cd": "PH",
+    "tele_locator_uid": 10000009
+  },
+  {
+    "telephoneNbr": "4562323222",
+    "extensionTxt": "211",
+    "use_cd": "H",
+    "cd": "PH",
+    "tele_locator_uid": 10000010
+  },
+  {
+    "telephoneNbr": "2323222222",
+    "extensionTxt": "231",
+    "use_cd": "WP",
+    "cd": "PH",
+    "tele_locator_uid": 10000011
+  },
+  {
+    "telephoneNbr": "2323222422",
+    "extensionTxt": "232",
+    "use_cd": "WP",
+    "cd": "PH",
+    "tele_locator_uid": 10000012
+  },
+  {
+    "telephoneNbr": "2323252421",
+    "extensionTxt": "",
+    "use_cd": "C",
+    "cd": "PH",
+    "tele_locator_uid": 10000014
+  },
+  {
+    "telephoneNbr": "2823252423",
+    "extensionTxt": "",
+    "use_cd": "C",
+    "cd": "PH",
+    "tele_locator_uid": 10000015
+  }
+]
