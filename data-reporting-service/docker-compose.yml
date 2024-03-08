@@ -1,0 +1,110 @@
+services:
+  nbs-dataaccess-mssql:
+    build: ./db
+    container_name: nbs-dataaccess-mssql
+    ports:
+      - 1433:1433
+    volumes:
+      - nbs-mssql-data:/var/opt/mssql
+    environment:
+      - ACCEPT_EULA=1
+      - SQLCMDPASSWORD=fake.fake.fake.1234
+      - SA_PASSWORD=fake.fake.fake.1234
+      - MSSQL_AGENT_ENABLED=true
+    networks:
+      - etldatapipeline
+
+  zookeeper:
+    image: quay.io/debezium/zookeeper:${DEBEZIUM_VERSION:-2.5}
+    hostname: zookeeper
+    container_name: zookeeper
+    ports:
+      - 2181:2181
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - etldatapipeline
+
+  broker:
+    image: quay.io/debezium/kafka:${DEBEZIUM_VERSION:-2.5}
+    hostname: broker
+    container_name: kafka_broker
+    depends_on:
+      - zookeeper
+    ports:
+      - 9092:9092
+    links:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1.1
+      KAFKA_LISTENERS: 'INTERNAL://broker:29092,EXTERNAL://broker:9092'
+      KAFKA_ADVERTISED_LISTENERS: 'INTERNAL://broker:29092,EXTERNAL://localhost:9092'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'INTERNAL'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      ZOOKEEPER_CONNECT: 'zookeeper:2181'
+    networks:
+      - etldatapipeline
+
+  data-reporting-service:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    ports:
+      - 8090:8090
+    depends_on:
+      - broker
+    container_name: data-reporting-service
+    env_file:
+      - etldatapipeline.env
+    environment:
+      SPRING_KAFKA_BOOTSTRAPSERVERS: broker:29092
+    networks:
+      - etldatapipeline
+
+  connect:
+    image: quay.io/debezium/connect:${DEBEZIUM_VERSION:-2.5}
+    container_name: Debezium_Change_Data_Connector
+    ports:
+      - 8083:8083
+    links:
+      - broker
+      - nbs-dataaccess-mssql
+    environment:
+      - BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVER:-broker:29092}
+      - CONFIG_STORAGE_TOPIC=debezium-config
+      - OFFSET_STORAGE_TOPIC=debezium-offset
+      - STATUS_STORAGE_TOPIC=debezium-status
+      - GROUP_ID=2
+      - CONNECT_CONNECTOR_CLASS=io.debezium.connector.sqlserver.SqlServerConnector
+      - CONNECT_TOPIC_CREATION_ENABLE=true
+      - CONNECT_DATABASE_HOSTNAME=${DB_URL:-host.docker.internal}
+      - CONNECT_DATABASE_PORT=1433
+      - CONNECT_DATABASE_DBNAME=${DB_ODSE:-NBS_ODSE}
+      - CONNECT_DATABASE_USER=${DB_USERNAME:-sa}
+      - CONNECT_DATABASE_PASSWORD=${DB_PASSWORD:-fake.fake.fake.1234}
+      - CONNECT_SNAPSHOT_MODE=schema_only
+      - CONNECT_DATABASE_TRUSTSERVERCERTIFICATE=true
+      - CONNECT_TOPIC_PREFIX=cdc
+      - CONNECT_TABLE_INCLUDE_LIST=nbs-dataaccess-mssql.dbo.Person,nbs-dataaccess-mssql.dbo.NBS_page
+      - CONNECT_SCHEMA_HISTORY_INTERNAL_KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVER:-broker:29092}
+      - CONNECT_TOPIC_CREATION_DEFAULT_REPLICATION_FACTOR=1
+      - CONNECT_TOPIC_CREATION_DEFAULT_PARTITIONS=1
+      - |
+        KAFKA_CONNECT_CONFIGURATION=
+        key.converter=org.apache.kafka.connect.json.JsonConverter
+        value.converter=org.apache.kafka.connect.json.JsonConverter
+    networks:
+      - etldatapipeline
+
+volumes:
+  nbs-mssql-data:
+
+networks:
+  etldatapipeline:
+    name: etldatapipeline
+    driver: bridge
