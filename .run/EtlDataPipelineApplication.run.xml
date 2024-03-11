@@ -7,7 +7,7 @@
       <env name="DB_URL" value="localhost" />
       <env name="DB_USERNAME" value="sa" />
     </envs>
-    <module name="etl-data-pipeline.main" />
+    <module name="data-reporting-service.main" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="gov.cdc.etldatapipeline.EtlDataPipelineApplication" />
     <extension name="coverage">
       <pattern>
