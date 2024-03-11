@@ -16,7 +16,7 @@ public class StreamsSerdes extends Serdes {
         return new PersonSerde();
     }
 
-    public static Serde<PatientOP> PatientSerde() {
+    public static Serde<PersonOp> PatientSerde() {
         return new PatientSerde();
     }
 
@@ -80,10 +80,10 @@ public class StreamsSerdes extends Serdes {
         }
     }
 
-    public static final class PatientSerde extends WrapperSerde<PatientOP> {
+    public static final class PatientSerde extends WrapperSerde<PersonOp> {
         public PatientSerde() {
             super(new JsonSerializer<>(),
-                    new JsonDeserializer<>(PatientOP.class, false));
+                    new JsonDeserializer<>(PersonOp.class, false));
         }
     }
 }

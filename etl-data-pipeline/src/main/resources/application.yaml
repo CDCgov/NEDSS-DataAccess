@@ -7,8 +7,12 @@ spring:
       input:
         person:
           topic-name: cdc.NBS_ODSE.dbo.Person
+        provider:
+          topic-name: cdc.NBS_ODSE.dbo.Provider.input
+        patient:
+          topic-name: cdc.NBS_ODSE.dbo.Patient.input
         organization:
-          topic-name: cdc.NBS_ODSE.dbo.Organization
+          topic-name: cdc.NBS_ODSE.dbo.Organization.input
       output:
           provider:
             topic-name: cdc.nbs_odse.dbo.Provider.output
@@ -20,6 +24,9 @@ spring:
     streams:
       application-id: debezium-cdc-consumer-app-1
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:localhost:9092}
+    consumer:
+      key-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
   application:
     name: etl-data-pipeline
   datasource:

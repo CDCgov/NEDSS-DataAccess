@@ -13,6 +13,7 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Produced;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.stream.Collectors;
 
@@ -24,8 +25,10 @@ public class OrganizationConsumerService {
 
     private final UtilHelper utilHelper = UtilHelper.getInstance();
 
-    private final String organizationTopicName;
-    private final String organizationOutputTopicName;
+    @Value("#{kafkaConfig.getOrganizationTopicName()}")
+    private String organizationTopicName;
+    @Value("#{kafkaConfig.getOrganizationAggregateTopicName()}")
+    private String organizationOutputTopicName;
     private final OrganizationRepository organizationRepository;
 
     /**

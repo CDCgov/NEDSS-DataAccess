@@ -1,6 +1,6 @@
 package gov.cdc.etldatapipeline;
 
-import gov.cdc.etldatapipeline.changedata.model.dto.PatientOP;
+import gov.cdc.etldatapipeline.changedata.model.dto.PersonOp;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -18,43 +18,43 @@ public class PatientDataPostProcessingTests {
     public void consolidatedPatientTransformationTest() {
 
         // Build the Patient object with the json serialized data
-        PatientOP p = new PatientOP();
-        p.setPatientName(readFileData("PatientName.json"));
-        p.setPatientAddress(readFileData("PatientAddress.json"));
-        p.setPatientRace(readFileData("PatientRace.json"));
-        p.setPatientTelephone(readFileData("PatientTelephone.json"));
-        p.setPatientAddAuthNested(readFileData("PatientAddAuthUser.json"));
-        p.setPatientChgAuthNested(readFileData("PatientChgAuthUser.json"));
-        p.setPatientEntityData(readFileData("PatientEntityData.json"));
+        PersonOp p = new PersonOp();
+        p.setName(readFileData("PatientName.json"));
+        p.setAddress(readFileData("PatientAddress.json"));
+        p.setRace(readFileData("PatientRace.json"));
+        p.setTelephone(readFileData("PatientTelephone.json"));
+        p.setAddAuthNested(readFileData("PersonAddAuthUser.json"));
+        p.setChgAuthNested(readFileData("PatientChgAuthUser.json"));
+        p.setEntityData(readFileData("PatientEntityData.json"));
 
         // Patient Fields to be processed
-        Function<PatientOP, List<Object>> pDetailsFn = (PatientOp) -> Arrays.asList(
-                p.getPatientLastName(),
-                p.getPatientMiddleName(),
-                p.getPatientFirstName(),
-                p.getPatientNameSuffix(),
-                p.getPatientStreetAddress1(),
-                p.getPatientStreetAddress2(),
-                p.getPatientCity(),
-                p.getPatientZip(),
-                p.getPatientCountyCode(),
-                p.getPatientCounty(),
-                p.getPatientStateCode(),
-                p.getPatientState(),
-                p.getPatientCountryCode(),
-                p.getPatientCountry(),
-                p.getPatientBirthCountry(),
-                p.getPatientPhoneWork(),
-                p.getPatientPhoneExtWork(),
-                p.getPatientPhoneHome(),
-                p.getPatientPhoneExtHome(),
-                p.getPatientPhoneCell(),
-                p.getPatientRaceCd(),
-                p.getPatientRaceCategory(),
-                p.getPatientRaceDesc(),
-                p.getPatientAddedBy(),
-                p.getPatientLastChangedBy(),
-                p.getPatientSsn());
+        Function<PersonOp, List<Object>> pDetailsFn = (PatientOp) -> Arrays.asList(
+                p.getLastNm(),
+                p.getMiddleNm(),
+                p.getFirstNm(),
+                p.getNmSuffix(),
+                p.getStreetAddress1(),
+                p.getStreetAddress2(),
+                p.getCity(),
+                p.getZip(),
+                p.getCountyCode(),
+                p.getCounty(),
+                p.getStateCode(),
+                p.getState(),
+                p.getCountryCode(),
+                p.getCountry(),
+                p.getBirthCountry(),
+                p.getPhoneWork(),
+                p.getPhoneExtWork(),
+                p.getPhoneHome(),
+                p.getPhoneExtHome(),
+                p.getPhoneCell(),
+                p.getRaceCd(),
+                p.getRaceCategory(),
+                p.getRaceDesc(),
+                p.getAddedBy(),
+                p.getLastChangedBy(),
+                p.getSsn());
         // Assert all fields null before processing
         pDetailsFn.apply(p).forEach(Assertions::assertNull);
         // Process the respective field json to patient fields
@@ -95,15 +95,15 @@ public class PatientDataPostProcessingTests {
     public void PatientNameTransformationTest() {
 
         // Build the Patient object with the json serialized data
-        PatientOP p = new PatientOP();
-        p.setPatientName(readFileData("PatientName.json"));
+        PersonOp p = new PersonOp();
+        p.setName(readFileData("PatientName.json"));
 
         // Patient Fields to be processed
-        Function<PatientOP, List<String>> pDetailsFn = (PatientOp) -> Arrays.asList(
-                p.getPatientLastName(),
-                p.getPatientMiddleName(),
-                p.getPatientFirstName(),
-                p.getPatientNameSuffix());
+        Function<PersonOp, List<String>> pDetailsFn = (PatientOp) -> Arrays.asList(
+                p.getLastNm(),
+                p.getMiddleNm(),
+                p.getFirstNm(),
+                p.getNmSuffix());
         // Assert all fields null before processing
         pDetailsFn.apply(p).forEach(Assertions::assertNull);
         // Process the respective field json to patient fields
@@ -122,23 +122,23 @@ public class PatientDataPostProcessingTests {
     public void PatientAddressTransformationTest() {
 
         // Build the Patient object with the json serialized data
-        PatientOP p = new PatientOP();
-        p.setPatientAddress(readFileData("PatientAddress.json"));
+        PersonOp p = new PersonOp();
+        p.setAddress(readFileData("PatientAddress.json"));
 
         // Patient Fields to be processed
-        Function<PatientOP, List<String>> pDetailsFn = (PatientOp) -> Arrays.asList(
+        Function<PersonOp, List<String>> pDetailsFn = (PatientOp) -> Arrays.asList(
 
-                p.getPatientStreetAddress1(),
-                p.getPatientStreetAddress2(),
-                p.getPatientCity(),
-                p.getPatientZip(),
-                p.getPatientCountyCode(),
-                p.getPatientCounty(),
-                p.getPatientStateCode(),
-                p.getPatientState(),
-                p.getPatientCountryCode(),
-                p.getPatientCountry(),
-                p.getPatientBirthCountry());
+                p.getStreetAddress1(),
+                p.getStreetAddress2(),
+                p.getCity(),
+                p.getZip(),
+                p.getCountyCode(),
+                p.getCounty(),
+                p.getStateCode(),
+                p.getState(),
+                p.getCountryCode(),
+                p.getCountry(),
+                p.getBirthCountry());
         // Assert all fields null before processing
         pDetailsFn.apply(p).forEach(Assertions::assertNull);
         // Process the respective field json to patient fields
@@ -163,14 +163,14 @@ public class PatientDataPostProcessingTests {
     @Test
     public void PatientRaceTransformationTest() {
         // Build the Patient object with the json serialized data
-        PatientOP p = new PatientOP();
-        p.setPatientRace(readFileData("PatientRace.json"));
+        PersonOp p = new PersonOp();
+        p.setRace(readFileData("PatientRace.json"));
 
         // Patient Fields to be processed
-        Function<PatientOP, List<String>> pDetailsFn = (PatientOp) -> Arrays.asList(
-                p.getPatientRaceCd(),
-                p.getPatientRaceCategory(),
-                p.getPatientRaceDesc());
+        Function<PersonOp, List<String>> pDetailsFn = (PatientOp) -> Arrays.asList(
+                p.getRaceCd(),
+                p.getRaceCategory(),
+                p.getRaceDesc());
         // Assert all fields null before processing
         pDetailsFn.apply(p).forEach(Assertions::assertNull);
         // Process the respective field json to patient fields
@@ -188,16 +188,16 @@ public class PatientDataPostProcessingTests {
     public void PatientTelephoneTransformationTest() {
 
         // Build the Patient object with the json serialized data
-        PatientOP p = new PatientOP();
-        p.setPatientTelephone(readFileData("PatientTelephone.json"));
+        PersonOp p = new PersonOp();
+        p.setTelephone(readFileData("PatientTelephone.json"));
 
         // Patient Fields to be processed
-        Function<PatientOP, List<String>> pDetailsFn = (PatientOp) -> Arrays.asList(
-                p.getPatientPhoneWork(),
-                p.getPatientPhoneExtWork(),
-                p.getPatientPhoneHome(),
-                p.getPatientPhoneExtHome(),
-                p.getPatientPhoneCell());
+        Function<PersonOp, List<String>> pDetailsFn = (PatientOp) -> Arrays.asList(
+                p.getPhoneWork(),
+                p.getPhoneExtWork(),
+                p.getPhoneHome(),
+                p.getPhoneExtHome(),
+                p.getPhoneCell());
         // Assert all fields null before processing
         pDetailsFn.apply(p).forEach(Assertions::assertNull);
         // Process the respective field json to patient fields
@@ -217,14 +217,14 @@ public class PatientDataPostProcessingTests {
     public void PatientAddChangeAuthUserTransformationTest() {
 
         // Build the Patient object with the json serialized data
-        PatientOP p = new PatientOP();
-        p.setPatientAddAuthNested(readFileData("PatientAddAuthUser.json"));
-        p.setPatientChgAuthNested(readFileData("PatientChgAuthUser.json"));
+        PersonOp p = new PersonOp();
+        p.setAddAuthNested(readFileData("PersonAddAuthUser.json"));
+        p.setChgAuthNested(readFileData("PatientChgAuthUser.json"));
 
         // Patient Fields to be processed
-        Function<PatientOP, List<Long>> pDetailsFn = (PatientOp) -> Arrays.asList(
-                p.getPatientAddedBy(),
-                p.getPatientLastChangedBy());
+        Function<PersonOp, List<Long>> pDetailsFn = (PatientOp) -> Arrays.asList(
+                p.getAddedBy(),
+                p.getLastChangedBy());
         // Assert all fields null before processing
         pDetailsFn.apply(p).forEach(Assertions::assertNull);
         // Process the respective field json to patient fields
@@ -241,11 +241,11 @@ public class PatientDataPostProcessingTests {
     public void PatientSsnTransformationTest() {
 
         // Build the Patient object with the json serialized data
-        PatientOP p = new PatientOP();
-        p.setPatientEntityData(readFileData("PatientEntityData.json"));
+        PersonOp p = new PersonOp();
+        p.setEntityData(readFileData("PatientEntityData.json"));
 
         // Patient Fields to be processed
-        Function<PatientOP, List<String>> pDetailsFn = (PatientOp) -> Collections.singletonList(p.getPatientSsn());
+        Function<PersonOp, List<String>> pDetailsFn = (PatientOp) -> Collections.singletonList(p.getSsn());
         // Assert all fields null before processing
         pDetailsFn.apply(p).forEach(Assertions::assertNull);
         // Process the respective field json to patient fields

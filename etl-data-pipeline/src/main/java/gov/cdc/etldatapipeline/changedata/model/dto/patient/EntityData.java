@@ -2,7 +2,7 @@ package gov.cdc.etldatapipeline.changedata.model.dto.patient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import gov.cdc.etldatapipeline.changedata.model.dto.PatientOP;
+import gov.cdc.etldatapipeline.changedata.model.dto.PersonOp;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,8 +22,8 @@ public class EntityData {
     @JsonProperty("ASSIGNING_AUTHORITY_CD")
     private String assigningAuthorityCd;
 
-    public PatientOP updatePerson(PatientOP patient) {
-        patient.setPatientSsn(rootExtensionTxt);
-        return patient;
+    public PersonOp updatePerson(PersonOp personOp) {
+        personOp.setSsn(rootExtensionTxt);
+        return personOp;
     }
 }

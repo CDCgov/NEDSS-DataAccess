@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import gov.cdc.etldatapipeline.changedata.model.dto.PatientOP;
+import gov.cdc.etldatapipeline.changedata.model.dto.PersonOp;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,8 +30,8 @@ public class AddAuthUser {
     @JsonProperty("patientAddedBy")
     private String patientAddedBy;
 
-    public PatientOP updatePerson(PatientOP patient) {
-        patient.setPatientAddedBy(addUserId);
-        return patient;
+    public PersonOp updatePerson(PersonOp personOp) {
+        personOp.setAddedBy(addUserId);
+        return personOp;
     }
 }

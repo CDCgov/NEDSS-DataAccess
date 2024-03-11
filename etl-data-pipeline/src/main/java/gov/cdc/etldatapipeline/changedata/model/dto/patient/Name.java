@@ -2,7 +2,7 @@ package gov.cdc.etldatapipeline.changedata.model.dto.patient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import gov.cdc.etldatapipeline.changedata.model.dto.PatientOP;
+import gov.cdc.etldatapipeline.changedata.model.dto.PersonOp;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,11 +24,11 @@ public class Name {
     @JsonProperty("person_uid")
     private Long personUid;
 
-    public PatientOP updatePerson(PatientOP patient){
-        patient.setPatientLastName(this.lastNm);
-        patient.setPatientMiddleName(this.middleNm);
-        patient.setPatientFirstName(this.firstNm);
-        patient.setPatientNameSuffix(this.nmSuffix);
+    public PersonOp updatePerson(PersonOp patient){
+        patient.setLastNm(this.lastNm);
+        patient.setMiddleNm(this.middleNm);
+        patient.setFirstNm(this.firstNm);
+        patient.setNmSuffix(this.nmSuffix);
         return patient;
     }
 }

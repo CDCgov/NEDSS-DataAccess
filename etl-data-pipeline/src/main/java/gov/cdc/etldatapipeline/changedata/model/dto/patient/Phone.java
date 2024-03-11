@@ -2,7 +2,7 @@ package gov.cdc.etldatapipeline.changedata.model.dto.patient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import gov.cdc.etldatapipeline.changedata.model.dto.PatientOP;
+import gov.cdc.etldatapipeline.changedata.model.dto.PersonOp;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,16 +20,16 @@ public class Phone {
     @JsonProperty("tele_locator_uid")
     private Long teleLocatorUid;
 
-    public PatientOP updatePerson(PatientOP patient) {
+    public PersonOp updatePerson(PersonOp personOp) {
         if (useCd.equalsIgnoreCase("WP")) {
-            patient.setPatientPhoneWork(telephoneNbr);
-            patient.setPatientPhoneExtWork(extensionTxt);
+            personOp.setPhoneWork(telephoneNbr);
+            personOp.setPhoneExtWork(extensionTxt);
         } else if (useCd.equalsIgnoreCase("H")) {
-            patient.setPatientPhoneHome(telephoneNbr);
-            patient.setPatientPhoneExtHome(extensionTxt);
+            personOp.setPhoneHome(telephoneNbr);
+            personOp.setPhoneExtHome(extensionTxt);
         } else {
-            patient.setPatientPhoneCell(telephoneNbr);
+            personOp.setPhoneCell(telephoneNbr);
         }
-        return patient;
+        return personOp;
     }
 }

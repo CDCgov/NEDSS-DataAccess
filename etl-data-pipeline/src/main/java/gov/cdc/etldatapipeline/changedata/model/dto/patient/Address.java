@@ -2,7 +2,7 @@ package gov.cdc.etldatapipeline.changedata.model.dto.patient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import gov.cdc.etldatapipeline.changedata.model.dto.PatientOP;
+import gov.cdc.etldatapipeline.changedata.model.dto.PersonOp;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,18 +34,18 @@ public class Address {
     @JsonProperty("postal_locator_uid")
     private Long postalLocatorUid;
 
-    public PatientOP updatePerson(PatientOP patient) {
-        patient.setPatientStreetAddress1(streetAddr1);
-        patient.setPatientStreetAddress2(streetAddr2);
-        patient.setPatientCity(city);
-        patient.setPatientZip(zip);
-        patient.setPatientCountyCode(cntyCd);
-        patient.setPatientCounty(county);
-        patient.setPatientStateCode(state);
-        patient.setPatientState(stateDesc);
-        patient.setPatientCountryCode(cntryCd);
-        patient.setPatientCountry(homeCountry);
-        patient.setPatientBirthCountry(birthCountry);
-        return patient;
+    public PersonOp updatePerson(PersonOp personOp) {
+        personOp.setStreetAddress1(streetAddr1);
+        personOp.setStreetAddress2(streetAddr2);
+        personOp.setCity(city);
+        personOp.setZip(zip);
+        personOp.setCountyCode(cntyCd);
+        personOp.setCounty(county);
+        personOp.setStateCode(state);
+        personOp.setState(stateDesc);
+        personOp.setCountryCode(cntryCd);
+        personOp.setCountry(homeCountry);
+        personOp.setBirthCountry(birthCountry);
+        return personOp;
     }
 }
