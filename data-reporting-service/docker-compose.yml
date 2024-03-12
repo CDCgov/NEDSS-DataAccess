@@ -12,7 +12,7 @@ services:
       - SA_PASSWORD=fake.fake.fake.1234
       - MSSQL_AGENT_ENABLED=true
     networks:
-      - etldatapipeline
+      - datareportingservice
 
   zookeeper:
     image: quay.io/debezium/zookeeper:${DEBEZIUM_VERSION:-2.5}
@@ -24,7 +24,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     networks:
-      - etldatapipeline
+      - datareportingservice
 
   broker:
     image: quay.io/debezium/kafka:${DEBEZIUM_VERSION:-2.5}
@@ -48,7 +48,7 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       ZOOKEEPER_CONNECT: 'zookeeper:2181'
     networks:
-      - etldatapipeline
+      - datareportingservice
 
   data-reporting-service:
     build:
@@ -60,11 +60,11 @@ services:
       - broker
     container_name: data-reporting-service
     env_file:
-      - etldatapipeline.env
+      - datareportingservice.env
     environment:
       SPRING_KAFKA_BOOTSTRAPSERVERS: broker:29092
     networks:
-      - etldatapipeline
+      - datareportingservice
 
   connect:
     image: quay.io/debezium/connect:${DEBEZIUM_VERSION:-2.5}
@@ -99,12 +99,12 @@ services:
         key.converter=org.apache.kafka.connect.json.JsonConverter
         value.converter=org.apache.kafka.connect.json.JsonConverter
     networks:
-      - etldatapipeline
+      - datareportingservice
 
 volumes:
   nbs-mssql-data:
 
 networks:
-  etldatapipeline:
-    name: etldatapipeline
+  datareportingservice:
+    name: datareportingservice
     driver: bridge

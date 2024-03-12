@@ -1,0 +1,13 @@
+package gov.cdc.datareportingservice.observation.repository;
+
+
+import gov.cdc.datareportingservice.observation.repository.model.Observation;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+
+@Repository
+public interface IObservationRepository extends JpaRepository<Observation, String> {
+    Optional<Observation> findAllBy(String id);
+}

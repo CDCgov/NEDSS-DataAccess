@@ -15,7 +15,7 @@
         </encoder>
     </appender>
 
-    <appender name="DYNAMIC_FILE" class="gov.cdc.etldatapipeline.changedata.config.LogDynamicFileAppenderConfig">
+    <appender name="DYNAMIC_FILE" class="gov.cdc.datareportingservice.changedata.config.LogDynamicFileAppenderConfig">
         <logFilePath>${LOG_PATH}/kafka_da_error-%d{yyyy-MM-dd_HH-mm-ss}.log</logFilePath>
         <append>true</append>
         <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
@@ -35,11 +35,11 @@
         </triggeringPolicy>
     </appender>
 
-    <logger name="gov/cdc/etldatapipeline/changedata/service/KafkaStreamsService" level="INFO">
+    <logger name="gov/cdc/datareportingservice/changedata/service/KafkaStreamsService" level="INFO">
         <appender-ref ref="DYNAMIC_FILE" />
     </logger>
 
-    <logger name="gov/cdc/etldatapipeline/changedata/controller/DataPipelineController" level="INFO">
+    <logger name="gov/cdc/datareportingservice/changedata/controller/DataPipelineController" level="INFO">
         <appender-ref ref="FILE"/>
     </logger>
 

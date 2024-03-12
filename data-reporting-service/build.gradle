@@ -84,7 +84,7 @@ tasks.named('test') {
 jar {
     manifest {
         attributes(
-                'Main-Class': 'gov.cdc.etldatapipeline.EtlDataPipelineApplication'
+                'Main-Class': 'gov.cdc.datareportingservice.datareportingserviceApplication'
         )
     }
     zip64 true
