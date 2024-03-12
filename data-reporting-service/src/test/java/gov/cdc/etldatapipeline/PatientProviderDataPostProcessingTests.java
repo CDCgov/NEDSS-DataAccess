@@ -57,6 +57,11 @@ public class PatientProviderDataPostProcessingTests {
                 pf.getAddedBy(),
                 pf.getLastChangedBy(),
                 pf.getSsn(),
+                pf.getPatientNumber(),
+                pf.getPatientNumberAuth(),
+                pf.getProviderQuickCode(),
+                pf.getProviderRegistrationNum(),
+                pf.getProviderRegistrationNumAuth(),
                 pf.getEmail());
 
         // Process the respective field json to PatientProvider fields
@@ -89,6 +94,11 @@ public class PatientProviderDataPostProcessingTests {
                 10000000L,
                 470200741L,
                 "313431144414",
+                "56743114514",
+                "2.16.740.1.113883.3.1147.1.1002",
+                "12314286",
+                "86741517517",
+                "3.16.740.1.113883.3.1147.1.1002",
                 "someone2@email.com");
         // Validate the PatientProvider field processing
         Assertions.assertEquals(expected, pDetailsFn.apply(pf));
@@ -230,19 +240,31 @@ public class PatientProviderDataPostProcessingTests {
     }
 
     @Test
-    public void PatientProviderSsnTransformationTest() {
+    public void PatientProviderEntityDataTransformationTest() {
 
         // Build the PatientProvider object with the json serialized data
         PersonOp personOp = new PersonOp();
         personOp.setEntityData(readFileData("PersonEntityData.json"));
 
         // PatientProvider Fields to be processed
-        Function<PersonFull, List<String>> pDetailsFn = (p) -> Collections.singletonList(p.getSsn());
+        Function<PersonFull, List<String>> pDetailsFn = (p) -> Arrays.asList(
+                p.getSsn(),
+                p.getPatientNumber(),
+                p.getPatientNumberAuth(),
+                p.getProviderQuickCode(),
+                p.getProviderRegistrationNum(),
+                p.getProviderRegistrationNumAuth());
 
         // Process the respective field json to PatientProvider fields
         PersonFull pf = personOp.processPatient();
         // Expected
-        List<String> expected = List.of("313431144414");
+        List<String> expected = List.of(
+                "313431144414",
+                "56743114514",
+                "2.16.740.1.113883.3.1147.1.1002",
+                "12314286",
+                "86741517517",
+                "3.16.740.1.113883.3.1147.1.1002");
         // Validate the PatientProvider field processing
         Assertions.assertEquals(expected, pDetailsFn.apply(pf));
     }

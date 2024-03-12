@@ -1,6 +1,7 @@
 package gov.cdc.etldatapipeline.changedata.service;
 
 import gov.cdc.etldatapipeline.changedata.model.dto.OrganizationOP;
+import gov.cdc.etldatapipeline.changedata.model.odse.Organization;
 import gov.cdc.etldatapipeline.changedata.repository.OrganizationRepository;
 import gov.cdc.etldatapipeline.changedata.utils.StreamsSerdes;
 import gov.cdc.etldatapipeline.changedata.utils.UtilHelper;
@@ -46,11 +47,11 @@ public class OrganizationConsumerService {
      */
 
     public void processOrganizationData(StreamsBuilder streamsBuilder) {
-        KStream<String, OrganizationOP> organizationKStream
+        KStream<String, Organization> organizationKStream
                 = streamsBuilder.stream(organizationTopicName, Consumed.with(STRING_SERDE, STRING_SERDE))
                 .map((k, v) -> new KeyValue<>(
                         k,
-                        utilHelper.deserializePayload(v, "/payload/after", OrganizationOP.class)))
+                        utilHelper.deserializePayload(v, "/payload/after", Organization.class)))
                 // KStream<String, Organization>
                 .peek((key, value) -> log.info("Calling the Organization Repository for " + value.getOrganizationUid()));
 

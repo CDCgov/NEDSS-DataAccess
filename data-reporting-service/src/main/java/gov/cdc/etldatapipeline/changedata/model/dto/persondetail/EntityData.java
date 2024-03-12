@@ -17,13 +17,23 @@ public class EntityData {
     private String typeCd;
     private String recordStatusCd;
     private String rootExtensionTxt;
-    @JsonProperty("entityIdSeq")
+    @JsonProperty("entity_id_seq")
     private Long entityIdSeq;
     @JsonProperty("ASSIGNING_AUTHORITY_CD")
     private String assigningAuthorityCd;
 
     public PersonFull updatePerson(PersonFull personFull) {
-        personFull.setSsn(rootExtensionTxt);
+        if(assigningAuthorityCd.equalsIgnoreCase("SSA")) {
+            personFull.setSsn(rootExtensionTxt);
+        } else if (typeCd.equalsIgnoreCase("PN")) {
+            personFull.setPatientNumber(rootExtensionTxt);
+            personFull.setPatientNumberAuth(assigningAuthorityCd);
+        } else if (typeCd.equalsIgnoreCase("QEC")) {
+            personFull.setProviderQuickCode(rootExtensionTxt);
+        } else if (typeCd.equalsIgnoreCase("PRN")) {
+            personFull.setProviderRegistrationNum(rootExtensionTxt);
+            personFull.setProviderRegistrationNumAuth(assigningAuthorityCd);
+        }
         return personFull;
     }
 }

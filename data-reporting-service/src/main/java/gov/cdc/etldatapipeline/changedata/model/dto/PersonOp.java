@@ -4,14 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.cdc.etldatapipeline.changedata.model.dto.persondetail.*;
-import gov.cdc.etldatapipeline.changedata.model.odse.DebeziumMetadata;
 import gov.cdc.etldatapipeline.changedata.utils.UtilHelper;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.ObjectUtils;
@@ -19,15 +17,15 @@ import org.springframework.util.ObjectUtils;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 @Slf4j
 @Data
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper=true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PersonOp extends DebeziumMetadata {
+public class PersonOp {
     @Id
     @Column(name = "person_uid")
     private String personUid;
@@ -159,16 +157,16 @@ public class PersonOp extends DebeziumMetadata {
             }
 
             if (!ObjectUtils.isEmpty(telephone)) {
-                Function<String, PersonOp> patientPhoneFn =
+                Function<String, PersonFull> personPhoneFn =
                         (useCd) -> Arrays.stream(
-                                UtilHelper.getInstance().deserializePayload(telephone, Phone[].class))
+                                        UtilHelper.getInstance().deserializePayload(telephone, Phone[].class))
                                 .filter(phone -> phone.getUseCd().equalsIgnoreCase(useCd))
                                 .max(Comparator.comparing(Phone::getTeleLocatorUid))
                                 .map(n -> n.updatePerson(personFull))
                                 .orElse(null);
-                patientPhoneFn.apply("WP");
-                patientPhoneFn.apply("H");
-                patientPhoneFn.apply("C");
+                personPhoneFn.apply("WP");
+                personPhoneFn.apply("H");
+                personPhoneFn.apply("CP");
             }
 
             if (!ObjectUtils.isEmpty(addAuthNested)) {
@@ -184,10 +182,18 @@ public class PersonOp extends DebeziumMetadata {
             }
 
             if (!ObjectUtils.isEmpty(entityData)) {
-                Arrays.stream(mapper.readValue(entityData, EntityData[].class))
-                        .filter(e -> e.getAssigningAuthorityCd().equalsIgnoreCase("SSA"))
-                        .max(Comparator.comparing(EntityData::getEntityIdSeq))
-                        .map(n -> n.updatePerson(personFull));
+                Function<Predicate<? super EntityData>, PersonFull> entityDataTypeCdFn =
+                        (Predicate<? super EntityData> p) -> Arrays.stream(
+                                        UtilHelper.getInstance().deserializePayload(entityData, EntityData[].class))
+                                .filter(p)
+                                .filter(e -> e.getEntityIdSeq() != null)
+                                .max(Comparator.comparing(EntityData::getEntityIdSeq))
+                                .map(n -> n.updatePerson(personFull))
+                                .orElse(null);
+                entityDataTypeCdFn.apply(e -> e.getAssigningAuthorityCd().equalsIgnoreCase("SSA"));
+                entityDataTypeCdFn.apply(e -> e.getTypeCd().equalsIgnoreCase("PN"));
+                entityDataTypeCdFn.apply(e -> e.getTypeCd().equalsIgnoreCase("QEC"));
+                entityDataTypeCdFn.apply(e -> e.getTypeCd().equalsIgnoreCase("PRN"));
             }
 
             if (!ObjectUtils.isEmpty(email)) {

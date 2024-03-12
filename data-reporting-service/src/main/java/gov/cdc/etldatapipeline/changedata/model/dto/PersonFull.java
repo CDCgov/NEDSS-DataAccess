@@ -37,6 +37,11 @@ public class PersonFull extends PersonOp {
     private String raceCd;
     private String raceCategory;
     private String raceDesc;
+    private String patientNumber;
+    private String patientNumberAuth;
+    private String providerQuickCode;
+    private String providerRegistrationNum;
+    private String providerRegistrationNumAuth;
 
     public PersonFull constructPersonFull(PersonOp p) {
         setPersonParentUid(p.getPersonUid());

@@ -30,14 +30,14 @@
   {
     "telephoneNbr": "2323252421",
     "extensionTxt": "",
-    "use_cd": "C",
+    "use_cd": "CP",
     "cd": "PH",
     "tele_locator_uid": 10000014
   },
   {
     "telephoneNbr": "2823252423",
     "extensionTxt": "",
-    "use_cd": "C",
+    "use_cd": "CP",
     "cd": "PH",
     "tele_locator_uid": 10000015
   }
