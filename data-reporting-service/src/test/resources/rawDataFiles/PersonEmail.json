@@ -1,0 +1,14 @@
+[
+  {
+    "emailAddress": "someone1@email.com",
+    "use_cd": "H",
+    "cd": "PH",
+    "tele_locator_uid": 10000009
+  },
+  {
+    "emailAddress": "someone2@email.com",
+    "use_cd": "H",
+    "cd": "PH",
+    "tele_locator_uid": 10000010
+  }
+]
