@@ -1,4 +1,3 @@
-use NBS_ODSE
 CREATE OR ALTER PROCEDURE dbo.sp_Provider_Event @user_id_list varchar(max)
 AS
 
@@ -29,8 +28,8 @@ BEGIN
            nested.phone     AS 'PROVIDER_TELEPHONE_NESTED',
            nested.email     AS 'PROVIDER_EMAIL_NESTED',
            nested.entity_id AS 'PROVIDER_ENTITY_ID_NESTED',
-           nested.authadd   AS 'PATIENT_ADD_AUTH_NESTED',
-           nested.authchg   AS 'PATIENT_CHG_AUTH_NESTED'
+           nested.authadd   AS 'PROVIDER_ADD_AUTH_NESTED',
+           nested.authchg   AS 'PROVIDER_CHG_AUTH_NESTED'
     FROM NBS_ODSE.dbo.Person p WITH (NOLOCK)
              OUTER apply (SELECT *
                           FROM
@@ -49,8 +48,8 @@ BEGIN
                                               scc.code_desc_txt                       county,
                                               pl.within_city_limits_ind               within_city_limits_ind,
                                               cc.code_short_desc_txt                  country
-                                       FROM Entity_locator_participation elp WITH (NOLOCK)
-                                                LEFT OUTER JOIN Postal_locator pl WITH (NOLOCK)
+                                       FROM NBS_ODSE.dbo.Entity_locator_participation elp WITH (NOLOCK)
+                                                LEFT OUTER JOIN NBS_ODSE.dbo.Postal_locator pl WITH (NOLOCK)
                                                                 ON elp.locator_uid = pl.postal_locator_uid
                                                 LEFT OUTER JOIN NBS_SRTE.dbo.STATE_CODE sc with (NOLOCK) ON sc.STATE_CD = pl.STATE_CD
                                                 LEFT OUTER JOIN NBS_SRTE.dbo.STATE_COUNTY_CODE_VALUE scc with (NOLOCK)
@@ -66,8 +65,8 @@ BEGIN
                                               elp.cd,
                                               REPLACE(REPLACE(tl.phone_nbr_txt, '-', ''), ' ', '') telephoneNbr,
                                               tl.extension_txt                                     extensionTxt
-                                       FROM Entity_locator_participation elp WITH (NOLOCK)
-                                                JOIN Tele_locator tl WITH (NOLOCK) ON elp.locator_uid = tl.tele_locator_uid
+                                       FROM NBS_ODSE.dbo.Entity_locator_participation elp WITH (NOLOCK)
+                                                JOIN NBS_ODSE.dbo.Tele_locator tl WITH (NOLOCK) ON elp.locator_uid = tl.tele_locator_uid
                                        WHERE elp.entity_uid = p.person_uid
                                          AND elp.class_cd = 'TELE'
                                          AND elp.status_cd = 'A'
@@ -78,8 +77,8 @@ BEGIN
                                               elp.use_cd,
                                               elp.cd,
                                               STRING_ESCAPE(tl.email_address, 'json') emailAddress
-                                       FROM Entity_locator_participation elp WITH (NOLOCK)
-                                                JOIN Tele_locator tl WITH (NOLOCK) ON elp.locator_uid = tl.tele_locator_uid
+                                       FROM NBS_ODSE.dbo.Entity_locator_participation elp WITH (NOLOCK)
+                                                JOIN NBS_ODSE.dbo.Tele_locator tl WITH (NOLOCK) ON elp.locator_uid = tl.tele_locator_uid
                                        WHERE elp.entity_uid = p.person_uid
                                          AND elp.class_cd = 'TELE'
                                          AND elp.status_cd = 'A'
@@ -97,7 +96,7 @@ BEGIN
                                               pn.nm_degree                                         nmDegree,
                                               pn.person_name_seq,
                                               pn.last_chg_time
-                                       FROM person_name pn WITH (NOLOCK)
+                                       FROM NBS_ODSE.dbo.person_name pn WITH (NOLOCK)
                                        WHERE person_uid = p.person_uid
                                        FOR json path, INCLUDE_NULL_VALUES) AS name) AS name,
                               -- Entity id
@@ -108,7 +107,7 @@ BEGIN
                                                             'json') rootExtensionTxt,
                                               ei.entity_id_seq,
                                               ei.assigning_authority_cd
-                                       FROM entity_id ei WITH (NOLOCK)
+                                       FROM NBS_ODSE.dbo.entity_id ei WITH (NOLOCK)
                                        WHERE ei.entity_uid = p.person_uid
                                        FOR json path, INCLUDE_NULL_VALUES) AS entity_id) AS entity_id,
                               --auth user add

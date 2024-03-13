@@ -20,11 +20,11 @@ public class ChgAuthUser {
     @JsonProperty("LAST_CHG_USER_ID")
     private Long lastChgUserId;
     @JsonProperty("add_time")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS", timezone = "UTC")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime addTime;
     @JsonProperty("LAST_CHG_USER_TIME")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS", timezone = "UTC")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime lastChgUserTime;
     @JsonProperty("PATIENT_LAST_UPDATED_BY")

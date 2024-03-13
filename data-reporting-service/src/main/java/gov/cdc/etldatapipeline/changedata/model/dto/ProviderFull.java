@@ -52,7 +52,7 @@ public class ProviderFull extends Provider implements PersonExtendedProps{
      * @return Fully Transformed Provider Object
      */
     public ProviderFull constructProviderFull(Provider p) {
-        setPersonParentUid(p.getPersonUid());
+        setPersonUid(p.getPersonUid());
         setPersonParentUid(p.getPersonParentUid());
         setDescription(p.getDescription());
         setAddTime(p.getAddTime());

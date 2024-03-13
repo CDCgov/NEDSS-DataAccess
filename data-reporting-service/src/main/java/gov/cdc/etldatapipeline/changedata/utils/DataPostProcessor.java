@@ -7,6 +7,7 @@ import gov.cdc.etldatapipeline.changedata.model.dto.persondetail.*;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -47,7 +48,8 @@ public class DataPostProcessor {
             Function<String, T> personPhoneFn =
                     (useCd) -> Arrays.stream(
                                     UtilHelper.getInstance().deserializePayload(telephone, Phone[].class))
-                            .filter(phone -> phone.getUseCd().equalsIgnoreCase(useCd))
+                            .filter(phone -> StringUtils.hasText(phone.getUseCd())
+                                    && phone.getUseCd().equalsIgnoreCase(useCd))
                             .max(Comparator.comparing(Phone::getTeleLocatorUid))
                             .map(n -> n.updatePerson(pf))
                             .orElse(null);
@@ -83,10 +85,14 @@ public class DataPostProcessor {
                             .max(Comparator.comparing(EntityData::getEntityIdSeq))
                             .map(n -> n.updatePerson(pf))
                             .orElse(null);
-            entityDataTypeCdFn.apply(e -> e.getAssigningAuthorityCd().equalsIgnoreCase("SSA"));
-            entityDataTypeCdFn.apply(e -> e.getTypeCd().equalsIgnoreCase("PN"));
-            entityDataTypeCdFn.apply(e -> e.getTypeCd().equalsIgnoreCase("QEC"));
-            entityDataTypeCdFn.apply(e -> e.getTypeCd().equalsIgnoreCase("PRN"));
+            entityDataTypeCdFn.apply(e -> StringUtils.hasText(e.getAssigningAuthorityCd())
+                    && e.getAssigningAuthorityCd().equalsIgnoreCase("SSA"));
+            entityDataTypeCdFn.apply(e -> StringUtils.hasText(e.getTypeCd())
+                    && e.getTypeCd().equalsIgnoreCase("PN"));
+            entityDataTypeCdFn.apply(e ->  StringUtils.hasText(e.getTypeCd())
+                    && e.getTypeCd().equalsIgnoreCase("QEC"));
+            entityDataTypeCdFn.apply(e ->  StringUtils.hasText(e.getTypeCd())
+                    && e.getTypeCd().equalsIgnoreCase("PRN"));
         }
     }
 

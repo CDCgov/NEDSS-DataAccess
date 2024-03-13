@@ -44,7 +44,7 @@ public class PatientFull extends Patient implements PersonExtendedProps {
     private String providerRegistrationNumAuth;
 
     public PatientFull constructPersonFull(Patient p) {
-        setPersonParentUid(p.getPersonUid());
+        setPersonUid(p.getPersonUid());
         setPersonParentUid(p.getPersonParentUid());
         setDescription(p.getDescription());
         setAddTime(p.getAddTime());

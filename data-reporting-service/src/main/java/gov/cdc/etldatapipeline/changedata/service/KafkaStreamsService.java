@@ -50,8 +50,8 @@ public class KafkaStreamsService {
 
         personKStream.split()
                 .branch((k, v) -> v.getCd() != null && v.getCd().equalsIgnoreCase("PAT"),
-                        Branched.withConsumer(ks -> ks.
-                                mapValues(v ->
+                        Branched.withConsumer(ks -> ks
+                                .mapValues(v ->
                                         patientRepository.computePatients(v.getPersonUid()))
                                 //KStream<String, List<Patient>>
                                 .flatMap((k, v) -> v.stream()
@@ -59,10 +59,10 @@ public class KafkaStreamsService {
                                         .collect(Collectors.toSet()))
                                 .peek((key, value) -> log.info("Patient : {}", value.toString()))
                                 .to((key, v, recordContext) -> patientOutputTopicName,
-                                        Produced.with(Serdes.String(), StreamsSerdes.PatientSerde()))))
+                                        Produced.with(Serdes.Long(), StreamsSerdes.PatientSerde()))))
                 .branch((k, v) -> v.getCd() != null && v.getCd().equalsIgnoreCase("PRV"),
-                        Branched.withConsumer(ks -> ks.
-                                mapValues(v ->
+                        Branched.withConsumer(ks -> ks
+                                .mapValues(v ->
                                         providerRepository.computeProviders(v.getPersonUid()))
                                 //KStream<String, List<Patient>>
                                 .flatMap((k, v) -> v.stream()
@@ -70,7 +70,7 @@ public class KafkaStreamsService {
                                         .collect(Collectors.toSet()))
                                 .peek((key, value) -> log.info("Provider : {}", value.toString()))
                                 .to((key, v, recordContext) -> providerOutputTopicName,
-                                        Produced.with(Serdes.String(), StreamsSerdes.ProviderSerde()))))
+                                        Produced.with(Serdes.Long(), StreamsSerdes.ProviderSerde()))))
                 .defaultBranch( Branched.withConsumer(ks -> ks.to(defaultDataTopicName,
                         Produced.with(Serdes.String(), StreamsSerdes.PersonSerde())) ));
 

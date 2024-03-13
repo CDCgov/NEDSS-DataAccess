@@ -1,6 +1,7 @@
 package gov.cdc.etldatapipeline.changedata.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import gov.cdc.etldatapipeline.changedata.utils.DataPostProcessor;
 import jakarta.persistence.Column;
@@ -20,9 +21,10 @@ import lombok.extern.slf4j.Slf4j;
 public class Patient {
     @Id
     @Column(name = "person_uid")
-    private String personUid;
+    @JsonProperty("patientUid")
+    private Long personUid;
     @Column(name = "person_parent_uid")
-    private String personParentUid;
+    private Long personParentUid;
     @Column(name = "description")
     private String description;
     @Column(name = "add_time")
@@ -98,9 +100,9 @@ public class Patient {
     @Column(name = "prim_lang_cd")
     private String primLangCd;
     @Column(name = "add_user_id")
-    private String addUserId;
+    private Long addUserId;
     @Column(name = "last_chg_user_id")
-    private String lastChgUserId;
+    private Long lastChgUserId;
     @Column(name = "multiple_birth_ind")
     private String multipleBirthInd;
     @Column(name = "adults_in_house_nbr")

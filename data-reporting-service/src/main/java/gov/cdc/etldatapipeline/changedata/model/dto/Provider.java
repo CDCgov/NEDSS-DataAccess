@@ -9,7 +9,6 @@ import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -17,14 +16,13 @@ import lombok.extern.slf4j.Slf4j;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Provider {
     @Id
     @Column(name = "person_uid")
-    private String personUid;
+    private Long personUid;
     @Column(name = "person_parent_uid")
-    private String personParentUid;
+    private Long personParentUid;
     @Column(name = "description")
     private String description;
     @Column(name = "add_time")
@@ -60,9 +58,9 @@ public class Provider {
     @Column(name = "dedup_match_ind")
     private String dedupMatchInd;
     @Column(name = "add_user_id")
-    private String addUserId;
+    private Long addUserId;
     @Column(name = "last_chg_user_id")
-    private String lastChgUserId;
+    private Long lastChgUserId;
     @Column(name = "PROVIDER_NAME_NESTED")
     private String name;
     @Column(name = "PROVIDER_ADDRESS_NESTED")
