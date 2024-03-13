@@ -1,6 +1,7 @@
 package gov.cdc.etldatapipeline.changedata.service;
 
 import gov.cdc.etldatapipeline.changedata.model.dto.OrganizationOP;
+import gov.cdc.etldatapipeline.changedata.model.odse.Organization;
 import gov.cdc.etldatapipeline.changedata.repository.OrganizationRepository;
 import gov.cdc.etldatapipeline.changedata.utils.StreamsSerdes;
 import gov.cdc.etldatapipeline.changedata.utils.UtilHelper;
@@ -13,6 +14,7 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Produced;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.stream.Collectors;
 
@@ -24,8 +26,10 @@ public class OrganizationConsumerService {
 
     private final UtilHelper utilHelper = UtilHelper.getInstance();
 
-    private final String organizationTopicName;
-    private final String organizationOutputTopicName;
+    @Value("#{kafkaConfig.getOrganizationTopicName()}")
+    private String organizationTopicName;
+    @Value("#{kafkaConfig.getOrganizationAggregateTopicName()}")
+    private String organizationOutputTopicName;
     private final OrganizationRepository organizationRepository;
 
     /**
@@ -43,11 +47,11 @@ public class OrganizationConsumerService {
      */
 
     public void processOrganizationData(StreamsBuilder streamsBuilder) {
-        KStream<String, OrganizationOP> organizationKStream
+        KStream<String, Organization> organizationKStream
                 = streamsBuilder.stream(organizationTopicName, Consumed.with(STRING_SERDE, STRING_SERDE))
                 .map((k, v) -> new KeyValue<>(
                         k,
-                        utilHelper.deserializePayload(v, "/payload/after", OrganizationOP.class)))
+                        utilHelper.deserializePayload(v, "/payload/after", Organization.class)))
                 // KStream<String, Organization>
                 .peek((key, value) -> log.info("Calling the Organization Repository for " + value.getOrganizationUid()));
 

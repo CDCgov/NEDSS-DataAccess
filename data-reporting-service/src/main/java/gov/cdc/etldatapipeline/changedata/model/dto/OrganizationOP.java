@@ -1,20 +1,21 @@
 package gov.cdc.etldatapipeline.changedata.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import gov.cdc.etldatapipeline.changedata.model.odse.DebeziumMetadata;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-@EqualsAndHashCode
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class OrganizationOP extends DebeziumMetadata {
+public class OrganizationOP {
     @Id
     @Column(name = "ORGANIZATION_UID")
     private String organizationUid;
