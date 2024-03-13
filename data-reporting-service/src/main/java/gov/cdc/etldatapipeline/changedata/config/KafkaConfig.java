@@ -18,6 +18,8 @@ public class KafkaConfig {
     private String patientInputTopicName;
     @Value("${spring.kafka.stream.input.organization.topic-name}")
     private String organizationTopicName;
+    @Value("${spring.kafka.stream.input.defaultData.topic-name}")
+    private String defaultDataTopicName;
     @Value("${spring.kafka.stream.output.provider.topic-name}")
     private String providerAggregateTopicName;
     @Value("${spring.kafka.stream.output.patient.topic-name}")

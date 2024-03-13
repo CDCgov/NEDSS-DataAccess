@@ -13,6 +13,8 @@ spring:
           topic-name: cdc.NBS_ODSE.dbo.Patient.input
         organization:
           topic-name: cdc.NBS_ODSE.dbo.Organization.input
+        defaultData:
+          topic-name: cdc.NBS_ODSE.dbo.Default.input
       output:
           provider:
             topic-name: cdc.nbs_odse.dbo.Provider.output
@@ -27,6 +29,8 @@ spring:
     consumer:
       key-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+    admin:
+      auto-create: true
   application:
     name: data-reporting-service
   datasource:

@@ -1,8 +1,8 @@
 package gov.cdc.etldatapipeline.changedata.service;
 
-import gov.cdc.etldatapipeline.changedata.model.dto.PersonFull;
 import gov.cdc.etldatapipeline.changedata.model.odse.Person;
-import gov.cdc.etldatapipeline.changedata.repository.PersonRepository;
+import gov.cdc.etldatapipeline.changedata.repository.PatientRepository;
+import gov.cdc.etldatapipeline.changedata.repository.ProviderRepository;
 import gov.cdc.etldatapipeline.changedata.utils.StreamsSerdes;
 import gov.cdc.etldatapipeline.changedata.utils.UtilHelper;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
+import org.apache.kafka.streams.kstream.Branched;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Produced;
@@ -24,13 +25,16 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class KafkaStreamsService {
-    private final PersonRepository personRepository;
+    private final PatientRepository patientRepository;
+    private final ProviderRepository providerRepository;
     @Value("#{kafkaConfig.getPersonTopicName()}")
     private String personTopicName;
     @Value("#{kafkaConfig.getPatientAggregateTopicName()}")
     private String patientOutputTopicName;
     @Value("#{kafkaConfig.getProviderAggregateTopicName()}")
     private String providerOutputTopicName;
+    @Value("#{kafkaConfig.getDefaultDataTopicName()}")
+    private String defaultDataTopicName;
 
     @Autowired
     public void processMessage(StreamsBuilder streamsBuilder) {
@@ -44,20 +48,31 @@ public class KafkaStreamsService {
                 .filter((k, v) -> v != null)
                 .peek((key, value) -> log.info("Received Person : " + value.getPersonUid()));
 
-        KStream<String, PersonFull> consolidatedPatientStream = personKStream
-                .mapValues(v ->
-                        personRepository.computeAllPatients(v.getPersonUid()))
-                //KStream<String, List<Patient>>
-                .flatMap((k, v) -> v.stream()
-                        .map(p -> KeyValue.pair(p.getPersonUid(), p.processPatient()))
-                        .collect(Collectors.toSet()))
-                // KStream<String, Patient>
-                .peek((key, value) -> log.info("Patient Info : {}", value.toString()));
-
-        consolidatedPatientStream.filter((k,v) -> v.getCd().equalsIgnoreCase("PAT"))
-                .to(patientOutputTopicName, Produced.with(Serdes.String(), StreamsSerdes.PatientSerde()));
-        consolidatedPatientStream.filter((k,v) -> v.getCd().equalsIgnoreCase("PRV"))
-                .to(providerOutputTopicName, Produced.with(Serdes.String(), StreamsSerdes.PatientSerde()));
+        personKStream.split()
+                .branch((k, v) -> v.getCd() != null && v.getCd().equalsIgnoreCase("PAT"),
+                        Branched.withConsumer(ks -> ks.
+                                mapValues(v ->
+                                        patientRepository.computePatients(v.getPersonUid()))
+                                //KStream<String, List<Patient>>
+                                .flatMap((k, v) -> v.stream()
+                                        .map(p -> KeyValue.pair(p.getPersonUid(), p.processPatient()))
+                                        .collect(Collectors.toSet()))
+                                .peek((key, value) -> log.info("Patient : {}", value.toString()))
+                                .to((key, v, recordContext) -> patientOutputTopicName,
+                                        Produced.with(Serdes.String(), StreamsSerdes.PatientSerde()))))
+                .branch((k, v) -> v.getCd() != null && v.getCd().equalsIgnoreCase("PRV"),
+                        Branched.withConsumer(ks -> ks.
+                                mapValues(v ->
+                                        providerRepository.computeProviders(v.getPersonUid()))
+                                //KStream<String, List<Patient>>
+                                .flatMap((k, v) -> v.stream()
+                                        .map(p -> KeyValue.pair(p.getPersonUid(), p.processProvider()))
+                                        .collect(Collectors.toSet()))
+                                .peek((key, value) -> log.info("Provider : {}", value.toString()))
+                                .to((key, v, recordContext) -> providerOutputTopicName,
+                                        Produced.with(Serdes.String(), StreamsSerdes.ProviderSerde()))))
+                .defaultBranch( Branched.withConsumer(ks -> ks.to(defaultDataTopicName,
+                        Produced.with(Serdes.String(), StreamsSerdes.PersonSerde())) ));
 
     }
 }

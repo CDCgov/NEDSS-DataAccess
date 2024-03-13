@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import gov.cdc.etldatapipeline.changedata.model.dto.PersonFull;
+import gov.cdc.etldatapipeline.changedata.model.dto.PersonExtendedProps;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,7 +30,7 @@ public class ChgAuthUser {
     @JsonProperty("PATIENT_LAST_UPDATED_BY")
     private String patientLastUpdatedBy;
 
-    public PersonFull updatePerson(PersonFull personFull) {
+    public <T extends PersonExtendedProps> T updatePerson(T personFull) {
         personFull.setLastChangedBy(lastChgUserId);
         return personFull;
     }

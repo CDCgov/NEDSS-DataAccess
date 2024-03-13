@@ -4,18 +4,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.cdc.etldatapipeline.changedata.model.odse.DebeziumMetadata;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Objects;
 
 @Slf4j
+@NoArgsConstructor
 public class UtilHelper {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private static UtilHelper utilHelper;
-
-    private UtilHelper() {
-    }
 
     public static UtilHelper getInstance() {
         utilHelper = (utilHelper == null) ? new UtilHelper() : utilHelper;
