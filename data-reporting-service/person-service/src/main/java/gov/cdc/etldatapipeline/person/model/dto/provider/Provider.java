@@ -1,4 +1,4 @@
-package gov.cdc.etldatapipeline.person.model.dto;
+package gov.cdc.etldatapipeline.person.model.dto.provider;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;

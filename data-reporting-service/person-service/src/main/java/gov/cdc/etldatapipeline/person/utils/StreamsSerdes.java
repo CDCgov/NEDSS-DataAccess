@@ -1,8 +1,8 @@
 package gov.cdc.etldatapipeline.person.utils;
 
 import gov.cdc.etldatapipeline.person.model.dto.OrganizationOP;
-import gov.cdc.etldatapipeline.person.model.dto.PatientFull;
-import gov.cdc.etldatapipeline.person.model.dto.ProviderFull;
+import gov.cdc.etldatapipeline.person.model.dto.patient.PatientFull;
+import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderFull;
 import gov.cdc.etldatapipeline.person.model.odse.Person;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;

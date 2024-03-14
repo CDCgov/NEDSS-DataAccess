@@ -1,7 +1,7 @@
 package gov.cdc.etldatapipeline.person;
 
-import gov.cdc.etldatapipeline.person.model.dto.PatientFull;
-import gov.cdc.etldatapipeline.person.model.dto.Patient;
+import gov.cdc.etldatapipeline.person.model.dto.patient.PatientFull;
+import gov.cdc.etldatapipeline.person.model.dto.patient.Patient;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

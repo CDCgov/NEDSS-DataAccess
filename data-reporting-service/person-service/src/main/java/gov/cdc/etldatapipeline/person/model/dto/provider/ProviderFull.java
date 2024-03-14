@@ -1,6 +1,7 @@
-package gov.cdc.etldatapipeline.person.model.dto;
+package gov.cdc.etldatapipeline.person.model.dto.provider;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 @EqualsAndHashCode(callSuper=true)
-public class PatientFull extends Patient implements PersonExtendedProps {
+public class ProviderFull extends Provider implements PersonExtendedProps {
     private String streetAddress1;
     private String streetAddress2;
     private String city;
@@ -43,31 +44,26 @@ public class PatientFull extends Patient implements PersonExtendedProps {
     private String providerRegistrationNum;
     private String providerRegistrationNumAuth;
 
-    public PatientFull constructPersonFull(Patient p) {
+    public void setRaceCd(String raceCd){}
+    public void setRaceCategory(String raceCategoryCd){}
+    public void setRaceDesc(String raceDescTxt){}
+
+    /***
+     * Transform the Name, Address,  Telephone, Email, EntityData(SSN), AddAuthUser, ChangeAuthUser
+     * @return Fully Transformed Provider Object
+     */
+    public ProviderFull constructProviderFull(Provider p) {
         setPersonUid(p.getPersonUid());
         setPersonParentUid(p.getPersonParentUid());
         setDescription(p.getDescription());
         setAddTime(p.getAddTime());
-        setAgeReported(p.getAgeReported());
-        setAgeReportedUnitCd(p.getAgeReportedUnitCd());
         setFirstNm(p.getFirstNm());
         setMiddleNm(p.getMiddleNm());
         setLastNm(p.getLastNm());
         setNmSuffix(p.getNmSuffix());
-        setAsOfDateMorbidity(p.getAsOfDateAdmin());
-        setAsOfDateEthnicity(p.getAsOfDateEthnicity());
-        setAsOfDateGeneral(p.getAsOfDateGeneral());
-        setAsOfDateMorbidity(p.getAsOfDateMorbidity());
-        setAsOfDateSex(p.getAsOfDateSex());
-        setBirthTime(p.getBirthTime());
-        setBirthTimeCalc(p.getBirthTimeCalc());
         setCd(p.getCd());
-        setCurrSexCd(p.getCurrSexCd());
-        setDeceasedIndCd(p.getDeceasedIndCd());
         setElectronicInd(p.getElectronicInd());
-        setEthnicGroupInd(p.getEthnicGroupInd());
         setLastChgTime(p.getLastChgTime());
-        setMaritalStatusCd(p.getMaritalStatusCd());
         setRecordStatusCd(p.getRecordStatusCd());
         setRecordStatusTime(p.getRecordStatusTime());
         setStatusCd(p.getStatusCd());
@@ -76,20 +72,15 @@ public class PatientFull extends Patient implements PersonExtendedProps {
         setVersionCtrlNbr(p.getVersionCtrlNbr());
         setEdxInd(p.getEdxInd());
         setDedupMatchInd(p.getDedupMatchInd());
-        setSpeaksEnglishCd(p.getSpeaksEnglishCd());
-        setEthnicUnkReasonCd(p.getEthnicUnkReasonCd());
-        setSexUnkReasonCd(p.getSexUnkReasonCd());
-        setPreferredGenderCd(p.getPreferredGenderCd());
-        setAdditionalGenderCd(p.getAdditionalGenderCd());
-        setOccupationCd(p.getOccupationCd());
-        setPrimLangCd(p.getPrimLangCd());
         setAddUserId(p.getAddUserId());
         setLastChgUserId(p.getLastChgUserId());
-        setMultipleBirthInd(p.getMultipleBirthInd());
-        setAdultsInHouseNbr(p.getAdultsInHouseNbr());
-        setBirthOrderNbr(p.getBirthOrderNbr());
-        setChildrenInHouseNbr(p.getChildrenInHouseNbr());
-        setEducationLevelCd(p.getEducationLevelCd());
+        setName(p.getName());
+        setAddress(p.getAddress());
+        setTelephone(p.getTelephone());
+        setEmail(p.getEmail());
+        setEntityData(p.getEntityData());
+        setAddAuthNested(p.getAddAuthNested());
+        setChgAuthNested(p.getChgAuthNested());
         return this;
     }
 }
