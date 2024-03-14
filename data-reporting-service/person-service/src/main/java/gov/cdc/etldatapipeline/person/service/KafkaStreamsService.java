@@ -71,8 +71,7 @@ public class KafkaStreamsService {
                                 .peek((key, value) -> log.info("Provider : {}", value.toString()))
                                 .to((key, v, recordContext) -> providerOutputTopicName,
                                         Produced.with(Serdes.Long(), StreamsSerdes.ProviderSerde()))))
-                .defaultBranch( Branched.withConsumer(ks -> ks.to(defaultDataTopicName,
-                        Produced.with(Serdes.String(), StreamsSerdes.PersonSerde())) ));
-
+                .defaultBranch(Branched.withConsumer(ks -> ks.to(defaultDataTopicName,
+                        Produced.with(Serdes.String(), StreamsSerdes.PersonSerde()))));
     }
 }
