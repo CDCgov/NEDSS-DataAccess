@@ -54,9 +54,14 @@ services:
     build:
       context: ./
       dockerfile: ./Dockerfile
+      args:
+        DB_USERNAME: $DB_USERNAME
+        DB_PASSWORD: $DB_PASSWORD
+        DB_URL: $DB_URL
+        DB_ODSE: $DB_ODSE
     ports:
       - 8080:8080
-    container_name: person-reporting-service
+    container_name: data-reporting-service
     env_file:
       - etldatapipeline.env
     networks:
@@ -78,7 +83,7 @@ services:
     networks:
       - etldatapipeline
 
-  connect:
+  debezium-source-connect:
     image: quay.io/debezium/connect:${DEBEZIUM_VERSION:-2.5}
     container_name: Debezium_Change_Data_Connector
     ports:

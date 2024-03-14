@@ -1,6 +1,6 @@
 package gov.cdc.etldatapipeline.person.repository;
 
-import gov.cdc.etldatapipeline.person.model.dto.Patient;
+import gov.cdc.etldatapipeline.person.model.dto.patient.Patient;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
