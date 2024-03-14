@@ -102,7 +102,7 @@ liquibase {
     activities {
         main {
             changelogFile './src/main/resources/db/changelog/db.changelog-master.yaml'
-            url "jdbc:sqlserver://${System.env.DB_URL};databaseName=${System.env.DB_ODSE};encrypt=true;trustServerCertificate=true"
+            url "jdbc:sqlserver://${System.env.DB_URL}:1433;databaseName=${System.env.DB_ODSE};encrypt=true;trustServerCertificate=true"
             username  "${System.env.DB_USERNAME}"
             password "${System.env.DB_PASSWORD}"
         }
