@@ -55,10 +55,22 @@ services:
       context: ./
       dockerfile: ./Dockerfile
     ports:
+      - 8080:8080
+    container_name: person-reporting-service
+    env_file:
+      - etldatapipeline.env
+    networks:
+      - etldatapipeline
+
+  person-reporting-service:
+    build:
+      context: ./person-service
+      dockerfile: ./Dockerfile
+    ports:
       - 8090:8090
     depends_on:
       - broker
-    container_name: data-reporting-service
+    container_name: person-reporting-service
     env_file:
       - etldatapipeline.env
     environment:
