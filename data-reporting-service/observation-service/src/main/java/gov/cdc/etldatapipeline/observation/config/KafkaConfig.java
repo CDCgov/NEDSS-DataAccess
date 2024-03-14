@@ -70,6 +70,12 @@ public class KafkaConfig {
     }
 
 
+    @Bean
+    public NewTopic createAggregateObservationTopicName() {
+        return TopicBuilder.name(observationAggregateTopicName).build();
+    }
+
+
 }
 
 
