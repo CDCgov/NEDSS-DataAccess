@@ -30,7 +30,7 @@ public class PersonServiceController {
     }
 
 
-    @GetMapping("/person-service-status")
+    @GetMapping("/status")
     @ResponseBody
     public ResponseEntity<String> getDataPipelineStatusHealth() {
         return this.dataPipelineStatusSvc.getHealthStatus();
