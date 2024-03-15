@@ -25,10 +25,10 @@ echo "Building Kafka Broker"
 docker-compose -f $BASE/docker-compose.yml up broker --build -d
 
 # Build and deploy ETL Data pipeline container
-echo "Updating the th Data Pipeline"
+echo "Building the Data Pipeline"
 docker-compose -f $BASE/docker-compose.yml up data-reporting-service --build -d
 
-echo "Updating the th Person Reporting Service"
+echo "Building Person Reporting Service"
 docker-compose -f $BASE/docker-compose.yml up person-reporting-service --build -d
 
 # Cleanup 
