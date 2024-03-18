@@ -25,15 +25,21 @@ echo "Building Kafka Broker"
 docker-compose -f $BASE/docker-compose.yml up broker --build -d
 
 # Build and deploy ETL Data pipeline container
-echo "Building ETL Data Pipeline"
+echo "Building the Data Pipeline"
 docker-compose -f $BASE/docker-compose.yml up data-reporting-service --build -d
+
+echo "Building Person Reporting Service"
+docker-compose -f $BASE/docker-compose.yml up person-reporting-service --build -d
 
 # Cleanup 
 #rm -rf $DA_PATH
 
 echo "**** NEDSS DataAccess ETL Data Pipeline build complete ****"
-echo "Health Check"
-echo "http://localhost:8090/data-pipeline-status"
+echo "Reporting Service Health Check"
+echo "http://localhost:8081/status"
+echo ""
+echo "Person Reporting Service Health Check"
+echo "http://localhost:8090/status"
 echo ""
 echo "Database: localhost:1433"
 echo "DB user: sa"

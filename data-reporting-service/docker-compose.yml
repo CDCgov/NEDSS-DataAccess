@@ -60,7 +60,7 @@ services:
         DB_URL: $DB_URL
         DB_ODSE: $DB_ODSE
     ports:
-      - 8080:8080
+      - 8081:8081
     container_name: data-reporting-service
     env_file:
       - etldatapipeline.env
