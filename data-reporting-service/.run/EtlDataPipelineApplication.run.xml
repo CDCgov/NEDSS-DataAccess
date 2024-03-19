@@ -1,0 +1,18 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="EtlDataPipelineApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+    <envs>
+      <env name="DA_LOG_PATH" value="logs" />
+      <env name="DB_ODSE" value="NBS_ODSE" />
+      <env name="DB_PASSWORD" value="fake.fake.fake.1234" />
+      <env name="DB_URL" value="localhost" />
+      <env name="DB_USERNAME" value="sa" />
+      <env name="KAFKA_BOOTSTRAP_SERVER" value="localhost:9092" />
+    </envs>
+    <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+    <module name="data-reporting-service.main" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="gov.cdc.etldatapipeline.EtlDataPipelineApplication" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

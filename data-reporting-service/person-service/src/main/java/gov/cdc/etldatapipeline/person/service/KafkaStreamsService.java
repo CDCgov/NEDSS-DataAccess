@@ -6,6 +6,7 @@ import gov.cdc.etldatapipeline.person.repository.ProviderRepository;
 import gov.cdc.etldatapipeline.person.utils.StreamsSerdes;
 import gov.cdc.etldatapipeline.person.utils.UtilHelper;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KeyValue;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Setter
 @Slf4j
 public class KafkaStreamsService {
     private final PatientRepository patientRepository;

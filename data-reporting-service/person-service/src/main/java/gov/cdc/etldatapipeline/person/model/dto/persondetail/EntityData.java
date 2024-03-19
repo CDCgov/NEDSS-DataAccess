@@ -6,6 +6,7 @@ import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.util.StringUtils;
 
 @Data
 @AllArgsConstructor
@@ -23,16 +24,18 @@ public class EntityData {
     private String assigningAuthorityCd;
 
     public <T extends PersonExtendedProps> T updatePerson(T personFull) {
-        if(assigningAuthorityCd.equalsIgnoreCase("SSA")) {
+        if (StringUtils.hasText(assigningAuthorityCd) && assigningAuthorityCd.equalsIgnoreCase("SSA")) {
             personFull.setSsn(rootExtensionTxt);
-        } else if (typeCd.equalsIgnoreCase("PN")) {
-            personFull.setPatientNumber(rootExtensionTxt);
-            personFull.setPatientNumberAuth(assigningAuthorityCd);
-        } else if (typeCd.equalsIgnoreCase("QEC")) {
-            personFull.setProviderQuickCode(rootExtensionTxt);
-        } else if (typeCd.equalsIgnoreCase("PRN")) {
-            personFull.setProviderRegistrationNum(rootExtensionTxt);
-            personFull.setProviderRegistrationNumAuth(assigningAuthorityCd);
+        } else if (StringUtils.hasText(typeCd)) {
+            if (typeCd.equalsIgnoreCase("PN")) {
+                personFull.setPatientNumber(rootExtensionTxt);
+                personFull.setPatientNumberAuth(assigningAuthorityCd);
+            } else if (typeCd.equalsIgnoreCase("QEC")) {
+                personFull.setProviderQuickCode(rootExtensionTxt);
+            } else if (typeCd.equalsIgnoreCase("PRN")) {
+                personFull.setProviderRegistrationNum(rootExtensionTxt);
+                personFull.setProviderRegistrationNumAuth(assigningAuthorityCd);
+            }
         }
         return personFull;
     }
