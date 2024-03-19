@@ -20,3 +20,10 @@ databaseChangeLog:
         - sqlFile:
             path: src/main/resources/db/sp-organization-001.sql
             splitStatements: false
+  - changeSet:
+      id: 4
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/sp-patient-001.sql
+            splitStatements: false

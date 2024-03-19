@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -13,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-@EqualsAndHashCode(callSuper=true)
 public class ProviderFull extends Provider implements PersonExtendedProps {
     private String streetAddress1;
     private String streetAddress2;

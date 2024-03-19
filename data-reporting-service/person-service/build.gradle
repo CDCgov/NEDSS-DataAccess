@@ -36,6 +36,8 @@ dependencies {
     implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.projectlombok:lombok'
+    // https://mvnrepository.com/artifact/org.apache.kafka/kafka-streams-test-utils
+    testImplementation 'org.apache.kafka:kafka-streams-test-utils:3.7.0'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.testcontainers:testcontainers:1.17.3'
     testImplementation "org.testcontainers:kafka:1.17.3"
