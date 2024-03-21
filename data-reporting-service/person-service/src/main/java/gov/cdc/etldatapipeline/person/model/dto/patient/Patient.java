@@ -2,7 +2,10 @@ package gov.cdc.etldatapipeline.person.model.dto.patient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import gov.cdc.etldatapipeline.person.utils.DataPostProcessor;
+import io.confluent.kafka.schemaregistry.json.JsonSchema;
+import io.confluent.kafka.schemaregistry.json.JsonSchemaUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -10,6 +13,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.io.IOException;
+import java.util.Objects;
 
 @Slf4j
 @Data
@@ -19,11 +25,11 @@ import lombok.extern.slf4j.Slf4j;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Patient {
     @Id
-    @Column(name = "person_uid")
+    @Column(name = "person_uid", columnDefinition = "bigint")
     private Long personUid;
-    @Column(name = "person_parent_uid")
+    @Column(name = "person_parent_uid", columnDefinition = "bigint")
     private Long personParentUid;
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "text")
     private String description;
     @Column(name = "add_time")
     private String addTime;
@@ -149,5 +155,18 @@ public class Patient {
             log.error("JsonProcessingException: ", e);
         }
         return pf;
+    }
+
+    public PatientEnvelope constructPatientEnvelope() {
+        PatientFull pf = processPatient();
+        JsonNode jsonNode;
+        try {
+            JsonSchema schema = JsonSchemaUtils.getSchema(pf);
+            jsonNode = Objects.isNull(schema) ? null : schema.toJsonNode();
+        } catch (IOException e) {
+            //ToDo: Replace with Generic ExceptionHandler
+            throw new RuntimeException(e);
+        }
+        return new PatientEnvelope(jsonNode, pf);
     }
 }

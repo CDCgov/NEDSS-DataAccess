@@ -2,7 +2,10 @@ package gov.cdc.etldatapipeline.person.model.dto.provider;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import gov.cdc.etldatapipeline.person.utils.DataPostProcessor;
+import io.confluent.kafka.schemaregistry.json.JsonSchema;
+import io.confluent.kafka.schemaregistry.json.JsonSchemaUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -10,6 +13,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.io.IOException;
+import java.util.Objects;
 
 @Slf4j
 @Data
@@ -92,6 +98,19 @@ public class Provider {
             log.error("JsonProcessingException: ", e);
         }
         return pf;
+    }
+
+    public ProviderEnvelope constructPatientEnvelope() {
+        ProviderFull pf = processProvider();
+        JsonNode jsonNode;
+        try {
+            JsonSchema schema = JsonSchemaUtils.getSchema(pf);
+            jsonNode = Objects.isNull(schema) ? null : schema.toJsonNode();
+        } catch (IOException e) {
+            //ToDo: Replace with Generic ExceptionHandler
+            throw new RuntimeException(e);
+        }
+        return new ProviderEnvelope(jsonNode, pf);
     }
 }
 

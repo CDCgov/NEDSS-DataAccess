@@ -4,12 +4,14 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.TopicBuilder;
 
 @Slf4j
 @Configuration
+@ConfigurationProperties
 @Getter
 public class KafkaConfig {
     @Value("${spring.kafka.stream.input.person.topic-name}")

@@ -2,9 +2,11 @@ package gov.cdc.etldatapipeline.person;
 
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
 import gov.cdc.etldatapipeline.person.model.dto.patient.Patient;
+import gov.cdc.etldatapipeline.person.model.dto.patient.PatientEnvelope;
 import gov.cdc.etldatapipeline.person.model.dto.patient.PatientFull;
 import gov.cdc.etldatapipeline.person.model.dto.persondetail.*;
 import gov.cdc.etldatapipeline.person.model.dto.provider.Provider;
+import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderEnvelope;
 import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderFull;
 import gov.cdc.etldatapipeline.person.repository.PatientRepository;
 import gov.cdc.etldatapipeline.person.repository.ProviderRepository;
@@ -69,10 +71,9 @@ public class KafkaStreamsServiceTest {
             List<String> transformedData = outputTopic.readValuesToList();
             Assertions.assertNotNull(transformedData);
             PatientFull expected = new PatientFull();
-            expected.setPersonUid(10000001L);
             constructPatPrvFull(expected);
-            PatientFull actual = UtilHelper.getInstance().deserializePayload(transformedData.get(0), PatientFull.class);
-            Assertions.assertEquals(expected, actual);
+            PatientEnvelope actual = UtilHelper.getInstance().deserializePayload(transformedData.get(0), PatientEnvelope.class);
+            Assertions.assertEquals(expected, actual.getPayload());
         }
     }
 
@@ -102,8 +103,8 @@ public class KafkaStreamsServiceTest {
             ProviderFull expected = new ProviderFull();
             expected.setPersonUid(10000001L);
             constructPatPrvFull(expected);
-            ProviderFull actual = UtilHelper.getInstance().deserializePayload(transformedData.get(0), ProviderFull.class);
-            Assertions.assertEquals(expected, actual);
+            ProviderEnvelope actual = UtilHelper.getInstance().deserializePayload(transformedData.get(0), ProviderEnvelope.class);
+            Assertions.assertEquals(expected, actual.getPayload());
         }
     }
 
@@ -118,6 +119,7 @@ public class KafkaStreamsServiceTest {
 
     private Patient constructPatient() {
         Patient p = new Patient();
+        p.setPersonUid(10000001L);
         p.setName(readFileData("PersonName.json"));
         p.setAddress(readFileData("PersonAddress.json"));
         p.setRace(readFileData("PersonRace.json"));
@@ -131,6 +133,7 @@ public class KafkaStreamsServiceTest {
 
     private Provider constructProvider() {
         Provider p = new Provider();
+        p.setPersonUid(10000001L);
         p.setName(readFileData("PersonName.json"));
         p.setAddress(readFileData("PersonAddress.json"));
         p.setTelephone(readFileData("PersonTelephone.json"));
