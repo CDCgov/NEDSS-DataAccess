@@ -861,39 +861,6 @@
           "type": "string"
         }
       ]
-    },
-    "providerQuickCode": {
-      "oneOf": [
-        {
-          "type": "null",
-          "title": "Not included"
-        },
-        {
-          "type": "string"
-        }
-      ]
-    },
-    "providerRegistrationNum": {
-      "oneOf": [
-        {
-          "type": "null",
-          "title": "Not included"
-        },
-        {
-          "type": "string"
-        }
-      ]
-    },
-    "providerRegistrationNumAuth": {
-      "oneOf": [
-        {
-          "type": "null",
-          "title": "Not included"
-        },
-        {
-          "type": "string"
-        }
-      ]
     }
   }
 }

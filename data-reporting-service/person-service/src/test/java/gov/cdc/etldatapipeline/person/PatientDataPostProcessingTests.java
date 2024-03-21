@@ -59,9 +59,6 @@ public class PatientDataPostProcessingTests {
                 pf.getSsn(),
                 pf.getPatientNumber(),
                 pf.getPatientNumberAuth(),
-                pf.getProviderQuickCode(),
-                pf.getProviderRegistrationNum(),
-                pf.getProviderRegistrationNumAuth(),
                 pf.getEmail());
 
         // Process the respective field json to PatientProvider fields
@@ -96,9 +93,6 @@ public class PatientDataPostProcessingTests {
                 "313431144414",
                 "56743114514",
                 "2.16.740.1.113883.3.1147.1.1002",
-                "12314286",
-                "86741517517",
-                "3.16.740.1.113883.3.1147.1.1002",
                 "someone2@email.com");
         // Validate the PatientProvider field processing
         Assertions.assertEquals(expected, pDetailsFn.apply(pf));
@@ -250,10 +244,7 @@ public class PatientDataPostProcessingTests {
         Function<PatientFull, List<String>> pDetailsFn = (p) -> Arrays.asList(
                 p.getSsn(),
                 p.getPatientNumber(),
-                p.getPatientNumberAuth(),
-                p.getProviderQuickCode(),
-                p.getProviderRegistrationNum(),
-                p.getProviderRegistrationNumAuth());
+                p.getPatientNumberAuth());
 
         // Process the respective field json to PatientProvider fields
         PatientFull pf = patient.processPatient();
@@ -261,10 +252,7 @@ public class PatientDataPostProcessingTests {
         List<String> expected = List.of(
                 "313431144414",
                 "56743114514",
-                "2.16.740.1.113883.3.1147.1.1002",
-                "12314286",
-                "86741517517",
-                "3.16.740.1.113883.3.1147.1.1002");
+                "2.16.740.1.113883.3.1147.1.1002");
         // Validate the PatientProvider field processing
         Assertions.assertEquals(expected, pDetailsFn.apply(pf));
     }

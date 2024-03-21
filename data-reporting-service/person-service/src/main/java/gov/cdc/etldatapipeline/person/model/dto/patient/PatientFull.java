@@ -38,9 +38,6 @@ public class PatientFull extends Patient implements PersonExtendedProps {
     private String raceDesc;
     private String patientNumber;
     private String patientNumberAuth;
-    private String providerQuickCode;
-    private String providerRegistrationNum;
-    private String providerRegistrationNumAuth;
 
     public PatientFull constructPersonFull(Patient p) {
         setPersonUid(p.getPersonUid());
@@ -98,5 +95,20 @@ public class PatientFull extends Patient implements PersonExtendedProps {
         setChgAuthNested(p.getChgAuthNested());
         setRace(p.getRace());
         return this;
+    }
+
+    @Override
+    public void setProviderQuickCode(String providerQuickCode) {
+
+    }
+
+    @Override
+    public void setProviderRegistrationNum(String providerRegistrationNum) {
+
+    }
+
+    @Override
+    public void setProviderRegistrationNumAuth(String providerRegistrationNumAuth) {
+
     }
 }

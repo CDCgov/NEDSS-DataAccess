@@ -52,7 +52,6 @@ public class ProviderDataPostProcessingTests {
                 pf.getPhoneCell(),
                 pf.getAddedBy(),
                 pf.getLastChangedBy(),
-                pf.getSsn(),
                 pf.getPatientNumber(),
                 pf.getPatientNumberAuth(),
                 pf.getProviderQuickCode(),
@@ -86,7 +85,6 @@ public class ProviderDataPostProcessingTests {
                 "2823252423",
                 10000000L,
                 470200741L,
-                "313431144414",
                 "56743114514",
                 "2.16.740.1.113883.3.1147.1.1002",
                 "12314286",
@@ -219,7 +217,6 @@ public class ProviderDataPostProcessingTests {
 
         // PatientProvider Fields to be processed
         Function<ProviderFull, List<String>> pDetailsFn = (p) -> Arrays.asList(
-                p.getSsn(),
                 p.getPatientNumber(),
                 p.getPatientNumberAuth(),
                 p.getProviderQuickCode(),
@@ -230,7 +227,6 @@ public class ProviderDataPostProcessingTests {
         ProviderFull pf = personOp.processProvider();
         // Expected
         List<String> expected = List.of(
-                "313431144414",
                 "56743114514",
                 "2.16.740.1.113883.3.1147.1.1002",
                 "12314286",

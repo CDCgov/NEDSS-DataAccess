@@ -30,7 +30,6 @@ public class ProviderFull extends Provider implements PersonExtendedProps {
     private String phoneExtHome;
     private String phoneCell;
     private String email;
-    private String ssn;
     private Long addedBy;
     private Long lastChangedBy;
     private String raceCd;
@@ -42,9 +41,19 @@ public class ProviderFull extends Provider implements PersonExtendedProps {
     private String providerRegistrationNum;
     private String providerRegistrationNumAuth;
 
-    public void setRaceCd(String raceCd){}
-    public void setRaceCategory(String raceCategoryCd){}
-    public void setRaceDesc(String raceDescTxt){}
+    @Override
+    public void setSsn(String ssn) {
+
+    }
+
+    public void setRaceCd(String raceCd) {
+    }
+
+    public void setRaceCategory(String raceCategoryCd) {
+    }
+
+    public void setRaceDesc(String raceDescTxt) {
+    }
 
     /***
      * Transform the Name, Address,  Telephone, Email, EntityData(SSN), AddAuthUser, ChangeAuthUser

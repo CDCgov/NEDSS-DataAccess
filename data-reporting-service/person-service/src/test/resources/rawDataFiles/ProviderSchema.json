@@ -488,17 +488,6 @@
         }
       ]
     },
-    "ssn": {
-      "oneOf": [
-        {
-          "type": "null",
-          "title": "Not included"
-        },
-        {
-          "type": "string"
-        }
-      ]
-    },
     "addedBy": {
       "oneOf": [
         {
