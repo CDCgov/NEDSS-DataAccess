@@ -1,5 +1,6 @@
 package gov.cdc.etldatapipeline.person;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
 import gov.cdc.etldatapipeline.person.model.dto.patient.Patient;
 import gov.cdc.etldatapipeline.person.model.dto.patient.PatientEnvelope;
@@ -74,6 +75,9 @@ public class KafkaStreamsServiceTest {
             constructPatPrvFull(expected);
             PatientEnvelope actual = UtilHelper.getInstance().deserializePayload(transformedData.get(0), PatientEnvelope.class);
             Assertions.assertEquals(expected, actual.getPayload());
+            Assertions.assertEquals(
+                    new ObjectMapper().readTree(readFileData("PatientSchema.json")),
+                    actual.getSchema());
         }
     }
 
@@ -105,6 +109,9 @@ public class KafkaStreamsServiceTest {
             constructPatPrvFull(expected);
             ProviderEnvelope actual = UtilHelper.getInstance().deserializePayload(transformedData.get(0), ProviderEnvelope.class);
             Assertions.assertEquals(expected, actual.getPayload());
+            Assertions.assertEquals(
+                    new ObjectMapper().readTree(readFileData("ProviderSchema.json")),
+                    actual.getSchema());
         }
     }
 
