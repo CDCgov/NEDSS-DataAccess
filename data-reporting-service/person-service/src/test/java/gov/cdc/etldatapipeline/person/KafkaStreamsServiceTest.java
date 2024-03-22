@@ -1,18 +1,20 @@
 package gov.cdc.etldatapipeline.person;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import gov.cdc.etldatapipeline.person.model.dto.DataEnvelope;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
 import gov.cdc.etldatapipeline.person.model.dto.patient.Patient;
-import gov.cdc.etldatapipeline.person.model.dto.patient.PatientEnvelope;
 import gov.cdc.etldatapipeline.person.model.dto.patient.PatientFull;
+import gov.cdc.etldatapipeline.person.model.dto.patient.PatientKey;
 import gov.cdc.etldatapipeline.person.model.dto.persondetail.*;
 import gov.cdc.etldatapipeline.person.model.dto.provider.Provider;
-import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderEnvelope;
 import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderFull;
+import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderKey;
 import gov.cdc.etldatapipeline.person.repository.PatientRepository;
 import gov.cdc.etldatapipeline.person.repository.ProviderRepository;
 import gov.cdc.etldatapipeline.person.service.KafkaStreamsService;
-import gov.cdc.etldatapipeline.person.utils.UtilHelper;
+import io.confluent.kafka.schemaregistry.json.JsonSchemaUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -55,7 +57,15 @@ public class KafkaStreamsServiceTest {
         String personPatientOdseData = FileUtils.readFileToString(file,
                 Charset.defaultCharset());
 
-        Mockito.when(patientRepository.computePatients(anyString())).thenReturn(List.of(constructPatient()));
+        Patient patient = constructPatient();
+        Mockito.when(patientRepository.computePatients(anyString())).thenReturn(List.of(patient));
+        //Build expected unflattened Provider
+        PatientFull expectedPf = new PatientFull().constructPersonFull(patient);
+        //Construct transformed patient
+        constructPatPrvFull(expectedPf);
+        //Construct expected Patient Key
+        PatientKey expectedPatientKey = new PatientKey(expectedPf.getPersonUid());
+
         StreamsBuilder streamsBuilder = new StreamsBuilder();
         KafkaStreamsService ks = getKafkaStreamService();
         ks.processMessage(streamsBuilder);
@@ -69,15 +79,24 @@ public class KafkaStreamsServiceTest {
             TestOutputTopic<String, String> outputTopic = topologyTestDriver
                     .createOutputTopic(patientTopic, new StringDeserializer(), new StringDeserializer());
             inputTopic.pipeInput("10000001", personPatientOdseData);
-            List<String> transformedData = outputTopic.readValuesToList();
-            Assertions.assertNotNull(transformedData);
-            PatientFull expected = new PatientFull();
-            constructPatPrvFull(expected);
-            PatientEnvelope actual = UtilHelper.getInstance().deserializePayload(transformedData.get(0), PatientEnvelope.class);
-            Assertions.assertEquals(expected, actual.getPayload());
-            Assertions.assertEquals(
-                    new ObjectMapper().readTree(readFileData("PatientSchema.json")),
-                    actual.getSchema());
+            List<KeyValue<String, String>> actualData = outputTopic.readKeyValuesToList();
+            Assertions.assertNotNull(actualData);
+
+            //Validate the Patient Payload
+            TypeReference<DataEnvelope<PatientFull>> patientFullDataEnv = new TypeReference<>() {};
+
+            DataEnvelope<PatientFull> actualValue
+                    = new ObjectMapper().readValue(actualData.get(0).value, patientFullDataEnv);
+            Assertions.assertEquals(expectedPf, actualValue.getPayload());
+            Assertions.assertEquals(JsonSchemaUtils.getSchema(expectedPf).toJsonNode(), actualValue.getSchema());
+
+            //Validate the Patient Key
+            TypeReference<DataEnvelope<PatientKey>> patientKeyDataEnv = new TypeReference<>() {};
+            DataEnvelope<PatientKey> actualKey
+                    = new ObjectMapper().readValue(actualData.get(0).key, patientKeyDataEnv);
+            Assertions.assertEquals(expectedPatientKey, actualKey.getPayload());
+            Assertions.assertEquals(JsonSchemaUtils.getSchema(expectedPatientKey).toJsonNode(), actualKey.getSchema());
+
         }
     }
 
@@ -88,7 +107,16 @@ public class KafkaStreamsServiceTest {
         String personPatientOdseData = FileUtils.readFileToString(file,
                 Charset.defaultCharset());
 
-        Mockito.when(providerRepository.computeProviders(anyString())).thenReturn(List.of(constructProvider()));
+        Provider constructedProvider = constructProvider();
+        Mockito.when(providerRepository.computeProviders(anyString())).thenReturn(List.of(constructedProvider));
+
+        //Build expected unflattened Provider
+        ProviderFull expectedPf = new ProviderFull().constructProviderFull(constructedProvider);
+        //Augment Provider with the flattened data
+        constructPatPrvFull(expectedPf);
+        //Construct expected Provider Key
+        ProviderKey expectedProviderKey = new ProviderKey(expectedPf.getPersonUid());
+
         StreamsBuilder streamsBuilder = new StreamsBuilder();
         KafkaStreamsService ks = getKafkaStreamService();
         ks.processMessage(streamsBuilder);
@@ -102,16 +130,23 @@ public class KafkaStreamsServiceTest {
             TestOutputTopic<String, String> outputTopic = topologyTestDriver
                     .createOutputTopic(providerTopic, new StringDeserializer(), new StringDeserializer());
             inputTopic.pipeInput("10000001", personPatientOdseData);
-            List<String> transformedData = outputTopic.readValuesToList();
-            Assertions.assertNotNull(transformedData);
-            ProviderFull expected = new ProviderFull();
-            expected.setPersonUid(10000001L);
-            constructPatPrvFull(expected);
-            ProviderEnvelope actual = UtilHelper.getInstance().deserializePayload(transformedData.get(0), ProviderEnvelope.class);
-            Assertions.assertEquals(expected, actual.getPayload());
-            Assertions.assertEquals(
-                    new ObjectMapper().readTree(readFileData("ProviderSchema.json")),
-                    actual.getSchema());
+            List<KeyValue<String, String>> actualData = outputTopic.readKeyValuesToList();
+            Assertions.assertNotNull(actualData);
+
+            //Validate the Provider Payload
+            TypeReference<DataEnvelope<ProviderFull>> providerFullDataEnv = new TypeReference<>() {};
+            DataEnvelope<ProviderFull> actualValue
+                    = new ObjectMapper().readValue(actualData.get(0).value, providerFullDataEnv);
+            Assertions.assertEquals(expectedPf, actualValue.getPayload());
+            Assertions.assertEquals(JsonSchemaUtils.getSchema(expectedPf).toJsonNode(), actualValue.getSchema());
+
+            //Validate the Provider Key
+            TypeReference<DataEnvelope<ProviderKey>> providerKeyDataEnv = new TypeReference<>() {};
+            DataEnvelope<ProviderKey> actualKey
+                    = new ObjectMapper().readValue(actualData.get(0).key, providerKeyDataEnv);
+            Assertions.assertEquals(expectedProviderKey, actualKey.getPayload());
+            Assertions.assertEquals(JsonSchemaUtils.getSchema(expectedProviderKey).toJsonNode(), actualKey.getSchema());
+
         }
     }
 
@@ -134,7 +169,7 @@ public class KafkaStreamsServiceTest {
         p.setAddAuthNested(readFileData("PersonAddAuthUser.json"));
         p.setChgAuthNested(readFileData("PersonChgAuthUser.json"));
         p.setEntityData(readFileData("PersonEntityData.json"));
-        p.setEmail(readFileData("PersonEmail.json"));
+        p.setEmailNested(readFileData("PersonEmail.json"));
         return p;
     }
 
@@ -147,7 +182,7 @@ public class KafkaStreamsServiceTest {
         p.setAddAuthNested(readFileData("PersonAddAuthUser.json"));
         p.setChgAuthNested(readFileData("PersonChgAuthUser.json"));
         p.setEntityData(readFileData("PersonEntityData.json"));
-        p.setEmail(readFileData("PersonEmail.json"));
+        p.setEmailNested(readFileData("PersonEmail.json"));
         return p;
     }
 

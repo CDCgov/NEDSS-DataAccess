@@ -1,5 +1,7 @@
 package gov.cdc.etldatapipeline.person.service;
 
+import gov.cdc.etldatapipeline.person.model.dto.patient.PatientKey;
+import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderKey;
 import gov.cdc.etldatapipeline.person.model.odse.Person;
 import gov.cdc.etldatapipeline.person.repository.PatientRepository;
 import gov.cdc.etldatapipeline.person.repository.ProviderRepository;
@@ -40,7 +42,7 @@ public class KafkaStreamsService {
 
     @Autowired
     public void processMessage(StreamsBuilder streamsBuilder) {
-
+        UtilHelper utilHelper = new UtilHelper();
         KStream<String, Person> personKStream
                 = streamsBuilder.stream(personTopicName, Consumed.with(Serdes.String(), Serdes.String()))
                 .map((k, v) -> new KeyValue<>(
@@ -57,22 +59,30 @@ public class KafkaStreamsService {
                                         patientRepository.computePatients(v.getPersonUid()))
                                 //KStream<String, List<Patient>>
                                 .flatMap((k, v) -> v.stream()
-                                        .map(p -> KeyValue.pair(p.getPersonUid(), p.constructPatientEnvelope()))
+                                        .map(p -> KeyValue.pair(
+                                                utilHelper.constructDataEnvelope(new PatientKey(p.getPersonUid())),
+                                                utilHelper.constructDataEnvelope(p.processPatient())))
                                         .collect(Collectors.toSet()))
                                 .peek((key, value) -> log.info("Patient : {}", value.toString()))
                                 .to((key, v, recordContext) -> patientOutputTopicName,
-                                        Produced.with(Serdes.Long(), StreamsSerdes.PatientEnvelopeSerde()))))
+                                        Produced.with(
+                                                StreamsSerdes.DataEnvelopeSerde(),
+                                                StreamsSerdes.DataEnvelopeSerde()))))
                 .branch((k, v) -> v.getCd() != null && v.getCd().equalsIgnoreCase("PRV"),
                         Branched.withConsumer(ks -> ks
                                 .mapValues(v ->
                                         providerRepository.computeProviders(v.getPersonUid()))
                                 //KStream<String, List<Patient>>
                                 .flatMap((k, v) -> v.stream()
-                                        .map(p -> KeyValue.pair(p.getPersonUid(), p.constructPatientEnvelope()))
+                                        .map(p -> KeyValue.pair(
+                                                utilHelper.constructDataEnvelope(new ProviderKey(p.getPersonUid())),
+                                                utilHelper.constructDataEnvelope(p.processProvider())))
                                         .collect(Collectors.toSet()))
                                 .peek((key, value) -> log.info("Provider : {}", value.toString()))
                                 .to((key, v, recordContext) -> providerOutputTopicName,
-                                        Produced.with(Serdes.Long(), StreamsSerdes.ProviderEnvelopeSerde()))))
+                                        Produced.with(
+                                                StreamsSerdes.DataEnvelopeSerde(),
+                                                StreamsSerdes.DataEnvelopeSerde()))))
                 .defaultBranch(Branched.withConsumer(ks -> ks.to(defaultDataTopicName,
                         Produced.with(Serdes.String(), StreamsSerdes.PersonSerde()))));
     }

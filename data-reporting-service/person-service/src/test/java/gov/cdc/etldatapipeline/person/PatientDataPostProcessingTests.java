@@ -27,7 +27,7 @@ public class PatientDataPostProcessingTests {
         p.setAddAuthNested(readFileData("PersonAddAuthUser.json"));
         p.setChgAuthNested(readFileData("PersonChgAuthUser.json"));
         p.setEntityData(readFileData("PersonEntityData.json"));
-        p.setEmail(readFileData("PersonEmail.json"));
+        p.setEmailNested(readFileData("PersonEmail.json"));
 
         // PatientProvider Fields to be processed
         Function<PatientFull, List<Object>> pDetailsFn = (pf) -> Arrays.asList(
@@ -262,7 +262,7 @@ public class PatientDataPostProcessingTests {
 
         // Build the PatientProvider object with the json serialized data
         Patient patient = new Patient();
-        patient.setEmail(readFileData("PersonEmail.json"));
+        patient.setEmailNested(readFileData("PersonEmail.json"));
 
         // PatientProvider Fields to be processed
         Function<PatientFull, List<String>> pDetailsFn = (p) -> Collections.singletonList(p.getEmail());

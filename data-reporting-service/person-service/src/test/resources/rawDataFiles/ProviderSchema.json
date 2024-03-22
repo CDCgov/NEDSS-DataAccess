@@ -268,7 +268,7 @@
         }
       ]
     },
-    "email": {
+    "emailNested": {
       "oneOf": [
         {
           "type": "null",
@@ -478,6 +478,17 @@
       ]
     },
     "phoneCell": {
+      "oneOf": [
+        {
+          "type": "null",
+          "title": "Not included"
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "email": {
       "oneOf": [
         {
           "type": "null",

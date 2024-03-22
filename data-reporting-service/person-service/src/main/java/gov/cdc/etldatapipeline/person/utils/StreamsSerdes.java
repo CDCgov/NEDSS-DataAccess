@@ -1,8 +1,7 @@
 package gov.cdc.etldatapipeline.person.utils;
 
+import gov.cdc.etldatapipeline.person.model.dto.DataEnvelope;
 import gov.cdc.etldatapipeline.person.model.dto.OrganizationOP;
-import gov.cdc.etldatapipeline.person.model.dto.patient.PatientEnvelope;
-import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderEnvelope;
 import gov.cdc.etldatapipeline.person.model.odse.Person;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
@@ -11,12 +10,8 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 
 public class StreamsSerdes extends Serdes {
 
-    public static Serde<PatientEnvelope> PatientEnvelopeSerde() {
-        return new PatientEnvelopeSerde();
-    }
-
-    public static Serde<ProviderEnvelope> ProviderEnvelopeSerde() {
-        return new ProviderEnvelopeSerde();
+    public static Serde<DataEnvelope> DataEnvelopeSerde() {
+        return new DataEnvelopeSerde();
     }
 
     public static Serde<Person> PersonSerde() {
@@ -32,17 +27,10 @@ public class StreamsSerdes extends Serdes {
         }
     }
 
-    public static final class PatientEnvelopeSerde extends WrapperSerde<PatientEnvelope> {
-        public PatientEnvelopeSerde() {
+    public static final class DataEnvelopeSerde extends WrapperSerde<DataEnvelope> {
+        public DataEnvelopeSerde() {
             super(new JsonSerializer<>(),
-                    new JsonDeserializer<>(PatientEnvelope.class, false));
-        }
-    }
-
-    public static final class ProviderEnvelopeSerde extends WrapperSerde<ProviderEnvelope> {
-        public ProviderEnvelopeSerde() {
-            super(new JsonSerializer<>(),
-                    new JsonDeserializer<>(ProviderEnvelope.class, false));
+                    new JsonDeserializer<>(DataEnvelope.class, false));
         }
     }
 

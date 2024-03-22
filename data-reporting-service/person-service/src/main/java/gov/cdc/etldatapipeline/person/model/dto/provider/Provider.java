@@ -3,6 +3,7 @@ package gov.cdc.etldatapipeline.person.model.dto.provider;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import gov.cdc.etldatapipeline.person.model.dto.DataEnvelope;
 import gov.cdc.etldatapipeline.person.utils.DataPostProcessor;
 import io.confluent.kafka.schemaregistry.json.JsonSchema;
 import io.confluent.kafka.schemaregistry.json.JsonSchemaUtils;
@@ -74,7 +75,7 @@ public class Provider {
     @Column(name = "PROVIDER_TELEPHONE_NESTED")
     private String telephone;
     @Column(name = "PROVIDER_EMAIL_NESTED")
-    private String email;
+    private String emailNested;
     @Column(name = "PROVIDER_ENTITY_ID_NESTED")
     private String entityData;
     @Column(name = "PROVIDER_ADD_AUTH_NESTED")
@@ -92,7 +93,7 @@ public class Provider {
             processor.processPersonAddAuth(addAuthNested, pf);
             processor.processPersonChangeAuth(chgAuthNested, pf);
             processor.processPersonEntityData(entityData, pf);
-            processor.processPersonEmail(email, pf);
+            processor.processPersonEmail(emailNested, pf);
 
         } catch (JsonProcessingException e) {
             log.error("JsonProcessingException: ", e);
@@ -100,7 +101,7 @@ public class Provider {
         return pf;
     }
 
-    public ProviderEnvelope constructPatientEnvelope() {
+    public DataEnvelope constructPatientEnvelope() {
         ProviderFull pf = processProvider();
         JsonNode jsonNode;
         try {
@@ -110,7 +111,7 @@ public class Provider {
             //ToDo: Replace with Generic ExceptionHandler
             throw new RuntimeException(e);
         }
-        return new ProviderEnvelope(jsonNode, pf);
+        return new DataEnvelope<>(jsonNode, pf);
     }
 }
 

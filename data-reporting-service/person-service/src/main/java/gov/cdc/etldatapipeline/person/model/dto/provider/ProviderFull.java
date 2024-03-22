@@ -2,16 +2,16 @@ package gov.cdc.etldatapipeline.person.model.dto.provider;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
+@ToString(callSuper = true)
 public class ProviderFull extends Provider implements PersonExtendedProps {
     private String streetAddress1;
     private String streetAddress2;
@@ -84,7 +84,7 @@ public class ProviderFull extends Provider implements PersonExtendedProps {
         setName(p.getName());
         setAddress(p.getAddress());
         setTelephone(p.getTelephone());
-        setEmail(p.getEmail());
+        setEmailNested(p.getEmailNested());
         setEntityData(p.getEntityData());
         setAddAuthNested(p.getAddAuthNested());
         setChgAuthNested(p.getChgAuthNested());

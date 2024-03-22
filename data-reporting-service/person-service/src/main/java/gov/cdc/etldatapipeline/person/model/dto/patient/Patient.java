@@ -3,13 +3,13 @@ package gov.cdc.etldatapipeline.person.model.dto.patient;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import gov.cdc.etldatapipeline.person.model.dto.DataEnvelope;
 import gov.cdc.etldatapipeline.person.utils.DataPostProcessor;
 import io.confluent.kafka.schemaregistry.json.JsonSchema;
 import io.confluent.kafka.schemaregistry.json.JsonSchemaUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,6 @@ import java.util.Objects;
 @Slf4j
 @Data
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Patient {
@@ -126,7 +125,7 @@ public class Patient {
     @Column(name = "PATIENT_TELEPHONE_NESTED")
     private String telephone;
     @Column(name = "PATIENT_EMAIL_NESTED")
-    private String email;
+    private String emailNested;
     @Column(name = "PATIENT_ENTITY_ID_NESTED")
     private String entityData;
     @Column(name = "PATIENT_ADD_AUTH_NESTED")
@@ -149,7 +148,7 @@ public class Patient {
             processor.processPersonAddAuth(addAuthNested, pf);
             processor.processPersonChangeAuth(chgAuthNested, pf);
             processor.processPersonEntityData(entityData, pf);
-            processor.processPersonEmail(email, pf);
+            processor.processPersonEmail(emailNested, pf);
 
         } catch (JsonProcessingException e) {
             log.error("JsonProcessingException: ", e);
@@ -157,7 +156,7 @@ public class Patient {
         return pf;
     }
 
-    public PatientEnvelope constructPatientEnvelope() {
+    public DataEnvelope constructPatientEnvelope() {
         PatientFull pf = processPatient();
         JsonNode jsonNode;
         try {
@@ -167,6 +166,6 @@ public class Patient {
             //ToDo: Replace with Generic ExceptionHandler
             throw new RuntimeException(e);
         }
-        return new PatientEnvelope(jsonNode, pf);
+        return new DataEnvelope(jsonNode, pf);
     }
 }
