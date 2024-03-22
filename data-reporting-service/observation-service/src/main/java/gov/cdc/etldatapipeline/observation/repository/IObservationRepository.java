@@ -10,6 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface IObservationRepository extends JpaRepository<Observation, String> {
+
     @Query(nativeQuery = true, value = "execute sp_Observation_Event :observation_uids")
-    Optional<Observation> computePatients(@Param("observation_uids") String observation_uids);
+    Optional<Observation> computeObservations(@Param("observation_uids") String observation_uids);
 }

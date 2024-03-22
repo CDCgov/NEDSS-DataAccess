@@ -1,26 +1,18 @@
 spring:
   kafka:
-    producer:
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      key-serializer: org.springframework.kafka.support.serializer.StringOrBytesSerializer
-    group-id: data-reporting-group
     stream:
       input:
         observation:
-          topic-name: cdc.NBS_ODSE.dbo.Observation
+          topic-name: cdc.nbs_odse.dbo.Observation
         defaultData:
-          topic-name: cdc.NBS_ODSE.dbo.Default.input
+          topic-name: cdc.nbs_odse.dbo.Default.input
       output:
           observation:
             topic-name: cdc.nbs_odse.dbo.Observation.output
-
+            topic-name-transformed: cdc.nbs_odse.dbo.Observation.output-transformed
     streams:
-      application-id: debezium-cdc-consumer-app-3
+      application-id: debezium-cdc-consumer-app-1
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:localhost:9092}
-    consumer:
-      maxPollIntervalMs: 30000
-      key-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
     admin:
       auto-create: true
   application:
@@ -32,8 +24,8 @@ spring:
   liquibase:
     change-log: db/changelog/db.changelog-master.yaml
 logging:
-  #  Only one config can be active at a time
-#  config: classpath:logback-config.xml
+  # Only one config can be active at a time
+  config: classpath:logback-config.xml
   file:
     name: ObservationService.log
     path: ${DA_LOG_PATH:logs}
