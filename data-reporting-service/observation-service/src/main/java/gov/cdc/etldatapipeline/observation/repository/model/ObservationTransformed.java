@@ -7,11 +7,11 @@ import lombok.*;
 @Setter
 @ToString
 public class ObservationTransformed {
-    private String orderingPersonId;
-    private String patientId;
-    private String performingOrganizationId;
-    private String authorOrganizationId;
-    private String orderingOrganizationId;
-    private String materialId;
-    private String resultObservationUid;
+    private Long orderingPersonId;
+    private Long patientId;
+    private Long performingOrganizationId;
+    private Long authorOrganizationId;
+    private Long orderingOrganizationId;
+    private Long materialId;
+    private Long resultObservationUid;
 }

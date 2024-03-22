@@ -27,9 +27,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class ObservationService {
-    private final IObservationRepository iObservationRepository;
-
-    private static final Logger logger = LoggerFactory.getLogger(ObservationService.class);
 
     @Value("${spring.kafka.stream.input.observation.topic-name}")
     private String observationTopic = "cdc.nbs_odse.dbo.Observation";
@@ -40,11 +37,10 @@ public class ObservationService {
     @Value("${spring.kafka.stream.output.observation.topic-name-transformed}")
     public String observationTopicOutputTransformed = "cdc.nbs_odse.dbo.Observation.output-transformed";
 
+    private final IObservationRepository iObservationRepository;
+    private static final Logger logger = LoggerFactory.getLogger(ObservationService.class);
+
     private String topicDebugLog = "Received Observation ID: {} from topic: {}";
-
-//    Optional<Observation> observationData;
-
-    ObservationTransformed observationTransformed;
 
     private final KafkaTemplate<String, String> kafkaTemplate;
 
@@ -63,21 +59,20 @@ public class ObservationService {
                             if (afterNode != null && afterNode.has("observation_uid")) {
                                 String observationUid = afterNode.get("observation_uid").asText();
                                 logger.debug(topicDebugLog, observationUid, observationTopic);
-                                System.err.println("Received Observation ID..."+observationUid+"...from topic..."+ observationTopic);
                                 Optional<Observation> observationData = iObservationRepository.computeObservations(observationUid);
                                 transformObservationData(observationData);
                                 return observationData.map(observation -> {
                                     try {
                                         return objectMapper.writeValueAsString(observation);
                                     } catch (JsonProcessingException e) {
-                                        e.printStackTrace();
+                                        log.error("Error processing observation: {}", e.getMessage());
                                         return null;
                                     }
                                 }).orElse(null);
                             }
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.error("Error processing observation: {}", e.getMessage());
                     }
                     return null;
                 })
@@ -86,23 +81,23 @@ public class ObservationService {
     }
 
     private void transformObservationData(Optional<Observation> observationData) {
+
         observationData.ifPresent(data -> {
-        String personParticipationsJson = data.getPersonParticipations();
-        String organizationParticipationsJson = data.getOrganizationParticipations();
-        String materialParticipationsJson = data.getMaterialParticipations();
-        String followupObservationsJson = data.getFollowupObservations();
-        String observationDomainStatusCode = data.getObsDomainCdSt1();
+            String personParticipationsJson = data.getPersonParticipations();
+            String organizationParticipationsJson = data.getOrganizationParticipations();
+            String materialParticipationsJson = data.getMaterialParticipations();
+            String followupObservationsJson = data.getFollowupObservations();
+            String observationDomainStatusCode = data.getObsDomainCdSt1();
 
-        observationTransformed = new ObservationTransformed();
+            ObservationTransformed observationTransformed = new ObservationTransformed();
 
-//        if(observationDomainStatusCode.equals("Order")) {
             ObjectMapper objectMapper = new ObjectMapper();
             try {
                 JsonNode personParticipationsJsonArray = personParticipationsJson != null ? objectMapper.readTree(personParticipationsJson) : null;
                 JsonNode organizationParticipationsJsonArray = organizationParticipationsJson != null ? objectMapper.readTree(organizationParticipationsJson) : null;
                 JsonNode materialParticipationsJsonArray = materialParticipationsJson != null ? objectMapper.readTree(materialParticipationsJson) : null;
                 JsonNode followupObservationsJsonArray = followupObservationsJson != null ? objectMapper.readTree(followupObservationsJson) : null;
-
+                log.debug("Transformed object is: {}", observationTransformed);
 
                 if(personParticipationsJson != null && personParticipationsJsonArray.isArray()) {
                     for(JsonNode jsonNode : personParticipationsJsonArray) {
@@ -125,51 +120,39 @@ public class ObservationService {
                     }
                 }
             } catch (JsonProcessingException e) {
-                e.printStackTrace();
+                log.error("Error processing JSON array from observation data: {}", e.getMessage());
             }
-
-//        }
-//        else if(observationDomainStatusCode.equals("Result")) {
-//
-//        }
-//        else {
-//            logger.error("Unknown Observation Domain Status Code found: {}", observationDomainStatusCode);
-//        }
-        System.err.println("transformed obj is..." + observationTransformed.toString());
-        kafkaTemplate.send(observationTopicOutputTransformed, observationTransformed.toString());
+            kafkaTemplate.send(observationTopicOutputTransformed, observationTransformed.toString());
         });
     }
 
     private void processJson(JsonNode jsonNode, ObservationTransformed observationTransformed) {
         String typeCode = jsonNode.get("type_cd").asText();
         String subjectClassCode = jsonNode.get("subject_class_cd").asText();
-//        String domainCdSt1 = String.valueOf(jsonNode.get("domain_cd_st_1"));
-        //String observationDomainStatusCode = observationData.get().getObsDomainCdSt1();
-
 
         if(typeCode != null && subjectClassCode != null &&
                 typeCode.equals("ORD") && subjectClassCode.equals("PSN")) {
-            observationTransformed.setOrderingOrganizationId(String.valueOf(jsonNode.get("entity_id")));
+            observationTransformed.setOrderingOrganizationId(jsonNode.get("entity_id").asLong());
         }
         if (typeCode != null && subjectClassCode != null &&
                 typeCode.equals("PATSBJ") && subjectClassCode.equals("PSN")) {
-            observationTransformed.setPatientId(String.valueOf(jsonNode.get("entity_id")));
+            observationTransformed.setPatientId(jsonNode.get("entity_id").asLong());
         }
         if (typeCode != null && subjectClassCode != null &&
                 typeCode.equals("PRF") && subjectClassCode.equals("ORG")) {
-            observationTransformed.setPerformingOrganizationId(String.valueOf(jsonNode.get("entity_id")));
+            observationTransformed.setPerformingOrganizationId(jsonNode.get("entity_id").asLong());
         }
         if (typeCode != null && subjectClassCode != null &&
                 typeCode.equals("AUT") && subjectClassCode.equals("ORG")) {
-            observationTransformed.setAuthorOrganizationId(String.valueOf(jsonNode.get("entity_id")));
+            observationTransformed.setAuthorOrganizationId(jsonNode.get("entity_id").asLong());
         }
         if (typeCode != null && subjectClassCode != null &&
                 typeCode.equals("ORD") && subjectClassCode.equals("ORG")) {
-            observationTransformed.setOrderingOrganizationId(String.valueOf(jsonNode.get("entity_id")));
+            observationTransformed.setOrderingOrganizationId(jsonNode.get("entity_id").asLong());
         }
         if (typeCode != null && subjectClassCode != null &&
                 typeCode.equals("SPC") && subjectClassCode.equals("MAT")) {
-            observationTransformed.setMaterialId(String.valueOf(jsonNode.get("entity_id")));
+            observationTransformed.setMaterialId(jsonNode.get("entity_id").asLong());
         }
     }
 
@@ -177,7 +160,7 @@ public class ObservationService {
         String domainCdSt1 = jsonNode.get("domain_cd_st_1").asText();
 
         if (observationDomainStatusCode.equalsIgnoreCase("Order") && domainCdSt1 != null && domainCdSt1.equals("Result")) {
-            observationTransformed.setResultObservationUid(jsonNode.get("result_observation_uid").asText());
+            observationTransformed.setResultObservationUid(jsonNode.get("result_observation_uid").asLong());
         }
     }
 }
