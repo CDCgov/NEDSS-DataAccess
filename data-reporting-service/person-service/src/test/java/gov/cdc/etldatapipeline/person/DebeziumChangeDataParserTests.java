@@ -26,7 +26,7 @@ public class DebeziumChangeDataParserTests {
 
     @Test
     public void parseDebeziumValueTest() throws IOException {
-        File file = new File("src/test/resources/rawDataFiles/Person_ChangeData.json");
+        File file = new File("src/test/resources/rawDataFiles/PersonProviderChangeData.json");
         String testData = FileUtils.readFileToString(file,
                 Charset.defaultCharset());
         Person person = UtilHelper.getInstance().deserializePayload(testData,

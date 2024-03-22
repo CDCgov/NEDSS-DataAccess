@@ -6,22 +6,22 @@ spring:
     stream:
       input:
         person:
-          topic-name: cdc.NBS_ODSE.dbo.Person
+          topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Person
         provider:
-          topic-name: cdc.NBS_ODSE.dbo.Provider.input
+          topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Provider.input
         patient:
-          topic-name: cdc.NBS_ODSE.dbo.Patient.input
+          topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Patient.input
         organization:
-          topic-name: cdc.NBS_ODSE.dbo.Organization.input
+          topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Organization.input
         defaultData:
-          topic-name: cdc.NBS_ODSE.dbo.Default.input
+          topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Default.input
       output:
           provider:
-            topic-name: cdc.nbs_odse.dbo.Provider.output
+            topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Provider.output
           patient:
-            topic-name: cdc.nbs_odse.dbo.Patient.output
+            topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Patient.output
           organization:
-            topic-name: cdc.nbs_odse.dbo.Organization.output
+            topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Organization.output
 
     streams:
       application-id: debezium-cdc-consumer-app-1
@@ -36,7 +36,7 @@ spring:
   datasource:
     password: ${DB_PASSWORD:-fake.fake.fake.1234}
     username: ${DB_USERNAME:-sa}
-    url: jdbc:sqlserver://${DB_URL:localhost}:1433;databaseName=${DB_ODSE:NBS_ODSE};encrypt=true;trustServerCertificate=true;
+    url: jdbc:sqlserver://${DB_URL:localhost}:1433;databaseName=${DB_ODSE:nbs_odse};encrypt=true;trustServerCertificate=true;
   liquibase:
     change-log: db/changelog/db.changelog-master.yaml
 logging:
@@ -46,4 +46,4 @@ logging:
     name: PersonService.log
     path: ${DA_LOG_PATH:logs}
 server:
-  port: '8090'
+  port: '8091'

@@ -15,7 +15,7 @@ services:
       - etldatapipeline
 
   zookeeper:
-    image: quay.io/debezium/zookeeper:${DEBEZIUM_VERSION:-2.5}
+    image: confluentinc/cp-zookeeper:${CONFLUENT_VERSION:-7.6.0}
     hostname: zookeeper
     container_name: zookeeper
     ports:
@@ -27,7 +27,7 @@ services:
       - etldatapipeline
 
   broker:
-    image: quay.io/debezium/kafka:${DEBEZIUM_VERSION:-2.5}
+    image: confluentinc/cp-kafka:${CONFLUENT_VERSION:-7.6.0}
     hostname: broker
     container_name: kafka_broker
     depends_on:
@@ -37,16 +37,14 @@ services:
     links:
       - zookeeper
     environment:
-      KAFKA_BROKER_ID: 1.1
-      KAFKA_LISTENERS: 'INTERNAL://broker:29092,EXTERNAL://broker:9092'
-      KAFKA_ADVERTISED_LISTENERS: 'INTERNAL://broker:29092,EXTERNAL://localhost:9092'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT'
-      KAFKA_INTER_BROKER_LISTENER_NAME: 'INTERNAL'
+      KAFKA_BROKER_ID: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
     networks:
       - etldatapipeline
 
@@ -54,9 +52,14 @@ services:
     build:
       context: ./
       dockerfile: ./Dockerfile
+      args:
+        DB_USERNAME: $DB_USERNAME
+        DB_PASSWORD: $DB_PASSWORD
+        DB_URL: $DB_URL
+        DB_ODSE: $DB_ODSE
     ports:
-      - 8080:8080
-    container_name: person-reporting-service
+      - 8090:8090
+    container_name: data-reporting-service
     env_file:
       - etldatapipeline.env
     networks:
@@ -67,7 +70,7 @@ services:
       context: ./person-service
       dockerfile: ./Dockerfile
     ports:
-      - 8090:8090
+      - 8091:8091
     depends_on:
       - broker
     container_name: person-reporting-service
@@ -78,7 +81,7 @@ services:
     networks:
       - etldatapipeline
 
-  connect:
+  debezium-source-connect:
     image: quay.io/debezium/connect:${DEBEZIUM_VERSION:-2.5}
     container_name: Debezium_Change_Data_Connector
     ports:

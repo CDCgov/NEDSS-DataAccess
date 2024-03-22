@@ -13,6 +13,9 @@ java {
 
 repositories {
     mavenCentral()
+    maven {
+        url "https://packages.confluent.io/maven"
+    }
 }
 
 dependencies {
@@ -20,6 +23,8 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     // https://mvnrepository.com/artifact/org.springframework.kafka/spring-kafka
     implementation 'org.springframework.kafka:spring-kafka:3.1.2'
+    // https://mvnrepository.com/artifact/io.confluent/kafka-json-schema-serializer
+    implementation 'io.confluent:kafka-json-schema-serializer:7.6.0'
     // https://mvnrepository.com/artifact/org.apache.kafka/kafka-streams
     implementation 'org.apache.kafka:kafka-streams:3.7.0'
     // https://mvnrepository.com/artifact/io.debezium/debezium-core
@@ -36,6 +41,8 @@ dependencies {
     implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.projectlombok:lombok'
+    // https://mvnrepository.com/artifact/org.apache.kafka/kafka-streams-test-utils
+    testImplementation 'org.apache.kafka:kafka-streams-test-utils:3.7.0'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.testcontainers:testcontainers:1.17.3'
     testImplementation "org.testcontainers:kafka:1.17.3"
