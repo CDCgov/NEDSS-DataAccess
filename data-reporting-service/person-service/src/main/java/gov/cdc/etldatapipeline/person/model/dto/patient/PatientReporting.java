@@ -67,6 +67,7 @@ public class PatientReporting implements PersonExtendedProps, DataRequiredFields
     private String zip;
     private String county;
     private String countyCode;
+    @JsonProperty("country")
     private String countryCode;
     private String withinCityLimits;
     private String birthCountry;

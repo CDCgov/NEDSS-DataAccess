@@ -105,7 +105,7 @@
       {
         "type": "string",
         "optional": true,
-        "field": "country_code"
+        "field": "country"
       },
       {
         "type": "string",
@@ -454,7 +454,7 @@
     "zip": "30025",
     "county": "Gwinnett County",
     "county_code": "13135",
-    "country_code": "840",
+    "country": "840",
     "within_city_limits": null,
     "birth_country": "Canada",
     "census_tract": null,
