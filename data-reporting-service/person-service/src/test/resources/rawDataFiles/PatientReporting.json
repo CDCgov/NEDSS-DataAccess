@@ -125,22 +125,17 @@
       {
         "type": "string",
         "optional": true,
+        "field": "deceased_date"
+      },
+      {
+        "type": "string",
+        "optional": true,
         "field": "race_calc_details"
       },
       {
         "type": "string",
         "optional": true,
-        "field": "street_address1"
-      },
-      {
-        "type": "string",
-        "optional": true,
         "field": "dob"
-      },
-      {
-        "type": "string",
-        "optional": true,
-        "field": "street_address2"
       },
       {
         "type": "string",
@@ -235,6 +230,11 @@
       {
         "type": "string",
         "optional": true,
+        "field": "add_user_name"
+      },
+      {
+        "type": "string",
+        "optional": true,
         "field": "state"
       },
       {
@@ -275,11 +275,6 @@
       {
         "type": "string",
         "optional": true,
-        "field": "patient_deceased_date"
-      },
-      {
-        "type": "string",
-        "optional": true,
         "field": "local_id"
       },
       {
@@ -296,11 +291,6 @@
         "type": "string",
         "optional": true,
         "field": "phone_work"
-      },
-      {
-        "type": "string",
-        "optional": true,
-        "field": "person_nm_seq"
       },
       {
         "type": "string",
@@ -340,6 +330,11 @@
       {
         "type": "string",
         "optional": true,
+        "field": "street_address_2"
+      },
+      {
+        "type": "string",
+        "optional": true,
         "field": "race_calculated"
       },
       {
@@ -375,17 +370,17 @@
       {
         "type": "string",
         "optional": true,
-        "field": "added_user_name"
-      },
-      {
-        "type": "string",
-        "optional": true,
         "field": "age_reported_unit"
       },
       {
         "type": "string",
         "optional": true,
         "field": "email"
+      },
+      {
+        "type": "string",
+        "optional": true,
+        "field": "street_address_1"
       },
       {
         "type": "string",
@@ -430,7 +425,7 @@
     "dob": null,
     "current_sex": null,
     "deceased_indicator": null,
-    "patient_deceased_date": null,
+    "deceased_date": null,
     "general_comments": null,
     "entry_method": null,
     "ethnicity": null,
@@ -446,16 +441,13 @@
     "record_status": null,
     "curr_sex_unk_rsn": null,
     "speaks_english": null,
-    "added_user_name": null,
+    "add_user_name": null,
     "last_chg_user_name": null,
     "first_name": "Suurma",
     "middle_name": "Js",
     "last_name": "Singgh",
     "name_suffix": "Jr",
     "alias_nickname": null,
-    "person_nm_seq": null,
-    "street_address1": "123 Main St.",
-    "street_address2": "",
     "city": "Atlanta",
     "state": "Georgia",
     "state_code": "13",
@@ -478,6 +470,8 @@
     "race_all": null,
     "phone_ext_home": "211",
     "phone_cell": "2823252423",
+    "street_address_1": "123 Main St.",
+    "street_address_2": "",
     "race_amer_ind_1": null,
     "race_amer_ind_2": null,
     "race_amer_ind_3": null,

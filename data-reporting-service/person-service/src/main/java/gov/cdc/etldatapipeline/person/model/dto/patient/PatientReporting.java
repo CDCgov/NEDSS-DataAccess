@@ -28,7 +28,7 @@ public class PatientReporting implements PersonExtendedProps, DataRequiredFields
     private String dob;
     private String currentSex;
     private String deceasedIndicator;
-    private String patientDeceasedDate;
+    private String deceasedDate;
     private String generalComments;
     private String entryMethod;
     private String ethnicity;
@@ -46,7 +46,7 @@ public class PatientReporting implements PersonExtendedProps, DataRequiredFields
     private String speaksEnglish;
 
     // From Function AUTH_USR
-    private String addedUserName;
+    private String addUserName;
     private String lastChgUserName;
 
     //Name from Person_Name ODSE Table
@@ -55,10 +55,11 @@ public class PatientReporting implements PersonExtendedProps, DataRequiredFields
     private String lastName;
     private String nameSuffix;
     private String aliasNickname;
-    private String personNmSeq;
 
     //Address
+    @JsonProperty("street_address_1")
     private String streetAddress1;
+    @JsonProperty("street_address_2")
     private String streetAddress2;
     private String city;
     private String state;
@@ -68,8 +69,6 @@ public class PatientReporting implements PersonExtendedProps, DataRequiredFields
     private String countyCode;
     private String countryCode;
     private String withinCityLimits;
-    /* @JsonProperty("home_country") // ToDo: Do you want to have home_country since birth_country is provided.
-     private String homeCountry;*/
     private String birthCountry;
     private String censusTract;
 
@@ -155,7 +154,7 @@ public class PatientReporting implements PersonExtendedProps, DataRequiredFields
         setDob(p.getBirthTime());
         setCurrentSex(p.getCurrSexCd());
         setDeceasedIndicator(p.getDeceasedIndCd());
-        setPatientDeceasedDate(p.getDeceasedTime());
+        setDeceasedDate(p.getDeceasedTime());
         setGeneralComments(p.getDescription());
         setEntryMethod(p.getElectronicInd());
         setEthnicity(p.getEthnicGroupInd());
@@ -173,7 +172,7 @@ public class PatientReporting implements PersonExtendedProps, DataRequiredFields
         setSpeaksEnglish(p.getSpeaksEnglishCd());
 
         // Fn() - Auth_User
-        setAddedUserName(p.getAddUserName());
+        setAddUserName(p.getAddUserName());
         setLastChgUserName(p.getLastChgUserName());
         return this;
     }
