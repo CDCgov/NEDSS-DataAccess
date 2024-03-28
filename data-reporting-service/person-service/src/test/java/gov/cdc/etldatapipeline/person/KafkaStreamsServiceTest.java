@@ -2,19 +2,16 @@ package gov.cdc.etldatapipeline.person;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import gov.cdc.etldatapipeline.person.model.dto.DataEnvelope;
+import gov.cdc.etldatapipeline.person.model.dto.DataProps.DataEnvelope;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
 import gov.cdc.etldatapipeline.person.model.dto.patient.Patient;
-import gov.cdc.etldatapipeline.person.model.dto.patient.PatientFull;
-import gov.cdc.etldatapipeline.person.model.dto.patient.PatientKey;
+import gov.cdc.etldatapipeline.person.model.dto.patient.PatientReporting;
 import gov.cdc.etldatapipeline.person.model.dto.persondetail.*;
 import gov.cdc.etldatapipeline.person.model.dto.provider.Provider;
-import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderFull;
-import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderKey;
+import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderReporting;
 import gov.cdc.etldatapipeline.person.repository.PatientRepository;
 import gov.cdc.etldatapipeline.person.repository.ProviderRepository;
 import gov.cdc.etldatapipeline.person.service.KafkaStreamsService;
-import io.confluent.kafka.schemaregistry.json.JsonSchemaUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -25,8 +22,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.ClassPathResource;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -45,26 +42,25 @@ public class KafkaStreamsServiceTest {
     ProviderRepository providerRepository;
 
     private final String personTopic = "PersonTopic";
-    private final String patientTopic = "PatientTopic";
+    private final String patientElasticTopic = "PatientElasticTopic";
+    private final String patientReportingTopic = "PatientReportingTopic";
     private final String providerTopic = "ProviderTopic";
-    private final String defaultTopic = "DefaultTopic";
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
 
     @Test
     public void processPatientData() throws IOException {
         // Generate a Debezium Person Patient Change Data
-        File file = new File("src/test/resources/rawDataFiles/PersonPatientChangeData.json");
-        String personPatientOdseData = FileUtils.readFileToString(file,
+        String personPatientOdseData = FileUtils.readFileToString(
+                new ClassPathResource("rawDataFiles/PersonPatientChangeData.json").getFile(),
                 Charset.defaultCharset());
 
         Patient patient = constructPatient();
         Mockito.when(patientRepository.computePatients(anyString())).thenReturn(List.of(patient));
         //Build expected unflattened Provider
-        PatientFull expectedPf = new PatientFull().constructPersonFull(patient);
+        PatientReporting expectedPf = new PatientReporting().constructPatientReporting(patient);
         //Construct transformed patient
         constructPatPrvFull(expectedPf);
-        //Construct expected Patient Key
-        PatientKey expectedPatientKey = new PatientKey(expectedPf.getPersonUid());
 
         StreamsBuilder streamsBuilder = new StreamsBuilder();
         KafkaStreamsService ks = getKafkaStreamService();
@@ -76,46 +72,51 @@ public class KafkaStreamsServiceTest {
             TestInputTopic<String, String> inputTopic = topologyTestDriver
                     .createInputTopic(personTopic, new StringSerializer(), new StringSerializer());
 
-            TestOutputTopic<String, String> outputTopic = topologyTestDriver
-                    .createOutputTopic(patientTopic, new StringDeserializer(), new StringDeserializer());
+            TestOutputTopic<String, String> patientReportingOutputTopic = topologyTestDriver
+                    .createOutputTopic(patientReportingTopic, new StringDeserializer(), new StringDeserializer());
             inputTopic.pipeInput("10000001", personPatientOdseData);
-            List<KeyValue<String, String>> actualData = outputTopic.readKeyValuesToList();
+            List<KeyValue<String, String>> actualData = patientReportingOutputTopic.readKeyValuesToList();
             Assertions.assertNotNull(actualData);
 
             //Validate the Patient Payload
-            TypeReference<DataEnvelope<PatientFull>> patientFullDataEnv = new TypeReference<>() {};
+            TypeReference<DataEnvelope> dataEnvelopeTypeReference = new TypeReference<>() {
+            };
 
-            DataEnvelope<PatientFull> actualValue
-                    = new ObjectMapper().readValue(actualData.get(0).value, patientFullDataEnv);
-            Assertions.assertEquals(expectedPf, actualValue.getPayload());
-            Assertions.assertEquals(JsonSchemaUtils.getSchema(expectedPf).toJsonNode(), actualValue.getSchema());
+            DataEnvelope<PatientReporting> actualValue
+                    = objectMapper.readValue(actualData.get(0).value, dataEnvelopeTypeReference);
+            Assertions.assertEquals(
+                    objectMapper.readValue(FileUtils.readFileToString(
+                                    new ClassPathResource("rawDataFiles/PatientReporting.json").getFile(),
+                                    Charset.defaultCharset()),
+                            dataEnvelopeTypeReference),
+                    actualValue);
 
             //Validate the Patient Key
-            TypeReference<DataEnvelope<PatientKey>> patientKeyDataEnv = new TypeReference<>() {};
-            DataEnvelope<PatientKey> actualKey
-                    = new ObjectMapper().readValue(actualData.get(0).key, patientKeyDataEnv);
-            Assertions.assertEquals(expectedPatientKey, actualKey.getPayload());
-            Assertions.assertEquals(JsonSchemaUtils.getSchema(expectedPatientKey).toJsonNode(), actualKey.getSchema());
-
+            DataEnvelope<DataEnvelope> actualKey
+                    = objectMapper.readValue(actualData.get(0).key, dataEnvelopeTypeReference);
+            Assertions.assertEquals(
+                    objectMapper.readValue(FileUtils.readFileToString(
+                                    new ClassPathResource("rawDataFiles/PatientKey.json").getFile(),
+                                    Charset.defaultCharset()),
+                            dataEnvelopeTypeReference),
+                    actualKey);
         }
     }
 
     @Test
     public void processProviderData() throws IOException {
         // Generate a Debezium Person Patient Change Data
-        File file = new File("src/test/resources/rawDataFiles/PersonProviderChangeData.json");
-        String personPatientOdseData = FileUtils.readFileToString(file,
+        String personProviderOdseData = FileUtils.readFileToString(
+                new ClassPathResource("rawDataFiles/PersonProviderChangeData.json").getFile(),
                 Charset.defaultCharset());
 
         Provider constructedProvider = constructProvider();
         Mockito.when(providerRepository.computeProviders(anyString())).thenReturn(List.of(constructedProvider));
 
         //Build expected unflattened Provider
-        ProviderFull expectedPf = new ProviderFull().constructProviderFull(constructedProvider);
+        ProviderReporting expectedPf = new ProviderReporting().constructProviderFull(constructedProvider);
         //Augment Provider with the flattened data
         constructPatPrvFull(expectedPf);
-        //Construct expected Provider Key
-        ProviderKey expectedProviderKey = new ProviderKey(expectedPf.getPersonUid());
 
         StreamsBuilder streamsBuilder = new StreamsBuilder();
         KafkaStreamsService ks = getKafkaStreamService();
@@ -129,46 +130,54 @@ public class KafkaStreamsServiceTest {
 
             TestOutputTopic<String, String> outputTopic = topologyTestDriver
                     .createOutputTopic(providerTopic, new StringDeserializer(), new StringDeserializer());
-            inputTopic.pipeInput("10000001", personPatientOdseData);
+            inputTopic.pipeInput("10000001", personProviderOdseData);
             List<KeyValue<String, String>> actualData = outputTopic.readKeyValuesToList();
             Assertions.assertNotNull(actualData);
 
             //Validate the Provider Payload
-            TypeReference<DataEnvelope<ProviderFull>> providerFullDataEnv = new TypeReference<>() {};
-            DataEnvelope<ProviderFull> actualValue
-                    = new ObjectMapper().readValue(actualData.get(0).value, providerFullDataEnv);
-            Assertions.assertEquals(expectedPf, actualValue.getPayload());
-            Assertions.assertEquals(JsonSchemaUtils.getSchema(expectedPf).toJsonNode(), actualValue.getSchema());
+            TypeReference<DataEnvelope> dataEnvelopeTypeReference = new TypeReference<>() {
+            };
 
-            //Validate the Provider Key
-            TypeReference<DataEnvelope<ProviderKey>> providerKeyDataEnv = new TypeReference<>() {};
-            DataEnvelope<ProviderKey> actualKey
-                    = new ObjectMapper().readValue(actualData.get(0).key, providerKeyDataEnv);
-            Assertions.assertEquals(expectedProviderKey, actualKey.getPayload());
-            Assertions.assertEquals(JsonSchemaUtils.getSchema(expectedProviderKey).toJsonNode(), actualKey.getSchema());
+            DataEnvelope<DataEnvelope> actualValue
+                    = objectMapper.readValue(actualData.get(0).value, dataEnvelopeTypeReference);
+            Assertions.assertEquals(
+                    objectMapper.readValue(FileUtils.readFileToString(
+                                    new ClassPathResource("rawDataFiles/ProviderReporting.json").getFile(),
+                                    Charset.defaultCharset()),
+                            dataEnvelopeTypeReference),
+                    actualValue);
 
+            //Validate the Patient Key
+            DataEnvelope<DataEnvelope> actualKey
+                    = objectMapper.readValue(actualData.get(0).key, dataEnvelopeTypeReference);
+            //Construct expected Patient Key
+            Assertions.assertEquals(
+                    objectMapper.readValue(FileUtils.readFileToString(
+                                    new ClassPathResource("rawDataFiles/ProviderKey.json").getFile(),
+                                    Charset.defaultCharset()),
+                            dataEnvelopeTypeReference),
+                    actualKey);
         }
     }
+
 
     private KafkaStreamsService getKafkaStreamService() {
         KafkaStreamsService ks = new KafkaStreamsService(patientRepository, providerRepository);
         ks.setPersonTopicName(personTopic);
-        ks.setPatientOutputTopicName(patientTopic);
-        ks.setProviderOutputTopicName(providerTopic);
-        ks.setDefaultDataTopicName(defaultTopic);
+        ks.setPatientElasticSearchTopicName(patientElasticTopic);
+        ks.setPatientReportingOutputTopic(patientReportingTopic);
+        ks.setProviderReportingOutputTopic(providerTopic);
         return ks;
     }
 
     private Patient constructPatient() {
         Patient p = new Patient();
-        p.setPersonUid(10000001L);
-        p.setName(readFileData("PersonName.json"));
-        p.setAddress(readFileData("PersonAddress.json"));
-        p.setRace(readFileData("PersonRace.json"));
-        p.setTelephone(readFileData("PersonTelephone.json"));
-        p.setAddAuthNested(readFileData("PersonAddAuthUser.json"));
-        p.setChgAuthNested(readFileData("PersonChgAuthUser.json"));
-        p.setEntityData(readFileData("PersonEntityData.json"));
+        p.setPatientUid(10000001L);
+        p.setNameNested(readFileData("PersonName.json"));
+        p.setAddressNested(readFileData("PersonAddress.json"));
+        p.setRaceNested(readFileData("PersonRace.json"));
+        p.setTelephoneNested(readFileData("PersonTelephone.json"));
+        p.setEntityDataNested(readFileData("PersonEntityData.json"));
         p.setEmailNested(readFileData("PersonEmail.json"));
         return p;
     }
@@ -176,12 +185,10 @@ public class KafkaStreamsServiceTest {
     private Provider constructProvider() {
         Provider p = new Provider();
         p.setPersonUid(10000001L);
-        p.setName(readFileData("PersonName.json"));
-        p.setAddress(readFileData("PersonAddress.json"));
-        p.setTelephone(readFileData("PersonTelephone.json"));
-        p.setAddAuthNested(readFileData("PersonAddAuthUser.json"));
-        p.setChgAuthNested(readFileData("PersonChgAuthUser.json"));
-        p.setEntityData(readFileData("PersonEntityData.json"));
+        p.setNameNested(readFileData("PersonName.json"));
+        p.setAddressNested(readFileData("PersonAddress.json"));
+        p.setTelephoneNested(readFileData("PersonTelephone.json"));
+        p.setEntityDataNested(readFileData("PersonEntityData.json"));
         p.setEmailNested(readFileData("PersonEmail.json"));
         return p;
     }
@@ -232,16 +239,6 @@ public class KafkaStreamsServiceTest {
         race.setRaceCategoryCd("2028-9");
         race.setRaceDescTxt("Amer Indian");
         race.updatePerson(patProv);
-
-
-        AddAuthUser addAuthUser = new AddAuthUser();
-        addAuthUser.setAddUserId(10000000L);
-        addAuthUser.updatePerson(patProv);
-
-
-        ChgAuthUser chgAuthUser = new ChgAuthUser();
-        chgAuthUser.setLastChgUserId(470200741L);
-        chgAuthUser.updatePerson(patProv);
 
 
         EntityData ssa = new EntityData();

@@ -1,22 +1,29 @@
 package gov.cdc.etldatapipeline.person.utils;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import gov.cdc.etldatapipeline.person.model.dto.DataEnvelope;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import gov.cdc.etldatapipeline.person.model.dto.DataProps.DataEnvelope;
+import gov.cdc.etldatapipeline.person.model.dto.DataProps.DataField;
+import gov.cdc.etldatapipeline.person.model.dto.DataProps.DataSchema;
+import gov.cdc.etldatapipeline.person.model.dto.DataRequiredFields;
 import gov.cdc.etldatapipeline.person.model.odse.DebeziumMetadata;
-import io.confluent.kafka.schemaregistry.json.JsonSchema;
-import io.confluent.kafka.schemaregistry.json.JsonSchemaUtils;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Slf4j
 @NoArgsConstructor
 public class UtilHelper {
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule());
 
     private static UtilHelper utilHelper;
 
@@ -43,7 +50,7 @@ public class UtilHelper {
             JsonNode jsonTree = objectMapper.readTree(jsonString);
             JsonNode rootNode = jsonTree.at(nodeName);
             T dMetadata = objectMapper.convertValue(rootNode, type);
-            if(!Objects.isNull(dMetadata)) {
+            if (!Objects.isNull(dMetadata)) {
                 if (!Objects.isNull(jsonTree.at("/payload/ts_ms")))
                     dMetadata.setTs_ms(jsonTree.at("/payload/ts_ms").asLong());
                 if (!Objects.isNull(jsonTree.at("/payload/op")))
@@ -68,15 +75,33 @@ public class UtilHelper {
         return null;
     }
 
-    public <T> DataEnvelope constructDataEnvelope(T obj) {
-        JsonNode jsonNode;
+    public <T extends DataRequiredFields> DataEnvelope constructDataEnvelope(T obj) {
+        Set<DataField> dataFields = new HashSet<>();
         try {
-            JsonSchema schema = JsonSchemaUtils.getSchema(obj);
-            jsonNode = Objects.isNull(schema) ? null : schema.toJsonNode();
-        } catch (IOException e) {
-            //ToDo: Replace with Generic ExceptionHandler
-            throw new RuntimeException(e);
+            for (Field field : obj.getClass().getDeclaredFields()) {
+                DataField dataField = new DataField();
+                if (field.isAnnotationPresent(JsonProperty.class)) {
+                    dataField.setField(field.getAnnotation(JsonProperty.class).value());
+                } else {
+                    dataField.setField(PropertyNamingStrategies.SnakeCaseStrategy.INSTANCE.translate(field.getName()));
+                }
+                dataField.setOptional(
+                        obj.getRequiredFields() == null || !obj.getRequiredFields().contains(field.getName()));
+                dataField.setType(getType(field.getType().getSimpleName().toLowerCase()));
+                dataFields.add(dataField);
+            }
+        } catch (Exception e) {
+            throw e;
         }
-        return new DataEnvelope<>(jsonNode, obj);
+        return new DataEnvelope(new DataSchema("struct", dataFields), obj);
+    }
+
+    private String getType(String javaType) {
+        return switch (javaType.toLowerCase()) {
+            case "long" -> "int64";
+            case "integer", "int" -> "int32";
+            case "string" -> "string";
+            default -> null;
+        };
     }
 }

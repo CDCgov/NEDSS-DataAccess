@@ -1,0 +1,15 @@
+{
+  "schema": {
+    "type": "struct",
+    "dataFields": [
+      {
+        "type": "int64",
+        "optional": false,
+        "field": "provider_uid"
+      }
+    ]
+  },
+  "payload": {
+    "provider_uid": 10000001
+  }
+}

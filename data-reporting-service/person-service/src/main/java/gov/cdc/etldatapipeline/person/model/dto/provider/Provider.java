@@ -2,26 +2,17 @@ package gov.cdc.etldatapipeline.person.model.dto.provider;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import gov.cdc.etldatapipeline.person.model.dto.DataEnvelope;
 import gov.cdc.etldatapipeline.person.utils.DataPostProcessor;
-import io.confluent.kafka.schemaregistry.json.JsonSchema;
-import io.confluent.kafka.schemaregistry.json.JsonSchemaUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
-import java.util.Objects;
-
 @Slf4j
 @Data
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Provider {
@@ -68,50 +59,35 @@ public class Provider {
     private Long addUserId;
     @Column(name = "last_chg_user_id")
     private Long lastChgUserId;
-    @Column(name = "PROVIDER_NAME_NESTED")
-    private String name;
-    @Column(name = "PROVIDER_ADDRESS_NESTED")
-    private String address;
-    @Column(name = "PROVIDER_TELEPHONE_NESTED")
-    private String telephone;
-    @Column(name = "PROVIDER_EMAIL_NESTED")
+    @Column(name = "add_user_name")
+    private String addUserName;
+    @Column(name = "last_chg_user_name")
+    private String lastChgUserName;
+    @Column(name = "provider_name")
+    private String nameNested;
+    @Column(name = "provider_address")
+    private String addressNested;
+    @Column(name = "provider_telephone")
+    private String telephoneNested;
+    @Column(name = "provider_email")
     private String emailNested;
-    @Column(name = "PROVIDER_ENTITY_ID_NESTED")
-    private String entityData;
-    @Column(name = "PROVIDER_ADD_AUTH_NESTED")
-    private String addAuthNested;
-    @Column(name = "PROVIDER_CHG_AUTH_NESTED")
-    private String chgAuthNested;
+    @Column(name = "provider_entity")
+    private String entityDataNested;
 
-    public ProviderFull processProvider() {
-        ProviderFull pf = new ProviderFull().constructProviderFull(this);
+    public ProviderReporting processProvider() {
+        ProviderReporting pf = new ProviderReporting().constructProviderFull(this);
         DataPostProcessor processor = new DataPostProcessor();
         try {
-            processor.processPersonName(name, pf);
-            processor.processPersonAddress(address, pf);
-            processor.processPersonTelephone(telephone, pf);
-            processor.processPersonAddAuth(addAuthNested, pf);
-            processor.processPersonChangeAuth(chgAuthNested, pf);
-            processor.processPersonEntityData(entityData, pf);
+            processor.processPersonName(nameNested, pf);
+            processor.processPersonAddress(addressNested, pf);
+            processor.processPersonTelephone(telephoneNested, pf);
+            processor.processPersonEntityData(entityDataNested, pf);
             processor.processPersonEmail(emailNested, pf);
-
         } catch (JsonProcessingException e) {
             log.error("JsonProcessingException: ", e);
         }
         return pf;
     }
 
-    public DataEnvelope constructPatientEnvelope() {
-        ProviderFull pf = processProvider();
-        JsonNode jsonNode;
-        try {
-            JsonSchema schema = JsonSchemaUtils.getSchema(pf);
-            jsonNode = Objects.isNull(schema) ? null : schema.toJsonNode();
-        } catch (IOException e) {
-            //ToDo: Replace with Generic ExceptionHandler
-            throw new RuntimeException(e);
-        }
-        return new DataEnvelope<>(jsonNode, pf);
-    }
 }
 
