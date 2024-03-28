@@ -1,7 +1,17 @@
 {
   "schema": {
     "type": "struct",
-    "dataFields": [
+    "fields": [
+      {
+        "type": "string",
+        "optional": true,
+        "field": "race_amer_ind_2"
+      },
+      {
+        "type": "string",
+        "optional": true,
+        "field": "race_amer_ind_1"
+      },
       {
         "type": "string",
         "optional": true,
@@ -10,12 +20,22 @@
       {
         "type": "string",
         "optional": true,
-        "field": "added_by"
+        "field": "first_name"
       },
       {
         "type": "string",
         "optional": true,
         "field": "census_tract"
+      },
+      {
+        "type": "string",
+        "optional": true,
+        "field": "race_black_2"
+      },
+      {
+        "type": "string",
+        "optional": true,
+        "field": "race_black_1"
       },
       {
         "type": "string",
@@ -35,7 +55,7 @@
       {
         "type": "string",
         "optional": true,
-        "field": "last_name"
+        "field": "race_black_3"
       },
       {
         "type": "string",
@@ -56,6 +76,11 @@
         "type": "string",
         "optional": true,
         "field": "phone_ext_home"
+      },
+      {
+        "type": "string",
+        "optional": true,
+        "field": "middle_name"
       },
       {
         "type": "string",
@@ -95,32 +120,12 @@
       {
         "type": "string",
         "optional": true,
-        "field": "electronic_ind"
-      },
-      {
-        "type": "string",
-        "optional": true,
         "field": "marital_status"
       },
       {
         "type": "string",
         "optional": true,
-        "field": "race_white1"
-      },
-      {
-        "type": "string",
-        "optional": true,
-        "field": "race_white3"
-      },
-      {
-        "type": "string",
-        "optional": true,
         "field": "race_calc_details"
-      },
-      {
-        "type": "string",
-        "optional": true,
-        "field": "race_white2"
       },
       {
         "type": "string",
@@ -145,17 +150,12 @@
       {
         "type": "string",
         "optional": true,
-        "field": "race_amer_ind1"
+        "field": "last_chg_user_name"
       },
       {
         "type": "string",
         "optional": true,
         "field": "race_asian_all"
-      },
-      {
-        "type": null,
-        "optional": true,
-        "field": "log"
       },
       {
         "type": "string",
@@ -176,16 +176,6 @@
         "type": "string",
         "optional": true,
         "field": "city"
-      },
-      {
-        "type": "string",
-        "optional": true,
-        "field": "race_amer_ind2"
-      },
-      {
-        "type": "string",
-        "optional": true,
-        "field": "race_amer_ind3"
       },
       {
         "type": "string",
@@ -223,6 +213,11 @@
         "field": "ssn"
       },
       {
+        "type": "string",
+        "optional": true,
+        "field": "entry_method"
+      },
+      {
         "type": "int64",
         "optional": true,
         "field": "last_chg_user_id"
@@ -231,11 +226,6 @@
         "type": "string",
         "optional": true,
         "field": "patient_number"
-      },
-      {
-        "type": "string",
-        "optional": true,
-        "field": "race_asian2"
       },
       {
         "type": "string",
@@ -250,17 +240,12 @@
       {
         "type": "string",
         "optional": true,
-        "field": "race_asian1"
-      },
-      {
-        "type": "string",
-        "optional": true,
         "field": "primary_language"
       },
       {
         "type": "string",
         "optional": true,
-        "field": "race_asian3"
+        "field": "last_name"
       },
       {
         "type": "string",
@@ -270,17 +255,17 @@
       {
         "type": "string",
         "optional": true,
-        "field": "race_black3"
+        "field": "race_asian_1"
       },
       {
         "type": "string",
         "optional": true,
-        "field": "race_black2"
+        "field": "race_asian_3"
       },
       {
         "type": "string",
         "optional": true,
-        "field": "race_black1"
+        "field": "race_asian_2"
       },
       {
         "type": "string",
@@ -315,21 +300,6 @@
       {
         "type": "string",
         "optional": true,
-        "field": "race_nat_hi1"
-      },
-      {
-        "type": "string",
-        "optional": true,
-        "field": "race_nat_hi2"
-      },
-      {
-        "type": "string",
-        "optional": true,
-        "field": "race_nat_hi3"
-      },
-      {
-        "type": "string",
-        "optional": true,
         "field": "person_nm_seq"
       },
       {
@@ -355,11 +325,6 @@
       {
         "type": "string",
         "optional": true,
-        "field": "last_updated_by"
-      },
-      {
-        "type": "string",
-        "optional": true,
         "field": "race_black_all"
       },
       {
@@ -375,11 +340,6 @@
       {
         "type": "string",
         "optional": true,
-        "field": "middle_name"
-      },
-      {
-        "type": "string",
-        "optional": true,
         "field": "race_calculated"
       },
       {
@@ -390,12 +350,32 @@
       {
         "type": "string",
         "optional": true,
+        "field": "race_nat_hi_1"
+      },
+      {
+        "type": "string",
+        "optional": true,
+        "field": "race_nat_hi_2"
+      },
+      {
+        "type": "string",
+        "optional": true,
+        "field": "race_nat_hi_3"
+      },
+      {
+        "type": "string",
+        "optional": true,
         "field": "race_white_gt3_ind"
       },
       {
         "type": "string",
         "optional": true,
         "field": "race_amer_ind_all"
+      },
+      {
+        "type": "string",
+        "optional": true,
+        "field": "added_user_name"
       },
       {
         "type": "string",
@@ -415,12 +395,27 @@
       {
         "type": "string",
         "optional": true,
+        "field": "race_white_2"
+      },
+      {
+        "type": "string",
+        "optional": true,
+        "field": "race_white_1"
+      },
+      {
+        "type": "string",
+        "optional": true,
+        "field": "race_white_3"
+      },
+      {
+        "type": "string",
+        "optional": true,
         "field": "name_suffix"
       },
       {
         "type": "string",
         "optional": true,
-        "field": "first_name"
+        "field": "race_amer_ind_3"
       }
     ]
   },
@@ -437,7 +432,7 @@
     "deceased_indicator": null,
     "patient_deceased_date": null,
     "general_comments": null,
-    "electronic_ind": null,
+    "entry_method": null,
     "ethnicity": null,
     "unk_ethnic_rsn": null,
     "last_chg_user_id": null,
@@ -451,8 +446,8 @@
     "record_status": null,
     "curr_sex_unk_rsn": null,
     "speaks_english": null,
-    "added_by": null,
-    "last_updated_by": null,
+    "added_user_name": null,
+    "last_chg_user_name": null,
     "first_name": "Suurma",
     "middle_name": "Js",
     "last_name": "Singgh",
@@ -481,32 +476,32 @@
     "race_calculated": null,
     "race_calc_details": null,
     "race_all": null,
-    "race_amer_ind1": null,
-    "race_amer_ind2": null,
-    "race_amer_ind3": null,
+    "phone_ext_home": "211",
+    "phone_cell": "2823252423",
+    "race_amer_ind_1": null,
+    "race_amer_ind_2": null,
+    "race_amer_ind_3": null,
     "race_amer_ind_gt3_ind": null,
     "race_amer_ind_all": null,
-    "race_asian1": null,
-    "race_asian2": null,
-    "race_asian3": null,
+    "race_asian_1": null,
+    "race_asian_2": null,
+    "race_asian_3": null,
     "race_asian_gt3_ind": null,
     "race_asian_all": null,
-    "race_black1": null,
-    "race_black2": null,
-    "race_black3": null,
+    "race_black_1": null,
+    "race_black_2": null,
+    "race_black_3": null,
     "race_black_gt3_ind": null,
     "race_black_all": null,
-    "race_nat_hi1": null,
-    "race_nat_hi2": null,
-    "race_nat_hi3": null,
+    "race_nat_hi_1": null,
+    "race_nat_hi_2": null,
+    "race_nat_hi_3": null,
     "race_nat_hi_gt3_ind": null,
     "race_nat_hi_all": null,
-    "race_white1": null,
-    "race_white2": null,
-    "race_white3": null,
+    "race_white_1": null,
+    "race_white_2": null,
+    "race_white_3": null,
     "race_white_gt3_ind": null,
-    "race_white_all": null,
-    "phone_ext_home": "211",
-    "phone_cell": "2823252423"
+    "race_white_all": null
   }
 }

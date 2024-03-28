@@ -14,5 +14,5 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DataSchema {
     private String type;
-    private Set<DataField> dataFields;
+    private Set<DataField> fields;
 }

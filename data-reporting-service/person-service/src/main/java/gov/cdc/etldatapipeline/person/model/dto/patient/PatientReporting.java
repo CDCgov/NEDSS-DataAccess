@@ -1,6 +1,7 @@
 package gov.cdc.etldatapipeline.person.model.dto.patient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import gov.cdc.etldatapipeline.person.model.dto.DataRequiredFields;
@@ -8,11 +9,9 @@ import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.Set;
 
-@Slf4j
 @Data
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -31,7 +30,7 @@ public class PatientReporting implements PersonExtendedProps, DataRequiredFields
     private String deceasedIndicator;
     private String patientDeceasedDate;
     private String generalComments;
-    private String electronicInd;
+    private String entryMethod;
     private String ethnicity;
     private String unkEthnicRsn;
     private Long lastChgUserId;
@@ -47,8 +46,8 @@ public class PatientReporting implements PersonExtendedProps, DataRequiredFields
     private String speaksEnglish;
 
     // From Function AUTH_USR
-    private String addedBy;
-    private String lastUpdatedBy;
+    private String addedUserName;
+    private String lastChgUserName;
 
     //Name from Person_Name ODSE Table
     private String firstName;
@@ -94,30 +93,55 @@ public class PatientReporting implements PersonExtendedProps, DataRequiredFields
     private String raceCalculated;
     private String raceCalcDetails;
     private String raceAll;
+    @JsonProperty("race_amer_ind_1")
     private String raceAmerInd1;
+    @JsonProperty("race_amer_ind_2")
     private String raceAmerInd2;
+    @JsonProperty("race_amer_ind_3")
     private String raceAmerInd3;
+    @JsonProperty("race_amer_ind_gt3_ind")
     private String raceAmerIndGt3Ind;
+    @JsonProperty("race_amer_ind_all")
     private String raceAmerIndAll;
+    @JsonProperty("race_asian_1")
     private String raceAsian1;
+    @JsonProperty("race_asian_2")
     private String raceAsian2;
+    @JsonProperty("race_asian_3")
     private String raceAsian3;
+    @JsonProperty("race_asian_gt3_ind")
     private String raceAsianGt3Ind;
+    @JsonProperty("race_asian_all")
     private String raceAsianAll;
+    @JsonProperty("race_black_1")
     private String raceBlack1;
+    @JsonProperty("race_black_2")
     private String raceBlack2;
+    @JsonProperty("race_black_3")
     private String raceBlack3;
+    @JsonProperty("race_black_gt3_ind")
     private String raceBlackGt3Ind;
+    @JsonProperty("race_black_all")
     private String raceBlackAll;
+    @JsonProperty("race_nat_hi_1")
     private String raceNatHi1;
+    @JsonProperty("race_nat_hi_2")
     private String raceNatHi2;
+    @JsonProperty("race_nat_hi_3")
     private String raceNatHi3;
+    @JsonProperty("race_nat_hi_gt3_ind")
     private String raceNatHiGt3Ind;
+    @JsonProperty("race_nat_hi_all")
     private String raceNatHiAll;
+    @JsonProperty("race_white_1")
     private String raceWhite1;
+    @JsonProperty("race_white_2")
     private String raceWhite2;
+    @JsonProperty("race_white_3")
     private String raceWhite3;
+    @JsonProperty("race_white_gt3_ind")
     private String raceWhiteGt3Ind;
+    @JsonProperty("race_white_all")
     private String raceWhiteAll;
 
     public PatientReporting constructPatientReporting(Patient p) {
@@ -133,7 +157,7 @@ public class PatientReporting implements PersonExtendedProps, DataRequiredFields
         setDeceasedIndicator(p.getDeceasedIndCd());
         setPatientDeceasedDate(p.getDeceasedTime());
         setGeneralComments(p.getDescription());
-        setElectronicInd(p.getElectronicInd());
+        setEntryMethod(p.getElectronicInd());
         setEthnicity(p.getEthnicGroupInd());
         setUnkEthnicRsn(p.getEthnicUnkReasonCd());
         setLastChgUserId(p.getLastChgUserId());
@@ -149,8 +173,8 @@ public class PatientReporting implements PersonExtendedProps, DataRequiredFields
         setSpeaksEnglish(p.getSpeaksEnglishCd());
 
         // Fn() - Auth_User
-        setAddedBy(p.getAddUserName());
-        setLastUpdatedBy(p.getLastChgUserName());
+        setAddedUserName(p.getAddUserName());
+        setLastChgUserName(p.getLastChgUserName());
         return this;
     }
 
