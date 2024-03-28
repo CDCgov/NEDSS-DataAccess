@@ -65,7 +65,7 @@ public class ProviderDataPostProcessingTests {
                 "Gwinnett County",
                 "13",
                 "Georgia",
-                "840",
+                "United States",
                 "2323222422",
                 "232",
                 "2823252423",
@@ -132,7 +132,7 @@ public class ProviderDataPostProcessingTests {
                 "Gwinnett County",
                 "13",
                 "Georgia",
-                "840");
+                "United States");
         // Validate the PatientProvider field processing
         Assertions.assertEquals(expected, pDetailsFn.apply(pf));
     }

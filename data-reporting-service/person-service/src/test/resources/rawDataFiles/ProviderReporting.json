@@ -105,22 +105,12 @@
       {
         "type": "string",
         "optional": true,
-        "field": "street_address1"
-      },
-      {
-        "type": "string",
-        "optional": true,
-        "field": "street_address2"
+        "field": "street_address_2"
       },
       {
         "type": "string",
         "optional": true,
         "field": "last_chg_user_name"
-      },
-      {
-        "type": null,
-        "optional": true,
-        "field": "log"
       },
       {
         "type": "string",
@@ -155,12 +145,22 @@
       {
         "type": "string",
         "optional": true,
+        "field": "street_address_1"
+      },
+      {
+        "type": "string",
+        "optional": true,
         "field": "provider_registration_num_auth"
       },
       {
         "type": "string",
         "optional": true,
         "field": "last_chg_time"
+      },
+      {
+        "type": "string",
+        "optional": true,
+        "field": "address_comments"
       },
       {
         "type": "string",
@@ -191,15 +191,14 @@
     "last_name": "Singgh",
     "name_suffix": "Jr",
     "name_degree": null,
-    "street_address1": "123 Main St.",
-    "street_address2": "",
     "city": "Atlanta",
     "state": "Georgia",
     "state_code": "13",
     "zip": "30025",
     "county": "Gwinnett County",
     "county_code": "13135",
-    "country": "840",
+    "country": "United States",
+    "address_comments": null,
     "phone_work": "2323222422",
     "phone_ext_work": "232",
     "phone_comments": null,
@@ -207,6 +206,8 @@
     "email_work": "someone2@email.com",
     "provider_quick_code": "12314286",
     "provider_registration_num": "86741517517",
-    "provider_registration_num_auth": "3.16.740.1.113883.3.1147.1.1002"
+    "provider_registration_num_auth": "3.16.740.1.113883.3.1147.1.1002",
+    "street_address_1": "123 Main St.",
+    "street_address_2": ""
   }
 }

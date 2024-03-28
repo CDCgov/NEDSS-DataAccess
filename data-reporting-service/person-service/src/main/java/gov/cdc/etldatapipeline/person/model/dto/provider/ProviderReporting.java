@@ -1,6 +1,7 @@
 package gov.cdc.etldatapipeline.person.model.dto.provider;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import gov.cdc.etldatapipeline.person.model.dto.DataRequiredFields;
@@ -8,11 +9,9 @@ import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.Set;
 
-@Slf4j
 @Data
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -39,7 +38,9 @@ public class ProviderReporting implements PersonExtendedProps, DataRequiredField
     private String nameDegree;
 
     //Address
+    @JsonProperty("street_address_1")
     private String streetAddress1;
+    @JsonProperty("street_address_2")
     private String streetAddress2;
     private String city;
     private String state;
@@ -48,6 +49,7 @@ public class ProviderReporting implements PersonExtendedProps, DataRequiredField
     private String county;
     private String countyCode;
     private String country;
+    private String addressComments;
 
 
     //Phone
@@ -121,5 +123,10 @@ public class ProviderReporting implements PersonExtendedProps, DataRequiredField
     @Override
     public void setEmail(String email) {
         setEmailWork(email);
+    }
+
+    @Override
+    public void setHomeCountry(String homeCountry) {
+        setCountry(homeCountry);
     }
 }

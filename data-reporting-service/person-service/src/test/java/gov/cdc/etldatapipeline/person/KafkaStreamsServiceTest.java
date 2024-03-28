@@ -68,7 +68,7 @@ public class KafkaStreamsServiceTest {
                 personTopic,
                 patientReportingTopic,
                 "rawDataFiles/PatientReporting.json",
-                "rawDataFiles/PatientKey.json" );
+                "rawDataFiles/PatientKey.json");
     }
 
     @Test
@@ -91,7 +91,7 @@ public class KafkaStreamsServiceTest {
                 personTopic,
                 patientElasticTopic,
                 "rawDataFiles/PatientElastic.json",
-                "rawDataFiles/PatientKey.json" );
+                "rawDataFiles/PatientKey.json");
     }
 
     @Test
@@ -115,7 +115,7 @@ public class KafkaStreamsServiceTest {
                 personTopic,
                 providerTopic,
                 "rawDataFiles/ProviderReporting.json",
-                "rawDataFiles/ProviderKey.json" );
+                "rawDataFiles/ProviderKey.json");
     }
 
     /**

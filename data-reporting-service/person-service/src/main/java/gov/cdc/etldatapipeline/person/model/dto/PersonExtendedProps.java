@@ -10,9 +10,9 @@ public interface PersonExtendedProps {
 
     void setPersonNameNmSuffix(String nmSuffix);
 
-    void setStreetAddress1(String street_address_1);
+    void setStreetAddress1(String streetAddress1);
 
-    void setStreetAddress2(String street_address_2);
+    void setStreetAddress2(String streetAddress2);
 
     void setCity(String city);
 
@@ -26,24 +26,31 @@ public interface PersonExtendedProps {
 
     void setCountyCode(String county_code);
 
-    void setCountryCode(String countryCode);
-
-    default void setBirthCountry(String birth_country) {
+    default void setCountryCode(String countryCode) {
     }
 
-    default void setPhoneWork(String phone_work) {
+    default void setHomeCountry(String homeCountry) {
     }
 
-    default void setPhoneExtWork(String phone_ext_work) {
+    default void setBirthCountry(String birthCountry) {
     }
 
-    default void setPhoneHome(String phone_home) {
+    default void setAddressComments(String birthCountry) {
     }
 
-    default void setPhoneExtHome(String phone_ext_home) {
+    default void setPhoneWork(String phoneWork) {
     }
 
-    default void setPhoneCell(String phone_cell) {
+    default void setPhoneExtWork(String phoneExtWork) {
+    }
+
+    default void setPhoneHome(String phoneHome) {
+    }
+
+    default void setPhoneExtHome(String phoneExtHome) {
+    }
+
+    default void setPhoneCell(String phoneCell) {
     }
 
     void setEmail(String email);
@@ -60,10 +67,10 @@ public interface PersonExtendedProps {
     default void setRaceDesc(String raceDesc) {
     }
 
-    default void setPatientNumber(String patient_number) {
+    default void setPatientNumber(String patientNumber) {
     }
 
-    default void setPatientNumberAuth(String patient_number_auth) {
+    default void setPatientNumberAuth(String patientNumberAuth) {
     }
 
     default void setProviderQuickCode(String providerQuickCode) {

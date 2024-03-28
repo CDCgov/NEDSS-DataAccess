@@ -1,6 +1,8 @@
 CREATE or ALTER PROCEDURE dbo.sp_patient_event @user_id_list varchar(max)
 AS
+
 BEGIN
+
     BEGIN TRY
         SELECT p.person_uid,
                p.person_parent_uid,
@@ -43,7 +45,6 @@ BEGIN
                p.additional_gender_cd,
                p.occupation_cd,
                p.prim_lang_cd,
-               p.last_chg_user_id,
                p.multiple_birth_ind,
                p.adults_in_house_nbr,
                p.birth_order_nbr,
@@ -53,6 +54,7 @@ BEGIN
                case
                    when p.add_user_id > 0 then (select * from dbo.fn_get_user_name(p.add_user_id))
                    end          as add_user_name,
+               p.last_chg_user_id,
                case
                    when p.last_chg_user_id > 0 then (select * from dbo.fn_get_user_name(p.last_chg_user_id))
                    end          as last_chg_user_name,
@@ -82,8 +84,8 @@ BEGIN
                                                   case
                                                       when elp.use_cd = 'H'
                                                           then coalesce(cc.code_short_desc_txt, pl.cntry_cd)
-                                                      end                                                      AS [home_country],
-                                                  case when elp.use_cd = 'BIR' then cc.code_short_desc_txt end AS [birth_country]
+                                                      else null end                                                      AS [home_country],
+                                                  case when elp.use_cd = 'BIR' then cc.code_short_desc_txt else null end AS [birth_country]
                                            FROM nbs_odse.dbo.Entity_locator_participation elp WITH (NOLOCK)
                                                     LEFT OUTER JOIN nbs_odse.dbo.Postal_locator pl WITH (NOLOCK)
                                                                     ON elp.locator_uid = pl.postal_locator_uid
@@ -163,11 +165,18 @@ BEGIN
                                            FOR json path, INCLUDE_NULL_VALUES) AS entity_id) AS entity_id) AS nested
         WHERE p.person_uid in (SELECT value FROM STRING_SPLIT(@user_id_list, ','))
           AND p.cd = 'PAT'
+
+
     end try
     BEGIN CATCH
+
+
         IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+
         DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
+
         return @ErrorMessage;
+
     END CATCH
 
 end

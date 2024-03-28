@@ -100,8 +100,7 @@ public class UtilHelper {
         return switch (javaType.toLowerCase()) {
             case "long" -> "int64";
             case "integer", "int" -> "int32";
-            case "string" -> "string";
-            default -> null;
+            default -> javaType.toLowerCase();
         };
     }
 }

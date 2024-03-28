@@ -8,11 +8,9 @@ import gov.cdc.etldatapipeline.person.model.dto.DataRequiredFields;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.Set;
 
-@Slf4j
 @Data
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -91,6 +89,7 @@ public class PatientElasticSearch implements PersonExtendedProps, DataRequiredFi
     private String county;
     private String countyCode;
     private String countryCode;
+    private String homeCountry;
     private String withinCityLimits;
     private String elpCd;
     private String elpUseCd;

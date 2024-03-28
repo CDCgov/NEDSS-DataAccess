@@ -133,11 +133,6 @@
         "field": "as_of_date_sex"
       },
       {
-        "type": null,
-        "optional": true,
-        "field": "log"
-      },
-      {
         "type": "string",
         "optional": true,
         "field": "preferred_gender_cd"
@@ -385,6 +380,11 @@
       {
         "type": "string",
         "optional": true,
+        "field": "home_country"
+      },
+      {
+        "type": "string",
+        "optional": true,
         "field": "race_desc"
       },
       {
@@ -503,6 +503,7 @@
     "county": "Gwinnett County",
     "county_code": "13135",
     "country_code": "840",
+    "home_country": "United States",
     "within_city_limits": null,
     "elp_cd": null,
     "elp_use_cd": null,

@@ -41,7 +41,7 @@ public class PatientDataPostProcessingTests {
                 pf.getCounty(),
                 pf.getStateCode(),
                 pf.getState(),
-                pf.getCountryCode(),
+                pf.getHomeCountry(),
                 pf.getBirthCountry(),
                 pf.getPhoneWork(),
                 pf.getPhoneExtWork(),
@@ -69,7 +69,7 @@ public class PatientDataPostProcessingTests {
                 "Gwinnett County",
                 "13",
                 "Georgia",
-                "840",
+                "United States",
                 "Canada",
                 "2323222422",
                 "232",
@@ -126,7 +126,7 @@ public class PatientDataPostProcessingTests {
                 p.getCounty(),
                 p.getStateCode(),
                 p.getState(),
-                p.getCountryCode(),
+                p.getHomeCountry(),
                 p.getBirthCountry());
         // Process the respective field json to PatientProvider fields
         PatientReporting pf = perOp.processPatientReporting();
@@ -140,7 +140,7 @@ public class PatientDataPostProcessingTests {
                 "Gwinnett County",
                 "13",
                 "Georgia",
-                "840",
+                "United States",
                 "Canada");
         // Validate the PatientProvider field processing
         Assertions.assertEquals(expected, pDetailsFn.apply(pf));

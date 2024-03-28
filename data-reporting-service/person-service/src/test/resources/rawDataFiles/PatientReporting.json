@@ -105,11 +105,6 @@
       {
         "type": "string",
         "optional": true,
-        "field": "country"
-      },
-      {
-        "type": "string",
-        "optional": true,
         "field": "race_nat_hi_all"
       },
       {
@@ -156,6 +151,11 @@
         "type": "string",
         "optional": true,
         "field": "zip"
+      },
+      {
+        "type": "string",
+        "optional": true,
+        "field": "country"
       },
       {
         "type": "string",
@@ -454,7 +454,6 @@
     "zip": "30025",
     "county": "Gwinnett County",
     "county_code": "13135",
-    "country": "840",
     "within_city_limits": null,
     "birth_country": "Canada",
     "census_tract": null,
@@ -472,6 +471,7 @@
     "phone_cell": "2823252423",
     "street_address_1": "123 Main St.",
     "street_address_2": "",
+    "country": "United States",
     "race_amer_ind_1": null,
     "race_amer_ind_2": null,
     "race_amer_ind_3": null,
