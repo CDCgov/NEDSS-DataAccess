@@ -1,4 +1,4 @@
-package gov.cdc.etldatapipeline.investigation.repository.model;
+package gov.cdc.etldatapipeline.investigation.repository.model.dto;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

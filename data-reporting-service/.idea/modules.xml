@@ -2,6 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/data-reporting-service.iml" filepath="$PROJECT_DIR$/.idea/modules/data-reporting-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/data-reporting-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/data-reporting-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/gov.cdc.etldatapipeline.person-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/gov.cdc.etldatapipeline.person-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/investigation-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/investigation-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/observation-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/observation-service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/person-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/person-service.main.iml" />
     </modules>
   </component>
