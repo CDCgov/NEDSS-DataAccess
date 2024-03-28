@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(callSuper=true)
+@EqualsAndHashCode(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Organization extends DebeziumMetadata {
     @Column(name = "organization_uid")
@@ -118,8 +118,4 @@ public class Organization extends DebeziumMetadata {
     @Column(name = "edx_ind")
     @JsonProperty("edx_ind")
     private String edxInd;
-
-
-
-
 }

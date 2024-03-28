@@ -27,7 +27,7 @@ public class DataPostProcessor {
         }
     }
 
-    public <T extends PersonExtendedProps> void  processPersonAddress(String address, T pf) throws JsonProcessingException {
+    public <T extends PersonExtendedProps> void processPersonAddress(String address, T pf) throws JsonProcessingException {
         if (!ObjectUtils.isEmpty(address)) {
             Arrays.stream(mapper.readValue(address, Address[].class))
                     .max(Comparator.comparing(Address::getPostalLocatorUid))
@@ -35,7 +35,7 @@ public class DataPostProcessor {
         }
     }
 
-    public <T extends PersonExtendedProps> void  processPersonRace(String race, T pf) throws JsonProcessingException {
+    public <T extends PersonExtendedProps> void processPersonRace(String race, T pf) throws JsonProcessingException {
         if (!ObjectUtils.isEmpty(race)) {
             Arrays.stream(mapper.readValue(race, Race[].class))
                     .max(Comparator.comparing(Race::getPersonUid))
@@ -43,7 +43,7 @@ public class DataPostProcessor {
         }
     }
 
-    public <T extends PersonExtendedProps> void  processPersonTelephone(String telephone, T pf) throws JsonProcessingException {
+    public <T extends PersonExtendedProps> void processPersonTelephone(String telephone, T pf) throws JsonProcessingException {
         if (!ObjectUtils.isEmpty(telephone)) {
             Function<String, T> personPhoneFn =
                     (useCd) -> Arrays.stream(
@@ -59,23 +59,7 @@ public class DataPostProcessor {
         }
     }
 
-    public <T extends PersonExtendedProps> void  processPersonAddAuth(String addAuthNested, T pf) throws JsonProcessingException {
-        if (!ObjectUtils.isEmpty(addAuthNested)) {
-            Arrays.stream(mapper.readValue(addAuthNested, AddAuthUser[].class))
-                    .max(Comparator.comparing(AddAuthUser::getAddUserChgTime))
-                    .map(n -> n.updatePerson(pf));
-        }
-    }
-
-    public <T extends PersonExtendedProps> void  processPersonChangeAuth(String chgAuthNested, T pf) throws JsonProcessingException {
-        if (!ObjectUtils.isEmpty(chgAuthNested)) {
-            Arrays.stream(mapper.readValue(chgAuthNested, ChgAuthUser[].class))
-                    .max(Comparator.comparing(ChgAuthUser::getLastChgUserTime))
-                    .map(n -> n.updatePerson(pf));
-        }
-    }
-
-    public <T extends PersonExtendedProps> void  processPersonEntityData(String entityData, T pf) throws JsonProcessingException {
+    public <T extends PersonExtendedProps> void processPersonEntityData(String entityData, T pf) throws JsonProcessingException {
         if (!ObjectUtils.isEmpty(entityData)) {
             Function<Predicate<? super EntityData>, T> entityDataTypeCdFn =
                     (Predicate<? super EntityData> p) -> Arrays.stream(
@@ -89,9 +73,9 @@ public class DataPostProcessor {
                     && e.getAssigningAuthorityCd().equalsIgnoreCase("SSA"));
             entityDataTypeCdFn.apply(e -> StringUtils.hasText(e.getTypeCd())
                     && e.getTypeCd().equalsIgnoreCase("PN"));
-            entityDataTypeCdFn.apply(e ->  StringUtils.hasText(e.getTypeCd())
+            entityDataTypeCdFn.apply(e -> StringUtils.hasText(e.getTypeCd())
                     && e.getTypeCd().equalsIgnoreCase("QEC"));
-            entityDataTypeCdFn.apply(e ->  StringUtils.hasText(e.getTypeCd())
+            entityDataTypeCdFn.apply(e -> StringUtils.hasText(e.getTypeCd())
                     && e.getTypeCd().equalsIgnoreCase("PRN"));
         }
     }

@@ -24,11 +24,11 @@ public class Name {
     @JsonProperty("person_uid")
     private Long personUid;
 
-    public <T extends PersonExtendedProps> T updatePerson(T person){
-        person.setLastNm(this.lastNm);
-        person.setMiddleNm(this.middleNm);
-        person.setFirstNm(this.firstNm);
-        person.setNmSuffix(this.nmSuffix);
+    public <T extends PersonExtendedProps> T updatePerson(T person) {
+        person.setPersonNameLastNm(this.lastNm);
+        person.setPersonNameMiddleNm(this.middleNm);
+        person.setPersonNameFirstNm(this.firstNm);
+        person.setPersonNameNmSuffix(this.nmSuffix);
         return person;
     }
 }

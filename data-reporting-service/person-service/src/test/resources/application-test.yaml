@@ -12,25 +12,6 @@ spring:
     producer:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       key-serializer: org.springframework.kafka.support.serializer.StringOrBytesSerializer
-    stream:
-      input:
-        person:
-          topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Person
-        provider:
-          topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Provider.input
-        patient:
-          topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Patient.input
-        organization:
-          topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Organization.input
-        defaultData:
-          topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Default.input
-      output:
-        provider:
-          topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Provider.output
-        patient:
-          topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Patient.output
-        organization:
-          topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Organization.output
     streams:
       application-id: person-reporting-service
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:localhost:9092}

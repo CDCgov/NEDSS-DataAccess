@@ -44,7 +44,6 @@ public class Address {
         personFull.setStateCode(state);
         personFull.setState(stateDesc);
         personFull.setCountryCode(cntryCd);
-        personFull.setCountry(homeCountry);
         personFull.setBirthCountry(birthCountry);
         return personFull;
     }
