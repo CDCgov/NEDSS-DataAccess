@@ -33,6 +33,8 @@ public class Address {
     private String cd;
     @JsonProperty("postal_locator_uid")
     private Long postalLocatorUid;
+    @JsonProperty("address_comments")
+    private String addressComments;
 
     public <T extends PersonExtendedProps> T updatePerson(T personFull) {
         personFull.setStreetAddress1(streetAddr1);
@@ -44,8 +46,9 @@ public class Address {
         personFull.setStateCode(state);
         personFull.setState(stateDesc);
         personFull.setCountryCode(cntryCd);
-        personFull.setCountry(homeCountry);
+        personFull.setHomeCountry(homeCountry);
         personFull.setBirthCountry(birthCountry);
+        personFull.setAddressComments(addressComments);
         return personFull;
     }
 }

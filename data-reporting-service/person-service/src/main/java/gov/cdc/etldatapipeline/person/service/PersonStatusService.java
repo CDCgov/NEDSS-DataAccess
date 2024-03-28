@@ -13,7 +13,7 @@ public class PersonStatusService {
     public PersonStatusService() {
     }
 
-    public ResponseEntity<String> getHealthStatus(){
+    public ResponseEntity<String> getHealthStatus() {
         LOG.info("Status OK");
         return ResponseEntity.status(HttpStatus.OK).body("Status OK");
     }

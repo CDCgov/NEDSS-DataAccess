@@ -33,17 +33,16 @@ public class OrganizationConsumerService {
     private final OrganizationRepository organizationRepository;
 
     /**
-     * @param streamsBuilder
-     * From incoming Organization related topic capture the changes
-     * Compute the aggregated Organization data
-     * Publish the Organization data to aggregated Kafka output topic
-     * Steps:
-     * 1. Capture the `Organization` topic as Kafka Stream - KStream<String,String>
-     * 2. Transform to KStream<String, Organization>
-     * 3. For each Organization call the `sp_organization_event` stored proc &
-     *      transform the results to KStream<String,List<Organization>
-     * 4. Transform the above result to KStream<Organization.UID,Organization>
-     * 5. Write the consolidated `Organization` data to aggregated `Organization` Kafka topic
+     * @param streamsBuilder From incoming Organization related topic capture the changes
+     *                       Compute the aggregated Organization data
+     *                       Publish the Organization data to aggregated Kafka output topic
+     *                       Steps:
+     *                       1. Capture the `Organization` topic as Kafka Stream - KStream<String,String>
+     *                       2. Transform to KStream<String, Organization>
+     *                       3. For each Organization call the `sp_organization_event` stored proc &
+     *                       transform the results to KStream<String,List<Organization>
+     *                       4. Transform the above result to KStream<Organization.UID,Organization>
+     *                       5. Write the consolidated `Organization` data to aggregated `Organization` Kafka topic
      */
 
     public void processOrganizationData(StreamsBuilder streamsBuilder) {

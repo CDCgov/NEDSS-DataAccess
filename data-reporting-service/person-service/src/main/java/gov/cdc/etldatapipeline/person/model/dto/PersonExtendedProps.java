@@ -2,13 +2,13 @@ package gov.cdc.etldatapipeline.person.model.dto;
 
 
 public interface PersonExtendedProps {
-    void setFirstNm(String firstNm);
+    void setPersonNameFirstNm(String firstNm);
 
-    void setMiddleNm(String middleNm);
+    void setPersonNameMiddleNm(String middleNm);
 
-    void setLastNm(String lastNm);
+    void setPersonNameLastNm(String lastNm);
 
-    void setNmSuffix(String nmSuffix);
+    void setPersonNameNmSuffix(String nmSuffix);
 
     void setStreetAddress1(String streetAddress1);
 
@@ -24,46 +24,62 @@ public interface PersonExtendedProps {
 
     void setCounty(String county);
 
-    void setCountyCode(String countyCode);
+    void setCountyCode(String county_code);
 
-    void setCountry(String country);
+    default void setCountryCode(String countryCode) {
+    }
 
-    void setCountryCode(String countryCode);
+    default void setHomeCountry(String homeCountry) {
+    }
 
-    void setBirthCountry(String birthCountry);
+    default void setBirthCountry(String birthCountry) {
+    }
 
-    void setPhoneWork(String phoneWork);
+    default void setAddressComments(String birthCountry) {
+    }
 
-    void setPhoneExtWork(String phoneExtWork);
+    default void setPhoneWork(String phoneWork) {
+    }
 
-    void setPhoneHome(String phoneHome);
+    default void setPhoneExtWork(String phoneExtWork) {
+    }
 
-    void setPhoneExtHome(String phoneExtHome);
+    default void setPhoneHome(String phoneHome) {
+    }
 
-    void setPhoneCell(String phoneCell);
+    default void setPhoneExtHome(String phoneExtHome) {
+    }
+
+    default void setPhoneCell(String phoneCell) {
+    }
 
     void setEmail(String email);
 
-    void setSsn(String ssn);
+    default void setSsn(String ssn) {
+    }
 
-    void setAddedBy(Long addedBy);
+    default void setRaceCd(String raceCd) {
+    }
 
-    void setLastChangedBy(Long lastChangedBy);
+    default void setRaceCategory(String raceCategory) {
+    }
 
-    void setRaceCd(String raceCd);
+    default void setRaceDesc(String raceDesc) {
+    }
 
-    void setRaceCategory(String raceCategory);
+    default void setPatientNumber(String patientNumber) {
+    }
 
-    void setRaceDesc(String raceDesc);
+    default void setPatientNumberAuth(String patientNumberAuth) {
+    }
 
-    void setPatientNumber(String patientNumber);
+    default void setProviderQuickCode(String providerQuickCode) {
+    }
 
-    void setPatientNumberAuth(String patientNumberAuth);
+    default void setProviderRegistrationNum(String providerRegistrationNum) {
+    }
 
-    void setProviderQuickCode(String providerQuickCode);
-
-    void setProviderRegistrationNum(String providerRegistrationNum);
-
-    void setProviderRegistrationNumAuth(String providerRegistrationNumAuth);
+    default void setProviderRegistrationNumAuth(String providerRegistrationNumAuth) {
+    }
 }
 

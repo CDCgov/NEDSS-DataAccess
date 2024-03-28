@@ -1,17 +1,17 @@
 package gov.cdc.etldatapipeline.person;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import gov.cdc.etldatapipeline.person.model.dto.DataProps.DataEnvelope;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
 import gov.cdc.etldatapipeline.person.model.dto.patient.Patient;
-import gov.cdc.etldatapipeline.person.model.dto.patient.PatientEnvelope;
-import gov.cdc.etldatapipeline.person.model.dto.patient.PatientFull;
+import gov.cdc.etldatapipeline.person.model.dto.patient.PatientReporting;
 import gov.cdc.etldatapipeline.person.model.dto.persondetail.*;
 import gov.cdc.etldatapipeline.person.model.dto.provider.Provider;
-import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderEnvelope;
-import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderFull;
+import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderReporting;
 import gov.cdc.etldatapipeline.person.repository.PatientRepository;
 import gov.cdc.etldatapipeline.person.repository.ProviderRepository;
 import gov.cdc.etldatapipeline.person.service.KafkaStreamsService;
-import gov.cdc.etldatapipeline.person.utils.UtilHelper;
 import org.apache.commons.io.FileUtils;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -22,8 +22,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.ClassPathResource;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -42,105 +42,170 @@ public class KafkaStreamsServiceTest {
     ProviderRepository providerRepository;
 
     private final String personTopic = "PersonTopic";
-    private final String patientTopic = "PatientTopic";
+    private final String patientElasticTopic = "PatientElasticTopic";
+    private final String patientReportingTopic = "PatientReportingTopic";
     private final String providerTopic = "ProviderTopic";
-    private final String defaultTopic = "DefaultTopic";
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
 
     @Test
-    public void processPatientData() throws IOException {
+    public void processPatientReportingData() throws IOException {
         // Generate a Debezium Person Patient Change Data
-        File file = new File("src/test/resources/rawDataFiles/PersonPatientChangeData.json");
-        String personPatientOdseData = FileUtils.readFileToString(file,
+        String personPatientOdseData = FileUtils.readFileToString(
+                new ClassPathResource("rawDataFiles/PersonPatientChangeData.json").getFile(),
                 Charset.defaultCharset());
 
-        Mockito.when(patientRepository.computePatients(anyString())).thenReturn(List.of(constructPatient()));
+        Patient patient = constructPatient();
+        Mockito.when(patientRepository.computePatients(anyString())).thenReturn(List.of(patient));
+        //Build expected unflattened Provider
+        PatientReporting expectedPf = new PatientReporting().constructPatientReporting(patient);
+        //Construct transformed patient
+        constructPatPrvFull(expectedPf);
+
+        // Validate Patient Reporting Data Transformation
+        validateDataTransformation(
+                personPatientOdseData,
+                personTopic,
+                patientReportingTopic,
+                "rawDataFiles/PatientReporting.json",
+                "rawDataFiles/PatientKey.json");
+    }
+
+    @Test
+    public void processPatientElasticSearchData() throws IOException {
+        // Generate a Debezium Person Patient Change Data
+        String personPatientOdseData = FileUtils.readFileToString(
+                new ClassPathResource("rawDataFiles/PersonPatientChangeData.json").getFile(),
+                Charset.defaultCharset());
+
+        Patient patient = constructPatient();
+        Mockito.when(patientRepository.computePatients(anyString())).thenReturn(List.of(patient));
+        //Build expected unflattened Provider
+        PatientReporting expectedPf = new PatientReporting().constructPatientReporting(patient);
+        //Construct transformed patient
+        constructPatPrvFull(expectedPf);
+
+        // Validate Patient ElasticSearch Data Transformation
+        validateDataTransformation(
+                personPatientOdseData,
+                personTopic,
+                patientElasticTopic,
+                "rawDataFiles/PatientElastic.json",
+                "rawDataFiles/PatientKey.json");
+    }
+
+    @Test
+    public void processProviderReportingData() throws IOException {
+        // Generate a Debezium Person Patient Change Data
+        String personProviderOdseData = FileUtils.readFileToString(
+                new ClassPathResource("rawDataFiles/PersonProviderChangeData.json").getFile(),
+                Charset.defaultCharset());
+
+        Provider constructedProvider = constructProvider();
+        Mockito.when(providerRepository.computeProviders(anyString())).thenReturn(List.of(constructedProvider));
+
+        //Build expected unflattened Provider
+        ProviderReporting expectedPf = new ProviderReporting().constructProviderFull(constructedProvider);
+        //Augment Provider with the flattened data
+        constructPatPrvFull(expectedPf);
+
+        // Validate Patient Reporting Data Transformation
+        validateDataTransformation(
+                personProviderOdseData,
+                personTopic,
+                providerTopic,
+                "rawDataFiles/ProviderReporting.json",
+                "rawDataFiles/ProviderKey.json");
+    }
+
+    /**
+     * Create a mock Kafka cluster and do stream processing of the Patient/Provider data
+     *
+     * @param incomingChangeData    Debezium Change Data
+     * @param inputTopicName        Input Topic to monitor
+     * @param outputTopicName       Output Topic to produce the transformed data
+     * @param expectedValueFilePath Expected transformed Json Value Data in the DataEnvelope format
+     * @param expectedKeyFilePath   Expected transformed Json Key Data in the DataEnvelope format
+     */
+    private void validateDataTransformation(
+            String incomingChangeData,
+            String inputTopicName,
+            String outputTopicName,
+            String expectedValueFilePath,
+            String expectedKeyFilePath) {
         StreamsBuilder streamsBuilder = new StreamsBuilder();
         KafkaStreamsService ks = getKafkaStreamService();
         ks.processMessage(streamsBuilder);
         Topology topology = streamsBuilder.build();
-
         try (TopologyTestDriver topologyTestDriver = new TopologyTestDriver(topology, new Properties())) {
 
             TestInputTopic<String, String> inputTopic = topologyTestDriver
-                    .createInputTopic(personTopic, new StringSerializer(), new StringSerializer());
+                    .createInputTopic(inputTopicName, new StringSerializer(), new StringSerializer());
 
             TestOutputTopic<String, String> outputTopic = topologyTestDriver
-                    .createOutputTopic(patientTopic, new StringDeserializer(), new StringDeserializer());
-            inputTopic.pipeInput("10000001", personPatientOdseData);
-            List<String> transformedData = outputTopic.readValuesToList();
-            Assertions.assertNotNull(transformedData);
-            PatientFull expected = new PatientFull();
-            constructPatPrvFull(expected);
-            PatientEnvelope actual = UtilHelper.getInstance().deserializePayload(transformedData.get(0), PatientEnvelope.class);
-            Assertions.assertEquals(expected, actual.getPayload());
+                    .createOutputTopic(outputTopicName, new StringDeserializer(), new StringDeserializer());
+            inputTopic.pipeInput("10000001", incomingChangeData);
+            List<KeyValue<String, String>> actualData = outputTopic.readKeyValuesToList();
+            Assertions.assertNotNull(actualData);
+
+            //Validate the Provider Payload
+            TypeReference<DataEnvelope> dataEnvelopeTypeReference = new TypeReference<>() {
+            };
+
+            DataEnvelope<DataEnvelope> actualValue
+                    = objectMapper.readValue(actualData.get(0).value, dataEnvelopeTypeReference);
+            Assertions.assertEquals(
+                    objectMapper.readValue(FileUtils.readFileToString(
+                                    new ClassPathResource(expectedValueFilePath).getFile(),
+                                    Charset.defaultCharset()),
+                            dataEnvelopeTypeReference),
+                    actualValue);
+
+            //Validate the Patient Key
+            DataEnvelope<DataEnvelope> actualKey
+                    = objectMapper.readValue(actualData.get(0).key, dataEnvelopeTypeReference);
+            //Construct expected Patient Key
+            Assertions.assertEquals(
+                    objectMapper.readValue(FileUtils.readFileToString(
+                                    new ClassPathResource(expectedKeyFilePath).getFile(),
+                                    Charset.defaultCharset()),
+                            dataEnvelopeTypeReference),
+                    actualKey);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    @Test
-    public void processProviderData() throws IOException {
-        // Generate a Debezium Person Patient Change Data
-        File file = new File("src/test/resources/rawDataFiles/PersonProviderChangeData.json");
-        String personPatientOdseData = FileUtils.readFileToString(file,
-                Charset.defaultCharset());
-
-        Mockito.when(providerRepository.computeProviders(anyString())).thenReturn(List.of(constructProvider()));
-        StreamsBuilder streamsBuilder = new StreamsBuilder();
-        KafkaStreamsService ks = getKafkaStreamService();
-        ks.processMessage(streamsBuilder);
-        Topology topology = streamsBuilder.build();
-
-        try (TopologyTestDriver topologyTestDriver = new TopologyTestDriver(topology, new Properties())) {
-
-            TestInputTopic<String, String> inputTopic = topologyTestDriver
-                    .createInputTopic(personTopic, new StringSerializer(), new StringSerializer());
-
-            TestOutputTopic<String, String> outputTopic = topologyTestDriver
-                    .createOutputTopic(providerTopic, new StringDeserializer(), new StringDeserializer());
-            inputTopic.pipeInput("10000001", personPatientOdseData);
-            List<String> transformedData = outputTopic.readValuesToList();
-            Assertions.assertNotNull(transformedData);
-            ProviderFull expected = new ProviderFull();
-            expected.setPersonUid(10000001L);
-            constructPatPrvFull(expected);
-            ProviderEnvelope actual = UtilHelper.getInstance().deserializePayload(transformedData.get(0), ProviderEnvelope.class);
-            Assertions.assertEquals(expected, actual.getPayload());
-        }
-    }
 
     private KafkaStreamsService getKafkaStreamService() {
         KafkaStreamsService ks = new KafkaStreamsService(patientRepository, providerRepository);
         ks.setPersonTopicName(personTopic);
-        ks.setPatientOutputTopicName(patientTopic);
-        ks.setProviderOutputTopicName(providerTopic);
-        ks.setDefaultDataTopicName(defaultTopic);
+        ks.setPatientElasticSearchTopicName(patientElasticTopic);
+        ks.setPatientReportingOutputTopic(patientReportingTopic);
+        ks.setProviderReportingOutputTopic(providerTopic);
         return ks;
     }
 
     private Patient constructPatient() {
         Patient p = new Patient();
-        p.setPersonUid(10000001L);
-        p.setName(readFileData("PersonName.json"));
-        p.setAddress(readFileData("PersonAddress.json"));
-        p.setRace(readFileData("PersonRace.json"));
-        p.setTelephone(readFileData("PersonTelephone.json"));
-        p.setAddAuthNested(readFileData("PersonAddAuthUser.json"));
-        p.setChgAuthNested(readFileData("PersonChgAuthUser.json"));
-        p.setEntityData(readFileData("PersonEntityData.json"));
-        p.setEmail(readFileData("PersonEmail.json"));
+        p.setPatientUid(10000001L);
+        p.setNameNested(readFileData("PersonName.json"));
+        p.setAddressNested(readFileData("PersonAddress.json"));
+        p.setRaceNested(readFileData("PersonRace.json"));
+        p.setTelephoneNested(readFileData("PersonTelephone.json"));
+        p.setEntityDataNested(readFileData("PersonEntityData.json"));
+        p.setEmailNested(readFileData("PersonEmail.json"));
         return p;
     }
 
     private Provider constructProvider() {
         Provider p = new Provider();
         p.setPersonUid(10000001L);
-        p.setName(readFileData("PersonName.json"));
-        p.setAddress(readFileData("PersonAddress.json"));
-        p.setTelephone(readFileData("PersonTelephone.json"));
-        p.setAddAuthNested(readFileData("PersonAddAuthUser.json"));
-        p.setChgAuthNested(readFileData("PersonChgAuthUser.json"));
-        p.setEntityData(readFileData("PersonEntityData.json"));
-        p.setEmail(readFileData("PersonEmail.json"));
+        p.setNameNested(readFileData("PersonName.json"));
+        p.setAddressNested(readFileData("PersonAddress.json"));
+        p.setTelephoneNested(readFileData("PersonTelephone.json"));
+        p.setEntityDataNested(readFileData("PersonEntityData.json"));
+        p.setEmailNested(readFileData("PersonEmail.json"));
         return p;
     }
 
@@ -190,16 +255,6 @@ public class KafkaStreamsServiceTest {
         race.setRaceCategoryCd("2028-9");
         race.setRaceDescTxt("Amer Indian");
         race.updatePerson(patProv);
-
-
-        AddAuthUser addAuthUser = new AddAuthUser();
-        addAuthUser.setAddUserId(10000000L);
-        addAuthUser.updatePerson(patProv);
-
-
-        ChgAuthUser chgAuthUser = new ChgAuthUser();
-        chgAuthUser.setLastChgUserId(470200741L);
-        chgAuthUser.updatePerson(patProv);
 
 
         EntityData ssa = new EntityData();

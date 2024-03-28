@@ -1,6 +1,8 @@
 package gov.cdc.etldatapipeline.person.config;
 
 import ch.qos.logback.core.FileAppender;
+import lombok.Setter;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -9,21 +11,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+@Setter
 public class LogDynamicFileAppenderConfig<E> extends FileAppender<E> {
 
     private String logFilePath;
 
     /**
-     * Helper method used by Logback
-     * Reading logFilePatch tag from dlt-logback.xml and return value
-     * */
-    public void setLogFilePath(String logFilePath) {
-        this.logFilePath = logFilePath;
-    }
-
-    /**
      * Purpose: Dynamically create log file if not exist
-     * */
+     */
     @Override
     public void start() {
         if (logFilePath == null) {

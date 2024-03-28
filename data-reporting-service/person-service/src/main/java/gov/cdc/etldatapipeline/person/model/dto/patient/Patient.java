@@ -2,49 +2,37 @@ package gov.cdc.etldatapipeline.person.model.dto.patient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import gov.cdc.etldatapipeline.person.utils.DataPostProcessor;
-import io.confluent.kafka.schemaregistry.json.JsonSchema;
-import io.confluent.kafka.schemaregistry.json.JsonSchemaUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
-import java.util.Objects;
-
 @Slf4j
 @Data
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Patient {
     @Id
-    @Column(name = "person_uid", columnDefinition = "bigint")
-    private Long personUid;
-    @Column(name = "person_parent_uid", columnDefinition = "bigint")
-    private Long personParentUid;
-    @Column(name = "description", columnDefinition = "text")
-    private String description;
-    @Column(name = "add_time")
-    private String addTime;
+    @Column(name = "person_uid")
+    private Long patientUid;
     @Column(name = "age_reported")
     private String ageReported;
     @Column(name = "age_reported_unit_cd")
     private String ageReportedUnitCd;
-    @Column(name = "first_nm")
-    private String firstNm;
-    @Column(name = "middle_nm")
-    private String middleNm;
-    @Column(name = "last_nm")
-    private String lastNm;
-    @Column(name = "nm_suffix")
-    private String nmSuffix;
+    @Column(name = "additional_gender_cd")
+    private String additionalGenderCd;
+    @Column(name = "add_user_id")
+    private Long addUserId;
+    @Column(name = "add_user_name")
+    private String addUserName;
+    @Column(name = "add_time")
+    private String addTime;
+    @Column(name = "adults_in_house_nbr")
+    private String adultsInHouseNbr;
     @Column(name = "as_of_date_admin")
     private String asOfDateAdmin;
     @Column(name = "as_of_date_ethnicity")
@@ -55,101 +43,107 @@ public class Patient {
     private String asOfDateMorbidity;
     @Column(name = "as_of_date_sex")
     private String asOfDateSex;
+    @Column(name = "birth_gender_cd")
+    private String birthGenderCd;
+    @Column(name = "birth_order_nbr")
+    private String birthOrderNbr;
     @Column(name = "birth_time")
     private String birthTime;
-    @Column(name = "birth_time_calc")
-    private String birthTimeCalc;
     @Column(name = "cd")
     private String cd;
-    @Column(name = "currSexCd")
+    @Column(name = "children_in_house_nbr")
+    private String childrenInHouseNbr;
+    @Column(name = "curr_sex_cd")
     private String currSexCd;
-    @Column(name = "deceasedIndCd")
+    @Column(name = "deceased_ind_cd")
     private String deceasedIndCd;
+    @Column(name = "deceased_time")
+    private String deceasedTime;
+    @Column(name = "dedup_match_ind")
+    private String dedupMatchInd;
+    @Column(name = "description")
+    private String description;
+    @Column(name = "education_level_cd")
+    private String educationLevelCd;
+    @Column(name = "edx_ind")
+    private String edxInd;
     @Column(name = "electronic_ind")
     private String electronicInd;
     @Column(name = "ethnic_group_ind")
     private String ethnicGroupInd;
+    @Column(name = "ethnic_unk_reason_cd")
+    private String ethnicUnkReasonCd;
     @Column(name = "last_chg_time")
     private String lastChgTime;
+    @Column(name = "last_chg_user_id")
+    private Long lastChgUserId;
+    @Column(name = "last_chg_user_name")
+    private String lastChgUserName;
+    @Column(name = "local_id")
+    private String localId;
     @Column(name = "marital_status_cd")
     private String maritalStatusCd;
+    @Column(name = "multiple_birth_ind")
+    private String multipleBirthInd;
+    @Column(name = "occupation_cd")
+    private String occupationCd;
+    @Column(name = "person_parent_uid")
+    private Long personParentUid;
+    @Column(name = "first_nm")
+    private String personFirstNm;
+    @Column(name = "last_nm")
+    private String personLastNm;
+    @Column(name = "middle_nm")
+    private String personMiddleNm;
+    @Column(name = "nm_suffix")
+    private String personNmSuffix;
+    @Column(name = "preferred_gender_cd")
+    private String preferredGenderCd;
+    @Column(name = "prim_lang_cd")
+    private String primLangCd;
     @Column(name = "record_status_cd")
     private String recordStatusCd;
     @Column(name = "record_status_time")
     private String recordStatusTime;
     @Column(name = "status_cd")
     private String statusCd;
-    @Column(name = "status_time")
-    private String statusTime;
-    @Column(name = "local_id")
-    private String localId;
-    @Column(name = "version_ctrl_nbr")
-    private String versionCtrlNbr;
-    @Column(name = "edx_ind")
-    private String edxInd;
-    @Column(name = "dedup_match_ind")
-    private String dedupMatchInd;
     @Column(name = "speaks_english_cd")
     private String speaksEnglishCd;
-    @Column(name = "ethnic_unk_reason_cd")
-    private String ethnicUnkReasonCd;
+    @Column(name = "status_time")
+    private String statusTime;
     @Column(name = "sex_unk_reason_cd")
     private String sexUnkReasonCd;
-    @Column(name = "preferred_gender_cd")
-    private String preferredGenderCd;
-    @Column(name = "additional_gender_cd")
-    private String additionalGenderCd;
-    @Column(name = "occupation_cd")
-    private String occupationCd;
-    @Column(name = "prim_lang_cd")
-    private String primLangCd;
-    @Column(name = "add_user_id")
-    private Long addUserId;
-    @Column(name = "last_chg_user_id")
-    private Long lastChgUserId;
-    @Column(name = "multiple_birth_ind")
-    private String multipleBirthInd;
-    @Column(name = "adults_in_house_nbr")
-    private String adultsInHouseNbr;
-    @Column(name = "birth_order_nbr")
-    private String birthOrderNbr;
-    @Column(name = "children_in_house_nbr")
-    private String childrenInHouseNbr;
-    @Column(name = "education_level_cd")
-    private String educationLevelCd;
-    @Column(name = "PATIENT_NAME_NESTED")
-    private String name;
-    @Column(name = "PATIENT_ADDRESS_NESTED")
-    private String address;
-    @Column(name = "PATIENT_RACE_NESTED")
-    private String race;
-    @Column(name = "PATIENT_TELEPHONE_NESTED")
-    private String telephone;
-    @Column(name = "PATIENT_EMAIL_NESTED")
-    private String email;
-    @Column(name = "PATIENT_ENTITY_ID_NESTED")
-    private String entityData;
-    @Column(name = "PATIENT_ADD_AUTH_NESTED")
-    private String addAuthNested;
-    @Column(name = "PATIENT_CHG_AUTH_NESTED")
-    private String chgAuthNested;
+    @Column(name = "version_ctrl_nbr")
+    private String versionCtrlNbr;
+
+    //Following are Json data formatted nested fields
+    @Column(name = "patient_name")
+    private String nameNested;
+    @Column(name = "patient_address")
+    private String addressNested;
+    @Column(name = "patient_race")
+    private String raceNested;
+    @Column(name = "patient_telephone")
+    private String telephoneNested;
+    @Column(name = "patient_email")
+    private String emailNested;
+    @Column(name = "patient_entity")
+    private String entityDataNested;
 
     /***
      * Transform the Name, Address, Race, Telephone, Email, EntityData(SSN), AddAuthUser, ChangeAuthUser
      * @return Fully Transformed Patient Object
      */
-    public PatientFull processPatient() {
-        PatientFull pf = new PatientFull().constructPersonFull(this);
+    public PatientReporting processPatientReporting() {
+        PatientReporting pf = new PatientReporting().constructPatientReporting(this);
         DataPostProcessor processor = new DataPostProcessor();
         try {
-            processor.processPersonName(name, pf);
-            processor.processPersonAddress(address, pf);
-            processor.processPersonRace(race, pf);
-            processor.processPersonTelephone(telephone, pf);
-            processor.processPersonAddAuth(addAuthNested, pf);
-            processor.processPersonChangeAuth(chgAuthNested, pf);
-            processor.processPersonEntityData(entityData, pf);
-            processor.processPersonEmail(email, pf);
+            processor.processPersonName(nameNested, pf);
+            processor.processPersonAddress(addressNested, pf);
+            processor.processPersonRace(raceNested, pf);
+            processor.processPersonTelephone(telephoneNested, pf);
+            processor.processPersonEntityData(entityDataNested, pf);
+            processor.processPersonEmail(emailNested, pf);
 
         } catch (JsonProcessingException e) {
             log.error("JsonProcessingException: ", e);
@@ -157,16 +151,20 @@ public class Patient {
         return pf;
     }
 
-    public PatientEnvelope constructPatientEnvelope() {
-        PatientFull pf = processPatient();
-        JsonNode jsonNode;
+    public PatientElasticSearch processPatientElastic() {
+        PatientElasticSearch pf = new PatientElasticSearch().constructObject(this);
+        DataPostProcessor processor = new DataPostProcessor();
         try {
-            JsonSchema schema = JsonSchemaUtils.getSchema(pf);
-            jsonNode = Objects.isNull(schema) ? null : schema.toJsonNode();
-        } catch (IOException e) {
-            //ToDo: Replace with Generic ExceptionHandler
-            throw new RuntimeException(e);
+            processor.processPersonName(nameNested, pf);
+            processor.processPersonAddress(addressNested, pf);
+            processor.processPersonRace(raceNested, pf);
+            processor.processPersonTelephone(telephoneNested, pf);
+            processor.processPersonEntityData(entityDataNested, pf);
+            processor.processPersonEmail(emailNested, pf);
+
+        } catch (JsonProcessingException e) {
+            log.error("JsonProcessingException: ", e);
         }
-        return new PatientEnvelope(jsonNode, pf);
+        return pf;
     }
 }

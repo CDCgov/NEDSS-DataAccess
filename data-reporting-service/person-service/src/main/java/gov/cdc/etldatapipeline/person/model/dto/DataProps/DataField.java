@@ -1,7 +1,6 @@
-package gov.cdc.etldatapipeline.person.model.dto.patient;
+package gov.cdc.etldatapipeline.person.model.dto.DataProps;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PatientEnvelope {
-    private JsonNode schema;
-    private PatientFull payload;
+public class DataField {
+    private String type;
+    private boolean optional = true;
+    private String field;
 }
