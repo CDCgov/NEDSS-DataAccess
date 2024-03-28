@@ -49,7 +49,7 @@ public class KafkaStreamsServiceTest {
 
 
     @Test
-    public void processPatientData() throws IOException {
+    public void processPatientReportingData() throws IOException {
         // Generate a Debezium Person Patient Change Data
         String personPatientOdseData = FileUtils.readFileToString(
                 new ClassPathResource("rawDataFiles/PersonPatientChangeData.json").getFile(),
@@ -62,49 +62,40 @@ public class KafkaStreamsServiceTest {
         //Construct transformed patient
         constructPatPrvFull(expectedPf);
 
-        StreamsBuilder streamsBuilder = new StreamsBuilder();
-        KafkaStreamsService ks = getKafkaStreamService();
-        ks.processMessage(streamsBuilder);
-        Topology topology = streamsBuilder.build();
-
-        try (TopologyTestDriver topologyTestDriver = new TopologyTestDriver(topology, new Properties())) {
-
-            TestInputTopic<String, String> inputTopic = topologyTestDriver
-                    .createInputTopic(personTopic, new StringSerializer(), new StringSerializer());
-
-            TestOutputTopic<String, String> patientReportingOutputTopic = topologyTestDriver
-                    .createOutputTopic(patientReportingTopic, new StringDeserializer(), new StringDeserializer());
-            inputTopic.pipeInput("10000001", personPatientOdseData);
-            List<KeyValue<String, String>> actualData = patientReportingOutputTopic.readKeyValuesToList();
-            Assertions.assertNotNull(actualData);
-
-            //Validate the Patient Payload
-            TypeReference<DataEnvelope> dataEnvelopeTypeReference = new TypeReference<>() {
-            };
-
-            DataEnvelope<PatientReporting> actualValue
-                    = objectMapper.readValue(actualData.get(0).value, dataEnvelopeTypeReference);
-            Assertions.assertEquals(
-                    objectMapper.readValue(FileUtils.readFileToString(
-                                    new ClassPathResource("rawDataFiles/PatientReporting.json").getFile(),
-                                    Charset.defaultCharset()),
-                            dataEnvelopeTypeReference),
-                    actualValue);
-
-            //Validate the Patient Key
-            DataEnvelope<DataEnvelope> actualKey
-                    = objectMapper.readValue(actualData.get(0).key, dataEnvelopeTypeReference);
-            Assertions.assertEquals(
-                    objectMapper.readValue(FileUtils.readFileToString(
-                                    new ClassPathResource("rawDataFiles/PatientKey.json").getFile(),
-                                    Charset.defaultCharset()),
-                            dataEnvelopeTypeReference),
-                    actualKey);
-        }
+        // Validate Patient Reporting Data Transformation
+        validateDataTransformation(
+                personPatientOdseData,
+                personTopic,
+                patientReportingTopic,
+                "rawDataFiles/PatientReporting.json",
+                "rawDataFiles/PatientKey.json" );
     }
 
     @Test
-    public void processProviderData() throws IOException {
+    public void processPatientElasticSearchData() throws IOException {
+        // Generate a Debezium Person Patient Change Data
+        String personPatientOdseData = FileUtils.readFileToString(
+                new ClassPathResource("rawDataFiles/PersonPatientChangeData.json").getFile(),
+                Charset.defaultCharset());
+
+        Patient patient = constructPatient();
+        Mockito.when(patientRepository.computePatients(anyString())).thenReturn(List.of(patient));
+        //Build expected unflattened Provider
+        PatientReporting expectedPf = new PatientReporting().constructPatientReporting(patient);
+        //Construct transformed patient
+        constructPatPrvFull(expectedPf);
+
+        // Validate Patient ElasticSearch Data Transformation
+        validateDataTransformation(
+                personPatientOdseData,
+                personTopic,
+                patientElasticTopic,
+                "rawDataFiles/PatientElastic.json",
+                "rawDataFiles/PatientKey.json" );
+    }
+
+    @Test
+    public void processProviderReportingData() throws IOException {
         // Generate a Debezium Person Patient Change Data
         String personProviderOdseData = FileUtils.readFileToString(
                 new ClassPathResource("rawDataFiles/PersonProviderChangeData.json").getFile(),
@@ -118,19 +109,42 @@ public class KafkaStreamsServiceTest {
         //Augment Provider with the flattened data
         constructPatPrvFull(expectedPf);
 
+        // Validate Patient Reporting Data Transformation
+        validateDataTransformation(
+                personProviderOdseData,
+                personTopic,
+                providerTopic,
+                "rawDataFiles/ProviderReporting.json",
+                "rawDataFiles/ProviderKey.json" );
+    }
+
+    /**
+     * Create a mock Kafka cluster and do stream processing of the Patient/Provider data
+     *
+     * @param incomingChangeData    Debezium Change Data
+     * @param inputTopicName        Input Topic to monitor
+     * @param outputTopicName       Output Topic to produce the transformed data
+     * @param expectedValueFilePath Expected transformed Json Value Data in the DataEnvelope format
+     * @param expectedKeyFilePath   Expected transformed Json Key Data in the DataEnvelope format
+     */
+    private void validateDataTransformation(
+            String incomingChangeData,
+            String inputTopicName,
+            String outputTopicName,
+            String expectedValueFilePath,
+            String expectedKeyFilePath) {
         StreamsBuilder streamsBuilder = new StreamsBuilder();
         KafkaStreamsService ks = getKafkaStreamService();
         ks.processMessage(streamsBuilder);
         Topology topology = streamsBuilder.build();
-
         try (TopologyTestDriver topologyTestDriver = new TopologyTestDriver(topology, new Properties())) {
 
             TestInputTopic<String, String> inputTopic = topologyTestDriver
-                    .createInputTopic(personTopic, new StringSerializer(), new StringSerializer());
+                    .createInputTopic(inputTopicName, new StringSerializer(), new StringSerializer());
 
             TestOutputTopic<String, String> outputTopic = topologyTestDriver
-                    .createOutputTopic(providerTopic, new StringDeserializer(), new StringDeserializer());
-            inputTopic.pipeInput("10000001", personProviderOdseData);
+                    .createOutputTopic(outputTopicName, new StringDeserializer(), new StringDeserializer());
+            inputTopic.pipeInput("10000001", incomingChangeData);
             List<KeyValue<String, String>> actualData = outputTopic.readKeyValuesToList();
             Assertions.assertNotNull(actualData);
 
@@ -142,7 +156,7 @@ public class KafkaStreamsServiceTest {
                     = objectMapper.readValue(actualData.get(0).value, dataEnvelopeTypeReference);
             Assertions.assertEquals(
                     objectMapper.readValue(FileUtils.readFileToString(
-                                    new ClassPathResource("rawDataFiles/ProviderReporting.json").getFile(),
+                                    new ClassPathResource(expectedValueFilePath).getFile(),
                                     Charset.defaultCharset()),
                             dataEnvelopeTypeReference),
                     actualValue);
@@ -153,10 +167,12 @@ public class KafkaStreamsServiceTest {
             //Construct expected Patient Key
             Assertions.assertEquals(
                     objectMapper.readValue(FileUtils.readFileToString(
-                                    new ClassPathResource("rawDataFiles/ProviderKey.json").getFile(),
+                                    new ClassPathResource(expectedKeyFilePath).getFile(),
                                     Charset.defaultCharset()),
                             dataEnvelopeTypeReference),
                     actualKey);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

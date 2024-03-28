@@ -1,6 +1,7 @@
 package gov.cdc.etldatapipeline.person.model.dto.patient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import gov.cdc.etldatapipeline.person.model.dto.DataRequiredFields;
@@ -67,10 +68,15 @@ public class PatientElasticSearch implements PersonExtendedProps, DataRequiredFi
 
 
     //Name from Person_Name ODSE Table
+    @JsonProperty("firstnm")
     private String firstnm;
+    @JsonProperty("middleNm")
     private String middleNm;
+    @JsonProperty("lastNm")
     private String lastNm;
+    @JsonProperty("nmSuffix")
     private String nmSuffix;
+    @JsonProperty("nmdegree")
     private String nmdegree;
     private String personNmSeq;
     private String nmUseCd;
