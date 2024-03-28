@@ -35,11 +35,11 @@ public class KafkaStreamsService {
     private final ProviderRepository providerRepository;
     @Value("#{kafkaConfig.getPersonTopicName()}")
     private String personTopicName;
-    @Value("#{kafkaConfig.patientElasticSearchTopic()}")
+    @Value("#{kafkaConfig.getPatientElasticSearchTopic()}")
     private String patientElasticSearchTopicName;
     @Value("#{kafkaConfig.getPatientReportingTopic()}")
     private String patientReportingOutputTopic;
-    @Value("#{kafkaConfig.providerReportingTopic()}")
+    @Value("#{kafkaConfig.getProviderReportingTopic()}")
     private String providerReportingOutputTopic;
 
     @Autowired
