@@ -16,7 +16,4 @@ public class InvestigationTransformed {
     private String cityCountyCaseNbr;
     private String legacyCaseId;
     private Long phcInvFormId;
-    private String investigationObservation;
-    private String investigationNotification;
-    private String investigationConfirmationMethod;
 }

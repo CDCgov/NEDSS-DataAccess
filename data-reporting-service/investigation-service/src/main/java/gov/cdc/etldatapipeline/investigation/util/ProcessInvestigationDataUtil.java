@@ -10,14 +10,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
+import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -44,7 +39,7 @@ public class ProcessInvestigationDataUtil {
         transformOrganizationParticipations(investigation.getOrganizationParticipations(), investigationTransformed, objectMapper);
         transformActIds(investigation.getActIds(), investigationTransformed, objectMapper);
         transformObservationNotificationIds(investigation.getObservationNotificationIds(), investigationTransformed, objectMapper);
-        transforminvestigationConfirmationMethod(investigation.getInvestigationConfirmationMethod(), investigationTransformed, objectMapper);
+        transformInvestigationConfirmationMethod(investigation.getInvestigationConfirmationMethod(), investigationTransformed, objectMapper);
 
         return investigationTransformed;
     }
@@ -145,26 +140,30 @@ public class ProcessInvestigationDataUtil {
                         observationIds.add(node.get("source_act_uid").asLong());
                     }
                 }
-                investigationNotification.setNotificationId(notificationIds);
-                investigationObservation.setObservationId(observationIds);
-                kafkaTemplate.send(investigationObservationOutputTopicName, investigationObservation.toString());
-                kafkaTemplate.send(investigationNotificationOutputTopicName, investigationObservation.toString());
+                for(Long id : notificationIds) {
+                    investigationNotification.setNotificationId(id);
+                    kafkaTemplate.send(investigationNotificationOutputTopicName, investigationObservation.toString());
+                }
+                for(Long id : observationIds) {
+                    investigationObservation.setObservationId(id);
+                    kafkaTemplate.send(investigationObservationOutputTopicName, investigationObservation.toString());
+                }
             }
         } catch (Exception e) {
             logger.error("Error processing Observation Notification Ids JSON array from investigation data: {}", e.getMessage());
         }
     }
 
-    private void transforminvestigationConfirmationMethod(String investigationConfirmationMethod, InvestigationTransformed investigationTransformed, ObjectMapper objectMapper) {
+    private void transformInvestigationConfirmationMethod(String investigationConfirmationMethod, InvestigationTransformed investigationTransformed, ObjectMapper objectMapper) {
         try {
             JsonNode investigationConfirmationMethodJsonArray = investigationConfirmationMethod != null ? objectMapper.readTree(investigationConfirmationMethod) : null;
-            InvestigationConfirmation investigationConfirmation = new InvestigationConfirmation();
+            InvestigationConfirmationMethod investigationConfirmation = new InvestigationConfirmationMethod();
             Long investigationId = null;
             Map<String, String> confirmationMethodMap = new HashMap<>();
             Instant confirmationMethodTime = null;
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
-            // Redundant time variable in case if all confirmation_method_time is null
+            // Redundant time variable in case if confirmation_method_time is null in all rows of the array
             String phcLastChgTime = null;
 
 
@@ -172,34 +171,31 @@ public class ProcessInvestigationDataUtil {
                 investigationId = investigationConfirmationMethodJsonArray.get(0).get("public_health_case_uid").asLong();
                 phcLastChgTime = investigationConfirmationMethodJsonArray.get(0).get("phc_last_chg_time").asText();
                 for(JsonNode node : investigationConfirmationMethodJsonArray) {
-                    String confirmationMethodTimeString = node.get("confirmation_method_time").asText().replaceAll("\"", "");
-                    //LocalDateTime time = LocalDateTime.parse(confirmationMethodTimeString);;
-                    Instant instant = null;
-                    if(confirmationMethodTimeString != null && !confirmationMethodTimeString.equals("null")) {
-                        LocalDateTime time = LocalDateTime.parse(confirmationMethodTimeString);
-                        instant = time.toInstant(ZoneOffset.UTC);
-                    }
-                    if (confirmationMethodTime == null || instant.isAfter(confirmationMethodTime)) {
-                        confirmationMethodTime = instant;
-                    }
+                        String confirmationMethodTimeString = node.get("confirmation_method_time").asText();
+                        Instant currentInstant = null;
+
+                        // While getting data from JSON node, it is considered as literal String and that is why the null check
+                        // has equals for null String instead of null value.
+                        if(confirmationMethodTimeString != null && !confirmationMethodTimeString.equals("null")) {
+                            Date dateTime = sdf.parse(confirmationMethodTimeString);
+                            currentInstant = dateTime.toInstant();
+                        }
+                        if (confirmationMethodTime == null || currentInstant.isAfter(confirmationMethodTime)) {
+                            confirmationMethodTime = currentInstant;
+                        }
                     confirmationMethodMap.put(node.get("confirmation_method_cd").asText(), node.get("confirmation_method_desc_txt").asText());
                 }
-                System.err.println("confirmationMethodMap is..." + confirmationMethodMap);
             }
             investigationConfirmation.setInvestigationId(investigationId);
+
             if(confirmationMethodTime == null) {
                 investigationConfirmation.setConfirmationMethodTime(phcLastChgTime);
             }
             for(String key : confirmationMethodMap.keySet()) {
                 investigationConfirmation.setConfirmationMethodCd(key);
                 investigationConfirmation.setConfirmationMethodDescTxt(confirmationMethodMap.get(key));
-                System.err.println("Investigation id..." + investigationId);
-                System.err.println("confirmationMethodTime is..." + confirmationMethodTime);
-                System.err.println("phcLastChgTime is..." + phcLastChgTime);
-                System.err.println("confirmationMethodMap is..." + confirmationMethodMap);
                 kafkaTemplate.send(investigationConfirmationOutputTopicName, investigationConfirmation.toString());
             }
-
         } catch (Exception e) {
             logger.error("Error processing investigation confirmation method JSON array from investigation data: {}", e.getMessage());
         }

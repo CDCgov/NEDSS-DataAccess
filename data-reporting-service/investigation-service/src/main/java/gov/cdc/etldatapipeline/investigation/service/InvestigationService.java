@@ -1,5 +1,6 @@
 package gov.cdc.etldatapipeline.investigation.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import gov.cdc.etldatapipeline.investigation.repository.InvestigationRepository;
@@ -39,8 +40,6 @@ public class InvestigationService {
     private final ProcessInvestigationDataUtil processDataUtil;
     private String topicDebugLog = "Received Investigation ID: {} from topic: {}";
 
-    private String investigationUid = "263771897";
-
 
     @Autowired
     public void processMessage(StreamsBuilder streamsBuilder) {
@@ -54,26 +53,19 @@ public class InvestigationService {
     public String processInvestigation(String value) {
         try {
             ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-//            JsonNode jsonNode = objectMapper.readTree(value);
-//            JsonNode payloadNode = jsonNode.get("payload").path("after");
-//            if (payloadNode != null && payloadNode.has("public_health_case_uid")) {
-//                String publicHealthCaseUid = payloadNode.get("public_health_case_uid").asText();
-//                logger.debug(topicDebugLog, publicHealthCaseUid, investigationTopic);
-                Optional<Investigation> investigationData = investigationRepository.computeInvestigations(investigationUid);
+            JsonNode jsonNode = objectMapper.readTree(value);
+            JsonNode payloadNode = jsonNode.get("payload").path("after");
+            if (payloadNode != null && payloadNode.has("public_health_case_uid")) {
+                String publicHealthCaseUid = payloadNode.get("public_health_case_uid").asText();
+                logger.debug(topicDebugLog, publicHealthCaseUid, investigationTopic);
+                Optional<Investigation> investigationData = investigationRepository.computeInvestigations(publicHealthCaseUid);
                 if(investigationData.isPresent()) {
+                    kafkaTemplate.send(investigationTopicOutput, investigationData.get().toString());
                     InvestigationTransformed investigationTransformed = processDataUtil.transformInvestigationData(investigationData.get());
                     kafkaTemplate.send(investigationTopicOutputTransformed, investigationTransformed.toString());
                     return objectMapper.writeValueAsString(investigationData);
                 }
-//                return investigationData.map(investigation -> {
-//                    try {
-//
-//                    } catch (JsonProcessingException e) {
-//                        log.error("Error processing investigation: {}", e.getMessage());
-//                        return null;
-//                    }
-//                }).orElse(null);
-//            }
+            }
         } catch (Exception e) {
             logger.error("Error processing investigation: {}", e.getMessage());
         }

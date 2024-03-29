@@ -4,12 +4,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.List;
-
 @Getter
 @Setter
 @ToString
 public class InvestigationObservation {
     private Long investigationId;
-    private List<Long> observationId;
+    private Long observationId;
 }
