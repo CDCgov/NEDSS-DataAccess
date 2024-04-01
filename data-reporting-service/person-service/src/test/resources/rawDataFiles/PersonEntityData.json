@@ -62,5 +62,13 @@
     "rootExtensionTxt": "86741517517",
     "entity_id_seq": 6,
     "ASSIGNING_AUTHORITY_CD": "3.16.740.1.113883.3.1147.1.1002"
+  },
+  {
+    "entity_uid": 242790995,
+    "typeCd": "INVALID",
+    "entity_id_seq": 10
+  },
+  {
+    "entity_uid": ""
   }
 ]

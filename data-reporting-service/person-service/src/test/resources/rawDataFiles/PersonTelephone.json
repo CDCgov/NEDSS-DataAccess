@@ -40,5 +40,15 @@
     "use_cd": "CP",
     "cd": "PH",
     "tele_locator_uid": 10000015
+  },
+  {
+    "telephoneNbr": "123212331",
+    "extensionTxt": "",
+    "use_cd": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+    "cd": "PHONE_NOT_VALID",
+    "tele_locator_uid": 100234015
+  },
+  {
+    "telephoneNbr": ""
   }
 ]

@@ -30,5 +30,11 @@
     "USE_CD": "H",
     "cd": "H",
     "postal_locator_uid": 10000010
+  },
+  {
+    "streetAddr1": "Test street",
+    "streetAddr2": "",
+    "city": "NYC",
+    "zip": ""
   }
 ]
