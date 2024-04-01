@@ -2,6 +2,7 @@ package gov.cdc.etldatapipeline.person.model.dto.patient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
 import gov.cdc.etldatapipeline.person.utils.DataPostProcessor;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -135,24 +136,14 @@ public class Patient {
      * @return Fully Transformed Patient Object
      */
     public PatientReporting processPatientReporting() {
-        PatientReporting pf = new PatientReporting().constructPatientReporting(this);
-        DataPostProcessor processor = new DataPostProcessor();
-        try {
-            processor.processPersonName(nameNested, pf);
-            processor.processPersonAddress(addressNested, pf);
-            processor.processPersonRace(raceNested, pf);
-            processor.processPersonTelephone(telephoneNested, pf);
-            processor.processPersonEntityData(entityDataNested, pf);
-            processor.processPersonEmail(emailNested, pf);
-
-        } catch (JsonProcessingException e) {
-            log.error("JsonProcessingException: ", e);
-        }
-        return pf;
+        return postProcessJsonData(new PatientReporting().constructObject(this));
     }
 
     public PatientElasticSearch processPatientElastic() {
-        PatientElasticSearch pf = new PatientElasticSearch().constructObject(this);
+        return postProcessJsonData(new PatientElasticSearch().constructObject(this));
+    }
+
+    private <T extends PersonExtendedProps> T postProcessJsonData(T pf) {
         DataPostProcessor processor = new DataPostProcessor();
         try {
             processor.processPersonName(nameNested, pf);

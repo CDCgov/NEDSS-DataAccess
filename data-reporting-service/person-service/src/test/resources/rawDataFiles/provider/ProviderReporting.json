@@ -105,6 +105,16 @@
       {
         "type": "string",
         "optional": true,
+        "field": "name_prefix"
+      },
+      {
+        "type": "string",
+        "optional": true,
+        "field": "country_code"
+      },
+      {
+        "type": "string",
+        "optional": true,
         "field": "street_address_2"
       },
       {
@@ -116,11 +126,6 @@
         "type": "string",
         "optional": true,
         "field": "zip"
-      },
-      {
-        "type": "string",
-        "optional": true,
-        "field": "country"
       },
       {
         "type": "string",
@@ -186,18 +191,13 @@
     "add_time": null,
     "last_chg_user_name": null,
     "last_chg_time": null,
-    "first_name": "Suurma",
-    "middle_name": "Js",
-    "last_name": "Singgh",
-    "name_suffix": "Jr",
-    "name_degree": null,
     "city": "Atlanta",
     "state": "Georgia",
     "state_code": "13",
     "zip": "30025",
     "county": "Gwinnett County",
     "county_code": "13135",
-    "country": "United States",
+    "country_code": "840",
     "address_comments": null,
     "phone_work": "2323222422",
     "phone_ext_work": "232",
@@ -207,6 +207,12 @@
     "provider_quick_code": "12314286",
     "provider_registration_num": "86741517517",
     "provider_registration_num_auth": "3.16.740.1.113883.3.1147.1.1002",
+    "first_name": "Suurma",
+    "middle_name": "Js",
+    "last_name": "Singgh",
+    "name_suffix": "Jr",
+    "name_prefix": null,
+    "name_degree": null,
     "street_address_1": "123 Main St.",
     "street_address_2": ""
   }

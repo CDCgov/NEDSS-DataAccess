@@ -2,37 +2,36 @@ package gov.cdc.etldatapipeline.person;
 
 import gov.cdc.etldatapipeline.person.model.dto.patient.Patient;
 import gov.cdc.etldatapipeline.person.model.dto.patient.PatientReporting;
-import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
+import static gov.cdc.etldatapipeline.person.TestUtils.readFileData;
+
 public class PatientDataPostProcessingTests {
+    private static final String FILE_PREFIX = "rawDataFiles/person/";
     @Test
     public void consolidatedPatientTransformationTest() {
 
         // Build the PatientProvider object with the json serialized data
         Patient p = new Patient();
-        p.setNameNested(readFileData("PersonName.json"));
-        p.setAddressNested(readFileData("PersonAddress.json"));
-        p.setRaceNested(readFileData("PersonRace.json"));
-        p.setTelephoneNested(readFileData("PersonTelephone.json"));
-        p.setEntityDataNested(readFileData("PersonEntityData.json"));
-        p.setEmailNested(readFileData("PersonEmail.json"));
+        p.setNameNested(readFileData(FILE_PREFIX + "PersonName.json"));
+        p.setAddressNested(readFileData(FILE_PREFIX +"PersonAddress.json"));
+        p.setRaceNested(readFileData(FILE_PREFIX +"PersonRace.json"));
+        p.setTelephoneNested(readFileData(FILE_PREFIX +"PersonTelephone.json"));
+        p.setEntityDataNested(readFileData(FILE_PREFIX +"PersonEntityData.json"));
+        p.setEmailNested(readFileData(FILE_PREFIX +"PersonEmail.json"));
 
         // PatientProvider Fields to be processed
         Function<PatientReporting, List<Object>> pDetailsFn = (pf) -> Arrays.asList(
-                pf.getLastName(),
-                pf.getMiddleName(),
-                pf.getFirstName(),
-                pf.getNameSuffix(),
+                pf.getLastNm(),
+                pf.getMiddleNm(),
+                pf.getFirstNm(),
+                pf.getNmSuffix(),
                 pf.getStreetAddress1(),
                 pf.getStreetAddress2(),
                 pf.getCity(),
@@ -89,14 +88,14 @@ public class PatientDataPostProcessingTests {
 
         // Build the PatientProvider object with the json serialized data
         Patient patient = new Patient();
-        patient.setNameNested(readFileData("PersonName.json"));
+        patient.setNameNested(readFileData(FILE_PREFIX +"PersonName.json"));
 
         // PatientProviderProvider Fields to be processed
         Function<PatientReporting, List<String>> pDetailsFn = (p) -> Arrays.asList(
-                p.getLastName(),
-                p.getMiddleName(),
-                p.getFirstName(),
-                p.getNameSuffix());
+                p.getLastNm(),
+                p.getMiddleNm(),
+                p.getFirstNm(),
+                p.getNmSuffix());
         // Process the respective field json to PatientProviderProvider fields
         PatientReporting pf = patient.processPatientReporting();
         // Expected
@@ -114,7 +113,7 @@ public class PatientDataPostProcessingTests {
 
         // Build the PatientProvider object with the json serialized data
         Patient perOp = new Patient();
-        perOp.setAddressNested(readFileData("PersonAddress.json"));
+        perOp.setAddressNested(readFileData(FILE_PREFIX +"PersonAddress.json"));
 
         // PatientProvider Fields to be processed
         Function<PatientReporting, List<String>> pDetailsFn = (p) -> Arrays.asList(
@@ -151,7 +150,7 @@ public class PatientDataPostProcessingTests {
 
         // Build the PatientProvider object with the json serialized data
         Patient patient = new Patient();
-        patient.setTelephoneNested(readFileData("PersonTelephone.json"));
+        patient.setTelephoneNested(readFileData(FILE_PREFIX +"PersonTelephone.json"));
 
         // PatientProvider Fields to be processed
         Function<PatientReporting, List<String>> pDetailsFn = (p) -> Arrays.asList(
@@ -179,7 +178,7 @@ public class PatientDataPostProcessingTests {
 
         // Build the PatientProvider object with the json serialized data
         Patient patient = new Patient();
-        patient.setEntityDataNested(readFileData("PersonEntityData.json"));
+        patient.setEntityDataNested(readFileData(FILE_PREFIX +"PersonEntityData.json"));
 
         // PatientProvider Fields to be processed
         Function<PatientReporting, List<String>> pDetailsFn = (p) -> Arrays.asList(
@@ -203,7 +202,7 @@ public class PatientDataPostProcessingTests {
 
         // Build the PatientProvider object with the json serialized data
         Patient patient = new Patient();
-        patient.setEmailNested(readFileData("PersonEmail.json"));
+        patient.setEmailNested(readFileData(FILE_PREFIX +"PersonEmail.json"));
 
         // PatientProvider Fields to be processed
         Function<PatientReporting, List<String>> pDetailsFn = (p) -> Collections.singletonList(p.getEmail());
@@ -214,16 +213,5 @@ public class PatientDataPostProcessingTests {
         List<String> expected = List.of("someone2@email.com");
         // Validate the PatientProvider field processing
         Assertions.assertEquals(expected, pDetailsFn.apply(pf));
-    }
-
-    private String readFileData(String fileName) {
-        String filePathPrefix = "src/test/resources/rawDataFiles/";
-        try {
-            return FileUtils.readFileToString(
-                    new File(filePathPrefix + fileName),
-                    Charset.defaultCharset());
-        } catch (IOException e) {
-            throw new RuntimeException("File Read failed : " + fileName);
-        }
     }
 }

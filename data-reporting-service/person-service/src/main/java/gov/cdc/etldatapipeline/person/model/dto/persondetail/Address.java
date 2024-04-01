@@ -49,6 +49,9 @@ public class Address {
         personFull.setHomeCountry(homeCountry);
         personFull.setBirthCountry(birthCountry);
         personFull.setAddressComments(addressComments);
+        personFull.setAddrElpCd(cd);
+        personFull.setAddrElpUseCd(useCd);
+        personFull.setAddrPlUid(postalLocatorUid);
         return personFull;
     }
 }

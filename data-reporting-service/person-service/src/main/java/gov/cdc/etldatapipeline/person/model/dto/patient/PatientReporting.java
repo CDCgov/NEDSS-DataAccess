@@ -50,10 +50,14 @@ public class PatientReporting implements PersonExtendedProps, DataRequiredFields
     private String lastChgUserName;
 
     //Name from Person_Name ODSE Table
-    private String firstName;
-    private String middleName;
-    private String lastName;
-    private String nameSuffix;
+    @JsonProperty("first_name")
+    private String firstNm;
+    @JsonProperty("middle_name")
+    private String middleNm;
+    @JsonProperty("last_name")
+    private String lastNm;
+    @JsonProperty("name_suffix")
+    private String nmSuffix;
     private String aliasNickname;
 
     //Address
@@ -144,7 +148,7 @@ public class PatientReporting implements PersonExtendedProps, DataRequiredFields
     @JsonProperty("race_white_all")
     private String raceWhiteAll;
 
-    public PatientReporting constructPatientReporting(Patient p) {
+    public PatientReporting constructObject(Patient p) {
         setPatientUid(p.getPatientUid());
         setAddlGenderInfo(p.getAdditionalGenderCd());
         setAddUserId(p.getAddUserId());
@@ -185,26 +189,5 @@ public class PatientReporting implements PersonExtendedProps, DataRequiredFields
      */
     public Set<String> getRequiredFields() {
         return Set.of("patientUid");
-    }
-
-
-    @Override
-    public void setPersonNameFirstNm(String firstNm) {
-        setFirstName(firstNm);
-    }
-
-    @Override
-    public void setPersonNameMiddleNm(String middleNm) {
-        setMiddleName(middleNm);
-    }
-
-    @Override
-    public void setPersonNameLastNm(String lastNm) {
-        setLastName(lastNm);
-    }
-
-    @Override
-    public void setPersonNameNmSuffix(String nmSuffix) {
-        setNameSuffix(nmSuffix);
     }
 }

@@ -1,6 +1,5 @@
 CREATE or ALTER PROCEDURE dbo.sp_provider_event @user_id_list varchar(max)
 AS
-
 BEGIN
 
     BEGIN TRY
@@ -103,6 +102,7 @@ BEGIN
                                                   soundex(pn.first_nm)                                 firstNmSndx,
                                                   pn.nm_use_cd,
                                                   pn.nm_suffix                                         nmSuffix,
+                                                  pn.nm_prefix                                         nmPrefix,
                                                   pn.nm_degree                                         nmDegree,
                                                   pn.person_name_seq,
                                                   pn.last_chg_time AS                                  [pn_last_chg_time]
@@ -123,18 +123,11 @@ BEGIN
                                            FOR json path, INCLUDE_NULL_VALUES) AS entity_id) AS entity_id) AS nested
         WHERE p.person_uid in (SELECT value FROM STRING_SPLIT(@user_id_list, ','))
           AND p.cd = 'PRV';
-
-
     end try
     BEGIN CATCH
-
-
         IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
-
         DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
-
         return @ErrorMessage;
-
     END CATCH
 
 end

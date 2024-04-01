@@ -31,10 +31,17 @@ public class ProviderReporting implements PersonExtendedProps, DataRequiredField
     private String lastChgTime;
 
     //Name from Person_Name ODSE Table
-    private String firstName;
-    private String middleName;
-    private String lastName;
-    private String nameSuffix;
+    @JsonProperty("first_name")
+    private String firstNm;
+    @JsonProperty("middle_name")
+    private String middleNm;
+    @JsonProperty("last_name")
+    private String lastNm;
+    @JsonProperty("name_suffix")
+    private String nmSuffix;
+    @JsonProperty("name_prefix")
+    private String nmPrefix;
+    @JsonProperty("name_degree")
     private String nameDegree;
 
     //Address
@@ -48,7 +55,7 @@ public class ProviderReporting implements PersonExtendedProps, DataRequiredField
     private String zip;
     private String county;
     private String countyCode;
-    private String country;
+    private String countryCode;
     private String addressComments;
 
 
@@ -70,7 +77,7 @@ public class ProviderReporting implements PersonExtendedProps, DataRequiredField
      * Transform the Name, Address,  Telephone, Email, EntityData(SSN), AddAuthUser, ChangeAuthUser
      * @return Fully Transformed Provider Object
      */
-    public ProviderReporting constructProviderFull(Provider p) {
+    public ProviderReporting constructObject(Provider p) {
         setProviderUid(p.getPersonUid());
         setLocalId(p.getLocalId());
         setRecordStatus(p.getRecordStatusCd());
@@ -96,37 +103,8 @@ public class ProviderReporting implements PersonExtendedProps, DataRequiredField
     }
 
     @Override
-    public void setPersonNameFirstNm(String firstNm) {
-        setFirstName(firstNm);
-    }
-
-    @Override
-    public void setPersonNameMiddleNm(String middleNm) {
-        setMiddleName(middleNm);
-    }
-
-    @Override
-    public void setPersonNameLastNm(String lastNm) {
-        setLastName(lastNm);
-    }
-
-    @Override
-    public void setPersonNameNmSuffix(String nmSuffix) {
-        setNameSuffix(nmSuffix);
-    }
-
-    @Override
-    public void setCountryCode(String countryCode) {
-        setCountry(countryCode);
-    }
-
-    @Override
     public void setEmail(String email) {
         setEmailWork(email);
     }
 
-    @Override
-    public void setHomeCountry(String homeCountry) {
-        setCountry(homeCountry);
-    }
 }

@@ -44,78 +44,83 @@ public class KafkaStreamsServiceTest {
     private final String personTopic = "PersonTopic";
     private final String patientElasticTopic = "PatientElasticTopic";
     private final String patientReportingTopic = "PatientReportingTopic";
-    private final String providerTopic = "ProviderTopic";
+    private final String providerElasticTopic = "ProviderElasticTopic";
+    private final String providerReportingTopic = "ProviderReportingTopic";
     private final ObjectMapper objectMapper = new ObjectMapper();
 
 
     @Test
-    public void processPatientReportingData() throws IOException {
-        // Generate a Debezium Person Patient Change Data
-        String personPatientOdseData = FileUtils.readFileToString(
-                new ClassPathResource("rawDataFiles/PersonPatientChangeData.json").getFile(),
-                Charset.defaultCharset());
-
+    public void processPatientReportingData() {
         Patient patient = constructPatient();
         Mockito.when(patientRepository.computePatients(anyString())).thenReturn(List.of(patient));
         //Build expected unflattened Provider
-        PatientReporting expectedPf = new PatientReporting().constructPatientReporting(patient);
+        PatientReporting expectedPf = new PatientReporting().constructObject(patient);
         //Construct transformed patient
         constructPatPrvFull(expectedPf);
 
         // Validate Patient Reporting Data Transformation
         validateDataTransformation(
-                personPatientOdseData,
+                readFileData("rawDataFiles/person/PersonPatientChangeData.json"),
                 personTopic,
                 patientReportingTopic,
-                "rawDataFiles/PatientReporting.json",
-                "rawDataFiles/PatientKey.json");
+                "rawDataFiles/patient/PatientReporting.json",
+                "rawDataFiles/patient/PatientKey.json");
     }
 
     @Test
-    public void processPatientElasticSearchData() throws IOException {
-        // Generate a Debezium Person Patient Change Data
-        String personPatientOdseData = FileUtils.readFileToString(
-                new ClassPathResource("rawDataFiles/PersonPatientChangeData.json").getFile(),
-                Charset.defaultCharset());
-
+    public void processPatientElasticSearchData() {
         Patient patient = constructPatient();
         Mockito.when(patientRepository.computePatients(anyString())).thenReturn(List.of(patient));
         //Build expected unflattened Provider
-        PatientReporting expectedPf = new PatientReporting().constructPatientReporting(patient);
+        PatientReporting expectedPf = new PatientReporting().constructObject(patient);
         //Construct transformed patient
         constructPatPrvFull(expectedPf);
 
         // Validate Patient ElasticSearch Data Transformation
         validateDataTransformation(
-                personPatientOdseData,
+                readFileData("rawDataFiles/person/PersonPatientChangeData.json"),
                 personTopic,
                 patientElasticTopic,
-                "rawDataFiles/PatientElastic.json",
-                "rawDataFiles/PatientKey.json");
+                "rawDataFiles/patient/PatientElastic.json",
+                "rawDataFiles/patient/PatientKey.json");
     }
 
     @Test
-    public void processProviderReportingData() throws IOException {
-        // Generate a Debezium Person Patient Change Data
-        String personProviderOdseData = FileUtils.readFileToString(
-                new ClassPathResource("rawDataFiles/PersonProviderChangeData.json").getFile(),
-                Charset.defaultCharset());
-
+    public void processProviderReportingData() {
         Provider constructedProvider = constructProvider();
         Mockito.when(providerRepository.computeProviders(anyString())).thenReturn(List.of(constructedProvider));
 
         //Build expected unflattened Provider
-        ProviderReporting expectedPf = new ProviderReporting().constructProviderFull(constructedProvider);
+        ProviderReporting expectedPf = new ProviderReporting().constructObject(constructedProvider);
         //Augment Provider with the flattened data
         constructPatPrvFull(expectedPf);
 
         // Validate Patient Reporting Data Transformation
         validateDataTransformation(
-                personProviderOdseData,
+                readFileData("rawDataFiles/person/PersonProviderChangeData.json"),
                 personTopic,
-                providerTopic,
-                "rawDataFiles/ProviderReporting.json",
-                "rawDataFiles/ProviderKey.json");
+                providerReportingTopic,
+                "rawDataFiles/provider/ProviderReporting.json",
+                "rawDataFiles/provider/ProviderKey.json");
+    }
+
+    @Test
+    public void processProviderElasticSearchData() {
+        Provider constructedProvider = constructProvider();
+        Mockito.when(providerRepository.computeProviders(anyString())).thenReturn(List.of(constructedProvider));
+
+        //Build expected unflattened Provider
+        ProviderReporting expectedPf = new ProviderReporting().constructObject(constructedProvider);
+        //Augment Provider with the flattened data
+        constructPatPrvFull(expectedPf);
+
+        // Validate Patient Reporting Data Transformation
+        validateDataTransformation(
+                readFileData("rawDataFiles/person/PersonProviderChangeData.json"),
+                personTopic,
+                providerElasticTopic,
+                "rawDataFiles/provider/ProviderElasticSearch.json",
+                "rawDataFiles/provider/ProviderKey.json");
     }
 
     /**
@@ -182,30 +187,33 @@ public class KafkaStreamsServiceTest {
         ks.setPersonTopicName(personTopic);
         ks.setPatientElasticSearchTopicName(patientElasticTopic);
         ks.setPatientReportingOutputTopic(patientReportingTopic);
-        ks.setProviderReportingOutputTopic(providerTopic);
+        ks.setProviderReportingOutputTopic(providerReportingTopic);
+        ks.setProviderElasticSearchOutputTopic(providerElasticTopic);
         return ks;
     }
 
     private Patient constructPatient() {
         Patient p = new Patient();
         p.setPatientUid(10000001L);
-        p.setNameNested(readFileData("PersonName.json"));
-        p.setAddressNested(readFileData("PersonAddress.json"));
-        p.setRaceNested(readFileData("PersonRace.json"));
-        p.setTelephoneNested(readFileData("PersonTelephone.json"));
-        p.setEntityDataNested(readFileData("PersonEntityData.json"));
-        p.setEmailNested(readFileData("PersonEmail.json"));
+        String filePathPrefix = "rawDataFiles/person/";
+        p.setNameNested(readFileData(filePathPrefix + "PersonName.json"));
+        p.setAddressNested(readFileData(filePathPrefix + "PersonAddress.json"));
+        p.setRaceNested(readFileData(filePathPrefix + "PersonRace.json"));
+        p.setTelephoneNested(readFileData(filePathPrefix + "PersonTelephone.json"));
+        p.setEntityDataNested(readFileData(filePathPrefix + "PersonEntityData.json"));
+        p.setEmailNested(readFileData(filePathPrefix + "PersonEmail.json"));
         return p;
     }
 
     private Provider constructProvider() {
         Provider p = new Provider();
         p.setPersonUid(10000001L);
-        p.setNameNested(readFileData("PersonName.json"));
-        p.setAddressNested(readFileData("PersonAddress.json"));
-        p.setTelephoneNested(readFileData("PersonTelephone.json"));
-        p.setEntityDataNested(readFileData("PersonEntityData.json"));
-        p.setEmailNested(readFileData("PersonEmail.json"));
+        String filePathPrefix = "rawDataFiles/person/";
+        p.setNameNested(readFileData(filePathPrefix + "PersonName.json"));
+        p.setAddressNested(readFileData(filePathPrefix + "PersonAddress.json"));
+        p.setTelephoneNested(readFileData(filePathPrefix + "PersonTelephone.json"));
+        p.setEntityDataNested(readFileData(filePathPrefix + "PersonEntityData.json"));
+        p.setEmailNested(readFileData(filePathPrefix + "PersonEmail.json"));
         return p;
     }
 
