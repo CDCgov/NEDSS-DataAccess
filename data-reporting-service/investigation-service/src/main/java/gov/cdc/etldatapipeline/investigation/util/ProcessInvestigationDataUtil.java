@@ -38,7 +38,8 @@ public class ProcessInvestigationDataUtil {
         transformPersonParticipations(investigation.getPersonParticipations(), investigationTransformed, objectMapper);
         transformOrganizationParticipations(investigation.getOrganizationParticipations(), investigationTransformed, objectMapper);
         transformActIds(investigation.getActIds(), investigationTransformed, objectMapper);
-        transformObservationNotificationIds(investigation.getObservationNotificationIds(), investigationTransformed, objectMapper);
+        transformNotificationIds(investigation.getObservationNotificationIds(), objectMapper);
+        transformObservationIds(investigation.getObservationNotificationIds(), investigationTransformed, objectMapper);
         transformInvestigationConfirmationMethod(investigation.getInvestigationConfirmationMethod(), investigationTransformed, objectMapper);
 
         return investigationTransformed;
@@ -115,35 +116,53 @@ public class ProcessInvestigationDataUtil {
         }
     }
 
-    private void transformObservationNotificationIds(String observationNotificationIds, InvestigationTransformed investigationTransformed, ObjectMapper objectMapper) {
+    private void transformNotificationIds(String observationNotificationIds, ObjectMapper objectMapper) {
         try {
-            JsonNode observationNotificationIdsJsonArray = observationNotificationIds != null ? objectMapper.readTree(observationNotificationIds) : null;
+            JsonNode investigationNotificationIdsJsonArray = observationNotificationIds != null ? objectMapper.readTree(observationNotificationIds) : null;
             InvestigationNotification investigationNotification = new InvestigationNotification();
-            InvestigationObservation investigationObservation = new InvestigationObservation();
             List<Long> notificationIds = new ArrayList<>();
+
+            if(investigationNotificationIdsJsonArray != null && investigationNotificationIdsJsonArray.isArray()) {
+                for(JsonNode node : investigationNotificationIdsJsonArray) {
+                    String sourceClassCode = node.get("source_class_cd").asText();
+                    String actTypeCode = node.get("act_type_cd").asText();
+
+                    if(sourceClassCode.equals("NOTF") && actTypeCode.equals("Notification")) {
+                        investigationNotification.setInvestigationId(node.get("public_health_case_uid").asLong());
+                        notificationIds.add(node.get("source_act_uid").asLong());
+                    }
+                }
+                for(Long id : notificationIds) {
+                    investigationNotification.setNotificationId(id);
+                    kafkaTemplate.send(investigationNotificationOutputTopicName, investigationNotification.toString());
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Error processing Observation Notification Ids JSON array from investigation data: {}", e.getMessage());
+        }
+    }
+
+    private void transformObservationIds(String observationNotificationIds, InvestigationTransformed investigationTransformed, ObjectMapper objectMapper) {
+        try {
+            JsonNode investigationObservationIdsJsonArray = observationNotificationIds != null ? objectMapper.readTree(observationNotificationIds) : null;
+            InvestigationObservation investigationObservation = new InvestigationObservation();
             List<Long> observationIds = new ArrayList<>();
 
-            if(observationNotificationIdsJsonArray != null && observationNotificationIdsJsonArray.isArray()) {
-                for(JsonNode node : observationNotificationIdsJsonArray) {
+            if(investigationObservationIdsJsonArray != null && investigationObservationIdsJsonArray.isArray()) {
+                for(JsonNode node : investigationObservationIdsJsonArray) {
                     String sourceClassCode = node.get("source_class_cd").asText();
                     String actTypeCode = node.get("act_type_cd").asText();
 
                     if(sourceClassCode.equals("OBS") && actTypeCode.equals("PHCInvForm")) {
                         investigationTransformed.setPhcInvFormId(node.get("source_act_uid").asLong());
                     }
-                    if(sourceClassCode.equals("NOTF") && actTypeCode.equals("Notification")) {
-                        investigationNotification.setInvestigationId(node.get("public_health_case_uid").asLong());
-                        notificationIds.add(node.get("source_act_uid").asLong());
-                    }
+
                     if(sourceClassCode.equals("OBS") && actTypeCode.equals("LabReport")) {
                         investigationObservation.setInvestigationId(node.get("public_health_case_uid").asLong());
                         observationIds.add(node.get("source_act_uid").asLong());
                     }
                 }
-                for(Long id : notificationIds) {
-                    investigationNotification.setNotificationId(id);
-                    kafkaTemplate.send(investigationNotificationOutputTopicName, investigationObservation.toString());
-                }
+
                 for(Long id : observationIds) {
                     investigationObservation.setObservationId(id);
                     kafkaTemplate.send(investigationObservationOutputTopicName, investigationObservation.toString());

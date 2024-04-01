@@ -60,7 +60,6 @@ public class InvestigationService {
                 logger.debug(topicDebugLog, publicHealthCaseUid, investigationTopic);
                 Optional<Investigation> investigationData = investigationRepository.computeInvestigations(publicHealthCaseUid);
                 if(investigationData.isPresent()) {
-                    kafkaTemplate.send(investigationTopicOutput, investigationData.get().toString());
                     InvestigationTransformed investigationTransformed = processDataUtil.transformInvestigationData(investigationData.get());
                     kafkaTemplate.send(investigationTopicOutputTransformed, investigationTransformed.toString());
                     return objectMapper.writeValueAsString(investigationData);

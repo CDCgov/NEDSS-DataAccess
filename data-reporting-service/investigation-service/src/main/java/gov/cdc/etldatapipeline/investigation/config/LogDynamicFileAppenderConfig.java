@@ -34,7 +34,7 @@ public class LogDynamicFileAppenderConfig<E> extends FileAppender<E> {
 
         if (logFilePath.contains("%d{")) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-            dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+            dateFormat.setTimeZone(TimeZone.getDefault());
             String formattedDate = dateFormat.format(new Date());
             logFilePath = logFilePath.replace("%d{yyyy-MM-dd_HH-mm-ss}", formattedDate);
         }

@@ -3,16 +3,12 @@ package gov.cdc.etldatapipeline.investigation.repository.model.dto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 
 import java.time.Instant;
 
 @Entity
-@Getter
-@Setter
-@ToString
+@Data
 public class Investigation {
 
     @Id
