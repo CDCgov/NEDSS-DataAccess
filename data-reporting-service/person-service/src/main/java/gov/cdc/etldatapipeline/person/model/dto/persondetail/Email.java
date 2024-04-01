@@ -21,6 +21,9 @@ public class Email {
 
     public <T extends PersonExtendedProps> T updatePerson(T personFull) {
         personFull.setEmail(emailAddress);
+        personFull.setEmailElpCd(cd);
+        personFull.setEmailElpUseCd(useCd);
+        personFull.setEmailTlUid(teleLocatorUid);
         return personFull;
     }
 }

@@ -21,6 +21,9 @@ public class Phone {
     private Long teleLocatorUid;
 
     public <T extends PersonExtendedProps> T updatePerson(T personFull) {
+        personFull.setPhElpCd(cd);
+        personFull.setPhElpUseCd(useCd);
+        personFull.setPhTlUid(teleLocatorUid);
         if (useCd.equalsIgnoreCase("WP")) {
             personFull.setPhoneWork(telephoneNbr);
             personFull.setPhoneExtWork(extensionTxt);

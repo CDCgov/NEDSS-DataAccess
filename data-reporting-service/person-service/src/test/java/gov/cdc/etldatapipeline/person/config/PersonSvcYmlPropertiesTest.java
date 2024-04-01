@@ -28,7 +28,7 @@ public class PersonSvcYmlPropertiesTest {
         Assertions.assertEquals("cdc.nbs_odse.dbo.Provider.input", kafkaConfig.getProviderInputTopicName());
         Assertions.assertEquals("nbs_patient_elastic", kafkaConfig.getPatientElasticSearchTopic());
         Assertions.assertEquals("nbs_patient", kafkaConfig.getPatientReportingTopic());
-        Assertions.assertEquals("nbs_provider_elastic", kafkaConfig.getProviderElasticTopic());
+        Assertions.assertEquals("nbs_provider_elastic", kafkaConfig.getProviderElasticSearchTopic());
         Assertions.assertEquals("nbs_provider", kafkaConfig.getProviderReportingTopic());
         Assertions.assertEquals("nbs_organization", kafkaConfig.getOrganizationAggregateTopicName());
     }

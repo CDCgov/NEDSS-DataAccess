@@ -22,6 +22,7 @@ public class DataPostProcessor {
     public <T extends PersonExtendedProps> void processPersonName(String name, T pf) throws JsonProcessingException {
         if (!ObjectUtils.isEmpty(name)) {
             Arrays.stream(mapper.readValue(name, Name[].class))
+                    .filter(pName -> !ObjectUtils.isEmpty(pName.getPersonUid()))
                     .max(Comparator.comparing(Name::getPersonUid))
                     .map(n -> n.updatePerson(pf));
         }
@@ -30,6 +31,7 @@ public class DataPostProcessor {
     public <T extends PersonExtendedProps> void processPersonAddress(String address, T pf) throws JsonProcessingException {
         if (!ObjectUtils.isEmpty(address)) {
             Arrays.stream(mapper.readValue(address, Address[].class))
+                    .filter(pAddress -> !ObjectUtils.isEmpty(pAddress.getPostalLocatorUid()))
                     .max(Comparator.comparing(Address::getPostalLocatorUid))
                     .map(n -> n.updatePerson(pf));
         }
@@ -38,6 +40,7 @@ public class DataPostProcessor {
     public <T extends PersonExtendedProps> void processPersonRace(String race, T pf) throws JsonProcessingException {
         if (!ObjectUtils.isEmpty(race)) {
             Arrays.stream(mapper.readValue(race, Race[].class))
+                    .filter(pRace -> !ObjectUtils.isEmpty(pRace.getPersonUid()))
                     .max(Comparator.comparing(Race::getPersonUid))
                     .map(n -> n.updatePerson(pf));
         }
@@ -83,6 +86,7 @@ public class DataPostProcessor {
     public <T extends PersonExtendedProps> void processPersonEmail(String email, T pf) throws JsonProcessingException {
         if (!ObjectUtils.isEmpty(email)) {
             Arrays.stream(mapper.readValue(email, Email[].class))
+                    .filter(pEmail -> !ObjectUtils.isEmpty(pEmail.getTeleLocatorUid()))
                     .max(Comparator.comparing(Email::getTeleLocatorUid))
                     .map(n -> n.updatePerson(pf));
         }

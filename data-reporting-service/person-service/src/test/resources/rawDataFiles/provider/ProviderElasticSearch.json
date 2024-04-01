@@ -30,17 +30,27 @@
       {
         "type": "string",
         "optional": true,
+        "field": "person_name_seq"
+      },
+      {
+        "type": "string",
+        "optional": true,
         "field": "person_first_nm"
       },
       {
-        "type": "string",
+        "type": "int64",
         "optional": true,
-        "field": "entity_uid"
+        "field": "person_uid"
       },
       {
         "type": "string",
         "optional": true,
-        "field": "person_entity_record_status_cd"
+        "field": "streetAddr1"
+      },
+      {
+        "type": "string",
+        "optional": true,
+        "field": "streetAddr2"
       },
       {
         "type": "string",
@@ -53,14 +63,14 @@
         "field": "person_nm_suffix"
       },
       {
-        "type": "string",
+        "type": "int64",
         "optional": true,
-        "field": "race_code_desc_txt"
+        "field": "pn_person_uid"
       },
       {
-        "type": "string",
+        "type": "int64",
         "optional": true,
-        "field": "race_cd"
+        "field": "provider_uid"
       },
       {
         "type": "string",
@@ -68,24 +78,14 @@
         "field": "add_time"
       },
       {
-        "type": "string",
+        "type": "int64",
         "optional": true,
-        "field": "county_code"
+        "field": "entity_uid"
       },
       {
         "type": "string",
         "optional": true,
         "field": "dedup_match_ind"
-      },
-      {
-        "type": "string",
-        "optional": true,
-        "field": "country_code"
-      },
-      {
-        "type": "int64",
-        "optional": false,
-        "field": "patient_uid"
       },
       {
         "type": "string",
@@ -105,27 +105,17 @@
       {
         "type": "string",
         "optional": true,
+        "field": "entity_record_status_cd"
+      },
+      {
+        "type": "string",
+        "optional": true,
         "field": "marital_status_cd"
       },
       {
-        "type": "string",
+        "type": "int64",
         "optional": true,
-        "field": "street_address1"
-      },
-      {
-        "type": "string",
-        "optional": true,
-        "field": "elp_cd"
-      },
-      {
-        "type": "string",
-        "optional": true,
-        "field": "street_address2"
-      },
-      {
-        "type": "string",
-        "optional": true,
-        "field": "within_city_limits"
+        "field": "ph_tl_uid"
       },
       {
         "type": "string",
@@ -150,17 +140,12 @@
       {
         "type": "string",
         "optional": true,
-        "field": "postal_locator_uid"
-      },
-      {
-        "type": "string",
-        "optional": true,
         "field": "city"
       },
       {
-        "type": "string",
+        "type": "int32",
         "optional": true,
-        "field": "ph_tl_uid"
+        "field": "entity_id_seq"
       },
       {
         "type": "string",
@@ -176,11 +161,6 @@
         "type": "string",
         "optional": true,
         "field": "extension_txt"
-      },
-      {
-        "type": "string",
-        "optional": true,
-        "field": "race_category"
       },
       {
         "type": "string",
@@ -223,6 +203,11 @@
         "field": "state"
       },
       {
+        "type": "int64",
+        "optional": true,
+        "field": "addr_pl_uid"
+      },
+      {
         "type": "string",
         "optional": true,
         "field": "status_time"
@@ -230,17 +215,7 @@
       {
         "type": "string",
         "optional": true,
-        "field": "entity_id_seq"
-      },
-      {
-        "type": "string",
-        "optional": true,
         "field": "as_of_date_ethnicity"
-      },
-      {
-        "type": "string",
-        "optional": true,
-        "field": "firstnm"
       },
       {
         "type": "string",
@@ -256,11 +231,6 @@
         "type": "string",
         "optional": true,
         "field": "person_middle_nm"
-      },
-      {
-        "type": "string",
-        "optional": true,
-        "field": "pr_person_uid"
       },
       {
         "type": "string",
@@ -285,7 +255,7 @@
       {
         "type": "string",
         "optional": true,
-        "field": "county"
+        "field": "addr_elp_cd"
       },
       {
         "type": "string",
@@ -300,17 +270,17 @@
       {
         "type": "string",
         "optional": true,
-        "field": "person_nm_seq"
-      },
-      {
-        "type": "string",
-        "optional": true,
-        "field": "state_code"
+        "field": "cntryCd"
       },
       {
         "type": "int64",
         "optional": true,
         "field": "add_user_id"
+      },
+      {
+        "type": "string",
+        "optional": true,
+        "field": "nmPrefix"
       },
       {
         "type": "string",
@@ -325,22 +295,12 @@
       {
         "type": "string",
         "optional": true,
-        "field": "email_tl_uid"
-      },
-      {
-        "type": "string",
-        "optional": true,
         "field": "prim_lang_cd"
       },
       {
         "type": "int64",
         "optional": true,
         "field": "person_parent_uid"
-      },
-      {
-        "type": "string",
-        "optional": true,
-        "field": "race_code_parent_is_cd"
       },
       {
         "type": "string",
@@ -375,17 +335,12 @@
       {
         "type": "string",
         "optional": true,
+        "field": "firstNm"
+      },
+      {
+        "type": "string",
+        "optional": true,
         "field": "education_level_cd"
-      },
-      {
-        "type": "string",
-        "optional": true,
-        "field": "home_country"
-      },
-      {
-        "type": "string",
-        "optional": true,
-        "field": "race_desc"
       },
       {
         "type": "string",
@@ -408,6 +363,11 @@
         "field": "children_in_house_nbr"
       },
       {
+        "type": "int64",
+        "optional": true,
+        "field": "email_tl_uid"
+      },
+      {
         "type": "string",
         "optional": true,
         "field": "as_of_date_morbidity"
@@ -420,7 +380,17 @@
       {
         "type": "string",
         "optional": true,
+        "field": "state_desc"
+      },
+      {
+        "type": "string",
+        "optional": true,
         "field": "deceased_time"
+      },
+      {
+        "type": "string",
+        "optional": true,
+        "field": "addr_elp_use_cd"
       },
       {
         "type": "string",
@@ -435,17 +405,18 @@
       {
         "type": "string",
         "optional": true,
-        "field": "version_ctrl_nbr"
+        "field": "cntyCd"
       },
       {
         "type": "string",
         "optional": true,
-        "field": "elp_use_cd"
+        "field": "version_ctrl_nbr"
       }
     ]
   },
   "payload": {
-    "patient_uid": 10000001,
+    "person_uid": 10000001,
+    "provider_uid": 10000001,
     "additional_gender_cd": null,
     "adults_in_house_nbr": null,
     "as_of_date_admin": null,
@@ -483,6 +454,7 @@
     "person_middle_nm": null,
     "person_nm_suffix": null,
     "person_parent_uid": null,
+    "pn_person_uid": 10000009,
     "preferred_gender_cd": null,
     "prim_lang_cd": null,
     "record_status_cd": null,
@@ -492,46 +464,38 @@
     "status_cd": null,
     "status_time": null,
     "version_ctrl_nbr": null,
-    "person_nm_seq": null,
-    "nm_use_cd": null,
-    "street_address1": "123 Main St.",
-    "street_address2": "",
+    "nm_use_cd": "L",
     "city": "Atlanta",
     "state": "Georgia",
-    "state_code": "13",
     "zip": "30025",
-    "county": "Gwinnett County",
-    "county_code": "13135",
-    "country_code": "840",
-    "home_country": "United States",
-    "within_city_limits": null,
-    "elp_cd": null,
-    "elp_use_cd": null,
-    "postal_locator_uid": null,
+    "addr_elp_cd": "H",
+    "addr_elp_use_cd": "H",
+    "addr_pl_uid": 10000010,
     "telephone_nbr": null,
     "extension_txt": null,
-    "ph_elp_cd": null,
-    "ph_elp_use_cd": null,
-    "ph_tl_uid": null,
+    "ph_elp_cd": "PH",
+    "ph_elp_use_cd": "CP",
+    "ph_tl_uid": 10000015,
     "email": "someone2@email.com",
-    "email_elp_cd": null,
-    "email_elp_use_cd": null,
-    "email_tl_uid": null,
-    "race_cd": "2028-9",
-    "race_category": "2028-9",
-    "race_desc": "Amer Indian",
-    "race_code_desc_txt": null,
-    "race_code_parent_is_cd": null,
-    "pr_person_uid": null,
-    "type_cd": null,
-    "person_entity_record_status_cd": null,
-    "entity_uid": null,
-    "entity_id_seq": null,
-    "assigning_authority_cd": null,
-    "firstnm": "Suurma",
+    "email_elp_cd": "PH",
+    "email_elp_use_cd": "H",
+    "email_tl_uid": 10000010,
+    "type_cd": "PRN",
+    "entity_record_status_cd": "ACTIVE",
+    "entity_uid": 242790995,
+    "entity_id_seq": 6,
+    "assigning_authority_cd": "3.16.740.1.113883.3.1147.1.1002",
+    "firstNm": "Suurma",
     "middleNm": "Js",
     "lastNm": "Singgh",
     "nmSuffix": "Jr",
-    "nmdegree": null
+    "nmPrefix": null,
+    "nmdegree": null,
+    "person_name_seq": null,
+    "streetAddr1": "123 Main St.",
+    "streetAddr2": "",
+    "state_desc": "13",
+    "cntyCd": "13135",
+    "cntryCd": "840"
   }
 }

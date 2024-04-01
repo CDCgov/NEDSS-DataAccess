@@ -39,6 +39,8 @@ public class KafkaStreamsService {
     private String patientElasticSearchTopicName;
     @Value("#{kafkaConfig.getPatientReportingTopic()}")
     private String patientReportingOutputTopic;
+    @Value("#{kafkaConfig.getProviderElasticSearchTopic()}")
+    private String providerElasticSearchOutputTopic;
     @Value("#{kafkaConfig.getProviderReportingTopic()}")
     private String providerReportingOutputTopic;
 
@@ -90,10 +92,22 @@ public class KafkaStreamsService {
                 .flatMap((k, v) -> v.stream()
                         .map(p -> KeyValue.pair(
                                 utilHelper.constructDataEnvelope(new ProviderKey(p.getPersonUid())),
-                                utilHelper.constructDataEnvelope(p.processProvider())))
+                                utilHelper.constructDataEnvelope(p.processProviderReporting())))
                         .collect(Collectors.toSet()))
                 .peek((key, value) -> log.info("Provider : {}", value.toString()))
                 .to((key, v, recordContext) -> providerReportingOutputTopic,
+                        Produced.with(
+                                StreamsSerdes.DataEnvelopeSerde(),
+                                StreamsSerdes.DataEnvelopeSerde()));
+
+        providerStream
+                .flatMap((k, v) -> v.stream()
+                        .map(p -> KeyValue.pair(
+                                utilHelper.constructDataEnvelope(new ProviderKey(p.getPersonUid())),
+                                utilHelper.constructDataEnvelope(p.processProviderElastic())))
+                        .collect(Collectors.toSet()))
+                .peek((key, value) -> log.info("Provider : {}", value.toString()))
+                .to((key, v, recordContext) -> providerElasticSearchOutputTopic,
                         Produced.with(
                                 StreamsSerdes.DataEnvelopeSerde(),
                                 StreamsSerdes.DataEnvelopeSerde()));

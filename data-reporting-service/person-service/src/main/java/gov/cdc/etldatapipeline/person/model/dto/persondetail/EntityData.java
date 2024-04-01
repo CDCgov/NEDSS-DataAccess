@@ -19,7 +19,7 @@ public class EntityData {
     private String recordStatusCd;
     private String rootExtensionTxt;
     @JsonProperty("entity_id_seq")
-    private Long entityIdSeq;
+    private Integer entityIdSeq;
     @JsonProperty("ASSIGNING_AUTHORITY_CD")
     private String assigningAuthorityCd;
 
@@ -27,16 +27,22 @@ public class EntityData {
         if (StringUtils.hasText(assigningAuthorityCd) && assigningAuthorityCd.equalsIgnoreCase("SSA")) {
             personFull.setSsn(rootExtensionTxt);
         } else if (StringUtils.hasText(typeCd)) {
-            if (typeCd.equalsIgnoreCase("PN")) {
+            if (typeCd.equalsIgnoreCase("PN")) { // Patient Only Data
                 personFull.setPatientNumber(rootExtensionTxt);
                 personFull.setPatientNumberAuth(assigningAuthorityCd);
-            } else if (typeCd.equalsIgnoreCase("QEC")) {
+            } else if (typeCd.equalsIgnoreCase("QEC")) { // Provider only Data
                 personFull.setProviderQuickCode(rootExtensionTxt);
-            } else if (typeCd.equalsIgnoreCase("PRN")) {
+            } else if (typeCd.equalsIgnoreCase("PRN")) { // Provider Only Data
                 personFull.setProviderRegistrationNum(rootExtensionTxt);
                 personFull.setProviderRegistrationNumAuth(assigningAuthorityCd);
             }
         }
+        // ElasticSearch related data
+        personFull.setEntityUid(entityUid);
+        personFull.setEntityIdSeq(entityIdSeq);
+        personFull.setTypeCd(typeCd);
+        personFull.setEntityRecordStatusCd(recordStatusCd);
+        personFull.setAssigningAuthorityCd(assigningAuthorityCd);
         return personFull;
     }
 }

@@ -22,6 +22,7 @@ public class Race {
         personFull.setRaceCd(raceCd);
         personFull.setRaceCategory(raceCategoryCd);
         personFull.setRaceDesc(raceDescTxt);
+        personFull.setPrPersonUid(personUid);
         return personFull;
     }
 }
