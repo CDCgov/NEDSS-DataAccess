@@ -1,17 +1,17 @@
-package gov.cdc.etldatapipeline.person.repository;
+package gov.cdc.etldatapipeline.organization.repository;
 
-import gov.cdc.etldatapipeline.person.model.dto.OrganizationOP;
+import gov.cdc.etldatapipeline.organization.model.dto.organization.OrgSp;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Set;
 
 @Repository
-public interface OrganizationRepository extends JpaRepository<OrganizationOP, String> {
+public interface OrganizationRepository extends JpaRepository<OrgSp, String> {
 
     @Query(nativeQuery = true, value = "execute sp_Organization :org_uids")
-    List<OrganizationOP> computeAllOrganizations(@Param("org_uids") String org_ids);
+    Set<OrgSp> computeAllOrganizations(@Param("org_uids") String org_ids);
 
 }

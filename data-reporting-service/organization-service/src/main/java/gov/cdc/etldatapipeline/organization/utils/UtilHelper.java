@@ -1,4 +1,4 @@
-package gov.cdc.etldatapipeline.person.utils;
+package gov.cdc.etldatapipeline.organization.utils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -6,11 +6,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import gov.cdc.etldatapipeline.person.model.dto.DataRequiredFields;
-import gov.cdc.etldatapipeline.person.model.dto.dataprops.DataEnvelope;
-import gov.cdc.etldatapipeline.person.model.dto.dataprops.DataField;
-import gov.cdc.etldatapipeline.person.model.dto.dataprops.DataSchema;
-import gov.cdc.etldatapipeline.person.model.odse.DebeziumMetadata;
+import gov.cdc.etldatapipeline.organization.model.DataRequiredFields;
+import gov.cdc.etldatapipeline.organization.model.dto.dataprops.DataEnvelope;
+import gov.cdc.etldatapipeline.organization.model.dto.dataprops.DataField;
+import gov.cdc.etldatapipeline.organization.model.dto.dataprops.DataSchema;
+import gov.cdc.etldatapipeline.organization.model.odse.DebeziumMetadata;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,18 +32,6 @@ public class UtilHelper {
         return utilHelper;
     }
 
-    public <T> T parseJsonNode(String jsonString, String nodeName,
-                               Class<T> type) {
-        try {
-            JsonNode node = objectMapper.readTree(jsonString).at(nodeName);
-            return objectMapper.convertValue(node, type);
-        } catch (JsonProcessingException e) {
-            log.error("JsonProcessingException: ", e);
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     public <T extends DebeziumMetadata> T deserializePayload(
             String jsonString, String nodeName, Class<T> type) {
         try {
@@ -57,17 +45,6 @@ public class UtilHelper {
                     dMetadata.setOp(jsonTree.at("/payload/op").asText());
             }
             return dMetadata;
-        } catch (JsonProcessingException e) {
-            log.error("JsonProcessingException: ", e);
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public <T> T deserializePayload(String jsonString, Class<T> type) {
-        try {
-            if (jsonString == null) return null;
-            return objectMapper.readValue(jsonString, type);
         } catch (JsonProcessingException e) {
             log.error("JsonProcessingException: ", e);
             e.printStackTrace();

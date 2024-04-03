@@ -2,8 +2,8 @@ package gov.cdc.etldatapipeline.person;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import gov.cdc.etldatapipeline.person.model.dto.DataProps.DataEnvelope;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
+import gov.cdc.etldatapipeline.person.model.dto.dataprops.DataEnvelope;
 import gov.cdc.etldatapipeline.person.model.dto.patient.Patient;
 import gov.cdc.etldatapipeline.person.model.dto.patient.PatientReporting;
 import gov.cdc.etldatapipeline.person.model.dto.persondetail.*;

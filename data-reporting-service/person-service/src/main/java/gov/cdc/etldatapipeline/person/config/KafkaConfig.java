@@ -20,8 +20,6 @@ public class KafkaConfig {
     private String providerInputTopicName;
     @Value("${spring.kafka.stream.input.patient.topic-name}")
     private String patientInputTopicName;
-    @Value("${spring.kafka.stream.input.organization.topic-name}")
-    private String organizationTopicName;
     @Value("${spring.kafka.stream.input.defaultData.topic-name}")
     private String defaultDataTopicName;
     @Value("${spring.kafka.stream.output.providerElastic.topic-name}")
@@ -32,25 +30,11 @@ public class KafkaConfig {
     private String patientElasticSearchTopic;
     @Value("${spring.kafka.stream.output.patientReporting.topic-name}")
     private String patientReportingTopic;
-    @Value("${spring.kafka.stream.output.organizationReporting.topic-name}")
-    private String organizationAggregateTopicName;
 
     @Bean
     public NewTopic createPersonTopicName() {
         log.info("Creating topic : " + personTopicName);
         return TopicBuilder.name(personTopicName).build();
-    }
-
-    @Bean
-    public NewTopic createOrganizationTopicName() {
-        log.info("Creating topic : " + organizationTopicName);
-        return TopicBuilder.name(organizationTopicName).build();
-    }
-
-    @Bean
-    public NewTopic createAggregateOrganizationTopicName() {
-        log.info("Creating topic : " + organizationAggregateTopicName);
-        return TopicBuilder.name(organizationAggregateTopicName).build();
     }
 
     @Bean

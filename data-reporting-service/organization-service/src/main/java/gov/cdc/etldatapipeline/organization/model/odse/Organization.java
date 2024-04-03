@@ -1,4 +1,4 @@
-package gov.cdc.etldatapipeline.person.model.odse;
+package gov.cdc.etldatapipeline.organization.model.odse;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -118,4 +118,5 @@ public class Organization extends DebeziumMetadata {
     @Column(name = "edx_ind")
     @JsonProperty("edx_ind")
     private String edxInd;
+
 }

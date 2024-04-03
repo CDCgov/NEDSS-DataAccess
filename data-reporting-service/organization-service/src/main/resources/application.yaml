@@ -5,23 +5,15 @@ spring:
       key-serializer: org.springframework.kafka.support.serializer.StringOrBytesSerializer
     stream:
       input:
-        person:
-          topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Person
-        provider:
-          topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Provider.input
-        patient:
-          topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Patient.input
+        organization:
+          topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Organization.input
         defaultData:
           topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Default.input
       output:
-        providerElastic:
-          topic-name: ${PROVIDER_ELASTIC:nbs_provider_elastic}
-        providerReporting:
-          topic-name: ${PROVIDER_REPORTING:nbs_provider}
-        patientElastic:
-          topic-name: ${PATIENT_ELASTIC:nbs_patient_elastic}
-        patientReporting:
-          topic-name: ${PATIENT_REPORTING:nbs_patient}
+        organizationElastic:
+          topic-name: ${PROVIDER_ELASTIC:nbs_organization_elastic}
+        organizationReporting:
+          topic-name: ${ORGANIZATION_REPORTING:nbs_organization}
 
     streams:
       application-id: debezium-cdc-consumer-app-1
@@ -43,7 +35,7 @@ logging:
   #  Only one config can be active at a time
   config: classpath:logback-config.xml
   file:
-    name: PersonService.log
+    name: OrganizationService.log
     path: ${DA_LOG_PATH:logs}
 server:
-  port: '8091'
+  port: '8092'
