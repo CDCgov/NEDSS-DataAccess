@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Email {
+public class Email implements ExtendPerson {
     private String emailAddress;
     @JsonProperty("use_cd")
     private String useCd;

@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Address {
+public class Address implements ExtendPerson {
     private String streetAddr1;
     private String streetAddr2;
     private String city;

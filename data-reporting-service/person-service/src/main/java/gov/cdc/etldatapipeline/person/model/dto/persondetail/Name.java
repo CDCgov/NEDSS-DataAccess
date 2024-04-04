@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Name {
+public class Name implements ExtendPerson {
     private String lastNm;
     private String lastNmSndx;
     private String middleNm;

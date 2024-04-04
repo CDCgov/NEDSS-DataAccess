@@ -1,6 +1,7 @@
 package gov.cdc.etldatapipeline.person.model.dto.patient;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import gov.cdc.etldatapipeline.person.model.dto.DataRequiredFields;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,9 +13,9 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class PatientKey implements DataRequiredFields {
     @NonNull
-    @JsonProperty("patient_uid")
     private Long patientUid;
 
     @Override

@@ -1,10 +1,11 @@
 package gov.cdc.etldatapipeline.organization.service;
 
-
-import gov.cdc.etldatapipeline.organization.model.dto.organization.OrgKey;
-import gov.cdc.etldatapipeline.organization.model.dto.organization.OrgSp;
+import gov.cdc.etldatapipeline.organization.model.dto.org.OrgElastic;
+import gov.cdc.etldatapipeline.organization.model.dto.org.OrgKey;
+import gov.cdc.etldatapipeline.organization.model.dto.org.OrgReporting;
+import gov.cdc.etldatapipeline.organization.model.dto.org.OrgSp;
 import gov.cdc.etldatapipeline.organization.model.odse.Organization;
-import gov.cdc.etldatapipeline.organization.repository.OrganizationRepository;
+import gov.cdc.etldatapipeline.organization.repository.OrgRepository;
 import gov.cdc.etldatapipeline.organization.utils.StreamsSerdes;
 import gov.cdc.etldatapipeline.organization.utils.UtilHelper;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 
@@ -30,52 +32,43 @@ import java.util.stream.Collectors;
 @Slf4j
 public class KafkaStreamsService {
     @Value("#{kafkaConfig.getOrganizationTopic()}")
-    private String organizationTopicName;
+    private String orgTopicName;
     @Value("#{kafkaConfig.getOrganizationElasticSearchTopic()}")
-    private String organizationElasticSearchTopic;
+    private String orgElasticSearchTopic;
     @Value("#{kafkaConfig.getOrganizationReportingTopic()}")
-    private String organizationReportingOutputTopic;
+    private String orgReportingOutputTopic;
 
-    private final OrganizationRepository organizationRepository;
+    private final OrgRepository orgRepository;
 
     @Autowired
     public void processMessage(StreamsBuilder streamsBuilder) {
 
         UtilHelper utilHelper = UtilHelper.getInstance();
         KStream<String, Set<OrgSp>> organizationKStream
-                = streamsBuilder.stream(organizationTopicName, Consumed.with(Serdes.String(), Serdes.String()))
+                = streamsBuilder.stream(orgTopicName, Consumed.with(Serdes.String(), Serdes.String()))
                 .map((k, v) -> new KeyValue<>(
                         k,
                         UtilHelper.getInstance().deserializePayload(v, "/payload/after", Organization.class)))
-                // KStream<String, Person>
+                // KStream<String, Organization>
                 .filter((k, v) -> v != null)
-                .peek((key, value) -> log.info("Received Person : " + value.getOrganizationUid()))
-                .mapValues(v -> organizationRepository.computeAllOrganizations(v.getOrganizationUid()));
+                .peek((key, value) -> log.info("Received Organization : " + value.getOrganizationUid()))
+                .mapValues(v -> orgRepository.computeAllOrganizations(v.getOrganizationUid()));
 
-
-        // KStream<String, Set<Organization>>
-        organizationKStream.flatMap((k, v) -> v.stream()
+        Consumer<Boolean> fn = (isReporting) -> organizationKStream.flatMap((k, v) -> v.stream()
                         .map(p -> KeyValue.pair(
                                 utilHelper.constructDataEnvelope(new OrgKey(p.getOrganizationUid())),
-                                utilHelper.constructDataEnvelope(p.processOrgElastic())))
+                                utilHelper.constructDataEnvelope(isReporting
+                                        ? new OrgReporting().constructObject(p) : new OrgElastic().constructObject(p))))
                         .collect(Collectors.toSet()))
-                .peek((key, value) -> log.info("Patient Elastic : {}", value.toString()))
-                .to((key, v, recordContext) -> organizationElasticSearchTopic,
+                .peek((key, value) ->
+                        log.info("Patient " + (isReporting ? "Reporting " : "Elastic ") + " : {}", value.toString()))
+                .to((key, v, recordContext) -> isReporting ? orgReportingOutputTopic : orgElasticSearchTopic,
                         Produced.with(
                                 StreamsSerdes.DataEnvelopeSerde(),
                                 StreamsSerdes.DataEnvelopeSerde()));
-
-        // KStream<String, Set<Organization>>
-        organizationKStream.flatMap((k, v) -> v.stream()
-                        .map(p -> KeyValue.pair(
-                                utilHelper.constructDataEnvelope(new OrgKey(p.getOrganizationUid())),
-                                utilHelper.constructDataEnvelope(p.processOrgReporting())))
-                        .collect(Collectors.toSet()))
-                .peek((key, value) -> log.info("Patient Reporting : {}", value.toString()))
-                .to((key, v, recordContext) -> organizationReportingOutputTopic,
-                        Produced.with(
-                                StreamsSerdes.DataEnvelopeSerde(),
-                                StreamsSerdes.DataEnvelopeSerde()));
-
+        // Reporting
+        fn.accept(true);
+        // ElasticSearch
+        fn.accept(false);
     }
 }

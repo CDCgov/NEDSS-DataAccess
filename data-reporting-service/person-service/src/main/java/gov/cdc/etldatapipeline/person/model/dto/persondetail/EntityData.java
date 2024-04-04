@@ -12,7 +12,7 @@ import org.springframework.util.StringUtils;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class EntityData {
+public class EntityData implements ExtendPerson {
     @JsonProperty("entity_uid")
     private Long entityUid;
     private String typeCd;

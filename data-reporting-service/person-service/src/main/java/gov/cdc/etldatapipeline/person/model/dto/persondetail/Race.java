@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Race {
+public class Race implements ExtendPerson {
     private String raceCd;
     private String raceDescTxt;
     private String raceCategoryCd;

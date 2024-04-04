@@ -1,0 +1,67 @@
+package gov.cdc.etldatapipeline.organization.model.dto.orgdetails;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import gov.cdc.etldatapipeline.organization.model.dto.org.OrgElastic;
+import gov.cdc.etldatapipeline.organization.model.dto.org.OrgReporting;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
+@ToString(callSuper = true)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+public class Address implements OrgExtension {
+    private String addrElpCd;
+    private String addrElpUseCd;
+    private String addrPlUid;
+    private String streetAddr1;
+    private String streetAddr2;
+    private String city;
+    private String zip;
+    private String cntyCd;
+    private String state;
+    private String cntryCd;
+    private String state_desc;
+    private String county;
+    private String withinCityLimitsInd;
+    private String country;
+    private String addressComments;
+
+    public <T> T updateOrg(T org) {
+        if (org.getClass() == OrgReporting.class) {
+            OrgReporting orgRep = (OrgReporting) org;
+            orgRep.setStreetAddress1(streetAddr1);
+            orgRep.setStreetAddress2(streetAddr2);
+            orgRep.setCity(city);
+            orgRep.setStateCode(state);
+            orgRep.setState(state_desc);
+            orgRep.setZip(zip);
+            orgRep.setCountyCode(cntyCd);
+            orgRep.setCounty(county);
+            orgRep.setCountyCode(cntryCd);
+            orgRep.setCountry(country);
+            orgRep.setAddressComments(addressComments);
+        } else if (org.getClass() == OrgElastic.class) {
+            OrgElastic orgElastic = (OrgElastic) org;
+            orgElastic.setStreetAddr1(streetAddr1);
+            orgElastic.setStreetAddr2(streetAddr2);
+            orgElastic.setCity(city);
+            orgElastic.setState(state);
+            orgElastic.setState(state_desc);
+            orgElastic.setZip(zip);
+            orgElastic.setCntyCd(cntyCd);
+            orgElastic.setCntryCd(cntryCd);
+            orgElastic.setAddressComments(addressComments);
+            orgElastic.setAddrElpCd(addrElpCd);
+            orgElastic.setAddrElpUseCd(addrElpUseCd);
+            orgElastic.setAddrPlUid(addrPlUid);
+        }
+        return org;
+    }
+}
