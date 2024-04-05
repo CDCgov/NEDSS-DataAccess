@@ -6,7 +6,7 @@ spring:
     stream:
       input:
         organization:
-          topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Organization.input
+          topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Organization
         defaultData:
           topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Default.input
       output:

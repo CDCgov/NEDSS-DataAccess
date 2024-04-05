@@ -17,7 +17,7 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ToString(callSuper = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class PatientReporting implements PersonExtendedProps, DataRequiredFields {
+public class PatientReporting implements PersonExtendedProps, DataRequiredFields, PatientBuilder {
     private Long patientUid;
     private String addlGenderInfo;
     private String ageReported;
@@ -179,6 +179,9 @@ public class PatientReporting implements PersonExtendedProps, DataRequiredFields
         // Fn() - Auth_User
         setAddUserName(p.getAddUserName());
         setLastChgUserName(p.getLastChgUserName());
+
+        // Transform the nested Json data
+        p.postProcessJsonData(this);
         return this;
     }
 

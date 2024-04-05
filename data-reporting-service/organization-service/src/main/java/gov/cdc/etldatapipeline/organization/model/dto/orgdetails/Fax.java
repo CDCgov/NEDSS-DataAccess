@@ -17,7 +17,7 @@ import lombok.ToString;
 @ToString(callSuper = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class Fax implements OrgExtension {
-    private String faxTlUid;
+    private Long faxTlUid;
     private String faxElpCd;
     private String faxElpUseCd;
     private String orgFax;

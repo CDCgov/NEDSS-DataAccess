@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import gov.cdc.etldatapipeline.organization.model.DataRequiredFields;
-import gov.cdc.etldatapipeline.organization.utils.DataPostProcessor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -67,14 +66,7 @@ public class OrgReporting implements DataRequiredFields {
         setLastChgTime(orgSp.getLastChgTime());
         setAddUserName(orgSp.getAddUserName());
         setLastChgUserName(orgSp.getLastChgUserName());
-
-        new DataPostProcessor().processAllProps(
-                orgSp.getOrganizationFax(),
-                orgSp.getOrganizationAddress(),
-                orgSp.getOrganizationTelephone(),
-                orgSp.getOrganizationEntityId(),
-                orgSp.getOrganizationName(),
-                this);
+        orgSp.processNestedJsonData(this);
         return this;
     }
 

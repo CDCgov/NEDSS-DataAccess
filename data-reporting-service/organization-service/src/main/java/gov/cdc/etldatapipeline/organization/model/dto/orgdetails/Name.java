@@ -17,7 +17,7 @@ import lombok.ToString;
 @ToString(callSuper = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class Name implements OrgExtension {
-    private String onOrgUid;
+    private Long onOrgUid;
     private String organizationName;
 
     public <T> T updateOrg(T org) {

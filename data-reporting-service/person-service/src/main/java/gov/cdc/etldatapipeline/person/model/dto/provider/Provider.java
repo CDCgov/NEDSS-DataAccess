@@ -75,15 +75,7 @@ public class Provider {
     @Column(name = "provider_entity")
     private String entityDataNested;
 
-    public ProviderReporting processProviderReporting() {
-        return postProcessJsonData(new ProviderReporting().constructObject(this));
-    }
-
-    public ProviderElasticSearch processProviderElastic() {
-        return postProcessJsonData(new ProviderElasticSearch().constructObject(this));
-    }
-
-    private <T extends PersonExtendedProps> T postProcessJsonData(T pf) {
+    public <T extends PersonExtendedProps> T postProcessJsonData(T pf) {
         DataPostProcessor processor = new DataPostProcessor();
         try {
             processor.processPersonName(nameNested, pf);

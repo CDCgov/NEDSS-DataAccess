@@ -65,18 +65,14 @@ public class OrgSp {
     @Column(name = "organization_entity_id")
     private String organizationEntityId;
 
-
-    public OrgReporting processOrgReporting() {
-        return postProcessJsonData(new OrgReporting().constructObject(this));
-    }
-
-    public OrgElastic processOrgElastic() {
-        return postProcessJsonData(new OrgElastic().constructObject(this));
-    }
-
-    private <T> T postProcessJsonData(T pf) {
+    public <T> T processNestedJsonData(T obj) {
         DataPostProcessor processor = new DataPostProcessor();
-        return pf;
+        processor.processOrgAddress(organizationAddress, obj);
+        processor.processOrgPhone(organizationTelephone, obj);
+        processor.processOrgFax(organizationFax, obj);
+        processor.processOrgEntity(organizationEntityId, obj);
+        processor.processOrgName(organizationName, obj);
+        return obj;
     }
 }
 

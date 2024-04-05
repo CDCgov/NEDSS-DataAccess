@@ -30,6 +30,8 @@ dependencies {
     implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
     // https://mvnrepository.com/artifact/commons-io/commons-io
     implementation 'commons-io:commons-io:2.15.0'
+    // https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc
+    implementation 'com.microsoft.sqlserver:mssql-jdbc:12.3.0.jre17-preview'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.apache.kafka:kafka-streams-test-utils:3.7.0'

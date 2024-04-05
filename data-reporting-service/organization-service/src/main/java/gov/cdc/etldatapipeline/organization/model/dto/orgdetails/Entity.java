@@ -17,7 +17,7 @@ import lombok.ToString;
 @ToString(callSuper = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class Entity implements OrgExtension {
-    private String entityUid;
+    private Long entityUid;
     private String typeCd;
     private String recordStatusCd;
     private String rootExtensionTxt;
@@ -35,7 +35,7 @@ public class Entity implements OrgExtension {
         } else if (org.getClass() == OrgElastic.class) {
             OrgElastic orgElastic = (OrgElastic) org;
             orgElastic.setTypeCd(typeCd);
-            orgElastic.setRecordStatusCd(recordStatusCd);
+            orgElastic.setEntityRecordStatusCd(recordStatusCd);
             orgElastic.setEntityUid(entityUid);
             orgElastic.setEntityIdSeq(entityIdSeq);
             orgElastic.setAssigningAuthorityCd(assigningAuthorityCd);

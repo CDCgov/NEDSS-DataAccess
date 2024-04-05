@@ -15,7 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class PatientElasticSearch implements PersonExtendedProps, DataRequiredFields {
+public class PatientElasticSearch implements PersonExtendedProps, DataRequiredFields, PatientBuilder {
     private Long patientUid;
     private String additionalGenderCd;
     private String adultsInHouseNbr;
@@ -170,6 +170,9 @@ public class PatientElasticSearch implements PersonExtendedProps, DataRequiredFi
         setStatusTime(p.getStatusTime());
         setSpeaksEnglishCd(p.getSpeaksEnglishCd());
         setVersionCtrlNbr(p.getVersionCtrlNbr());
+
+        // Transform the nested Json data
+        p.postProcessJsonData(this);
         return this;
     }
 

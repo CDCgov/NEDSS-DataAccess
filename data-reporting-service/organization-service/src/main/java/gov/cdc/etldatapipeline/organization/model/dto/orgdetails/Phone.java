@@ -17,7 +17,7 @@ import lombok.ToString;
 @ToString(callSuper = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class Phone implements OrgExtension {
-    private String phTlUid;
+    private Long phTlUid;
     private String phElpCd;
     private String phElpUseCd;
     private String telephoneNbr;

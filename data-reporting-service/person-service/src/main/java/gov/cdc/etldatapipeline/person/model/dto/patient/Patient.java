@@ -139,11 +139,7 @@ public class Patient {
         return postProcessJsonData(new PatientReporting().constructObject(this));
     }
 
-    public PatientElasticSearch processPatientElastic() {
-        return postProcessJsonData(new PatientElasticSearch().constructObject(this));
-    }
-
-    private <T extends PersonExtendedProps> T postProcessJsonData(T pf) {
+    public <T extends PersonExtendedProps> T postProcessJsonData(T pf) {
         DataPostProcessor processor = new DataPostProcessor();
         try {
             processor.processPersonName(nameNested, pf);

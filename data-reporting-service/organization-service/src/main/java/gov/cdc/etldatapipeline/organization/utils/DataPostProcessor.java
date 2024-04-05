@@ -13,14 +13,6 @@ import java.util.Comparator;
 public class DataPostProcessor {
     ObjectMapper mapper = new ObjectMapper();
 
-    public <T> void processAllProps(String name, String entity, String address, String phone, String fax, T org) {
-        processOrgName(name, org);
-        processOrgEntity(entity, org);
-        processOrgAddress(address, org);
-        processOgrPhone(phone, org);
-        processOgrFax(fax, org);
-    }
-
     public <T> void processOrgName(String name, T org) {
         if (!ObjectUtils.isEmpty(name)) {
             try {
@@ -60,7 +52,7 @@ public class DataPostProcessor {
         }
     }
 
-    public <T> void processOgrPhone(String phone, T org) {
+    public <T> void processOrgPhone(String phone, T org) {
         if (!ObjectUtils.isEmpty(phone)) {
             try {
                 Arrays.stream(mapper.readValue(phone, Phone[].class))
@@ -73,7 +65,7 @@ public class DataPostProcessor {
         }
     }
 
-    public <T> void processOgrFax(String fax, T org) {
+    public <T> void processOrgFax(String fax, T org) {
         try {
             if (!ObjectUtils.isEmpty(fax)) {
                 Arrays.stream(mapper.readValue(fax, Fax[].class))

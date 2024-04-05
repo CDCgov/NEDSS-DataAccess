@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 
@@ -54,21 +53,29 @@ public class KafkaStreamsService {
                 .peek((key, value) -> log.info("Received Organization : " + value.getOrganizationUid()))
                 .mapValues(v -> orgRepository.computeAllOrganizations(v.getOrganizationUid()));
 
-        Consumer<Boolean> fn = (isReporting) -> organizationKStream.flatMap((k, v) -> v.stream()
+        organizationKStream.flatMap((k, v) -> v.stream()
                         .map(p -> KeyValue.pair(
                                 utilHelper.constructDataEnvelope(new OrgKey(p.getOrganizationUid())),
-                                utilHelper.constructDataEnvelope(isReporting
-                                        ? new OrgReporting().constructObject(p) : new OrgElastic().constructObject(p))))
+                                utilHelper.constructDataEnvelope(new OrgReporting().constructObject(p))))
                         .collect(Collectors.toSet()))
                 .peek((key, value) ->
-                        log.info("Patient " + (isReporting ? "Reporting " : "Elastic ") + " : {}", value.toString()))
-                .to((key, v, recordContext) -> isReporting ? orgReportingOutputTopic : orgElasticSearchTopic,
+                        log.info("Patient Reporting : {}", value.toString()))
+                .to((key, v, recordContext) -> orgReportingOutputTopic,
                         Produced.with(
                                 StreamsSerdes.DataEnvelopeSerde(),
                                 StreamsSerdes.DataEnvelopeSerde()));
-        // Reporting
-        fn.accept(true);
-        // ElasticSearch
-        fn.accept(false);
+
+        organizationKStream.flatMap((k, v) -> v.stream()
+                        .map(p -> KeyValue.pair(
+                                utilHelper.constructDataEnvelope(new OrgKey(p.getOrganizationUid())),
+                                utilHelper.constructDataEnvelope(new OrgElastic().constructObject(p))))
+                        .collect(Collectors.toSet()))
+                .peek((key, value) ->
+                        log.info("Patient Elastic : {}", value.toString()))
+                .to((key, v, recordContext) -> orgElasticSearchTopic,
+                        Produced.with(
+                                StreamsSerdes.DataEnvelopeSerde(),
+                                StreamsSerdes.DataEnvelopeSerde()));
+
     }
 }

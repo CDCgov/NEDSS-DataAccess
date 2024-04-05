@@ -1,5 +1,6 @@
 package gov.cdc.etldatapipeline.organization.model.dto.org;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import gov.cdc.etldatapipeline.organization.model.DataRequiredFields;
@@ -16,10 +17,11 @@ import java.util.Set;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class OrgKey implements DataRequiredFields {
     @NonNull
+    @JsonProperty("organization_uid")
     private Long orgUID;
 
     @Override
     public Set<String> getRequiredFields() {
-        return Set.of("patientUid");
+        return Set.of("orgUID");
     }
 }

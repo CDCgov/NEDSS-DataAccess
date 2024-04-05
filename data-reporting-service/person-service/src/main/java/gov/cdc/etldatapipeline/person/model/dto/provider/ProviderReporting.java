@@ -17,7 +17,7 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ToString(callSuper = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ProviderReporting implements PersonExtendedProps, DataRequiredFields {
+public class ProviderReporting implements PersonExtendedProps, DataRequiredFields, ProviderBuilder {
     private Long providerUid;
     private String localId;
     private String recordStatus;
@@ -89,7 +89,8 @@ public class ProviderReporting implements PersonExtendedProps, DataRequiredField
         setLastChgUserName(p.getLastChgUserName());
         setLastChgTime(p.getLastChgTime());
         setAddTime(p.getAddTime());
-        return this;
+        // Transform the nested Json data
+        return p.postProcessJsonData(this);
     }
 
     /**

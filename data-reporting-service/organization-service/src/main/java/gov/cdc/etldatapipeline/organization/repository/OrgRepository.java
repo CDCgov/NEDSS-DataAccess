@@ -11,7 +11,7 @@ import java.util.Set;
 @Repository
 public interface OrgRepository extends JpaRepository<OrgSp, String> {
 
-    @Query(nativeQuery = true, value = "execute sp_Organization :org_uids")
+    @Query(nativeQuery = true, value = "execute sp_organization_event :org_uids")
     Set<OrgSp> computeAllOrganizations(@Param("org_uids") String org_ids);
 
 }

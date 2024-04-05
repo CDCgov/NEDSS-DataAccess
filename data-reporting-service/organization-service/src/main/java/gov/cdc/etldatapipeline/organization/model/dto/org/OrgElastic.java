@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import gov.cdc.etldatapipeline.organization.model.DataRequiredFields;
-import gov.cdc.etldatapipeline.organization.utils.DataPostProcessor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -26,21 +25,22 @@ public class OrgElastic implements DataRequiredFields {
     private String edxInd;
     private String recordStatusTime;
     private String localId;
-    private String recordStatusCd;
+    @JsonProperty("record_status_cd")
+    private String orgRecordStatusCd;
     private String description;
     private String electronicInd;
     private String standIndClass;
-    private String onOrgUid;
+    private Long onOrgUid;
     private String organizationName;
     private String typeCd;
     @JsonProperty("recordStatusCd")
     private String entityRecordStatusCd;
-    private String entityUid;
+    private Long entityUid;
     private String entityIdSeq;
     private String assigningAuthorityCd;
     private String addrElpCd;
     private String addrElpUseCd;
-    private String addrPlUid;
+    private Long addrPlUid;
     @JsonProperty("streetAddr1")
     private String streetAddr1;
     @JsonProperty("streetAddr2")
@@ -56,7 +56,7 @@ public class OrgElastic implements DataRequiredFields {
     private String addressComments;
     private String phElpCd;
     private String phElpUseCd;
-    private String phTlUid;
+    private Long phTlUid;
     @JsonProperty("telephoneNbr")
     private String telephoneNbr;
     @JsonProperty("extensionTxt")
@@ -66,7 +66,7 @@ public class OrgElastic implements DataRequiredFields {
     private String phoneComments;
     private String faxElpCd;
     private String faxElpUseCd;
-    private String faxTlUid;
+    private Long faxTlUid;
     @JsonProperty("org_fax")
     private String fax;
     private Long addUserId;
@@ -83,7 +83,7 @@ public class OrgElastic implements DataRequiredFields {
         setEdxInd(orgSp.getEdxInd());
         setRecordStatusTime(orgSp.getRecordStatusTime());
         setLocalId(orgSp.getLocalId());
-        setRecordStatusCd(orgSp.getRecordStatusCd());
+        setOrgRecordStatusCd(orgSp.getRecordStatusCd());
         setDescription(orgSp.getDescription());
         setElectronicInd(orgSp.getElectronicInd());
         setStandIndClass(orgSp.getStandIndClass());
@@ -91,14 +91,7 @@ public class OrgElastic implements DataRequiredFields {
         setAddTime(orgSp.getAddTime());
         setLastChgUserId(orgSp.getLastChgUserId());
         setLastChgTime(orgSp.getLastChgTime());
-
-        new DataPostProcessor().processAllProps(
-                orgSp.getOrganizationFax(),
-                orgSp.getOrganizationAddress(),
-                orgSp.getOrganizationTelephone(),
-                orgSp.getOrganizationEntityId(),
-                orgSp.getOrganizationName(),
-                this);
+        orgSp.processNestedJsonData(this);
         return this;
     }
 

@@ -12,7 +12,6 @@ import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderReporting;
 import gov.cdc.etldatapipeline.person.repository.PatientRepository;
 import gov.cdc.etldatapipeline.person.repository.ProviderRepository;
 import gov.cdc.etldatapipeline.person.service.KafkaStreamsService;
-import org.apache.commons.io.FileUtils;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.kafka.streams.*;
@@ -22,10 +21,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Properties;
 
@@ -160,10 +157,7 @@ public class KafkaStreamsServiceTest {
             DataEnvelope<DataEnvelope> actualValue
                     = objectMapper.readValue(actualData.get(0).value, dataEnvelopeTypeReference);
             Assertions.assertEquals(
-                    objectMapper.readValue(FileUtils.readFileToString(
-                                    new ClassPathResource(expectedValueFilePath).getFile(),
-                                    Charset.defaultCharset()),
-                            dataEnvelopeTypeReference),
+                    objectMapper.readValue(TestUtils.readFileData(expectedValueFilePath), dataEnvelopeTypeReference),
                     actualValue);
 
             //Validate the Patient Key
@@ -171,10 +165,7 @@ public class KafkaStreamsServiceTest {
                     = objectMapper.readValue(actualData.get(0).key, dataEnvelopeTypeReference);
             //Construct expected Patient Key
             Assertions.assertEquals(
-                    objectMapper.readValue(FileUtils.readFileToString(
-                                    new ClassPathResource(expectedKeyFilePath).getFile(),
-                                    Charset.defaultCharset()),
-                            dataEnvelopeTypeReference),
+                    objectMapper.readValue(TestUtils.readFileData(expectedKeyFilePath), dataEnvelopeTypeReference),
                     actualKey);
         } catch (IOException e) {
             throw new RuntimeException(e);

@@ -22,7 +22,7 @@ public class OrganizationYmlPropertiesTest {
     @Test
     void whenBindingYMLConfigFile_thenAllFieldsAreSet() {
         Assertions.assertEquals("cdc.nbs_odse.dbo.Default.input", kafkaConfig.getDefaultDataTopic());
-        Assertions.assertEquals("cdc.nbs_odse.dbo.Organization.input", kafkaConfig.getOrganizationTopic());
+        Assertions.assertEquals("cdc.nbs_odse.dbo.Organization", kafkaConfig.getOrganizationTopic());
         Assertions.assertEquals("nbs_organization_elastic", kafkaConfig.getOrganizationElasticSearchTopic());
         Assertions.assertEquals("nbs_organization", kafkaConfig.getOrganizationReportingTopic());
     }

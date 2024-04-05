@@ -19,7 +19,7 @@ import lombok.ToString;
 public class Address implements OrgExtension {
     private String addrElpCd;
     private String addrElpUseCd;
-    private String addrPlUid;
+    private Long addrPlUid;
     private String streetAddr1;
     private String streetAddr2;
     private String city;
@@ -42,10 +42,9 @@ public class Address implements OrgExtension {
             orgRep.setStateCode(state);
             orgRep.setState(state_desc);
             orgRep.setZip(zip);
-            orgRep.setCountyCode(cntyCd);
             orgRep.setCounty(county);
-            orgRep.setCountyCode(cntryCd);
-            orgRep.setCountry(country);
+            orgRep.setCountyCode(cntyCd);
+            orgRep.setCountry(cntryCd);
             orgRep.setAddressComments(addressComments);
         } else if (org.getClass() == OrgElastic.class) {
             OrgElastic orgElastic = (OrgElastic) org;
