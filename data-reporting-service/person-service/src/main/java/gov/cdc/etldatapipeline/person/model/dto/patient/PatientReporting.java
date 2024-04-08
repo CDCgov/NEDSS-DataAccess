@@ -6,16 +6,14 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import gov.cdc.etldatapipeline.person.model.dto.DataRequiredFields;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.util.Set;
 
 @Data
-@NoArgsConstructor
+@Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ToString(callSuper = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class PatientReporting implements PersonExtendedProps, DataRequiredFields, PatientBuilder {
     private Long patientUid;
@@ -149,7 +147,7 @@ public class PatientReporting implements PersonExtendedProps, DataRequiredFields
     private String raceWhiteAll;
 
     public PatientReporting constructObject(Patient p) {
-        setPatientUid(p.getPatientUid());
+        setPatientUid(p.getPersonUid());
         setAddlGenderInfo(p.getAdditionalGenderCd());
         setAddUserId(p.getAddUserId());
         setAgeReported(p.getAgeReported());
@@ -183,6 +181,10 @@ public class PatientReporting implements PersonExtendedProps, DataRequiredFields
         // Transform the nested Json data
         p.postProcessJsonData(this);
         return this;
+    }
+
+    public static PatientReporting build(Patient p) {
+        return PatientReporting.builder().build().constructObject(p);
     }
 
     /**

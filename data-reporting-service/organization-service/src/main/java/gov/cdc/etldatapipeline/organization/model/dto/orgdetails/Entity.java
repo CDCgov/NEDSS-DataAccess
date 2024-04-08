@@ -6,15 +6,15 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import gov.cdc.etldatapipeline.organization.model.dto.org.OrgElastic;
 import gov.cdc.etldatapipeline.organization.model.dto.org.OrgReporting;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ToString(callSuper = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class Entity implements OrgExtension {
     private Long entityUid;

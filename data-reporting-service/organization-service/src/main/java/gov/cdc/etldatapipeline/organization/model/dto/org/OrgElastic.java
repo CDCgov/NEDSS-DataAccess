@@ -5,16 +5,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import gov.cdc.etldatapipeline.organization.model.DataRequiredFields;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.util.Set;
 
 @Data
-@NoArgsConstructor
+@Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ToString(callSuper = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class OrgElastic implements DataRequiredFields {
     private long organizationUid;
@@ -93,6 +91,10 @@ public class OrgElastic implements DataRequiredFields {
         setLastChgTime(orgSp.getLastChgTime());
         orgSp.processNestedJsonData(this);
         return this;
+    }
+
+    public static OrgElastic build(OrgSp p) {
+        return OrgElastic.builder().build().constructObject(p);
     }
 
     @Override

@@ -6,13 +6,13 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import gov.cdc.etldatapipeline.person.model.dto.DataRequiredFields;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
 @Data
-@NoArgsConstructor
+@Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class PatientElasticSearch implements PersonExtendedProps, DataRequiredFields, PatientBuilder {
@@ -130,7 +130,7 @@ public class PatientElasticSearch implements PersonExtendedProps, DataRequiredFi
     private String assigningAuthorityCd;
 
     public PatientElasticSearch constructObject(Patient p) {
-        setPatientUid(p.getPatientUid());
+        setPatientUid(p.getPersonUid());
         setAdditionalGenderCd(p.getAdditionalGenderCd());
         setAddUserId(p.getAddUserId());
         setAdultsInHouseNbr(p.getAdultsInHouseNbr());
@@ -174,6 +174,10 @@ public class PatientElasticSearch implements PersonExtendedProps, DataRequiredFi
         // Transform the nested Json data
         p.postProcessJsonData(this);
         return this;
+    }
+
+    public static PatientElasticSearch build(Patient p) {
+        return PatientElasticSearch.builder().build().constructObject(p);
     }
 
     /**

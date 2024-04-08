@@ -4,10 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.util.StringUtils;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -24,14 +27,16 @@ public class Phone implements ExtendPerson {
         personFull.setPhElpCd(cd);
         personFull.setPhElpUseCd(useCd);
         personFull.setPhTlUid(teleLocatorUid);
-        if (useCd.equalsIgnoreCase("WP")) {
-            personFull.setPhoneWork(telephoneNbr);
-            personFull.setPhoneExtWork(extensionTxt);
-        } else if (useCd.equalsIgnoreCase("H")) {
-            personFull.setPhoneHome(telephoneNbr);
-            personFull.setPhoneExtHome(extensionTxt);
-        } else {
-            personFull.setPhoneCell(telephoneNbr);
+        if (StringUtils.hasText(useCd)) {
+            if (useCd.equalsIgnoreCase("WP")) {
+                personFull.setPhoneWork(telephoneNbr);
+                personFull.setPhoneExtWork(extensionTxt);
+            } else if (useCd.equalsIgnoreCase("H")) {
+                personFull.setPhoneHome(telephoneNbr);
+                personFull.setPhoneExtHome(extensionTxt);
+            } else if (useCd.equalsIgnoreCase("CP")) {
+                personFull.setPhoneCell(telephoneNbr);
+            }
         }
         return personFull;
     }

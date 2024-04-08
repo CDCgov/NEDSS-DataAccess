@@ -6,16 +6,14 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import gov.cdc.etldatapipeline.person.model.dto.DataRequiredFields;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.util.Set;
 
 @Data
-@NoArgsConstructor
+@Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ToString(callSuper = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProviderReporting implements PersonExtendedProps, DataRequiredFields, ProviderBuilder {
     private Long providerUid;
@@ -91,6 +89,10 @@ public class ProviderReporting implements PersonExtendedProps, DataRequiredField
         setAddTime(p.getAddTime());
         // Transform the nested Json data
         return p.postProcessJsonData(this);
+    }
+
+    public static ProviderReporting build(Provider p) {
+        return ProviderReporting.builder().build().constructObject(p);
     }
 
     /**

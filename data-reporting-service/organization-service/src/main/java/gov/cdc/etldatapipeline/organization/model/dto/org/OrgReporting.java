@@ -5,16 +5,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import gov.cdc.etldatapipeline.organization.model.DataRequiredFields;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.util.Set;
 
 @Data
-@NoArgsConstructor
+@Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ToString(callSuper = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class OrgReporting implements DataRequiredFields {
     private Long organizationUid;
@@ -68,6 +66,10 @@ public class OrgReporting implements DataRequiredFields {
         setLastChgUserName(orgSp.getLastChgUserName());
         orgSp.processNestedJsonData(this);
         return this;
+    }
+
+    public static OrgReporting build(OrgSp p) {
+        return OrgReporting.builder().build().constructObject(p);
     }
 
     @Override

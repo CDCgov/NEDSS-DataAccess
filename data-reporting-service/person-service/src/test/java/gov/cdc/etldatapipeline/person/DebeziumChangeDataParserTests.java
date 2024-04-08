@@ -15,8 +15,7 @@ public class DebeziumChangeDataParserTests {
                 readFileData("rawDataFiles/person/Person.json"),
                 "/payload",
                 Person.class);
-        Assertions.assertEquals("10000001",
-                personId.getPersonUid());
+        Assertions.assertEquals("10000001", personId.getPersonUid());
     }
 
     @Test
@@ -25,11 +24,8 @@ public class DebeziumChangeDataParserTests {
                 readFileData("rawDataFiles/person/PersonPatientChangeData.json"),
                 "/payload/after",
                 Person.class);
-        Assertions.assertEquals("9005400",
-                person.getPersonUid());
-        Assertions.assertEquals(1708702633619L,
-                person.getTs_ms());
-        Assertions.assertEquals("u",
-                person.getOp());
+        Assertions.assertEquals("9005400", person.getPersonUid());
+        Assertions.assertEquals(1708702633619L, person.getTs_ms());
+        Assertions.assertEquals("u", person.getOp());
     }
 }

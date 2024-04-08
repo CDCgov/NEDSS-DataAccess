@@ -7,19 +7,23 @@ import gov.cdc.etldatapipeline.person.utils.DataPostProcessor;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Data
+@Builder
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Patient {
     @Id
     @Column(name = "person_uid")
-    private Long patientUid;
+    private Long personUid;
     @Column(name = "age_reported")
     private String ageReported;
     @Column(name = "age_reported_unit_cd")
@@ -130,14 +134,6 @@ public class Patient {
     private String emailNested;
     @Column(name = "patient_entity")
     private String entityDataNested;
-
-    /***
-     * Transform the Name, Address, Race, Telephone, Email, EntityData(SSN), AddAuthUser, ChangeAuthUser
-     * @return Fully Transformed Patient Object
-     */
-    public PatientReporting processPatientReporting() {
-        return postProcessJsonData(new PatientReporting().constructObject(this));
-    }
 
     public <T extends PersonExtendedProps> T postProcessJsonData(T pf) {
         DataPostProcessor processor = new DataPostProcessor();
