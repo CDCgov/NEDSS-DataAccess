@@ -15,7 +15,7 @@ import java.util.Set;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class PatientReporting implements PersonExtendedProps, DataRequiredFields, PatientBuilder {
+public class PatientReporting implements PersonExtendedProps, DataRequiredFields {
     private Long patientUid;
     private String addlGenderInfo;
     private String ageReported;
@@ -146,45 +146,38 @@ public class PatientReporting implements PersonExtendedProps, DataRequiredFields
     @JsonProperty("race_white_all")
     private String raceWhiteAll;
 
-    public PatientReporting constructObject(Patient p) {
-        setPatientUid(p.getPersonUid());
-        setAddlGenderInfo(p.getAdditionalGenderCd());
-        setAddUserId(p.getAddUserId());
-        setAgeReported(p.getAgeReported());
-        setAgeReportedUnit(p.getAgeReportedUnitCd());
-        setAddTime(p.getAddTime());
-        setBirth_sex(p.getBirthGenderCd());
-        setDob(p.getBirthTime());
-        setCurrentSex(p.getCurrSexCd());
-        setDeceasedIndicator(p.getDeceasedIndCd());
-        setDeceasedDate(p.getDeceasedTime());
-        setGeneralComments(p.getDescription());
-        setEntryMethod(p.getElectronicInd());
-        setEthnicity(p.getEthnicGroupInd());
-        setUnkEthnicRsn(p.getEthnicUnkReasonCd());
-        setLastChgUserId(p.getLastChgUserId());
-        setLastChgTime(p.getLastChgTime());
-        setLocalId(p.getLocalId());
-        setMaritalStatus(p.getMaritalStatusCd());
-        setPrimaryOccupation(p.getOccupationCd());
-        setPatientMprUid(p.getPersonParentUid());
-        setPreferredGender(p.getPreferredGenderCd());
-        setPrimaryLanguage(p.getPrimLangCd());
-        setRecordStatus(p.getRecordStatusCd());
-        setCurrSexUnkRsn(p.getSexUnkReasonCd());
-        setSpeaksEnglish(p.getSpeaksEnglishCd());
-
-        // Fn() - Auth_User
-        setAddUserName(p.getAddUserName());
-        setLastChgUserName(p.getLastChgUserName());
-
-        // Transform the nested Json data
-        p.postProcessJsonData(this);
-        return this;
-    }
-
-    public static PatientReporting build(Patient p) {
-        return PatientReporting.builder().build().constructObject(p);
+    public static PatientReporting build(PatientSp p) {
+        return p.postProcessJsonData(PatientReporting.builder()
+                .patientUid(p.getPersonUid())
+                .addlGenderInfo(p.getAdditionalGenderCd())
+                .addUserId(p.getAddUserId())
+                .ageReported(p.getAgeReported())
+                .ageReportedUnit(p.getAgeReportedUnitCd())
+                .addTime(p.getAddTime())
+                .birth_sex(p.getBirthGenderCd())
+                .dob(p.getBirthTime())
+                .currentSex(p.getCurrSexCd())
+                .deceasedIndicator(p.getDeceasedIndCd())
+                .deceasedDate(p.getDeceasedTime())
+                .generalComments(p.getDescription())
+                .entryMethod(p.getElectronicInd())
+                .ethnicity(p.getEthnicGroupInd())
+                .unkEthnicRsn(p.getEthnicUnkReasonCd())
+                .lastChgUserId(p.getLastChgUserId())
+                .lastChgTime(p.getLastChgTime())
+                .localId(p.getLocalId())
+                .maritalStatus(p.getMaritalStatusCd())
+                .primaryOccupation(p.getOccupationCd())
+                .patientMprUid(p.getPersonParentUid())
+                .preferredGender(p.getPreferredGenderCd())
+                .primaryLanguage(p.getPrimLangCd())
+                .recordStatus(p.getRecordStatusCd())
+                .currSexUnkRsn(p.getSexUnkReasonCd())
+                .speaksEnglish(p.getSpeaksEnglishCd())
+                // Fn() - Auth_User
+                .addUserName(p.getAddUserName())
+                .lastChgUserName(p.getLastChgUserName())
+                .build());
     }
 
     /**

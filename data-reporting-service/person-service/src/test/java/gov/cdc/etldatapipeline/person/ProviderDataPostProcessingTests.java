@@ -1,7 +1,7 @@
 package gov.cdc.etldatapipeline.person;
 
-import gov.cdc.etldatapipeline.person.model.dto.provider.Provider;
 import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderReporting;
+import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderSp;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +19,7 @@ public class ProviderDataPostProcessingTests {
     public void consolidatedProviderTransformationTest() {
 
         // Build the PatientProvider object with the json serialized data
-        Provider p = Provider.builder()
+        ProviderSp p = ProviderSp.builder()
                 .personUid(10000001L)
                 .nameNested(readFileData(FILE_PREFIX + "PersonName.json"))
                 .addressNested(readFileData(FILE_PREFIX + "PersonAddress.json"))
@@ -52,7 +52,7 @@ public class ProviderDataPostProcessingTests {
                 pf.getEmailWork());
 
         // Process the respective field json to PatientProvider fields
-        ProviderReporting pf = ProviderReporting.builder().build().constructObject(p);
+        ProviderReporting pf = ProviderReporting.build(p);
         // Expected
         List<Object> expected = Arrays.asList(
                 "Singgh",
@@ -83,7 +83,7 @@ public class ProviderDataPostProcessingTests {
     public void PatientProviderNameTransformationTest() {
 
         // Build the PatientProvider object with the json serialized data
-        Provider prov = Provider.builder()
+        ProviderSp prov = ProviderSp.builder()
                 .personUid(10000001L)
                 .nameNested(readFileData(FILE_PREFIX + "PersonName.json"))
                 .build();
@@ -95,7 +95,7 @@ public class ProviderDataPostProcessingTests {
                 p.getFirstNm(),
                 p.getNmSuffix());
         // Process the respective field json to PatientProviderProvider fields
-        ProviderReporting pf = ProviderReporting.builder().build().constructObject(prov);
+        ProviderReporting pf = ProviderReporting.build(prov);
         // Expected
         List<String> expected = Arrays.asList(
                 "Singgh",
@@ -110,7 +110,7 @@ public class ProviderDataPostProcessingTests {
     public void PatientProviderAddressTransformationTest() {
 
         // Build the PatientProvider object with the json serialized data
-        Provider prov = Provider.builder()
+        ProviderSp prov = ProviderSp.builder()
                 .personUid(10000001L)
                 .addressNested(readFileData(FILE_PREFIX + "PersonAddress.json"))
                 .build();
@@ -127,7 +127,7 @@ public class ProviderDataPostProcessingTests {
                 p.getState(),
                 p.getCountryCode());
         // Process the respective field json to PatientProvider fields
-        ProviderReporting pf = ProviderReporting.builder().build().constructObject(prov);
+        ProviderReporting pf = ProviderReporting.build(prov);
         // Expected
         List<String> expected = Arrays.asList(
                 "123 Main St.",
@@ -147,7 +147,7 @@ public class ProviderDataPostProcessingTests {
     public void PatientProviderTelephoneTransformationTest() {
 
         // Build the PatientProvider object with the json serialized data
-        Provider prov = Provider.builder()
+        ProviderSp prov = ProviderSp.builder()
                 .personUid(10000001L)
                 .telephoneNested(readFileData(FILE_PREFIX + "PersonTelephone.json"))
                 .build();
@@ -167,7 +167,7 @@ public class ProviderDataPostProcessingTests {
     public void PatientProviderEntityDataTransformationTest() {
 
         // Build the PatientProvider object with the json serialized data
-        Provider prov = Provider.builder()
+        ProviderSp prov = ProviderSp.builder()
                 .personUid(10000001L)
                 .entityDataNested(readFileData(FILE_PREFIX + "PersonEntityData.json"))
                 .build();
@@ -179,7 +179,7 @@ public class ProviderDataPostProcessingTests {
                 p.getProviderRegistrationNumAuth());
 
         // Process the respective field json to PatientProvider fields
-        ProviderReporting pf = ProviderReporting.builder().build().constructObject(prov);
+        ProviderReporting pf = ProviderReporting.build(prov);
         // Expected
         List<String> expected = List.of(
                 "12314286",
@@ -193,7 +193,7 @@ public class ProviderDataPostProcessingTests {
     public void PatientProviderEmailTransformationTest() {
 
         // Build the PatientProvider object with the json serialized data
-        Provider prov = Provider.builder()
+        ProviderSp prov = ProviderSp.builder()
                 .personUid(10000001L)
                 .emailNested(readFileData(FILE_PREFIX + "PersonEmail.json"))
                 .build();
@@ -202,7 +202,7 @@ public class ProviderDataPostProcessingTests {
         Function<ProviderReporting, List<String>> pDetailsFn = (p) -> Collections.singletonList(p.getEmailWork());
 
         // Process the respective field json to PatientProvider fields
-        ProviderReporting pf = ProviderReporting.builder().build().constructObject(prov);
+        ProviderReporting pf = ProviderReporting.build(prov);
         // Expected
         List<String> expected = List.of("someone2@email.com");
         // Validate the PatientProvider field processing

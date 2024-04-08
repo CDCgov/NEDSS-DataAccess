@@ -15,7 +15,7 @@ import java.util.Set;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ProviderReporting implements PersonExtendedProps, DataRequiredFields, ProviderBuilder {
+public class ProviderReporting implements PersonExtendedProps, DataRequiredFields {
     private Long providerUid;
     private String localId;
     private String recordStatus;
@@ -71,28 +71,20 @@ public class ProviderReporting implements PersonExtendedProps, DataRequiredField
     private String providerRegistrationNum;
     private String providerRegistrationNumAuth;
 
-    /***
-     * Transform the Name, Address,  Telephone, Email, EntityData(SSN), AddAuthUser, ChangeAuthUser
-     * @return Fully Transformed Provider Object
-     */
-    public ProviderReporting constructObject(Provider p) {
-        setProviderUid(p.getPersonUid());
-        setLocalId(p.getLocalId());
-        setRecordStatus(p.getRecordStatusCd());
-        setEntryMethod(p.getElectronicInd());
-        setGeneralComments(p.getDescription());
-        setAddUserId(p.getAddUserId());
-        setLastChgUserId(p.getLastChgUserId());
-        setAddUserName(p.getAddUserName());
-        setLastChgUserName(p.getLastChgUserName());
-        setLastChgTime(p.getLastChgTime());
-        setAddTime(p.getAddTime());
-        // Transform the nested Json data
-        return p.postProcessJsonData(this);
-    }
-
-    public static ProviderReporting build(Provider p) {
-        return ProviderReporting.builder().build().constructObject(p);
+    public static ProviderReporting build(ProviderSp p) {
+        return p.postProcessJsonData(ProviderReporting.builder()
+                .providerUid(p.getPersonUid())
+                .localId(p.getLocalId())
+                .recordStatus(p.getRecordStatusCd())
+                .entryMethod(p.getElectronicInd())
+                .generalComments(p.getDescription())
+                .addUserId(p.getAddUserId())
+                .lastChgUserId(p.getLastChgUserId())
+                .addUserName(p.getAddUserName())
+                .lastChgUserName(p.getLastChgUserName())
+                .lastChgTime(p.getLastChgTime())
+                .addTime(p.getAddTime())
+                .build());
     }
 
     /**

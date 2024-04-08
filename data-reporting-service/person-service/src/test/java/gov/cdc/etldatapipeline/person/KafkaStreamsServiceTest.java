@@ -4,12 +4,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
 import gov.cdc.etldatapipeline.person.model.dto.dataprops.DataEnvelope;
-import gov.cdc.etldatapipeline.person.model.dto.patient.Patient;
 import gov.cdc.etldatapipeline.person.model.dto.patient.PatientElasticSearch;
 import gov.cdc.etldatapipeline.person.model.dto.patient.PatientReporting;
+import gov.cdc.etldatapipeline.person.model.dto.patient.PatientSp;
 import gov.cdc.etldatapipeline.person.model.dto.persondetail.*;
-import gov.cdc.etldatapipeline.person.model.dto.provider.Provider;
 import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderReporting;
+import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderSp;
 import gov.cdc.etldatapipeline.person.repository.PatientRepository;
 import gov.cdc.etldatapipeline.person.repository.ProviderRepository;
 import gov.cdc.etldatapipeline.person.service.KafkaStreamsService;
@@ -49,10 +49,10 @@ public class KafkaStreamsServiceTest {
 
     @Test
     public void processPatientReportingData() {
-        Patient patient = constructPatient();
-        Mockito.when(patientRepository.computePatients(anyString())).thenReturn(List.of(patient));
+        PatientSp patientSp = constructPatient();
+        Mockito.when(patientRepository.computePatients(anyString())).thenReturn(List.of(patientSp));
         //Build expected unflattened Provider
-        PatientReporting expectedPf = PatientReporting.build(patient);
+        PatientReporting expectedPf = PatientReporting.build(patientSp);
         //Construct transformed patient
         constructPatPrvFull(expectedPf);
 
@@ -67,10 +67,10 @@ public class KafkaStreamsServiceTest {
 
     @Test
     public void processPatientElasticSearchData() {
-        Patient patient = constructPatient();
-        Mockito.when(patientRepository.computePatients(anyString())).thenReturn(List.of(patient));
+        PatientSp patientSp = constructPatient();
+        Mockito.when(patientRepository.computePatients(anyString())).thenReturn(List.of(patientSp));
         //Build expected unflattened Provider
-        PatientElasticSearch expectedPf = PatientElasticSearch.build(patient);
+        PatientElasticSearch expectedPf = PatientElasticSearch.build(patientSp);
         //Construct transformed patient
         constructPatPrvFull(expectedPf);
 
@@ -85,11 +85,11 @@ public class KafkaStreamsServiceTest {
 
     @Test
     public void processProviderReportingData() {
-        Provider constructedProvider = constructProvider();
-        Mockito.when(providerRepository.computeProviders(anyString())).thenReturn(List.of(constructedProvider));
+        ProviderSp constructedProviderSp = constructProvider();
+        Mockito.when(providerRepository.computeProviders(anyString())).thenReturn(List.of(constructedProviderSp));
 
         //Build expected unflattened Provider
-        ProviderReporting expectedPf = ProviderReporting.build(constructedProvider);
+        ProviderReporting expectedPf = ProviderReporting.build(constructedProviderSp);
         //Augment Provider with the flattened data
         constructPatPrvFull(expectedPf);
 
@@ -104,11 +104,11 @@ public class KafkaStreamsServiceTest {
 
     @Test
     public void processProviderElasticSearchData() {
-        Provider constructedProvider = constructProvider();
-        Mockito.when(providerRepository.computeProviders(anyString())).thenReturn(List.of(constructedProvider));
+        ProviderSp constructedProviderSp = constructProvider();
+        Mockito.when(providerRepository.computeProviders(anyString())).thenReturn(List.of(constructedProviderSp));
 
         //Build expected unflattened Provider
-        ProviderReporting expectedPf = ProviderReporting.build(constructedProvider);
+        ProviderReporting expectedPf = ProviderReporting.build(constructedProviderSp);
         //Augment Provider with the flattened data
         constructPatPrvFull(expectedPf);
 
@@ -184,9 +184,9 @@ public class KafkaStreamsServiceTest {
         return ks;
     }
 
-    private Patient constructPatient() {
+    private PatientSp constructPatient() {
         String filePathPrefix = "rawDataFiles/person/";
-        return Patient.builder()
+        return PatientSp.builder()
                 .personUid(10000001L)
                 .nameNested(readFileData(filePathPrefix + "PersonName.json"))
                 .addressNested(readFileData(filePathPrefix + "PersonAddress.json"))
@@ -197,9 +197,9 @@ public class KafkaStreamsServiceTest {
                 .build();
     }
 
-    private Provider constructProvider() {
+    private ProviderSp constructProvider() {
         String filePathPrefix = "rawDataFiles/person/";
-        return Provider.builder()
+        return ProviderSp.builder()
                 .personUid(10000001L)
                 .nameNested(readFileData(filePathPrefix + "PersonName.json"))
                 .addressNested(readFileData(filePathPrefix + "PersonAddress.json"))

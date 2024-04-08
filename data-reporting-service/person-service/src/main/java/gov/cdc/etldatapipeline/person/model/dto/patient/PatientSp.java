@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Patient {
+public class PatientSp {
     @Id
     @Column(name = "person_uid")
     private Long personUid;

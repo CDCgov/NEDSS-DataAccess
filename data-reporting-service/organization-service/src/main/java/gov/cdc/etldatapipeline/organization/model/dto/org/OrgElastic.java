@@ -72,29 +72,26 @@ public class OrgElastic implements DataRequiredFields {
     private Long lastChgUserId;
     private String lastChgTime;
 
-    public OrgElastic constructObject(OrgSp orgSp) {
-        setOrganizationUid(orgSp.getOrganizationUid());
-        setCd(orgSp.getCd());
-        setStatusCd(orgSp.getStatusCd());
-        setStatusTime(orgSp.getStatusTime());
-        setVersionCtrlNbr(orgSp.getVersionCtrlNbr());
-        setEdxInd(orgSp.getEdxInd());
-        setRecordStatusTime(orgSp.getRecordStatusTime());
-        setLocalId(orgSp.getLocalId());
-        setOrgRecordStatusCd(orgSp.getRecordStatusCd());
-        setDescription(orgSp.getDescription());
-        setElectronicInd(orgSp.getElectronicInd());
-        setStandIndClass(orgSp.getStandIndClass());
-        setAddUserId(orgSp.getAddUserId());
-        setAddTime(orgSp.getAddTime());
-        setLastChgUserId(orgSp.getLastChgUserId());
-        setLastChgTime(orgSp.getLastChgTime());
-        orgSp.processNestedJsonData(this);
-        return this;
-    }
-
-    public static OrgElastic build(OrgSp p) {
-        return OrgElastic.builder().build().constructObject(p);
+    public static OrgElastic build(OrgSp orgSp) {
+        return orgSp.processNestedJsonData(
+                OrgElastic.builder()
+                        .organizationUid(orgSp.getOrganizationUid())
+                        .cd(orgSp.getCd())
+                        .statusCd(orgSp.getStatusCd())
+                        .statusTime(orgSp.getStatusTime())
+                        .versionCtrlNbr(orgSp.getVersionCtrlNbr())
+                        .edxInd(orgSp.getEdxInd())
+                        .recordStatusTime(orgSp.getRecordStatusTime())
+                        .localId(orgSp.getLocalId())
+                        .orgRecordStatusCd(orgSp.getRecordStatusCd())
+                        .description(orgSp.getDescription())
+                        .electronicInd(orgSp.getElectronicInd())
+                        .standIndClass(orgSp.getStandIndClass())
+                        .addUserId(orgSp.getAddUserId())
+                        .addTime(orgSp.getAddTime())
+                        .lastChgUserId(orgSp.getLastChgUserId())
+                        .lastChgTime(orgSp.getLastChgTime())
+                        .build());
     }
 
     @Override

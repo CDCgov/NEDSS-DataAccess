@@ -16,7 +16,7 @@ public class ProviderKey implements DataRequiredFields {
     @NonNull
     private Long providerUid;
 
-    public static ProviderKey build(Provider p) {
+    public static ProviderKey build(ProviderSp p) {
         return ProviderKey.builder().providerUid(p.getPersonUid()).build();
     }
 

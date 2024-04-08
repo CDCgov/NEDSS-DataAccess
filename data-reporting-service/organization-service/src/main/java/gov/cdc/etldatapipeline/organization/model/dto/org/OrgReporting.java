@@ -50,26 +50,23 @@ public class OrgReporting implements DataRequiredFields {
     private String lastChgTime;
     private String refreshDatetime;
 
-    public OrgReporting constructObject(OrgSp orgSp) {
-        setOrganizationUid(orgSp.getOrganizationUid());
-        setLocalId(orgSp.getLocalId());
-        setRecordStatus(orgSp.getRecordStatusCd());
-        setGeneralComments(orgSp.getDescription());
-        setEntryMethod(orgSp.getElectronicInd());
-        setStandIndClass(orgSp.getStandIndClass());
-        setOrganizationName(orgSp.getOrganizationName());
-        setAddTime(orgSp.getAddTime());
-        setAddUserId(orgSp.getAddUserId());
-        setLastChgUserId(orgSp.getLastChgUserId());
-        setLastChgTime(orgSp.getLastChgTime());
-        setAddUserName(orgSp.getAddUserName());
-        setLastChgUserName(orgSp.getLastChgUserName());
-        orgSp.processNestedJsonData(this);
-        return this;
-    }
-
-    public static OrgReporting build(OrgSp p) {
-        return OrgReporting.builder().build().constructObject(p);
+    public static OrgReporting build(OrgSp orgSp) {
+        return orgSp.processNestedJsonData(
+                OrgReporting.builder()
+                        .organizationUid(orgSp.getOrganizationUid())
+                        .localId(orgSp.getLocalId())
+                        .recordStatus(orgSp.getRecordStatusCd())
+                        .generalComments(orgSp.getDescription())
+                        .entryMethod(orgSp.getElectronicInd())
+                        .standIndClass(orgSp.getStandIndClass())
+                        .organizationName(orgSp.getOrganizationName())
+                        .addTime(orgSp.getAddTime())
+                        .addUserId(orgSp.getAddUserId())
+                        .lastChgUserId(orgSp.getLastChgUserId())
+                        .lastChgTime(orgSp.getLastChgTime())
+                        .addUserName(orgSp.getAddUserName())
+                        .lastChgUserName(orgSp.getLastChgUserName())
+                        .build());
     }
 
     @Override

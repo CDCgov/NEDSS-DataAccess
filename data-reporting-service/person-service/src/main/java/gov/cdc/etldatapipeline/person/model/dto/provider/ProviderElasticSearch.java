@@ -15,7 +15,7 @@ import java.util.Set;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ProviderElasticSearch implements PersonExtendedProps, DataRequiredFields, ProviderBuilder {
+public class ProviderElasticSearch implements PersonExtendedProps, DataRequiredFields {
     private Long personUid;
     private Long providerUid;
     private String additionalGenderCd;
@@ -123,34 +123,29 @@ public class ProviderElasticSearch implements PersonExtendedProps, DataRequiredF
     private Integer entityIdSeq;
     private String assigningAuthorityCd;
 
-    public ProviderElasticSearch constructObject(Provider p) {
-        setPersonUid(p.getPersonUid());
-        setProviderUid(p.getPersonUid());
-        setAddTime(p.getAddTime());
-        setDedupMatchInd(p.getDedupMatchInd());
-        setDescription(p.getDescription());
-        setElectronicInd(p.getElectronicInd());
-        setEdxInd(p.getEdxInd());
-        setLastChgUserId(p.getLastChgUserId());
-        setLastChgTime(p.getLastChgTime());
-        setLocalId(p.getLocalId());
-        setPersonFirstNm(p.getFirstNm());
-        setPersonMiddleNm(p.getMiddleNm());
-        setPersonLastNm(p.getLastNm());
-        setPersonNmSuffix(p.getNmSuffix());
-        setPersonParentUid(p.getPersonParentUid());
-        setRecordStatusTime(p.getRecordStatusTime());
-        setRecordStatusCd(p.getRecordStatusCd());
-        setStatusCd(p.getStatusCd());
-        setStatusTime(p.getStatusTime());
-        setVersionCtrlNbr(p.getVersionCtrlNbr());
-
-        // Transform the nested Json data
-        return p.postProcessJsonData(this);
-    }
-
-    public static ProviderElasticSearch build(Provider p) {
-        return ProviderElasticSearch.builder().build().constructObject(p);
+    public static ProviderElasticSearch build(ProviderSp p) {
+        return p.postProcessJsonData(ProviderElasticSearch.builder()
+                .personUid(p.getPersonUid())
+                .providerUid(p.getPersonUid())
+                .addTime(p.getAddTime())
+                .dedupMatchInd(p.getDedupMatchInd())
+                .description(p.getDescription())
+                .electronicInd(p.getElectronicInd())
+                .edxInd(p.getEdxInd())
+                .lastChgUserId(p.getLastChgUserId())
+                .lastChgTime(p.getLastChgTime())
+                .localId(p.getLocalId())
+                .personFirstNm(p.getFirstNm())
+                .personMiddleNm(p.getMiddleNm())
+                .personLastNm(p.getLastNm())
+                .personNmSuffix(p.getNmSuffix())
+                .personParentUid(p.getPersonParentUid())
+                .recordStatusTime(p.getRecordStatusTime())
+                .recordStatusCd(p.getRecordStatusCd())
+                .statusCd(p.getStatusCd())
+                .statusTime(p.getStatusTime())
+                .versionCtrlNbr(p.getVersionCtrlNbr())
+                .build());
     }
 
     /**

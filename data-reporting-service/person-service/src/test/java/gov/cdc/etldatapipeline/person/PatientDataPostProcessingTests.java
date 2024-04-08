@@ -1,7 +1,7 @@
 package gov.cdc.etldatapipeline.person;
 
-import gov.cdc.etldatapipeline.person.model.dto.patient.Patient;
 import gov.cdc.etldatapipeline.person.model.dto.patient.PatientReporting;
+import gov.cdc.etldatapipeline.person.model.dto.patient.PatientSp;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +19,7 @@ public class PatientDataPostProcessingTests {
     public void consolidatedPatientTransformationTest() {
 
         // Build the PatientProvider object with the json serialized data
-        Patient pat = Patient.builder()
+        PatientSp pat = PatientSp.builder()
                 .personUid(10000001L)
                 .nameNested(readFileData(FILE_PREFIX + "PersonName.json"))
                 .addressNested(readFileData(FILE_PREFIX + "PersonAddress.json"))
@@ -90,7 +90,7 @@ public class PatientDataPostProcessingTests {
     public void PatientProviderNameTransformationTest() {
 
         // Build the PatientProvider object with the json serialized data
-        Patient perOp = Patient.builder()
+        PatientSp perOp = PatientSp.builder()
                 .personUid(10000001L)
                 .nameNested(readFileData(FILE_PREFIX + "PersonName.json"))
                 .build();
@@ -117,7 +117,7 @@ public class PatientDataPostProcessingTests {
     public void PatientProviderAddressTransformationTest() {
 
         // Build the PatientProvider object with the json serialized data
-        Patient perOp = Patient.builder()
+        PatientSp perOp = PatientSp.builder()
                 .personUid(10000001L)
                 .addressNested(readFileData(FILE_PREFIX + "PersonAddress.json"))
                 .build();
@@ -156,7 +156,7 @@ public class PatientDataPostProcessingTests {
     public void PatientProviderTelephoneTransformationTest() {
 
         // Build the PatientProvider object with the json serialized data
-        Patient perOp = Patient.builder()
+        PatientSp perOp = PatientSp.builder()
                 .personUid(10000001L)
                 .telephoneNested(readFileData(FILE_PREFIX + "PersonTelephone.json"))
                 .build();
@@ -186,7 +186,7 @@ public class PatientDataPostProcessingTests {
     public void PatientProviderEntityDataTransformationTest() {
 
         // Build the PatientProvider object with the json serialized data
-        Patient perOp = Patient.builder()
+        PatientSp perOp = PatientSp.builder()
                 .personUid(10000001L)
                 .entityDataNested(readFileData(FILE_PREFIX + "PersonEntityData.json"))
                 .build();
@@ -212,7 +212,7 @@ public class PatientDataPostProcessingTests {
     public void PatientProviderEmailTransformationTest() {
 
         // Build the PatientProvider object with the json serialized data
-        Patient perOp = Patient.builder()
+        PatientSp perOp = PatientSp.builder()
                 .personUid(10000001L)
                 .emailNested(readFileData(FILE_PREFIX + "PersonEmail.json"))
                 .build();

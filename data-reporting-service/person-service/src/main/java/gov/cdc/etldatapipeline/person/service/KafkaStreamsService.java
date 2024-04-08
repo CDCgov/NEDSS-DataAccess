@@ -1,13 +1,13 @@
 package gov.cdc.etldatapipeline.person.service;
 
-import gov.cdc.etldatapipeline.person.model.dto.patient.Patient;
 import gov.cdc.etldatapipeline.person.model.dto.patient.PatientElasticSearch;
 import gov.cdc.etldatapipeline.person.model.dto.patient.PatientKey;
 import gov.cdc.etldatapipeline.person.model.dto.patient.PatientReporting;
-import gov.cdc.etldatapipeline.person.model.dto.provider.Provider;
+import gov.cdc.etldatapipeline.person.model.dto.patient.PatientSp;
 import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderElasticSearch;
 import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderKey;
 import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderReporting;
+import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderSp;
 import gov.cdc.etldatapipeline.person.model.odse.Person;
 import gov.cdc.etldatapipeline.person.repository.PatientRepository;
 import gov.cdc.etldatapipeline.person.repository.ProviderRepository;
@@ -60,7 +60,7 @@ public class KafkaStreamsService {
                 .filter((k, v) -> v != null)
                 .peek((key, value) -> log.info("Received Person : " + value.getPersonUid()));
 
-        KStream<String, List<Patient>> patientStream = personKStream
+        KStream<String, List<PatientSp>> patientStream = personKStream
                 .filter((k, v) -> v.getCd() != null && v.getCd().equalsIgnoreCase("PAT"))
                 .mapValues(v -> patientRepository.computePatients(v.getPersonUid()));
 
@@ -87,7 +87,7 @@ public class KafkaStreamsService {
                                 StreamsSerdes.DataEnvelopeSerde(),
                                 StreamsSerdes.DataEnvelopeSerde()));
 
-        KStream<String, List<Provider>> providerStream = personKStream
+        KStream<String, List<ProviderSp>> providerStream = personKStream
                 .filter((k, v) -> v.getCd() != null && v.getCd().equalsIgnoreCase("PRV"))
                 .mapValues(v -> providerRepository.computeProviders(v.getPersonUid()));
 

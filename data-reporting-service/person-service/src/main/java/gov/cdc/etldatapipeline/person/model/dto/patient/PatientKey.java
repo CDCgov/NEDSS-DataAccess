@@ -16,7 +16,7 @@ public class PatientKey implements DataRequiredFields {
     @NonNull
     private Long patientUid;
 
-    public static PatientKey build(Patient p) {
+    public static PatientKey build(PatientSp p) {
         return PatientKey.builder().patientUid(p.getPersonUid()).build();
     }
 
