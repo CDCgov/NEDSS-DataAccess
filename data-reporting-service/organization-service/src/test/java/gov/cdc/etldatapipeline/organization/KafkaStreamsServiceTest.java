@@ -3,7 +3,7 @@ package gov.cdc.etldatapipeline.organization;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import gov.cdc.etldatapipeline.organization.model.dto.dataprops.DataEnvelope;
+import gov.cdc.etldatapipeline.organization.model.avro.DataEnvelope;
 import gov.cdc.etldatapipeline.organization.model.dto.org.OrgSp;
 import gov.cdc.etldatapipeline.organization.repository.OrgRepository;
 import gov.cdc.etldatapipeline.organization.service.KafkaStreamsService;

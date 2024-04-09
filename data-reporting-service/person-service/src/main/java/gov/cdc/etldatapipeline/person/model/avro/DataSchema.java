@@ -1,4 +1,4 @@
-package gov.cdc.etldatapipeline.person.model.dto.dataprops;
+package gov.cdc.etldatapipeline.person.model.avro;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

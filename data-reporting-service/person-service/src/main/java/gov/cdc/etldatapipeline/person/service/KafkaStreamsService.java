@@ -67,8 +67,8 @@ public class KafkaStreamsService {
         // KStream<String, List<Patient>>
         patientStream.flatMap((k, v) -> v.stream()
                         .map(p -> KeyValue.pair(
-                                utilHelper.constructDataEnvelope(PatientKey.build(p)),
-                                utilHelper.constructDataEnvelope(PatientElasticSearch.build(p))))
+                                utilHelper.buildAvroRecord(PatientKey.build(p)),
+                                utilHelper.buildAvroRecord(PatientElasticSearch.build(p))))
                         .collect(Collectors.toSet()))
                 .peek((key, value) -> log.info("Patient Elastic : {}", value.toString()))
                 .to((key, v, recordContext) -> patientElasticSearchTopicName,
@@ -78,8 +78,8 @@ public class KafkaStreamsService {
         // KStream<String, List<Patient>>
         patientStream.flatMap((k, v) -> v.stream()
                         .map(p -> KeyValue.pair(
-                                utilHelper.constructDataEnvelope(PatientKey.build(p)),
-                                utilHelper.constructDataEnvelope(PatientReporting.build(p))))
+                                utilHelper.buildAvroRecord(PatientKey.build(p)),
+                                utilHelper.buildAvroRecord(PatientReporting.build(p))))
                         .collect(Collectors.toSet()))
                 .peek((key, value) -> log.info("Patient Reporting : {}", value.toString()))
                 .to((key, v, recordContext) -> patientReportingOutputTopic,
@@ -95,8 +95,8 @@ public class KafkaStreamsService {
         providerStream
                 .flatMap((k, v) -> v.stream()
                         .map(p -> KeyValue.pair(
-                                utilHelper.constructDataEnvelope(ProviderKey.build(p)),
-                                utilHelper.constructDataEnvelope(ProviderReporting.build(p))))
+                                utilHelper.buildAvroRecord(ProviderKey.build(p)),
+                                utilHelper.buildAvroRecord(ProviderReporting.build(p))))
                         .collect(Collectors.toSet()))
                 .peek((key, value) -> log.info("Provider : {}", value.toString()))
                 .to((key, v, recordContext) -> providerReportingOutputTopic,
@@ -107,8 +107,8 @@ public class KafkaStreamsService {
         providerStream
                 .flatMap((k, v) -> v.stream()
                         .map(p -> KeyValue.pair(
-                                utilHelper.constructDataEnvelope(ProviderKey.build(p)),
-                                utilHelper.constructDataEnvelope(ProviderElasticSearch.build(p))))
+                                utilHelper.buildAvroRecord(ProviderKey.build(p)),
+                                utilHelper.buildAvroRecord(ProviderElasticSearch.build(p))))
                         .collect(Collectors.toSet()))
                 .peek((key, value) -> log.info("Provider : {}", value.toString()))
                 .to((key, v, recordContext) -> providerElasticSearchOutputTopic,

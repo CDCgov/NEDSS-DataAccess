@@ -55,8 +55,8 @@ public class KafkaStreamsService {
 
         organizationKStream.flatMap((k, v) -> v.stream()
                         .map(p -> KeyValue.pair(
-                                utilHelper.constructDataEnvelope(OrgKey.build(p)),
-                                utilHelper.constructDataEnvelope(OrgReporting.build(p))))
+                                utilHelper.buildAvroRecord(OrgKey.build(p)),
+                                utilHelper.buildAvroRecord(OrgReporting.build(p))))
                         .collect(Collectors.toSet()))
                 .peek((key, value) ->
                         log.info("Patient Reporting : {}", value.toString()))
@@ -67,8 +67,8 @@ public class KafkaStreamsService {
 
         organizationKStream.flatMap((k, v) -> v.stream()
                         .map(p -> KeyValue.pair(
-                                utilHelper.constructDataEnvelope(OrgKey.build(p)),
-                                utilHelper.constructDataEnvelope(OrgElastic.build(p))))
+                                utilHelper.buildAvroRecord(OrgKey.build(p)),
+                                utilHelper.buildAvroRecord(OrgElastic.build(p))))
                         .collect(Collectors.toSet()))
                 .peek((key, value) ->
                         log.info("Patient Elastic : {}", value.toString()))

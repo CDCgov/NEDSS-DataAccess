@@ -1,7 +1,7 @@
 package gov.cdc.etldatapipeline.organization.utils;
 
 
-import gov.cdc.etldatapipeline.organization.model.dto.dataprops.DataEnvelope;
+import gov.cdc.etldatapipeline.organization.model.avro.DataEnvelope;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
