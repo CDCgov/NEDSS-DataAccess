@@ -41,6 +41,7 @@ public class InvestigationService {
     private String topicDebugLog = "Received Investigation ID: {} from topic: {}";
 
 
+
     @Autowired
     public void processMessage(StreamsBuilder streamsBuilder) {
         streamsBuilder.stream(investigationTopic, Consumed.with(Serdes.String(), Serdes.String()))
@@ -70,7 +71,4 @@ public class InvestigationService {
         }
         return null;
     }
-
-
-
 }

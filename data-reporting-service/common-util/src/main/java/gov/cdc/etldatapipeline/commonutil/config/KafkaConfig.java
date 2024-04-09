@@ -1,4 +1,4 @@
-package gov.cdc.etldatapipeline.investigation.config;
+package gov.cdc.etldatapipeline.commonutil.config;
 
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,5 +47,10 @@ public class KafkaConfig {
     @Bean
     public NewTopic createInvestigationObservationOutputTopic() {
         return TopicBuilder.name(investigationObservationOutputTopicName).build();
+    }
+
+    @Bean
+    public NewTopic createInvestigationTopic() {
+        return TopicBuilder.name("cdc.nbs_odse.dbo.Investigation").build();
     }
 }

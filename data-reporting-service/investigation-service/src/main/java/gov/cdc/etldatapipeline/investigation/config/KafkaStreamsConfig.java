@@ -21,6 +21,7 @@ public class KafkaStreamsConfig {
     @Value("${spring.kafka.streams.application-id}")
     private String applicationId;
 
+
     @Bean(name = KafkaStreamsDefaultConfiguration.DEFAULT_STREAMS_CONFIG_BEAN_NAME)
     public KafkaStreamsConfiguration kStreamsConfigs() {
         Map<String, Object> props = new HashMap<>();
