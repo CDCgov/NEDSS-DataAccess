@@ -1,6 +1,6 @@
 package gov.cdc.etldatapipeline.organization.service;
 
-import gov.cdc.etldatapipeline.organization.model.dto.org.OrgElastic;
+import gov.cdc.etldatapipeline.organization.model.dto.org.OrgElasticSearch;
 import gov.cdc.etldatapipeline.organization.model.dto.org.OrgKey;
 import gov.cdc.etldatapipeline.organization.model.dto.org.OrgReporting;
 import gov.cdc.etldatapipeline.organization.model.dto.org.OrgSp;
@@ -68,7 +68,7 @@ public class KafkaStreamsService {
         organizationKStream.flatMap((k, v) -> v.stream()
                         .map(p -> KeyValue.pair(
                                 utilHelper.buildAvroRecord(OrgKey.build(p)),
-                                utilHelper.buildAvroRecord(OrgElastic.build(p))))
+                                utilHelper.buildAvroRecord(OrgElasticSearch.build(p))))
                         .collect(Collectors.toSet()))
                 .peek((key, value) ->
                         log.info("Patient Elastic : {}", value.toString()))

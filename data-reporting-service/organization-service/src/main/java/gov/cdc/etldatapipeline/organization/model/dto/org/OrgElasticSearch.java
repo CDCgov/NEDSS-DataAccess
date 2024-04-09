@@ -14,7 +14,7 @@ import java.util.Set;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class OrgElastic implements DataRequiredFields {
+public class OrgElasticSearch implements DataRequiredFields {
     private long organizationUid;
     private String cd;
     private String statusCd;
@@ -72,9 +72,9 @@ public class OrgElastic implements DataRequiredFields {
     private Long lastChgUserId;
     private String lastChgTime;
 
-    public static OrgElastic build(OrgSp orgSp) {
+    public static OrgElasticSearch build(OrgSp orgSp) {
         return orgSp.processNestedJsonData(
-                OrgElastic.builder()
+                OrgElasticSearch.builder()
                         .organizationUid(orgSp.getOrganizationUid())
                         .cd(orgSp.getCd())
                         .statusCd(orgSp.getStatusCd())

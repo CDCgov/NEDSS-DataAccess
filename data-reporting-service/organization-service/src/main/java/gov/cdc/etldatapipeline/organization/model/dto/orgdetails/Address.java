@@ -3,7 +3,7 @@ package gov.cdc.etldatapipeline.organization.model.dto.orgdetails;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import gov.cdc.etldatapipeline.organization.model.dto.org.OrgElastic;
+import gov.cdc.etldatapipeline.organization.model.dto.org.OrgElasticSearch;
 import gov.cdc.etldatapipeline.organization.model.dto.org.OrgReporting;
 import lombok.*;
 
@@ -44,8 +44,8 @@ public class Address implements OrgExtension {
             orgRep.setCountyCode(cntyCd);
             orgRep.setCountry(cntryCd);
             orgRep.setAddressComments(addressComments);
-        } else if (org.getClass() == OrgElastic.class) {
-            OrgElastic orgElastic = (OrgElastic) org;
+        } else if (org.getClass() == OrgElasticSearch.class) {
+            OrgElasticSearch orgElastic = (OrgElasticSearch) org;
             orgElastic.setStreetAddr1(streetAddr1);
             orgElastic.setStreetAddr2(streetAddr2);
             orgElastic.setCity(city);

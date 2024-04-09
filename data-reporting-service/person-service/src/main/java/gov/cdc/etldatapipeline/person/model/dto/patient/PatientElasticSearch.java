@@ -11,6 +11,9 @@ import lombok.Data;
 
 import java.util.Set;
 
+/**
+ * Data model for the Patient ElasticSearch target
+ */
 @Data
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)

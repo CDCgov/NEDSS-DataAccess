@@ -1,7 +1,6 @@
 package gov.cdc.etldatapipeline.person.model.dto.patient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
 import gov.cdc.etldatapipeline.person.utils.DataPostProcessor;
 import jakarta.persistence.Column;
@@ -13,6 +12,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Data Model to capture the results of the stored procedure `sp_patient_event`
+ */
 @Slf4j
 @Data
 @Builder
@@ -135,19 +137,21 @@ public class PatientSp {
     @Column(name = "patient_entity")
     private String entityDataNested;
 
+    /**
+     * Transforms the nested data elements in PatientSp to the individual properties
+     *
+     * @param pf  PatientReporting/PatientElasticSearch object
+     * @param <T> Any object extending PersonExtendedProps
+     * @return Transformed object
+     */
     public <T extends PersonExtendedProps> T postProcessJsonData(T pf) {
         DataPostProcessor processor = new DataPostProcessor();
-        try {
-            processor.processPersonName(nameNested, pf);
-            processor.processPersonAddress(addressNested, pf);
-            processor.processPersonRace(raceNested, pf);
-            processor.processPersonTelephone(telephoneNested, pf);
-            processor.processPersonEntityData(entityDataNested, pf);
-            processor.processPersonEmail(emailNested, pf);
-
-        } catch (JsonProcessingException e) {
-            log.error("JsonProcessingException: ", e);
-        }
+        processor.processPersonName(nameNested, pf);
+        processor.processPersonAddress(addressNested, pf);
+        processor.processPersonRace(raceNested, pf);
+        processor.processPersonTelephone(telephoneNested, pf);
+        processor.processPersonEntityData(entityDataNested, pf);
+        processor.processPersonEmail(emailNested, pf);
         return pf;
     }
 }

@@ -2,8 +2,8 @@ package gov.cdc.etldatapipeline.person;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
 import gov.cdc.etldatapipeline.person.model.avro.DataEnvelope;
+import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
 import gov.cdc.etldatapipeline.person.model.dto.patient.PatientElasticSearch;
 import gov.cdc.etldatapipeline.person.model.dto.patient.PatientReporting;
 import gov.cdc.etldatapipeline.person.model.dto.patient.PatientSp;
@@ -136,12 +136,11 @@ public class KafkaStreamsServiceTest {
             String outputTopicName,
             String expectedValueFilePath,
             String expectedKeyFilePath) {
-        StreamsBuilder streamsBuilder = new StreamsBuilder();
         KafkaStreamsService ks = getKafkaStreamService();
+        StreamsBuilder streamsBuilder = new StreamsBuilder();
         ks.processMessage(streamsBuilder);
         Topology topology = streamsBuilder.build();
         try (TopologyTestDriver topologyTestDriver = new TopologyTestDriver(topology, new Properties())) {
-
             TestInputTopic<String, String> inputTopic = topologyTestDriver
                     .createInputTopic(inputTopicName, new StringSerializer(), new StringSerializer());
 

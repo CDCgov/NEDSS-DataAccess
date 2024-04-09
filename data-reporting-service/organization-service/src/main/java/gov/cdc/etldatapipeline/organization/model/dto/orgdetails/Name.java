@@ -3,7 +3,7 @@ package gov.cdc.etldatapipeline.organization.model.dto.orgdetails;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import gov.cdc.etldatapipeline.organization.model.dto.org.OrgElastic;
+import gov.cdc.etldatapipeline.organization.model.dto.org.OrgElasticSearch;
 import gov.cdc.etldatapipeline.organization.model.dto.org.OrgReporting;
 import lombok.*;
 
@@ -22,8 +22,8 @@ public class Name implements OrgExtension {
         if (org.getClass() == OrgReporting.class) {
             OrgReporting orgReporting = (OrgReporting) org;
             orgReporting.setOrganizationName(organizationName);
-        } else if (org.getClass() == OrgElastic.class) {
-            OrgElastic orgElastic = (OrgElastic) org;
+        } else if (org.getClass() == OrgElasticSearch.class) {
+            OrgElasticSearch orgElastic = (OrgElasticSearch) org;
             orgElastic.setOrganizationName(organizationName);
             orgElastic.setOnOrgUid(onOrgUid);
         }

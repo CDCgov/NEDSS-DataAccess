@@ -7,6 +7,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.*;
 
+/**
+ * Data Model to capture the results of the stored procedure `sp_organization_event`
+ */
 @Data
 @Builder
 @Entity

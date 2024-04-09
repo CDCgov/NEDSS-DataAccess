@@ -32,6 +32,17 @@ public class UtilHelper {
         return utilHelper;
     }
 
+    public <T> T deserializePayload(String jsonString, Class<T> type) {
+        try {
+            if (jsonString == null) return null;
+            return objectMapper.readValue(jsonString, type);
+        } catch (JsonProcessingException e) {
+            log.error("JsonProcessingException: ", e);
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public <T extends DebeziumMetadata> T deserializePayload(
             String jsonString, String nodeName, Class<T> type) {
         try {

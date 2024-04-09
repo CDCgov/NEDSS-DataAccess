@@ -1,4 +1,4 @@
-CREATE or ALTER PROCEDURE dbo.sp_Person_Event  @user_id_list varchar(max)
+CREATE or ALTER PROCEDURE dbo.sp_Person_Event @user_id_list varchar(max)
 AS
 
 BEGIN
