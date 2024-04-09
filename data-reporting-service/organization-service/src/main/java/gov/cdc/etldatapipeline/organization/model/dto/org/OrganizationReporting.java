@@ -14,7 +14,7 @@ import java.util.Set;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class OrgReporting implements DataRequiredFields {
+public class OrganizationReporting implements DataRequiredFields {
     private Long organizationUid;
     private String localId;
     private String recordStatus;
@@ -50,9 +50,9 @@ public class OrgReporting implements DataRequiredFields {
     private String lastChgTime;
     private String refreshDatetime;
 
-    public static OrgReporting build(OrgSp orgSp) {
+    public static OrganizationReporting build(OrganizationSp orgSp) {
         return orgSp.processNestedJsonData(
-                OrgReporting.builder()
+                OrganizationReporting.builder()
                         .organizationUid(orgSp.getOrganizationUid())
                         .localId(orgSp.getLocalId())
                         .recordStatus(orgSp.getRecordStatusCd())

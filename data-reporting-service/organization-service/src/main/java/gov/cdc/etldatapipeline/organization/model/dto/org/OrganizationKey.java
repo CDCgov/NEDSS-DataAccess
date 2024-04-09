@@ -13,13 +13,13 @@ import java.util.Set;
 @Data
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class OrgKey implements DataRequiredFields {
+public class OrganizationKey implements DataRequiredFields {
     @NonNull
     @JsonProperty("organization_uid")
     private Long orgUID;
 
-    public static OrgKey build(OrgSp p) {
-        return OrgKey.builder().orgUID(p.getOrganizationUid()).build();
+    public static OrganizationKey build(OrganizationSp p) {
+        return OrganizationKey.builder().orgUID(p.getOrganizationUid()).build();
     }
 
     @Override

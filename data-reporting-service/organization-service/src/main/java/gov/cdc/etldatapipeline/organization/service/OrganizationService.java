@@ -1,9 +1,9 @@
 package gov.cdc.etldatapipeline.organization.service;
 
-import gov.cdc.etldatapipeline.organization.model.dto.org.OrgElasticSearch;
-import gov.cdc.etldatapipeline.organization.model.dto.org.OrgKey;
-import gov.cdc.etldatapipeline.organization.model.dto.org.OrgReporting;
-import gov.cdc.etldatapipeline.organization.model.dto.org.OrgSp;
+import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationElasticSearch;
+import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationKey;
+import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationReporting;
+import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationSp;
 import gov.cdc.etldatapipeline.organization.model.odse.Organization;
 import gov.cdc.etldatapipeline.organization.repository.OrgRepository;
 import gov.cdc.etldatapipeline.organization.utils.StreamsSerdes;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Setter
 @Slf4j
-public class KafkaStreamsService {
+public class OrganizationService {
     @Value("#{kafkaConfig.getOrganizationTopic()}")
     private String orgTopicName;
     @Value("#{kafkaConfig.getOrganizationElasticSearchTopic()}")
@@ -43,7 +43,7 @@ public class KafkaStreamsService {
     public void processMessage(StreamsBuilder streamsBuilder) {
 
         UtilHelper utilHelper = UtilHelper.getInstance();
-        KStream<String, Set<OrgSp>> organizationKStream
+        KStream<String, Set<OrganizationSp>> organizationKStream
                 = streamsBuilder.stream(orgTopicName, Consumed.with(Serdes.String(), Serdes.String()))
                 .map((k, v) -> new KeyValue<>(
                         k,
@@ -55,8 +55,8 @@ public class KafkaStreamsService {
 
         organizationKStream.flatMap((k, v) -> v.stream()
                         .map(p -> KeyValue.pair(
-                                utilHelper.buildAvroRecord(OrgKey.build(p)),
-                                utilHelper.buildAvroRecord(OrgReporting.build(p))))
+                                utilHelper.buildAvroRecord(OrganizationKey.build(p)),
+                                utilHelper.buildAvroRecord(OrganizationReporting.build(p))))
                         .collect(Collectors.toSet()))
                 .peek((key, value) ->
                         log.info("Patient Reporting : {}", value.toString()))
@@ -67,8 +67,8 @@ public class KafkaStreamsService {
 
         organizationKStream.flatMap((k, v) -> v.stream()
                         .map(p -> KeyValue.pair(
-                                utilHelper.buildAvroRecord(OrgKey.build(p)),
-                                utilHelper.buildAvroRecord(OrgElasticSearch.build(p))))
+                                utilHelper.buildAvroRecord(OrganizationKey.build(p)),
+                                utilHelper.buildAvroRecord(OrganizationElasticSearch.build(p))))
                         .collect(Collectors.toSet()))
                 .peek((key, value) ->
                         log.info("Patient Elastic : {}", value.toString()))

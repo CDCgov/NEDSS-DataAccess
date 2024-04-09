@@ -12,7 +12,7 @@ import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderReporting;
 import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderSp;
 import gov.cdc.etldatapipeline.person.repository.PatientRepository;
 import gov.cdc.etldatapipeline.person.repository.ProviderRepository;
-import gov.cdc.etldatapipeline.person.service.KafkaStreamsService;
+import gov.cdc.etldatapipeline.person.service.PersonService;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.kafka.streams.*;
@@ -31,7 +31,7 @@ import static gov.cdc.etldatapipeline.person.TestUtils.readFileData;
 import static org.mockito.ArgumentMatchers.anyString;
 
 @ExtendWith(MockitoExtension.class)
-public class KafkaStreamsServiceTest {
+public class PersonServiceTest {
 
     @Mock
     PatientRepository patientRepository;
@@ -136,7 +136,7 @@ public class KafkaStreamsServiceTest {
             String outputTopicName,
             String expectedValueFilePath,
             String expectedKeyFilePath) {
-        KafkaStreamsService ks = getKafkaStreamService();
+        PersonService ks = getKafkaStreamService();
         StreamsBuilder streamsBuilder = new StreamsBuilder();
         ks.processMessage(streamsBuilder);
         Topology topology = streamsBuilder.build();
@@ -173,8 +173,8 @@ public class KafkaStreamsServiceTest {
     }
 
 
-    private KafkaStreamsService getKafkaStreamService() {
-        KafkaStreamsService ks = new KafkaStreamsService(patientRepository, providerRepository);
+    private PersonService getKafkaStreamService() {
+        PersonService ks = new PersonService(patientRepository, providerRepository);
         ks.setPersonTopicName(personTopic);
         ks.setPatientElasticSearchTopicName(patientElasticTopic);
         ks.setPatientReportingOutputTopic(patientReportingTopic);

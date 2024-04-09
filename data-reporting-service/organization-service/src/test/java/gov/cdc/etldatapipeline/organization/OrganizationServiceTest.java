@@ -4,9 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.cdc.etldatapipeline.organization.model.avro.DataEnvelope;
-import gov.cdc.etldatapipeline.organization.model.dto.org.OrgSp;
+import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationSp;
 import gov.cdc.etldatapipeline.organization.repository.OrgRepository;
-import gov.cdc.etldatapipeline.organization.service.KafkaStreamsService;
+import gov.cdc.etldatapipeline.organization.service.OrganizationService;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.kafka.streams.*;
@@ -26,7 +26,7 @@ import static gov.cdc.etldatapipeline.organization.TestUtils.readFileData;
 import static org.mockito.ArgumentMatchers.anyString;
 
 @ExtendWith(MockitoExtension.class)
-public class KafkaStreamsServiceTest {
+public class OrganizationServiceTest {
 
     @Mock
     OrgRepository orgRepository;
@@ -39,7 +39,7 @@ public class KafkaStreamsServiceTest {
 
     @Test
     public void testOrgReportingData() throws JsonProcessingException {
-        OrgSp orgSp = objectMapper.readValue(readFileData("orgcdc/orgSp.json"), OrgSp.class);
+        OrganizationSp orgSp = objectMapper.readValue(readFileData("orgcdc/orgSp.json"), OrganizationSp.class);
         Mockito.when(orgRepository.computeAllOrganizations(anyString())).thenReturn(Set.of(orgSp));
 
         // Validate Patient Reporting Data Transformation
@@ -53,7 +53,7 @@ public class KafkaStreamsServiceTest {
 
     @Test
     public void testOrgElasticData() throws JsonProcessingException {
-        OrgSp orgSp = objectMapper.readValue(readFileData("orgcdc/orgSp.json"), OrgSp.class);
+        OrganizationSp orgSp = objectMapper.readValue(readFileData("orgcdc/orgSp.json"), OrganizationSp.class);
         Mockito.when(orgRepository.computeAllOrganizations(anyString())).thenReturn(Set.of(orgSp));
 
         // Validate Patient Reporting Data Transformation
@@ -81,7 +81,7 @@ public class KafkaStreamsServiceTest {
             String expectedValueFilePath,
             String expectedKeyFilePath) {
         StreamsBuilder streamsBuilder = new StreamsBuilder();
-        KafkaStreamsService ks = getKafkaStreamService();
+        OrganizationService ks = getKafkaStreamService();
         ks.processMessage(streamsBuilder);
         Topology topology = streamsBuilder.build();
         try (TopologyTestDriver topologyTestDriver = new TopologyTestDriver(topology, new Properties())) {
@@ -117,8 +117,8 @@ public class KafkaStreamsServiceTest {
         }
     }
 
-    private KafkaStreamsService getKafkaStreamService() {
-        KafkaStreamsService ks = new KafkaStreamsService(orgRepository);
+    private OrganizationService getKafkaStreamService() {
+        OrganizationService ks = new OrganizationService(orgRepository);
         ks.setOrgTopicName(orgTopic);
         ks.setOrgElasticSearchTopic(orgElasticTopic);
         ks.setOrgReportingOutputTopic(orgReportingTopic);

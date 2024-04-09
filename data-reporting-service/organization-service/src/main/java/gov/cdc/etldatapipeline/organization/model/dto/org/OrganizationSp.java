@@ -17,7 +17,7 @@ import lombok.*;
 @NoArgsConstructor
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class OrgSp {
+public class OrganizationSp {
     @Id
     @Column(name = "organization_uid")
     private Long organizationUid;

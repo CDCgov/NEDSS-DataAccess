@@ -3,8 +3,8 @@ package gov.cdc.etldatapipeline.organization.model.dto.orgdetails;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import gov.cdc.etldatapipeline.organization.model.dto.org.OrgElasticSearch;
-import gov.cdc.etldatapipeline.organization.model.dto.org.OrgReporting;
+import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationElasticSearch;
+import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationReporting;
 import lombok.*;
 
 @Data
@@ -32,8 +32,8 @@ public class Address implements OrgExtension {
     private String addressComments;
 
     public <T> T updateOrg(T org) {
-        if (org.getClass() == OrgReporting.class) {
-            OrgReporting orgRep = (OrgReporting) org;
+        if (org.getClass() == OrganizationReporting.class) {
+            OrganizationReporting orgRep = (OrganizationReporting) org;
             orgRep.setStreetAddress1(streetAddr1);
             orgRep.setStreetAddress2(streetAddr2);
             orgRep.setCity(city);
@@ -44,8 +44,8 @@ public class Address implements OrgExtension {
             orgRep.setCountyCode(cntyCd);
             orgRep.setCountry(cntryCd);
             orgRep.setAddressComments(addressComments);
-        } else if (org.getClass() == OrgElasticSearch.class) {
-            OrgElasticSearch orgElastic = (OrgElasticSearch) org;
+        } else if (org.getClass() == OrganizationElasticSearch.class) {
+            OrganizationElasticSearch orgElastic = (OrganizationElasticSearch) org;
             orgElastic.setStreetAddr1(streetAddr1);
             orgElastic.setStreetAddr2(streetAddr2);
             orgElastic.setCity(city);

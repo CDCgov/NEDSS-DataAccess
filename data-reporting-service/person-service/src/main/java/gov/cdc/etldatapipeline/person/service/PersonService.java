@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Setter
 @Slf4j
-public class KafkaStreamsService {
+public class PersonService {
     private final PatientRepository patientRepository;
     private final ProviderRepository providerRepository;
     @Value("#{kafkaConfig.getPersonTopicName()}")

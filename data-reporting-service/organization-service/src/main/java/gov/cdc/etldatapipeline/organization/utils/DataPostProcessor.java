@@ -1,6 +1,6 @@
 package gov.cdc.etldatapipeline.organization.utils;
 
-import gov.cdc.etldatapipeline.organization.model.dto.org.OrgElasticSearch;
+import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationElasticSearch;
 import gov.cdc.etldatapipeline.organization.model.dto.orgdetails.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.ObjectUtils;
@@ -27,7 +27,7 @@ public class DataPostProcessor {
     public <T> void processOrgEntity(String entity, T org) {
 
         if (!ObjectUtils.isEmpty(entity)) {
-            if (org.getClass() == OrgElasticSearch.class) {
+            if (org.getClass() == OrganizationElasticSearch.class) {
                 // ToDo: Entity Data for Organization Elastic search gets the max Entity Id and processes them.
                 //  Revisit after clarification from the Features team.
                 Arrays.stream(utilHelper.deserializePayload(entity, Entity[].class))

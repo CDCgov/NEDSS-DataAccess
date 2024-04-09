@@ -81,6 +81,22 @@ services:
     networks:
       - etldatapipeline
 
+  organization-reporting-service:
+    build:
+      context: ./organization-service
+      dockerfile: ./Dockerfile
+    ports:
+      - 8092:8092
+    depends_on:
+      - broker
+    container_name: organization-reporting-service
+    env_file:
+      - etldatapipeline.env
+    environment:
+      SPRING_KAFKA_BOOTSTRAPSERVERS: broker:29092
+    networks:
+      - etldatapipeline
+
   debezium-source-connect:
     image: quay.io/debezium/connect:${DEBEZIUM_VERSION:-2.5}
     container_name: Debezium_Change_Data_Connector
