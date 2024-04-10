@@ -48,7 +48,6 @@ public class OrganizationReporting implements DataRequiredFields {
     private Long lastChgUserId;
     private String lastChgUserName;
     private String lastChgTime;
-    private String refreshDatetime;
 
     public static OrganizationReporting build(OrganizationSp orgSp) {
         return OrganizationReporting.builder()

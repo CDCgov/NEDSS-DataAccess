@@ -95,11 +95,6 @@
       {
         "type": "string",
         "optional": true,
-        "field": "refresh_datetime"
-      },
-      {
-        "type": "string",
-        "optional": true,
         "field": "last_chg_user_name"
       },
       {
@@ -194,7 +189,6 @@
     "last_chg_user_id": 10180119,
     "last_chg_user_name": "ZRY4SFCLNAIUPX, CRPVQBYEAZNDJS6H",
     "last_chg_time": "2024-04-05 18:55:54.177",
-    "refresh_datetime": null,
     "street_address_1": "219 North Court Street",
     "street_address_2": "Unit#1"
   }
