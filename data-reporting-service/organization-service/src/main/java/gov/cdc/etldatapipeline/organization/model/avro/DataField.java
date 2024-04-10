@@ -1,4 +1,4 @@
-package gov.cdc.etldatapipeline.person.model.dto.DataProps;
+package gov.cdc.etldatapipeline.organization.model.avro;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
