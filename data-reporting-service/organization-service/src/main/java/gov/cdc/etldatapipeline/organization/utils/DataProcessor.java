@@ -1,6 +1,7 @@
 package gov.cdc.etldatapipeline.organization.utils;
 
 import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationElasticSearch;
+import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationSp;
 import gov.cdc.etldatapipeline.organization.model.dto.orgdetails.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.ObjectUtils;
@@ -11,8 +12,18 @@ import java.util.Comparator;
 import java.util.function.Function;
 
 @Slf4j
-public class DataPostProcessor {
+public class DataProcessor {
     UtilHelper utilHelper = UtilHelper.getInstance();
+
+    public static <T> T processOrganization(OrganizationSp orgSp, T obj) {
+        DataProcessor processor = new DataProcessor();
+        processor.processOrgAddress(orgSp.getOrganizationAddress(), obj);
+        processor.processOrgPhone(orgSp.getOrganizationTelephone(), obj);
+        processor.processOrgFax(orgSp.getOrganizationFax(), obj);
+        processor.processOrgEntity(orgSp.getOrganizationEntityId(), obj);
+        processor.processOrgName(orgSp.getOrganizationName(), obj);
+        return obj;
+    }
 
     public <T> void processOrgName(String name, T org) {
         if (!ObjectUtils.isEmpty(name)) {

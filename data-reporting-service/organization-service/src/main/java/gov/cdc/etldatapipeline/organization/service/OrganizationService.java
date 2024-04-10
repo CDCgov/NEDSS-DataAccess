@@ -6,6 +6,7 @@ import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationReporting;
 import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationSp;
 import gov.cdc.etldatapipeline.organization.model.odse.Organization;
 import gov.cdc.etldatapipeline.organization.repository.OrgRepository;
+import gov.cdc.etldatapipeline.organization.utils.DataProcessor;
 import gov.cdc.etldatapipeline.organization.utils.StreamsSerdes;
 import gov.cdc.etldatapipeline.organization.utils.UtilHelper;
 import lombok.RequiredArgsConstructor;
@@ -45,34 +46,36 @@ public class OrganizationService {
         UtilHelper utilHelper = UtilHelper.getInstance();
         KStream<String, Set<OrganizationSp>> organizationKStream
                 = streamsBuilder.stream(orgTopicName, Consumed.with(Serdes.String(), Serdes.String()))
-                .map((k, v) -> new KeyValue<>(
-                        k,
-                        UtilHelper.getInstance().deserializePayload(v, "/payload/after", Organization.class)))
+                .map((key, value) -> new KeyValue<>(
+                        key,
+                        UtilHelper.getInstance().deserializePayload(value, "/payload/after", Organization.class)))
                 // KStream<String, Organization>
-                .filter((k, v) -> v != null)
+                .filter((key, value) -> value != null)
                 .peek((key, value) -> log.info("Received Organization : " + value.getOrganizationUid()))
-                .mapValues(v -> orgRepository.computeAllOrganizations(v.getOrganizationUid()));
+                .mapValues(value -> orgRepository.computeAllOrganizations(value.getOrganizationUid()));
 
-        organizationKStream.flatMap((k, v) -> v.stream()
+        organizationKStream.flatMap((key, value) -> value.stream()
                         .map(p -> KeyValue.pair(
                                 utilHelper.buildAvroRecord(OrganizationKey.build(p)),
-                                utilHelper.buildAvroRecord(OrganizationReporting.build(p))))
+                                utilHelper.buildAvroRecord(
+                                        DataProcessor.processOrganization(p, OrganizationReporting.build(p)))))
                         .collect(Collectors.toSet()))
                 .peek((key, value) ->
-                        log.info("Patient Reporting : {}", value.toString()))
-                .to((key, v, recordContext) -> orgReportingOutputTopic,
+                        log.info("Organization Reporting : {}", value.toString()))
+                .to((key, value, recordContext) -> orgReportingOutputTopic,
                         Produced.with(
                                 StreamsSerdes.DataEnvelopeSerde(),
                                 StreamsSerdes.DataEnvelopeSerde()));
 
-        organizationKStream.flatMap((k, v) -> v.stream()
+        organizationKStream.flatMap((key, value) -> value.stream()
                         .map(p -> KeyValue.pair(
                                 utilHelper.buildAvroRecord(OrganizationKey.build(p)),
-                                utilHelper.buildAvroRecord(OrganizationElasticSearch.build(p))))
+                                utilHelper.buildAvroRecord(
+                                        DataProcessor.processOrganization(p, OrganizationElasticSearch.build(p)))))
                         .collect(Collectors.toSet()))
                 .peek((key, value) ->
-                        log.info("Patient Elastic : {}", value.toString()))
-                .to((key, v, recordContext) -> orgElasticSearchTopic,
+                        log.info("Organization Elastic : {}", value.toString()))
+                .to((key, value, recordContext) -> orgElasticSearchTopic,
                         Produced.with(
                                 StreamsSerdes.DataEnvelopeSerde(),
                                 StreamsSerdes.DataEnvelopeSerde()));

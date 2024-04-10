@@ -1,6 +1,5 @@
 package gov.cdc.etldatapipeline.organization.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.cdc.etldatapipeline.organization.config.KafkaConfig;
@@ -17,7 +16,7 @@ import java.util.UUID;
 @RestController
 public class OrganizationServiceController {
 
-    private OrganizationStatusService organizationStatusService;
+    private final OrganizationStatusService organizationStatusService;
 
     @Autowired
     private KafkaStreamsConfig kafkaStreamsConfig;
@@ -39,13 +38,18 @@ public class OrganizationServiceController {
 
     @PostMapping(value = "/organization", consumes = "application/json", produces = "application/json")
     @ResponseBody
-    public ResponseEntity<String> postOrganization(@RequestBody String payLoad) throws JsonProcessingException {
-        KafkaProducer<String, JsonNode> producer = new KafkaProducer<>(
-                kafkaStreamsConfig.kStreamsConfigs().asProperties());
-        producer.send(new ProducerRecord<>(kafkaConfig.getOrganizationTopic(),
-                UUID.randomUUID().toString(), new ObjectMapper().readTree(payLoad)));
-        producer.close();
-        return ResponseEntity.ok("Produced : " + payLoad);
+    public ResponseEntity<String> postOrganization(@RequestBody String payLoad) {
+        try {
+            KafkaProducer<String, JsonNode> producer = new KafkaProducer<>(
+                    kafkaStreamsConfig.kStreamsConfigs().asProperties());
+            producer.send(new ProducerRecord<>(kafkaConfig.getOrganizationTopic(),
+                    UUID.randomUUID().toString(), new ObjectMapper().readTree(payLoad)));
+            producer.close();
+            return ResponseEntity.ok("Produced : " + payLoad);
+        } catch (Exception ex) {
+            return ResponseEntity.internalServerError()
+                    .body("Error processing the Organization data. Exception: " + ex.getMessage());
+        }
     }
 
 }

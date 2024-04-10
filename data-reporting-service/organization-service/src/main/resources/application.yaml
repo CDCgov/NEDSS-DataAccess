@@ -6,14 +6,14 @@ spring:
     stream:
       input:
         organization:
-          topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Organization
+          topic-name: nbs_Organization
         defaultData:
-          topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Default.input
+          topic-name: nbs_Default
       output:
         organizationElastic:
-          topic-name: ${PROVIDER_ELASTIC:nbs_organization_elastic}
+          topic-name: ${PROVIDER_ELASTIC:nrt_organization_elastic}
         organizationReporting:
-          topic-name: ${ORGANIZATION_REPORTING:nbs_organization}
+          topic-name: ${ORGANIZATION_REPORTING:nrt_organization}
 
     streams:
       application-id: debezium-cdc-consumer-app-1

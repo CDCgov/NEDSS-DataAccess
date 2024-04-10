@@ -51,8 +51,7 @@ public class OrganizationReporting implements DataRequiredFields {
     private String refreshDatetime;
 
     public static OrganizationReporting build(OrganizationSp orgSp) {
-        return orgSp.processNestedJsonData(
-                OrganizationReporting.builder()
+        return OrganizationReporting.builder()
                         .organizationUid(orgSp.getOrganizationUid())
                         .localId(orgSp.getLocalId())
                         .recordStatus(orgSp.getRecordStatusCd())
@@ -66,7 +65,7 @@ public class OrganizationReporting implements DataRequiredFields {
                         .lastChgTime(orgSp.getLastChgTime())
                         .addUserName(orgSp.getAddUserName())
                         .lastChgUserName(orgSp.getLastChgUserName())
-                        .build());
+                        .build();
     }
 
     @Override

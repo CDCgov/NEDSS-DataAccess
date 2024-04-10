@@ -73,8 +73,7 @@ public class OrganizationElasticSearch implements DataRequiredFields {
     private String lastChgTime;
 
     public static OrganizationElasticSearch build(OrganizationSp orgSp) {
-        return orgSp.processNestedJsonData(
-                OrganizationElasticSearch.builder()
+        return OrganizationElasticSearch.builder()
                         .organizationUid(orgSp.getOrganizationUid())
                         .cd(orgSp.getCd())
                         .statusCd(orgSp.getStatusCd())
@@ -91,7 +90,7 @@ public class OrganizationElasticSearch implements DataRequiredFields {
                         .addTime(orgSp.getAddTime())
                         .lastChgUserId(orgSp.getLastChgUserId())
                         .lastChgTime(orgSp.getLastChgTime())
-                        .build());
+                        .build();
     }
 
     @Override

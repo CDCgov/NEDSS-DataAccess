@@ -1,7 +1,7 @@
 package gov.cdc.etldatapipeline.organization.model.dto.org;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import gov.cdc.etldatapipeline.organization.utils.DataPostProcessor;
+import gov.cdc.etldatapipeline.organization.utils.DataProcessor;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -15,7 +15,6 @@ import lombok.*;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OrganizationSp {
     @Id
@@ -67,7 +66,7 @@ public class OrganizationSp {
     private String organizationEntityId;
 
     public <T> T processNestedJsonData(T obj) {
-        DataPostProcessor processor = new DataPostProcessor();
+        DataProcessor processor = new DataProcessor();
         processor.processOrgAddress(organizationAddress, obj);
         processor.processOrgPhone(organizationTelephone, obj);
         processor.processOrgFax(organizationFax, obj);
