@@ -1,9 +1,13 @@
 package gov.cdc.etldatapipeline.person.service;
 
-import gov.cdc.etldatapipeline.person.model.dto.patient.Patient;
+import gov.cdc.etldatapipeline.person.model.dto.patient.PatientElasticSearch;
 import gov.cdc.etldatapipeline.person.model.dto.patient.PatientKey;
-import gov.cdc.etldatapipeline.person.model.dto.provider.Provider;
+import gov.cdc.etldatapipeline.person.model.dto.patient.PatientReporting;
+import gov.cdc.etldatapipeline.person.model.dto.patient.PatientSp;
+import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderElasticSearch;
 import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderKey;
+import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderReporting;
+import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderSp;
 import gov.cdc.etldatapipeline.person.model.odse.Person;
 import gov.cdc.etldatapipeline.person.repository.PatientRepository;
 import gov.cdc.etldatapipeline.person.repository.ProviderRepository;
@@ -30,7 +34,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Setter
 @Slf4j
-public class KafkaStreamsService {
+public class PersonService {
     private final PatientRepository patientRepository;
     private final ProviderRepository providerRepository;
     @Value("#{kafkaConfig.getPersonTopicName()}")
@@ -56,15 +60,15 @@ public class KafkaStreamsService {
                 .filter((k, v) -> v != null)
                 .peek((key, value) -> log.info("Received Person : " + value.getPersonUid()));
 
-        KStream<String, List<Patient>> patientStream = personKStream
+        KStream<String, List<PatientSp>> patientStream = personKStream
                 .filter((k, v) -> v.getCd() != null && v.getCd().equalsIgnoreCase("PAT"))
                 .mapValues(v -> patientRepository.computePatients(v.getPersonUid()));
 
         // KStream<String, List<Patient>>
         patientStream.flatMap((k, v) -> v.stream()
                         .map(p -> KeyValue.pair(
-                                utilHelper.constructDataEnvelope(new PatientKey(p.getPatientUid())),
-                                utilHelper.constructDataEnvelope(p.processPatientElastic())))
+                                utilHelper.buildAvroRecord(PatientKey.build(p)),
+                                utilHelper.buildAvroRecord(PatientElasticSearch.build(p))))
                         .collect(Collectors.toSet()))
                 .peek((key, value) -> log.info("Patient Elastic : {}", value.toString()))
                 .to((key, v, recordContext) -> patientElasticSearchTopicName,
@@ -74,8 +78,8 @@ public class KafkaStreamsService {
         // KStream<String, List<Patient>>
         patientStream.flatMap((k, v) -> v.stream()
                         .map(p -> KeyValue.pair(
-                                utilHelper.constructDataEnvelope(new PatientKey(p.getPatientUid())),
-                                utilHelper.constructDataEnvelope(p.processPatientReporting())))
+                                utilHelper.buildAvroRecord(PatientKey.build(p)),
+                                utilHelper.buildAvroRecord(PatientReporting.build(p))))
                         .collect(Collectors.toSet()))
                 .peek((key, value) -> log.info("Patient Reporting : {}", value.toString()))
                 .to((key, v, recordContext) -> patientReportingOutputTopic,
@@ -83,16 +87,16 @@ public class KafkaStreamsService {
                                 StreamsSerdes.DataEnvelopeSerde(),
                                 StreamsSerdes.DataEnvelopeSerde()));
 
-        KStream<String, List<Provider>> providerStream = personKStream
+        KStream<String, List<ProviderSp>> providerStream = personKStream
                 .filter((k, v) -> v.getCd() != null && v.getCd().equalsIgnoreCase("PRV"))
                 .mapValues(v -> providerRepository.computeProviders(v.getPersonUid()));
 
-        // KStream<String, List<Patient>>
+        // KStream<String, List<Provider>>
         providerStream
                 .flatMap((k, v) -> v.stream()
                         .map(p -> KeyValue.pair(
-                                utilHelper.constructDataEnvelope(new ProviderKey(p.getPersonUid())),
-                                utilHelper.constructDataEnvelope(p.processProviderReporting())))
+                                utilHelper.buildAvroRecord(ProviderKey.build(p)),
+                                utilHelper.buildAvroRecord(ProviderReporting.build(p))))
                         .collect(Collectors.toSet()))
                 .peek((key, value) -> log.info("Provider : {}", value.toString()))
                 .to((key, v, recordContext) -> providerReportingOutputTopic,
@@ -103,8 +107,8 @@ public class KafkaStreamsService {
         providerStream
                 .flatMap((k, v) -> v.stream()
                         .map(p -> KeyValue.pair(
-                                utilHelper.constructDataEnvelope(new ProviderKey(p.getPersonUid())),
-                                utilHelper.constructDataEnvelope(p.processProviderElastic())))
+                                utilHelper.buildAvroRecord(ProviderKey.build(p)),
+                                utilHelper.buildAvroRecord(ProviderElasticSearch.build(p))))
                         .collect(Collectors.toSet()))
                 .peek((key, value) -> log.info("Provider : {}", value.toString()))
                 .to((key, v, recordContext) -> providerElasticSearchOutputTopic,

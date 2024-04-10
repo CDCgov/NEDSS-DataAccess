@@ -1,22 +1,28 @@
 package gov.cdc.etldatapipeline.person.model.dto.provider;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
 import gov.cdc.etldatapipeline.person.utils.DataPostProcessor;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Data Model to capture the results of the stored procedure `sp_provider_event`
+ */
 @Slf4j
 @Data
+@Builder
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Provider {
+public class ProviderSp {
     @Id
     @Column(name = "person_uid")
     private Long personUid;
@@ -75,25 +81,20 @@ public class Provider {
     @Column(name = "provider_entity")
     private String entityDataNested;
 
-    public ProviderReporting processProviderReporting() {
-        return postProcessJsonData(new ProviderReporting().constructObject(this));
-    }
-
-    public ProviderElasticSearch processProviderElastic() {
-        return postProcessJsonData(new ProviderElasticSearch().constructObject(this));
-    }
-
-    private <T extends PersonExtendedProps> T postProcessJsonData(T pf) {
+    /**
+     * Transforms the nested data elements in ProviderSp to the individual properties
+     *
+     * @param pf  ProviderReporting/ProviderElasticSearch object
+     * @param <T> Any object extending PersonExtendedProps
+     * @return Transformed object
+     */
+    public <T extends PersonExtendedProps> T postProcessJsonData(T pf) {
         DataPostProcessor processor = new DataPostProcessor();
-        try {
-            processor.processPersonName(nameNested, pf);
-            processor.processPersonAddress(addressNested, pf);
-            processor.processPersonTelephone(telephoneNested, pf);
-            processor.processPersonEntityData(entityDataNested, pf);
-            processor.processPersonEmail(emailNested, pf);
-        } catch (JsonProcessingException e) {
-            log.error("JsonProcessingException: ", e);
-        }
+        processor.processPersonName(nameNested, pf);
+        processor.processPersonAddress(addressNested, pf);
+        processor.processPersonTelephone(telephoneNested, pf);
+        processor.processPersonEntityData(entityDataNested, pf);
+        processor.processPersonEmail(emailNested, pf);
         return pf;
     }
 

@@ -1,7 +1,5 @@
 package gov.cdc.etldatapipeline.person.utils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
 import gov.cdc.etldatapipeline.person.model.dto.persondetail.*;
 import lombok.NoArgsConstructor;
@@ -17,40 +15,39 @@ import java.util.function.Predicate;
 @Slf4j
 @NoArgsConstructor
 public class DataPostProcessor {
-    ObjectMapper mapper = new ObjectMapper();
+    UtilHelper utilHelper = UtilHelper.getInstance();
 
-    public <T extends PersonExtendedProps> void processPersonName(String name, T pf) throws JsonProcessingException {
+    public <T extends PersonExtendedProps> void processPersonName(String name, T pf) {
         if (!ObjectUtils.isEmpty(name)) {
-            Arrays.stream(mapper.readValue(name, Name[].class))
+            Arrays.stream(utilHelper.deserializePayload(name, Name[].class))
                     .filter(pName -> !ObjectUtils.isEmpty(pName.getPersonUid()))
                     .max(Comparator.comparing(Name::getPersonUid))
                     .map(n -> n.updatePerson(pf));
         }
     }
 
-    public <T extends PersonExtendedProps> void processPersonAddress(String address, T pf) throws JsonProcessingException {
+    public <T extends PersonExtendedProps> void processPersonAddress(String address, T pf) {
         if (!ObjectUtils.isEmpty(address)) {
-            Arrays.stream(mapper.readValue(address, Address[].class))
+            Arrays.stream(utilHelper.deserializePayload(address, Address[].class))
                     .filter(pAddress -> !ObjectUtils.isEmpty(pAddress.getPostalLocatorUid()))
                     .max(Comparator.comparing(Address::getPostalLocatorUid))
                     .map(n -> n.updatePerson(pf));
         }
     }
 
-    public <T extends PersonExtendedProps> void processPersonRace(String race, T pf) throws JsonProcessingException {
+    public <T extends PersonExtendedProps> void processPersonRace(String race, T pf) {
         if (!ObjectUtils.isEmpty(race)) {
-            Arrays.stream(mapper.readValue(race, Race[].class))
+            Arrays.stream(utilHelper.deserializePayload(race, Race[].class))
                     .filter(pRace -> !ObjectUtils.isEmpty(pRace.getPersonUid()))
                     .max(Comparator.comparing(Race::getPersonUid))
                     .map(n -> n.updatePerson(pf));
         }
     }
 
-    public <T extends PersonExtendedProps> void processPersonTelephone(String telephone, T pf) throws JsonProcessingException {
+    public <T extends PersonExtendedProps> void processPersonTelephone(String telephone, T pf) {
         if (!ObjectUtils.isEmpty(telephone)) {
             Function<String, T> personPhoneFn =
-                    (useCd) -> Arrays.stream(
-                                    UtilHelper.getInstance().deserializePayload(telephone, Phone[].class))
+                    (useCd) -> Arrays.stream(utilHelper.deserializePayload(telephone, Phone[].class))
                             .filter(phone -> StringUtils.hasText(phone.getUseCd())
                                     && phone.getUseCd().equalsIgnoreCase(useCd))
                             .max(Comparator.comparing(Phone::getTeleLocatorUid))
@@ -62,13 +59,13 @@ public class DataPostProcessor {
         }
     }
 
-    public <T extends PersonExtendedProps> void processPersonEntityData(String entityData, T pf) throws JsonProcessingException {
+    public <T extends PersonExtendedProps> void processPersonEntityData(String entityData, T pf) {
         if (!ObjectUtils.isEmpty(entityData)) {
             Function<Predicate<? super EntityData>, T> entityDataTypeCdFn =
                     (Predicate<? super EntityData> p) -> Arrays.stream(
-                                    UtilHelper.getInstance().deserializePayload(entityData, EntityData[].class))
+                                    utilHelper.deserializePayload(entityData, EntityData[].class))
                             .filter(p)
-                            .filter(e -> e.getEntityIdSeq() != null)
+                            .filter(e -> !ObjectUtils.isEmpty(e.getEntityIdSeq()))
                             .max(Comparator.comparing(EntityData::getEntityIdSeq))
                             .map(n -> n.updatePerson(pf))
                             .orElse(null);
@@ -83,9 +80,9 @@ public class DataPostProcessor {
         }
     }
 
-    public <T extends PersonExtendedProps> void processPersonEmail(String email, T pf) throws JsonProcessingException {
+    public <T extends PersonExtendedProps> void processPersonEmail(String email, T pf) {
         if (!ObjectUtils.isEmpty(email)) {
-            Arrays.stream(mapper.readValue(email, Email[].class))
+            Arrays.stream(utilHelper.deserializePayload(email, Email[].class))
                     .filter(pEmail -> !ObjectUtils.isEmpty(pEmail.getTeleLocatorUid()))
                     .max(Comparator.comparing(Email::getTeleLocatorUid))
                     .map(n -> n.updatePerson(pf));

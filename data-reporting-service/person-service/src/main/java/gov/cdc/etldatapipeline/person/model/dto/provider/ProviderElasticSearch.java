@@ -6,13 +6,16 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import gov.cdc.etldatapipeline.person.model.dto.DataRequiredFields;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
+/**
+ * Data model for the Provider Reporting Table
+ */
 @Data
-@NoArgsConstructor
+@Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProviderElasticSearch implements PersonExtendedProps, DataRequiredFields {
@@ -123,28 +126,29 @@ public class ProviderElasticSearch implements PersonExtendedProps, DataRequiredF
     private Integer entityIdSeq;
     private String assigningAuthorityCd;
 
-    public ProviderElasticSearch constructObject(Provider p) {
-        setPersonUid(p.getPersonUid());
-        setProviderUid(p.getPersonUid());
-        setAddTime(p.getAddTime());
-        setDedupMatchInd(p.getDedupMatchInd());
-        setDescription(p.getDescription());
-        setElectronicInd(p.getElectronicInd());
-        setEdxInd(p.getEdxInd());
-        setLastChgUserId(p.getLastChgUserId());
-        setLastChgTime(p.getLastChgTime());
-        setLocalId(p.getLocalId());
-        setPersonFirstNm(p.getFirstNm());
-        setPersonMiddleNm(p.getMiddleNm());
-        setPersonLastNm(p.getLastNm());
-        setPersonNmSuffix(p.getNmSuffix());
-        setPersonParentUid(p.getPersonParentUid());
-        setRecordStatusTime(p.getRecordStatusTime());
-        setRecordStatusCd(p.getRecordStatusCd());
-        setStatusCd(p.getStatusCd());
-        setStatusTime(p.getStatusTime());
-        setVersionCtrlNbr(p.getVersionCtrlNbr());
-        return this;
+    public static ProviderElasticSearch build(ProviderSp p) {
+        return p.postProcessJsonData(ProviderElasticSearch.builder()
+                .personUid(p.getPersonUid())
+                .providerUid(p.getPersonUid())
+                .addTime(p.getAddTime())
+                .dedupMatchInd(p.getDedupMatchInd())
+                .description(p.getDescription())
+                .electronicInd(p.getElectronicInd())
+                .edxInd(p.getEdxInd())
+                .lastChgUserId(p.getLastChgUserId())
+                .lastChgTime(p.getLastChgTime())
+                .localId(p.getLocalId())
+                .personFirstNm(p.getFirstNm())
+                .personMiddleNm(p.getMiddleNm())
+                .personLastNm(p.getLastNm())
+                .personNmSuffix(p.getNmSuffix())
+                .personParentUid(p.getPersonParentUid())
+                .recordStatusTime(p.getRecordStatusTime())
+                .recordStatusCd(p.getRecordStatusCd())
+                .statusCd(p.getStatusCd())
+                .statusTime(p.getStatusTime())
+                .versionCtrlNbr(p.getVersionCtrlNbr())
+                .build());
     }
 
     /**

@@ -35,11 +35,11 @@
         </triggeringPolicy>
     </appender>
 
-    <logger name="gov/cdc/etldatapipeline/changedata/service/KafkaStreamsService" level="INFO">
+    <logger name="gov/cdc/etldatapipeline/person/service/KafkaStreamsService" level="INFO">
         <appender-ref ref="DYNAMIC_FILE"/>
     </logger>
 
-    <logger name="gov/cdc/etldatapipeline/changedata/controller/DataPipelineController" level="INFO">
+    <logger name="gov/cdc/etldatapipeline/person/controller/PersonServiceController" level="INFO">
         <appender-ref ref="FILE"/>
     </logger>
 

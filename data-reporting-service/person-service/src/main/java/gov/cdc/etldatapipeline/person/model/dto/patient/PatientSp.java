@@ -1,25 +1,31 @@
 package gov.cdc.etldatapipeline.person.model.dto.patient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
 import gov.cdc.etldatapipeline.person.utils.DataPostProcessor;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Data Model to capture the results of the stored procedure `sp_patient_event`
+ */
 @Slf4j
 @Data
+@Builder
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Patient {
+public class PatientSp {
     @Id
     @Column(name = "person_uid")
-    private Long patientUid;
+    private Long personUid;
     @Column(name = "age_reported")
     private String ageReported;
     @Column(name = "age_reported_unit_cd")
@@ -131,31 +137,21 @@ public class Patient {
     @Column(name = "patient_entity")
     private String entityDataNested;
 
-    /***
-     * Transform the Name, Address, Race, Telephone, Email, EntityData(SSN), AddAuthUser, ChangeAuthUser
-     * @return Fully Transformed Patient Object
+    /**
+     * Transforms the nested data elements in PatientSp to the individual properties
+     *
+     * @param pf  PatientReporting/PatientElasticSearch object
+     * @param <T> Any object extending PersonExtendedProps
+     * @return Transformed object
      */
-    public PatientReporting processPatientReporting() {
-        return postProcessJsonData(new PatientReporting().constructObject(this));
-    }
-
-    public PatientElasticSearch processPatientElastic() {
-        return postProcessJsonData(new PatientElasticSearch().constructObject(this));
-    }
-
-    private <T extends PersonExtendedProps> T postProcessJsonData(T pf) {
+    public <T extends PersonExtendedProps> T postProcessJsonData(T pf) {
         DataPostProcessor processor = new DataPostProcessor();
-        try {
-            processor.processPersonName(nameNested, pf);
-            processor.processPersonAddress(addressNested, pf);
-            processor.processPersonRace(raceNested, pf);
-            processor.processPersonTelephone(telephoneNested, pf);
-            processor.processPersonEntityData(entityDataNested, pf);
-            processor.processPersonEmail(emailNested, pf);
-
-        } catch (JsonProcessingException e) {
-            log.error("JsonProcessingException: ", e);
-        }
+        processor.processPersonName(nameNested, pf);
+        processor.processPersonAddress(addressNested, pf);
+        processor.processPersonRace(raceNested, pf);
+        processor.processPersonTelephone(telephoneNested, pf);
+        processor.processPersonEntityData(entityDataNested, pf);
+        processor.processPersonEmail(emailNested, pf);
         return pf;
     }
 }

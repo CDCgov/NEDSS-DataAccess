@@ -6,13 +6,16 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import gov.cdc.etldatapipeline.person.model.dto.DataRequiredFields;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
+/**
+ * Data model for the Patient ElasticSearch target
+ */
 @Data
-@NoArgsConstructor
+@Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class PatientElasticSearch implements PersonExtendedProps, DataRequiredFields {
@@ -129,48 +132,49 @@ public class PatientElasticSearch implements PersonExtendedProps, DataRequiredFi
     private Integer entityIdSeq;
     private String assigningAuthorityCd;
 
-    public PatientElasticSearch constructObject(Patient p) {
-        setPatientUid(p.getPatientUid());
-        setAdditionalGenderCd(p.getAdditionalGenderCd());
-        setAddUserId(p.getAddUserId());
-        setAdultsInHouseNbr(p.getAdultsInHouseNbr());
-        setAgeReported(p.getAgeReported());
-        setAgeReportedUnitCd(p.getAgeReportedUnitCd());
-        setAddTime(p.getAddTime());
-        setBirthOrderNbr(p.getBirthOrderNbr());
-        setBirthSex(p.getBirthGenderCd());
-        setBirthTime(p.getBirthTime());
-        setCurrSexCd(p.getCurrSexCd());
-        setChildrenInHouseNbr(p.getChildrenInHouseNbr());
-        setDeceasedTime(p.getDeceasedTime());
-        setDedupMatchInd(p.getDedupMatchInd());
-        setDescription(p.getDescription());
-        setElectronicInd(p.getElectronicInd());
-        setEthnicGroupInd(p.getEthnicGroupInd());
-        setEthnicUnkReasonCd(p.getEthnicUnkReasonCd());
-        setEdxInd(p.getEdxInd());
-        setEducationLevelCd(p.getEducationLevelCd());
-        setLastChgUserId(p.getLastChgUserId());
-        setLastChgTime(p.getLastChgTime());
-        setLocalId(p.getLocalId());
-        setMaritalStatusCd(p.getMaritalStatusCd());
-        setMultipleBirthInd(p.getMultipleBirthInd());
-        setOccupationCd(p.getOccupationCd());
-        setPersonFirstNm(p.getPersonFirstNm());
-        setPersonMiddleNm(p.getPersonMiddleNm());
-        setPersonLastNm(p.getPersonLastNm());
-        setPersonNmSuffix(p.getPersonNmSuffix());
-        setPersonParentUid(p.getPersonParentUid());
-        setPreferredGenderCd(p.getPreferredGenderCd());
-        setPrimLangCd(p.getPrimLangCd());
-        setRecordStatusTime(p.getRecordStatusTime());
-        setRecordStatusCd(p.getRecordStatusCd());
-        setSexUnkReasonCd(p.getSexUnkReasonCd());
-        setStatusCd(p.getStatusCd());
-        setStatusTime(p.getStatusTime());
-        setSpeaksEnglishCd(p.getSpeaksEnglishCd());
-        setVersionCtrlNbr(p.getVersionCtrlNbr());
-        return this;
+    public static PatientElasticSearch build(PatientSp p) {
+        return p.postProcessJsonData(PatientElasticSearch.builder()
+                .patientUid(p.getPersonUid())
+                .additionalGenderCd(p.getAdditionalGenderCd())
+                .addUserId(p.getAddUserId())
+                .adultsInHouseNbr(p.getAdultsInHouseNbr())
+                .ageReported(p.getAgeReported())
+                .ageReportedUnitCd(p.getAgeReportedUnitCd())
+                .addTime(p.getAddTime())
+                .birthOrderNbr(p.getBirthOrderNbr())
+                .birthSex(p.getBirthGenderCd())
+                .birthTime(p.getBirthTime())
+                .currSexCd(p.getCurrSexCd())
+                .childrenInHouseNbr(p.getChildrenInHouseNbr())
+                .deceasedTime(p.getDeceasedTime())
+                .dedupMatchInd(p.getDedupMatchInd())
+                .description(p.getDescription())
+                .electronicInd(p.getElectronicInd())
+                .ethnicGroupInd(p.getEthnicGroupInd())
+                .ethnicUnkReasonCd(p.getEthnicUnkReasonCd())
+                .edxInd(p.getEdxInd())
+                .educationLevelCd(p.getEducationLevelCd())
+                .lastChgUserId(p.getLastChgUserId())
+                .lastChgTime(p.getLastChgTime())
+                .localId(p.getLocalId())
+                .maritalStatusCd(p.getMaritalStatusCd())
+                .multipleBirthInd(p.getMultipleBirthInd())
+                .occupationCd(p.getOccupationCd())
+                .personFirstNm(p.getPersonFirstNm())
+                .personMiddleNm(p.getPersonMiddleNm())
+                .personLastNm(p.getPersonLastNm())
+                .personNmSuffix(p.getPersonNmSuffix())
+                .personParentUid(p.getPersonParentUid())
+                .preferredGenderCd(p.getPreferredGenderCd())
+                .primLangCd(p.getPrimLangCd())
+                .recordStatusTime(p.getRecordStatusTime())
+                .recordStatusCd(p.getRecordStatusCd())
+                .sexUnkReasonCd(p.getSexUnkReasonCd())
+                .statusCd(p.getStatusCd())
+                .statusTime(p.getStatusTime())
+                .speaksEnglishCd(p.getSpeaksEnglishCd())
+                .versionCtrlNbr(p.getVersionCtrlNbr())
+                .build());
     }
 
     /**

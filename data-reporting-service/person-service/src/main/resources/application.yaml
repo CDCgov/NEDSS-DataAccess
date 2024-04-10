@@ -11,8 +11,6 @@ spring:
           topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Provider.input
         patient:
           topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Patient.input
-        organization:
-          topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Organization.input
         defaultData:
           topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Default.input
       output:
@@ -24,8 +22,6 @@ spring:
           topic-name: ${PATIENT_ELASTIC:nbs_patient_elastic}
         patientReporting:
           topic-name: ${PATIENT_REPORTING:nbs_patient}
-        organizationReporting:
-          topic-name: ${ORGANIZATION_REPORTING:nbs_organization}
 
     streams:
       application-id: debezium-cdc-consumer-app-1

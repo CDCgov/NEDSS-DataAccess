@@ -1,21 +1,24 @@
 package gov.cdc.etldatapipeline.person.model.dto.provider;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import gov.cdc.etldatapipeline.person.model.dto.DataRequiredFields;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 import java.util.Set;
 
 @Data
-@NoArgsConstructor
-@RequiredArgsConstructor
+@Builder
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProviderKey implements DataRequiredFields {
     @NonNull
-    @JsonProperty("provider_uid")
     private Long providerUid;
+
+    public static ProviderKey build(ProviderSp p) {
+        return ProviderKey.builder().providerUid(p.getPersonUid()).build();
+    }
 
     @Override
     public Set<String> getRequiredFields() {

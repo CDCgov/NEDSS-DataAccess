@@ -6,16 +6,17 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import gov.cdc.etldatapipeline.person.model.dto.DataRequiredFields;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.util.Set;
 
+/**
+ * Data model for the Provider Reporting Table
+ */
 @Data
-@NoArgsConstructor
+@Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ToString(callSuper = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProviderReporting implements PersonExtendedProps, DataRequiredFields {
     private Long providerUid;
@@ -73,23 +74,20 @@ public class ProviderReporting implements PersonExtendedProps, DataRequiredField
     private String providerRegistrationNum;
     private String providerRegistrationNumAuth;
 
-    /***
-     * Transform the Name, Address,  Telephone, Email, EntityData(SSN), AddAuthUser, ChangeAuthUser
-     * @return Fully Transformed Provider Object
-     */
-    public ProviderReporting constructObject(Provider p) {
-        setProviderUid(p.getPersonUid());
-        setLocalId(p.getLocalId());
-        setRecordStatus(p.getRecordStatusCd());
-        setEntryMethod(p.getElectronicInd());
-        setGeneralComments(p.getDescription());
-        setAddUserId(p.getAddUserId());
-        setLastChgUserId(p.getLastChgUserId());
-        setAddUserName(p.getAddUserName());
-        setLastChgUserName(p.getLastChgUserName());
-        setLastChgTime(p.getLastChgTime());
-        setAddTime(p.getAddTime());
-        return this;
+    public static ProviderReporting build(ProviderSp p) {
+        return p.postProcessJsonData(ProviderReporting.builder()
+                .providerUid(p.getPersonUid())
+                .localId(p.getLocalId())
+                .recordStatus(p.getRecordStatusCd())
+                .entryMethod(p.getElectronicInd())
+                .generalComments(p.getDescription())
+                .addUserId(p.getAddUserId())
+                .lastChgUserId(p.getLastChgUserId())
+                .addUserName(p.getAddUserName())
+                .lastChgUserName(p.getLastChgUserName())
+                .lastChgTime(p.getLastChgTime())
+                .addTime(p.getAddTime())
+                .build());
     }
 
     /**
