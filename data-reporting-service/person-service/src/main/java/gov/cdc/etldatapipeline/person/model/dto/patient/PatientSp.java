@@ -1,8 +1,6 @@
 package gov.cdc.etldatapipeline.person.model.dto.patient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
-import gov.cdc.etldatapipeline.person.utils.DataPostProcessor;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -136,22 +134,4 @@ public class PatientSp {
     private String emailNested;
     @Column(name = "patient_entity")
     private String entityDataNested;
-
-    /**
-     * Transforms the nested data elements in PatientSp to the individual properties
-     *
-     * @param pf  PatientReporting/PatientElasticSearch object
-     * @param <T> Any object extending PersonExtendedProps
-     * @return Transformed object
-     */
-    public <T extends PersonExtendedProps> T postProcessJsonData(T pf) {
-        DataPostProcessor processor = new DataPostProcessor();
-        processor.processPersonName(nameNested, pf);
-        processor.processPersonAddress(addressNested, pf);
-        processor.processPersonRace(raceNested, pf);
-        processor.processPersonTelephone(telephoneNested, pf);
-        processor.processPersonEntityData(entityDataNested, pf);
-        processor.processPersonEmail(emailNested, pf);
-        return pf;
-    }
 }

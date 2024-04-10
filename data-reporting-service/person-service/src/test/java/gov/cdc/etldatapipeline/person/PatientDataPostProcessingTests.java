@@ -2,6 +2,7 @@ package gov.cdc.etldatapipeline.person;
 
 import gov.cdc.etldatapipeline.person.model.dto.patient.PatientReporting;
 import gov.cdc.etldatapipeline.person.model.dto.patient.PatientSp;
+import gov.cdc.etldatapipeline.person.utils.DataProcessor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -56,7 +57,7 @@ public class PatientDataPostProcessingTests {
                 pf.getEmail());
 
         // Process the respective field json to PatientProvider fields
-        PatientReporting pf = PatientReporting.build(pat);
+        PatientReporting pf = DataProcessor.processPatientData(pat, PatientReporting.build(pat));
         // Expected
         List<Object> expected = Arrays.asList(
                 "Singgh",
@@ -102,7 +103,7 @@ public class PatientDataPostProcessingTests {
                 p.getFirstNm(),
                 p.getNmSuffix());
         // Process the respective field json to PatientProviderProvider fields
-        PatientReporting pf = PatientReporting.build(perOp);
+        PatientReporting pf = DataProcessor.processPatientData(perOp, PatientReporting.build(perOp));
         // Expected
         List<String> expected = Arrays.asList(
                 "Singgh",
@@ -135,7 +136,7 @@ public class PatientDataPostProcessingTests {
                 p.getHomeCountry(),
                 p.getBirthCountry());
         // Process the respective field json to PatientProvider fields
-        PatientReporting pf = PatientReporting.build(perOp);
+        PatientReporting pf = DataProcessor.processPatientData(perOp, PatientReporting.build(perOp));
         // Expected
         List<String> expected = Arrays.asList(
                 "123 Main St.",
@@ -169,7 +170,7 @@ public class PatientDataPostProcessingTests {
                 p.getPhoneExtHome(),
                 p.getPhoneCell());
         // Process the respective field json to PatientProvider fields
-        PatientReporting pf = PatientReporting.build(perOp);
+        PatientReporting pf = DataProcessor.processPatientData(perOp, PatientReporting.build(perOp));
         // Expected
         List<String> expected = Arrays.asList(
                 "2323222422",
@@ -198,7 +199,7 @@ public class PatientDataPostProcessingTests {
                 p.getPatientNumberAuth());
 
         // Process the respective field json to PatientProvider fields
-        PatientReporting pf = PatientReporting.build(perOp);
+        PatientReporting pf = DataProcessor.processPatientData(perOp, PatientReporting.build(perOp));
         // Expected
         List<String> expected = List.of(
                 "313431144414",
@@ -221,7 +222,7 @@ public class PatientDataPostProcessingTests {
         Function<PatientReporting, List<String>> pDetailsFn = (p) -> Collections.singletonList(p.getEmail());
 
         // Process the respective field json to PatientProvider fields
-        PatientReporting pf = PatientReporting.build(perOp);
+        PatientReporting pf = DataProcessor.processPatientData(perOp, PatientReporting.build(perOp));
         // Expected
         List<String> expected = List.of("someone2@email.com");
         // Validate the PatientProvider field processing

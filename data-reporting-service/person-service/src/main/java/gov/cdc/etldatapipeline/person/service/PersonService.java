@@ -11,6 +11,7 @@ import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderSp;
 import gov.cdc.etldatapipeline.person.model.odse.Person;
 import gov.cdc.etldatapipeline.person.repository.PatientRepository;
 import gov.cdc.etldatapipeline.person.repository.ProviderRepository;
+import gov.cdc.etldatapipeline.person.utils.DataProcessor;
 import gov.cdc.etldatapipeline.person.utils.StreamsSerdes;
 import gov.cdc.etldatapipeline.person.utils.UtilHelper;
 import lombok.RequiredArgsConstructor;
@@ -68,7 +69,8 @@ public class PersonService {
         patientStream.flatMap((k, v) -> v.stream()
                         .map(p -> KeyValue.pair(
                                 utilHelper.buildAvroRecord(PatientKey.build(p)),
-                                utilHelper.buildAvroRecord(PatientElasticSearch.build(p))))
+                                utilHelper.buildAvroRecord(
+                                        DataProcessor.processPatientData(p, PatientElasticSearch.build(p)))))
                         .collect(Collectors.toSet()))
                 .peek((key, value) -> log.info("Patient Elastic : {}", value.toString()))
                 .to((key, v, recordContext) -> patientElasticSearchTopicName,
@@ -79,7 +81,8 @@ public class PersonService {
         patientStream.flatMap((k, v) -> v.stream()
                         .map(p -> KeyValue.pair(
                                 utilHelper.buildAvroRecord(PatientKey.build(p)),
-                                utilHelper.buildAvroRecord(PatientReporting.build(p))))
+                                utilHelper.buildAvroRecord(
+                                        DataProcessor.processPatientData(p, PatientReporting.build(p)))))
                         .collect(Collectors.toSet()))
                 .peek((key, value) -> log.info("Patient Reporting : {}", value.toString()))
                 .to((key, v, recordContext) -> patientReportingOutputTopic,
@@ -96,7 +99,8 @@ public class PersonService {
                 .flatMap((k, v) -> v.stream()
                         .map(p -> KeyValue.pair(
                                 utilHelper.buildAvroRecord(ProviderKey.build(p)),
-                                utilHelper.buildAvroRecord(ProviderReporting.build(p))))
+                                utilHelper.buildAvroRecord(
+                                        DataProcessor.processProviderData(p, ProviderReporting.build(p)))))
                         .collect(Collectors.toSet()))
                 .peek((key, value) -> log.info("Provider : {}", value.toString()))
                 .to((key, v, recordContext) -> providerReportingOutputTopic,
@@ -108,7 +112,8 @@ public class PersonService {
                 .flatMap((k, v) -> v.stream()
                         .map(p -> KeyValue.pair(
                                 utilHelper.buildAvroRecord(ProviderKey.build(p)),
-                                utilHelper.buildAvroRecord(ProviderElasticSearch.build(p))))
+                                utilHelper.buildAvroRecord(
+                                        DataProcessor.processProviderData(p, ProviderElasticSearch.build(p)))))
                         .collect(Collectors.toSet()))
                 .peek((key, value) -> log.info("Provider : {}", value.toString()))
                 .to((key, v, recordContext) -> providerElasticSearchOutputTopic,

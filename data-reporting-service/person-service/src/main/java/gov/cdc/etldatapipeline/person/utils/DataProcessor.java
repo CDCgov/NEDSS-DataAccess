@@ -1,7 +1,9 @@
 package gov.cdc.etldatapipeline.person.utils;
 
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
+import gov.cdc.etldatapipeline.person.model.dto.patient.PatientSp;
 import gov.cdc.etldatapipeline.person.model.dto.persondetail.*;
+import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderSp;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.ObjectUtils;
@@ -14,8 +16,36 @@ import java.util.function.Predicate;
 
 @Slf4j
 @NoArgsConstructor
-public class DataPostProcessor {
+public class DataProcessor {
     UtilHelper utilHelper = UtilHelper.getInstance();
+
+    /**
+     * Transforms the nested data elements in PatientSp to the individual properties
+     *
+     * @param patientObj PatientReporting/PatientElasticSearch object
+     * @param <T>        Any object extending PersonExtendedProps
+     * @return Transformed object
+     */
+    public static <T extends PersonExtendedProps> T processPatientData(PatientSp patientSp, T patientObj) {
+        DataProcessor processor = new DataProcessor();
+        processor.processPersonName(patientSp.getNameNested(), patientObj);
+        processor.processPersonAddress(patientSp.getAddressNested(), patientObj);
+        processor.processPersonTelephone(patientSp.getTelephoneNested(), patientObj);
+        processor.processPersonEntityData(patientSp.getEntityDataNested(), patientObj);
+        processor.processPersonEmail(patientSp.getEmailNested(), patientObj);
+        processor.processPersonRace(patientSp.getRaceNested(), patientObj);
+        return patientObj;
+    }
+
+    public static <T extends PersonExtendedProps> T processProviderData(ProviderSp patientSp, T patientObj) {
+        DataProcessor processor = new DataProcessor();
+        processor.processPersonName(patientSp.getNameNested(), patientObj);
+        processor.processPersonAddress(patientSp.getAddressNested(), patientObj);
+        processor.processPersonTelephone(patientSp.getTelephoneNested(), patientObj);
+        processor.processPersonEntityData(patientSp.getEntityDataNested(), patientObj);
+        processor.processPersonEmail(patientSp.getEmailNested(), patientObj);
+        return patientObj;
+    }
 
     public <T extends PersonExtendedProps> void processPersonName(String name, T pf) {
         if (!ObjectUtils.isEmpty(name)) {

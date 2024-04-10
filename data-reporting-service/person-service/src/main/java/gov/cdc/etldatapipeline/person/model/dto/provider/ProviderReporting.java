@@ -56,6 +56,7 @@ public class ProviderReporting implements PersonExtendedProps, DataRequiredField
     private String zip;
     private String county;
     private String countyCode;
+    @JsonProperty("country")
     private String countryCode;
     private String addressComments;
 
@@ -70,12 +71,13 @@ public class ProviderReporting implements PersonExtendedProps, DataRequiredField
     private String emailWork;
 
     //Entity
+    @JsonProperty("quick_code")
     private String providerQuickCode;
     private String providerRegistrationNum;
     private String providerRegistrationNumAuth;
 
     public static ProviderReporting build(ProviderSp p) {
-        return p.postProcessJsonData(ProviderReporting.builder()
+        return ProviderReporting.builder()
                 .providerUid(p.getPersonUid())
                 .localId(p.getLocalId())
                 .recordStatus(p.getRecordStatusCd())
@@ -87,7 +89,7 @@ public class ProviderReporting implements PersonExtendedProps, DataRequiredField
                 .lastChgUserName(p.getLastChgUserName())
                 .lastChgTime(p.getLastChgTime())
                 .addTime(p.getAddTime())
-                .build());
+                .build();
     }
 
     /**

@@ -127,7 +127,7 @@ public class ProviderElasticSearch implements PersonExtendedProps, DataRequiredF
     private String assigningAuthorityCd;
 
     public static ProviderElasticSearch build(ProviderSp p) {
-        return p.postProcessJsonData(ProviderElasticSearch.builder()
+        return ProviderElasticSearch.builder()
                 .personUid(p.getPersonUid())
                 .providerUid(p.getPersonUid())
                 .addTime(p.getAddTime())
@@ -148,7 +148,7 @@ public class ProviderElasticSearch implements PersonExtendedProps, DataRequiredF
                 .statusCd(p.getStatusCd())
                 .statusTime(p.getStatusTime())
                 .versionCtrlNbr(p.getVersionCtrlNbr())
-                .build());
+                .build();
     }
 
     /**

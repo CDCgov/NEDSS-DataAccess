@@ -150,7 +150,7 @@ public class PatientReporting implements PersonExtendedProps, DataRequiredFields
     private String raceWhiteAll;
 
     public static PatientReporting build(PatientSp p) {
-        return p.postProcessJsonData(PatientReporting.builder()
+        return PatientReporting.builder()
                 .patientUid(p.getPersonUid())
                 .addlGenderInfo(p.getAdditionalGenderCd())
                 .addUserId(p.getAddUserId())
@@ -180,7 +180,7 @@ public class PatientReporting implements PersonExtendedProps, DataRequiredFields
                 // Fn() - Auth_User
                 .addUserName(p.getAddUserName())
                 .lastChgUserName(p.getLastChgUserName())
-                .build());
+                .build();
     }
 
     /**

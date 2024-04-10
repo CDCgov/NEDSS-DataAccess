@@ -133,7 +133,7 @@ public class PatientElasticSearch implements PersonExtendedProps, DataRequiredFi
     private String assigningAuthorityCd;
 
     public static PatientElasticSearch build(PatientSp p) {
-        return p.postProcessJsonData(PatientElasticSearch.builder()
+        return PatientElasticSearch.builder()
                 .patientUid(p.getPersonUid())
                 .additionalGenderCd(p.getAdditionalGenderCd())
                 .addUserId(p.getAddUserId())
@@ -174,7 +174,7 @@ public class PatientElasticSearch implements PersonExtendedProps, DataRequiredFi
                 .statusTime(p.getStatusTime())
                 .speaksEnglishCd(p.getSpeaksEnglishCd())
                 .versionCtrlNbr(p.getVersionCtrlNbr())
-                .build());
+                .build();
     }
 
     /**
