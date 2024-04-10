@@ -21,14 +21,12 @@ public class PersonSvcYmlPropertiesTest {
 
     @Test
     void whenBindingYMLConfigFile_thenAllFieldsAreSet() {
-        Assertions.assertEquals("cdc.nbs_odse.dbo.Default.input", kafkaConfig.getDefaultDataTopicName());
-        Assertions.assertEquals("cdc.nbs_odse.dbo.Person", kafkaConfig.getPersonTopicName());
-        Assertions.assertEquals("cdc.nbs_odse.dbo.Patient.input", kafkaConfig.getPatientInputTopicName());
-        Assertions.assertEquals("cdc.nbs_odse.dbo.Provider.input", kafkaConfig.getProviderInputTopicName());
-        Assertions.assertEquals("nbs_patient_elastic", kafkaConfig.getPatientElasticSearchTopic());
-        Assertions.assertEquals("nbs_patient", kafkaConfig.getPatientReportingTopic());
-        Assertions.assertEquals("nbs_provider_elastic", kafkaConfig.getProviderElasticSearchTopic());
-        Assertions.assertEquals("nbs_provider", kafkaConfig.getProviderReportingTopic());
+        Assertions.assertEquals("nbs_default", kafkaConfig.getDefaultDataTopicName());
+        Assertions.assertEquals("nbs_Person", kafkaConfig.getPersonTopicName());
+        Assertions.assertEquals("nrt_patient_elastic", kafkaConfig.getPatientElasticSearchTopic());
+        Assertions.assertEquals("nrt_patient", kafkaConfig.getPatientReportingTopic());
+        Assertions.assertEquals("nrt_provider_elastic", kafkaConfig.getProviderElasticSearchTopic());
+        Assertions.assertEquals("nrt_provider", kafkaConfig.getProviderReportingTopic());
     }
 
 }

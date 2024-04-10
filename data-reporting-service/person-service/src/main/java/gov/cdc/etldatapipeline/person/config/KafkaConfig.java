@@ -16,10 +16,6 @@ import org.springframework.kafka.config.TopicBuilder;
 public class KafkaConfig {
     @Value("${spring.kafka.stream.input.person.topic-name}")
     private String personTopicName;
-    @Value("${spring.kafka.stream.input.provider.topic-name}")
-    private String providerInputTopicName;
-    @Value("${spring.kafka.stream.input.patient.topic-name}")
-    private String patientInputTopicName;
     @Value("${spring.kafka.stream.input.defaultData.topic-name}")
     private String defaultDataTopicName;
     @Value("${spring.kafka.stream.output.providerElastic.topic-name}")
@@ -38,12 +34,6 @@ public class KafkaConfig {
     }
 
     @Bean
-    public NewTopic createInputPatientTopicName() {
-        log.info("Creating topic : " + patientInputTopicName);
-        return TopicBuilder.name(patientInputTopicName).build();
-    }
-
-    @Bean
     public NewTopic createPatientElasticTopicName() {
         log.info("Creating topic : " + patientElasticSearchTopic);
         return TopicBuilder.name(patientElasticSearchTopic).build();
@@ -56,12 +46,6 @@ public class KafkaConfig {
     }
 
     @Bean
-    public NewTopic createInputProviderTopicName() {
-        log.info("Creating topic : " + providerInputTopicName);
-        return TopicBuilder.name(providerInputTopicName).build();
-    }
-
-    @Bean
     public NewTopic createProviderElasticSearchTopicName() {
         log.info("Creating topic : " + providerElasticSearchTopic);
         return TopicBuilder.name(providerElasticSearchTopic).build();
@@ -70,7 +54,7 @@ public class KafkaConfig {
     @Bean
     public NewTopic createProviderReportingTopicName() {
         log.info("Creating topic : " + providerReportingTopic);
-        return TopicBuilder.name(providerInputTopicName).build();
+        return TopicBuilder.name(providerReportingTopic).build();
     }
 }
 

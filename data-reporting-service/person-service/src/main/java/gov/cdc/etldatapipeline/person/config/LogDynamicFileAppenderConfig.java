@@ -9,7 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.TimeZone;
 
 @Setter
 public class LogDynamicFileAppenderConfig<E> extends FileAppender<E> {
@@ -28,7 +27,6 @@ public class LogDynamicFileAppenderConfig<E> extends FileAppender<E> {
 
         if (logFilePath.contains("%d{")) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-            dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
             String formattedDate = dateFormat.format(new Date());
             logFilePath = logFilePath.replace("%d{yyyy-MM-dd_HH-mm-ss}", formattedDate);
         }

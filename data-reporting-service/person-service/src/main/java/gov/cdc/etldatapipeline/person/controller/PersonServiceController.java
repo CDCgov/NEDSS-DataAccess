@@ -1,6 +1,5 @@
 package gov.cdc.etldatapipeline.person.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.cdc.etldatapipeline.person.config.KafkaConfig;
@@ -38,24 +37,32 @@ public class PersonServiceController {
 
     @PostMapping(value = "/provider", consumes = "application/json", produces = "application/json")
     @ResponseBody
-    public ResponseEntity<String> postProvider(@RequestBody String payLoad) throws JsonProcessingException {
-        KafkaProducer<String, JsonNode> producer = new KafkaProducer<>(
-                kafkaStreamsConfig.kStreamsConfigs().asProperties());
-        producer.send(new ProducerRecord<>(kafkaConfig.getPersonTopicName(),
-                UUID.randomUUID().toString(), new ObjectMapper().readTree(payLoad)));
-        producer.close();
-        return ResponseEntity.ok("Produced : " + payLoad);
+    public ResponseEntity<String> postProvider(@RequestBody String payLoad) {
+        try {
+            KafkaProducer<String, JsonNode> producer = new KafkaProducer<>(
+                    kafkaStreamsConfig.kStreamsConfigs().asProperties());
+            producer.send(new ProducerRecord<>(kafkaConfig.getPersonTopicName(),
+                    UUID.randomUUID().toString(), new ObjectMapper().readTree(payLoad)));
+            producer.close();
+            return ResponseEntity.ok("Produced : " + payLoad);
+        } catch (Exception ex) {
+            return ResponseEntity.internalServerError().body("Failed to process the provider. Exception : " + ex.getMessage());
+        }
     }
 
     @PostMapping(value = "/patient", consumes = "application/json", produces = "application/json")
     @ResponseBody
-    public ResponseEntity<String> postPatient(@RequestBody String payLoad) throws JsonProcessingException {
-        KafkaProducer<String, JsonNode> producer = new KafkaProducer<>(
-                kafkaStreamsConfig.kStreamsConfigs().asProperties());
-        producer.send(new ProducerRecord<>(kafkaConfig.getPersonTopicName(),
-                UUID.randomUUID().toString(), new ObjectMapper().readTree(payLoad)));
-        producer.close();
-        return ResponseEntity.ok("Produced : " + payLoad);
+    public ResponseEntity<String> postPatient(@RequestBody String payLoad) {
+        try {
+            KafkaProducer<String, JsonNode> producer = new KafkaProducer<>(
+                    kafkaStreamsConfig.kStreamsConfigs().asProperties());
+            producer.send(new ProducerRecord<>(kafkaConfig.getPersonTopicName(),
+                    UUID.randomUUID().toString(), new ObjectMapper().readTree(payLoad)));
+            producer.close();
+            return ResponseEntity.ok("Produced : " + payLoad);
+        } catch (Exception ex) {
+            return ResponseEntity.internalServerError().body("Failed to process the Patient. Exception : " + ex.getMessage());
+        }
     }
 
 }
