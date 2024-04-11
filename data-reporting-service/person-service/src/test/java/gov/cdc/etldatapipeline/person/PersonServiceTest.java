@@ -185,7 +185,7 @@ public class PersonServiceTest {
 
 
     private PersonService getKafkaStreamService() {
-        PersonService ks = new PersonService(patientRepository, providerRepository);
+        PersonService ks = new PersonService(patientRepository, providerRepository, new PersonTransformers());
         ks.setPersonTopicName(personTopic);
         ks.setPatientElasticSearchTopicName(patientElasticTopic);
         ks.setPatientReportingOutputTopic(patientReportingTopic);

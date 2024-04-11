@@ -11,7 +11,9 @@ import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderKey;
 import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderReporting;
 import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderSp;
 import gov.cdc.etldatapipeline.person.utils.UtilHelper;
+import org.springframework.stereotype.Component;
 
+@Component
 public class PersonTransformers {
     UtilHelper utilHelper = new UtilHelper();
 

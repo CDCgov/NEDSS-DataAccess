@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 public class PersonService {
     private final PatientRepository patientRepository;
     private final ProviderRepository providerRepository;
+    private final PersonTransformers transformer;
     @Value("#{kafkaConfig.getPersonTopicName()}")
     private String personTopicName;
     @Value("#{kafkaConfig.getPatientElasticSearchTopic()}")
@@ -46,7 +47,6 @@ public class PersonService {
 
     @Autowired
     public void processMessage(StreamsBuilder streamsBuilder) {
-        PersonTransformers transformer = new PersonTransformers();
         KStream<String, Person> personKStream
                 = streamsBuilder.stream(personTopicName, Consumed.with(Serdes.String(), Serdes.String()))
                 .map((k, v) -> new KeyValue<>(
