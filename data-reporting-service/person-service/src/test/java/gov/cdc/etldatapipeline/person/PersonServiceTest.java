@@ -8,11 +8,14 @@ import gov.cdc.etldatapipeline.person.model.dto.patient.PatientElasticSearch;
 import gov.cdc.etldatapipeline.person.model.dto.patient.PatientReporting;
 import gov.cdc.etldatapipeline.person.model.dto.patient.PatientSp;
 import gov.cdc.etldatapipeline.person.model.dto.persondetail.*;
+import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderElasticSearch;
 import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderReporting;
 import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderSp;
 import gov.cdc.etldatapipeline.person.repository.PatientRepository;
 import gov.cdc.etldatapipeline.person.repository.ProviderRepository;
 import gov.cdc.etldatapipeline.person.service.PersonService;
+import gov.cdc.etldatapipeline.person.transformer.PersonTransformers;
+import gov.cdc.etldatapipeline.person.transformer.PersonType;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.kafka.streams.*;
@@ -39,6 +42,8 @@ public class PersonServiceTest {
     @Mock
     ProviderRepository providerRepository;
 
+    PersonTransformers tx = new PersonTransformers();
+
     private final String personTopic = "PersonTopic";
     private final String patientElasticTopic = "PatientElasticTopic";
     private final String patientReportingTopic = "PatientReportingTopic";
@@ -52,7 +57,8 @@ public class PersonServiceTest {
         PatientSp patientSp = constructPatient();
         Mockito.when(patientRepository.computePatients(anyString())).thenReturn(List.of(patientSp));
         //Build expected unflattened Provider
-        PatientReporting expectedPf = PatientReporting.build(patientSp);
+        PatientReporting expectedPf
+                = (PatientReporting) tx.processData(patientSp, PersonType.PATIENT_REPORTING).getPayload();
         //Construct transformed patient
         constructPatPrvFull(expectedPf);
 
@@ -70,7 +76,8 @@ public class PersonServiceTest {
         PatientSp patientSp = constructPatient();
         Mockito.when(patientRepository.computePatients(anyString())).thenReturn(List.of(patientSp));
         //Build expected unflattened Provider
-        PatientElasticSearch expectedPf = PatientElasticSearch.build(patientSp);
+        PatientElasticSearch expectedPf
+                = (PatientElasticSearch) tx.processData(patientSp, PersonType.PATIENT_ELASTIC_SEARCH).getPayload();
         //Construct transformed patient
         constructPatPrvFull(expectedPf);
 
@@ -85,11 +92,13 @@ public class PersonServiceTest {
 
     @Test
     public void processProviderReportingData() {
-        ProviderSp constructedProviderSp = constructProvider();
-        Mockito.when(providerRepository.computeProviders(anyString())).thenReturn(List.of(constructedProviderSp));
+        ProviderSp providerSp = constructProvider();
+        Mockito.when(providerRepository.computeProviders(anyString())).thenReturn(List.of(providerSp));
 
         //Build expected unflattened Provider
-        ProviderReporting expectedPf = ProviderReporting.build(constructedProviderSp);
+        ProviderReporting expectedPf
+                = (ProviderReporting) tx.processData(providerSp, PersonType.PROVIDER_REPORTING).getPayload();
+
         //Augment Provider with the flattened data
         constructPatPrvFull(expectedPf);
 
@@ -104,11 +113,13 @@ public class PersonServiceTest {
 
     @Test
     public void processProviderElasticSearchData() {
-        ProviderSp constructedProviderSp = constructProvider();
-        Mockito.when(providerRepository.computeProviders(anyString())).thenReturn(List.of(constructedProviderSp));
+        ProviderSp providerSp = constructProvider();
+        Mockito.when(providerRepository.computeProviders(anyString())).thenReturn(List.of(providerSp));
 
         //Build expected unflattened Provider
-        ProviderReporting expectedPf = ProviderReporting.build(constructedProviderSp);
+        ProviderElasticSearch expectedPf
+                = (ProviderElasticSearch) tx.processData(providerSp, PersonType.PROVIDER_ELASTIC_SEARCH).getPayload();
+
         //Augment Provider with the flattened data
         constructPatPrvFull(expectedPf);
 

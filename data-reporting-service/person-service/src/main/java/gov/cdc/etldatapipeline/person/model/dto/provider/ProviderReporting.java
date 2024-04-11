@@ -68,29 +68,14 @@ public class ProviderReporting implements PersonExtendedProps, DataRequiredField
     private String phoneCell;
 
     //Email
-    private String emailWork;
+    @JsonProperty("email_work")
+    private String email;
 
     //Entity
     @JsonProperty("quick_code")
     private String providerQuickCode;
     private String providerRegistrationNum;
     private String providerRegistrationNumAuth;
-
-    public static ProviderReporting build(ProviderSp p) {
-        return ProviderReporting.builder()
-                .providerUid(p.getPersonUid())
-                .localId(p.getLocalId())
-                .recordStatus(p.getRecordStatusCd())
-                .entryMethod(p.getElectronicInd())
-                .generalComments(p.getDescription())
-                .addUserId(p.getAddUserId())
-                .lastChgUserId(p.getLastChgUserId())
-                .addUserName(p.getAddUserName())
-                .lastChgUserName(p.getLastChgUserName())
-                .lastChgTime(p.getLastChgTime())
-                .addTime(p.getAddTime())
-                .build();
-    }
 
     /**
      * List of Required Fields
@@ -101,10 +86,4 @@ public class ProviderReporting implements PersonExtendedProps, DataRequiredField
     public Set<String> getRequiredFields() {
         return Set.of("providerUid");
     }
-
-    @Override
-    public void setEmail(String email) {
-        setEmailWork(email);
-    }
-
 }

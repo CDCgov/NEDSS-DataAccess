@@ -149,40 +149,6 @@ public class PatientReporting implements PersonExtendedProps, DataRequiredFields
     @JsonProperty("race_white_all")
     private String raceWhiteAll;
 
-    public static PatientReporting build(PatientSp p) {
-        return PatientReporting.builder()
-                .patientUid(p.getPersonUid())
-                .addlGenderInfo(p.getAdditionalGenderCd())
-                .addUserId(p.getAddUserId())
-                .ageReported(p.getAgeReported())
-                .ageReportedUnit(p.getAgeReportedUnitCd())
-                .addTime(p.getAddTime())
-                .birth_sex(p.getBirthGenderCd())
-                .dob(p.getBirthTime())
-                .currentSex(p.getCurrSexCd())
-                .deceasedIndicator(p.getDeceasedIndCd())
-                .deceasedDate(p.getDeceasedTime())
-                .generalComments(p.getDescription())
-                .entryMethod(p.getElectronicInd())
-                .ethnicity(p.getEthnicGroupInd())
-                .unkEthnicRsn(p.getEthnicUnkReasonCd())
-                .lastChgUserId(p.getLastChgUserId())
-                .lastChgTime(p.getLastChgTime())
-                .localId(p.getLocalId())
-                .maritalStatus(p.getMaritalStatusCd())
-                .primaryOccupation(p.getOccupationCd())
-                .patientMprUid(p.getPersonParentUid())
-                .preferredGender(p.getPreferredGenderCd())
-                .primaryLanguage(p.getPrimLangCd())
-                .recordStatus(p.getRecordStatusCd())
-                .currSexUnkRsn(p.getSexUnkReasonCd())
-                .speaksEnglish(p.getSpeaksEnglishCd())
-                // Fn() - Auth_User
-                .addUserName(p.getAddUserName())
-                .lastChgUserName(p.getLastChgUserName())
-                .build();
-    }
-
     /**
      * List of Required Fields
      *

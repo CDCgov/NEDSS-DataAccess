@@ -132,51 +132,6 @@ public class PatientElasticSearch implements PersonExtendedProps, DataRequiredFi
     private Integer entityIdSeq;
     private String assigningAuthorityCd;
 
-    public static PatientElasticSearch build(PatientSp p) {
-        return PatientElasticSearch.builder()
-                .patientUid(p.getPersonUid())
-                .additionalGenderCd(p.getAdditionalGenderCd())
-                .addUserId(p.getAddUserId())
-                .adultsInHouseNbr(p.getAdultsInHouseNbr())
-                .ageReported(p.getAgeReported())
-                .ageReportedUnitCd(p.getAgeReportedUnitCd())
-                .addTime(p.getAddTime())
-                .birthOrderNbr(p.getBirthOrderNbr())
-                .birthSex(p.getBirthGenderCd())
-                .birthTime(p.getBirthTime())
-                .currSexCd(p.getCurrSexCd())
-                .childrenInHouseNbr(p.getChildrenInHouseNbr())
-                .deceasedTime(p.getDeceasedTime())
-                .dedupMatchInd(p.getDedupMatchInd())
-                .description(p.getDescription())
-                .electronicInd(p.getElectronicInd())
-                .ethnicGroupInd(p.getEthnicGroupInd())
-                .ethnicUnkReasonCd(p.getEthnicUnkReasonCd())
-                .edxInd(p.getEdxInd())
-                .educationLevelCd(p.getEducationLevelCd())
-                .lastChgUserId(p.getLastChgUserId())
-                .lastChgTime(p.getLastChgTime())
-                .localId(p.getLocalId())
-                .maritalStatusCd(p.getMaritalStatusCd())
-                .multipleBirthInd(p.getMultipleBirthInd())
-                .occupationCd(p.getOccupationCd())
-                .personFirstNm(p.getPersonFirstNm())
-                .personMiddleNm(p.getPersonMiddleNm())
-                .personLastNm(p.getPersonLastNm())
-                .personNmSuffix(p.getPersonNmSuffix())
-                .personParentUid(p.getPersonParentUid())
-                .preferredGenderCd(p.getPreferredGenderCd())
-                .primLangCd(p.getPrimLangCd())
-                .recordStatusTime(p.getRecordStatusTime())
-                .recordStatusCd(p.getRecordStatusCd())
-                .sexUnkReasonCd(p.getSexUnkReasonCd())
-                .statusCd(p.getStatusCd())
-                .statusTime(p.getStatusTime())
-                .speaksEnglishCd(p.getSpeaksEnglishCd())
-                .versionCtrlNbr(p.getVersionCtrlNbr())
-                .build();
-    }
-
     /**
      * List of Required Fields
      *

@@ -126,31 +126,6 @@ public class ProviderElasticSearch implements PersonExtendedProps, DataRequiredF
     private Integer entityIdSeq;
     private String assigningAuthorityCd;
 
-    public static ProviderElasticSearch build(ProviderSp p) {
-        return ProviderElasticSearch.builder()
-                .personUid(p.getPersonUid())
-                .providerUid(p.getPersonUid())
-                .addTime(p.getAddTime())
-                .dedupMatchInd(p.getDedupMatchInd())
-                .description(p.getDescription())
-                .electronicInd(p.getElectronicInd())
-                .edxInd(p.getEdxInd())
-                .lastChgUserId(p.getLastChgUserId())
-                .lastChgTime(p.getLastChgTime())
-                .localId(p.getLocalId())
-                .personFirstNm(p.getFirstNm())
-                .personMiddleNm(p.getMiddleNm())
-                .personLastNm(p.getLastNm())
-                .personNmSuffix(p.getNmSuffix())
-                .personParentUid(p.getPersonParentUid())
-                .recordStatusTime(p.getRecordStatusTime())
-                .recordStatusCd(p.getRecordStatusCd())
-                .statusCd(p.getStatusCd())
-                .statusTime(p.getStatusTime())
-                .versionCtrlNbr(p.getVersionCtrlNbr())
-                .build();
-    }
-
     /**
      * List of Required Fields
      *
