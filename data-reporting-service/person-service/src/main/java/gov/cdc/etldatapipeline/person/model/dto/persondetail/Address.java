@@ -26,6 +26,7 @@ public class Address implements ExtendPerson {
     private String county;
     @JsonProperty("within_city_limits_ind")
     private String withinCityLimitsInd;
+    private String country;
     @JsonProperty("home_country")
     private String homeCountry;
     @JsonProperty("birth_country")
@@ -48,6 +49,7 @@ public class Address implements ExtendPerson {
         personFull.setStateCode(state);
         personFull.setState(stateDesc);
         personFull.setCountryCode(cntryCd);
+        personFull.setCountry(country);
         personFull.setHomeCountry(homeCountry);
         personFull.setBirthCountry(birthCountry);
         personFull.setAddressComments(addressComments);

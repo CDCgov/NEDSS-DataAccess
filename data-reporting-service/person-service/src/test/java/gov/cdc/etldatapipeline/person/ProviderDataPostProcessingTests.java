@@ -45,7 +45,7 @@ public class ProviderDataPostProcessingTests {
                 pf.getCounty(),
                 pf.getStateCode(),
                 pf.getState(),
-                pf.getCountryCode(),
+                pf.getCountry(),
                 pf.getPhoneWork(),
                 pf.getPhoneExtWork(),
                 pf.getPhoneCell(),
@@ -69,7 +69,7 @@ public class ProviderDataPostProcessingTests {
                 "Gwinnett County",
                 "13",
                 "Georgia",
-                "840",
+                "United States",
                 "2323222422",
                 "232",
                 "2823252423",
@@ -127,7 +127,7 @@ public class ProviderDataPostProcessingTests {
                 p.getCounty(),
                 p.getStateCode(),
                 p.getState(),
-                p.getCountryCode());
+                p.getCountry());
         // Process the respective field json to PatientProvider fields
         ProviderReporting pf = (ProviderReporting) tx.processData(prov, PersonType.PROVIDER_REPORTING).getPayload();
         List<String> expected = Arrays.asList(
@@ -139,7 +139,7 @@ public class ProviderDataPostProcessingTests {
                 "Gwinnett County",
                 "13",
                 "Georgia",
-                "840");
+                "United States");
         // Validate the PatientProvider field processing
         Assertions.assertEquals(expected, pDetailsFn.apply(pf));
     }

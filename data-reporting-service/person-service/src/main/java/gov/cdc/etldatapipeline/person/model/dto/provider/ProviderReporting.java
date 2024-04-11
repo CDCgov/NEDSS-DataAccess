@@ -56,8 +56,7 @@ public class ProviderReporting implements PersonExtendedProps, DataRequiredField
     private String zip;
     private String county;
     private String countyCode;
-    @JsonProperty("country")
-    private String countryCode;
+    private String country;
     private String addressComments;
 
 

@@ -45,6 +45,9 @@ public interface PersonExtendedProps {
     default void setCountryCode(String countryCode) {
     }
 
+    default void setCountry(String homeCountry) {
+    }
+
     default void setHomeCountry(String homeCountry) {
     }
 
