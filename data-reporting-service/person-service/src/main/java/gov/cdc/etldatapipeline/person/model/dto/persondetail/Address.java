@@ -31,10 +31,11 @@ public class Address implements ExtendPerson {
     private String homeCountry;
     @JsonProperty("birth_country")
     private String birthCountry;
-    @JsonProperty("USE_CD")
+    @JsonProperty("addr_elp_use_cd")
     private String useCd;
+    @JsonProperty("addr_elp_cd")
     private String cd;
-    @JsonProperty("postal_locator_uid")
+    @JsonProperty("addr_pl_uid")
     private Long postalLocatorUid;
     @JsonProperty("address_comments")
     private String addressComments;

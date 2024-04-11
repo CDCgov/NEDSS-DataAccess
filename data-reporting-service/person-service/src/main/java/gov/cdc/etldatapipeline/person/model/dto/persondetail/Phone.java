@@ -17,10 +17,11 @@ import org.springframework.util.StringUtils;
 public class Phone implements ExtendPerson {
     private String telephoneNbr;
     private String extensionTxt;
-    @JsonProperty("use_cd")
+    @JsonProperty("ph_elp_use_cd")
     private String useCd;
+    @JsonProperty("ph_elp_cd")
     private String cd;
-    @JsonProperty("tele_locator_uid")
+    @JsonProperty("ph_tl_uid")
     private Long teleLocatorUid;
 
     public <T extends PersonExtendedProps> T updatePerson(T personFull) {
