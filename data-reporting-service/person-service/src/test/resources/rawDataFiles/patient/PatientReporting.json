@@ -454,7 +454,7 @@
     "zip": "30025",
     "county": "Gwinnett County",
     "county_code": "13135",
-    "within_city_limits": null,
+    "within_city_limits": "Y",
     "birth_country": "Canada",
     "census_tract": null,
     "phone_work": "2323222422",

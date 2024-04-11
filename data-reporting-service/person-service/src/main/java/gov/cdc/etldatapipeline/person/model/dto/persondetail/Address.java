@@ -44,6 +44,7 @@ public class Address implements ExtendPerson {
         personFull.setStreetAddress1(streetAddr1);
         personFull.setStreetAddress2(streetAddr2);
         personFull.setCity(city);
+        personFull.setWithinCityLimits(withinCityLimitsInd);
         personFull.setZip(zip);
         personFull.setCountyCode(cntyCd);
         personFull.setCounty(county);

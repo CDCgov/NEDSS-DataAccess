@@ -31,6 +31,9 @@ public interface PersonExtendedProps {
 
     void setCity(String city);
 
+    default void setWithinCityLimits(String withInCityLimits) {
+    }
+
     void setState(String state);
 
     void setStateCode(String stateCode);

@@ -22,7 +22,7 @@ public class EntityData implements ExtendPerson {
     private String rootExtensionTxt;
     @JsonProperty("entity_id_seq")
     private Integer entityIdSeq;
-    @JsonProperty("ASSIGNING_AUTHORITY_CD")
+    @JsonProperty("assigning_authority_cd")
     private String assigningAuthorityCd;
 
     public <T extends PersonExtendedProps> T updatePerson(T personFull) {

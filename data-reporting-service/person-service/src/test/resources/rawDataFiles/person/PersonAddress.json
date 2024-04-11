@@ -24,7 +24,7 @@
     "cntryCd": "840",
     "state_desc": "Georgia",
     "county": "Gwinnett County",
-    "within_city_limits_ind": null,
+    "within_city_limits_ind": "Y",
     "country": "United States",
     "home_country": "United States",
     "birth_country": "Canada",

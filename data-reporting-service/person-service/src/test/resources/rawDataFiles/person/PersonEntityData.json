@@ -5,7 +5,7 @@
     "recordStatusCd": "ACTIVE",
     "rootExtensionTxt": "1113111",
     "entity_id_seq": 1,
-    "ASSIGNING_AUTHORITY_CD": "2.16.840.1.113883.3.1147.1.1001"
+    "assigning_authority_cd": "2.16.840.1.113883.3.1147.1.1001"
   },
   {
     "entity_uid": 242790991,
@@ -13,7 +13,15 @@
     "recordStatusCd": "ACTIVE",
     "rootExtensionTxt": "313431144414",
     "entity_id_seq": 2,
-    "ASSIGNING_AUTHORITY_CD": "SSA"
+    "assigning_authority_cd": "SSA"
+  },
+  {
+    "entity_uid": 25358107,
+    "typeCd": "SS",
+    "recordStatusCd": "ACTIVE",
+    "rootExtensionTxt": "555555555",
+    "entity_id_seq": 1,
+    "assigning_authority_cd": "SSA"
   },
   {
     "entity_uid": 242790992,
@@ -21,7 +29,7 @@
     "recordStatusCd": "ACTIVE",
     "rootExtensionTxt": "3213432",
     "entity_id_seq": 3,
-    "ASSIGNING_AUTHORITY_CD": "2.16.840.1.113883.3.1147.1.1001"
+    "assigning_authority_cd": "2.16.840.1.113883.3.1147.1.1001"
   },
   {
     "entity_uid": 242790993,
@@ -29,7 +37,7 @@
     "recordStatusCd": "ACTIVE",
     "rootExtensionTxt": "12314286",
     "entity_id_seq": 4,
-    "ASSIGNING_AUTHORITY_CD": "2.16.740.1.113883.3.1147.1.1002"
+    "assigning_authority_cd": "2.16.740.1.113883.3.1147.1.1002"
   },
   {
     "entity_uid": 242790994,
@@ -37,7 +45,7 @@
     "recordStatusCd": "ACTIVE",
     "rootExtensionTxt": "1113111",
     "entity_id_seq": 3,
-    "ASSIGNING_AUTHORITY_CD": "2.16.840.1.113883.3.1147.1.1001"
+    "assigning_authority_cd": "2.16.840.1.113883.3.1147.1.1001"
   },
   {
     "entity_uid": 242790995,
@@ -45,7 +53,7 @@
     "recordStatusCd": "ACTIVE",
     "rootExtensionTxt": "56743114514",
     "entity_id_seq": 4,
-    "ASSIGNING_AUTHORITY_CD": "2.16.740.1.113883.3.1147.1.1002"
+    "assigning_authority_cd": "2.16.740.1.113883.3.1147.1.1002"
   },
   {
     "entity_uid": 242790994,
@@ -53,7 +61,7 @@
     "recordStatusCd": "ACTIVE",
     "rootExtensionTxt": "1113111",
     "entity_id_seq": 5,
-    "ASSIGNING_AUTHORITY_CD": "2.16.840.1.113883.3.1147.1.1001"
+    "assigning_authority_cd": "2.16.840.1.113883.3.1147.1.1001"
   },
   {
     "entity_uid": 242790995,
@@ -61,7 +69,7 @@
     "recordStatusCd": "ACTIVE",
     "rootExtensionTxt": "86741517517",
     "entity_id_seq": 6,
-    "ASSIGNING_AUTHORITY_CD": "3.16.740.1.113883.3.1147.1.1002"
+    "assigning_authority_cd": "3.16.740.1.113883.3.1147.1.1002"
   },
   {
     "entity_uid": 242790995,
