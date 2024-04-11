@@ -1,4 +1,4 @@
-CREATE or ALTER PROCEDURE dbo.sp_patient_event @user_id_list varchar(max)
+CREATE OR ALTER PROCEDURE dbo.sp_patient_event @user_id_list varchar(max)
 AS
 
 BEGIN
@@ -10,6 +10,10 @@ BEGIN
                p.add_time,
                p.age_reported,
                p.age_reported_unit_cd,
+               case
+                   when (age_reported_unit_cd is not null or age_reported_unit_cd != '') then (select *
+                                                                                               from dbo.fn_get_value_by_cd_ques(p.age_reported_unit_cd, 'DEM218'))
+                   end          as age_reported_unit,
                p.first_nm,
                p.middle_nm,
                p.last_nm,
@@ -23,13 +27,33 @@ BEGIN
                p.birth_time_calc,
                p.cd,
                p.curr_sex_cd,
+               case
+                   when (p.curr_sex_cd is not null or p.curr_sex_cd != '')
+                       then (select * from dbo.fn_get_value_by_cd_ques(p.curr_sex_cd, 'DEM113'))
+                   end          as current_sex,
                p.deceased_ind_cd,
+               case
+                   when (p.deceased_ind_cd is not null or p.deceased_ind_cd != '') then (select *
+                                                                                         from dbo.fn_get_value_by_cd_ques(p.deceased_ind_cd, 'DEM127'))
+                   end          as deceased_indicator,
                p.electronic_ind,
                p.ethnic_group_ind,
+               case
+                   when (p.ethnic_group_ind is not null or p.ethnic_group_ind != '') then (select *
+                                                                                           from dbo.fn_get_value_by_cd_ques(p.ethnic_group_ind, 'DEM155'))
+                   end          as ethnicity,
                p.birth_gender_cd,
+               case
+                   when (p.birth_gender_cd is not null or p.birth_gender_cd != '') then (select *
+                                                                                         from dbo.fn_get_value_by_cd_ques(p.birth_gender_cd, 'DEM114'))
+                   end          as birth_sex,
                p.deceased_time,
                p.last_chg_time,
                p.marital_status_cd,
+               case
+                   when (p.marital_status_cd is not null or p.marital_status_cd != '') then (select *
+                                                                                             from dbo.fn_get_value_by_cd_ques(p.marital_status_cd, 'DEM140'))
+                   end          as marital_status,
                p.record_status_cd,
                p.record_status_time,
                p.status_cd,
@@ -39,12 +63,38 @@ BEGIN
                p.edx_ind,
                p.dedup_match_ind,
                p.speaks_english_cd,
+               case
+                   when (p.speaks_english_cd is not null or p.speaks_english_cd != '') then (select *
+                                                                                             from dbo.fn_get_value_by_cd_ques(p.speaks_english_cd, 'NBS214'))
+                   end          as speaks_english,
                p.ethnic_unk_reason_cd,
+               case
+                   when (p.ethnic_unk_reason_cd is not null or p.ethnic_unk_reason_cd != '') then (select *
+                                                                                                   from dbo.fn_get_value_by_cd_ques(p.ethnic_unk_reason_cd, 'NBS273'))
+                   end          as unk_ethnic_rsn,
                p.sex_unk_reason_cd,
+               case
+                   when (p.sex_unk_reason_cd is not null or p.sex_unk_reason_cd != '') then (select *
+                                                                                             from dbo.fn_get_value_by_cd_ques(p.sex_unk_reason_cd, 'NBS272'))
+                   end          as curr_sex_unk_rsn,
                p.preferred_gender_cd,
+               case
+                   when (p.preferred_gender_cd is not null or p.preferred_gender_cd != '') then (select *
+                                                                                                 from dbo.fn_get_value_by_cvg(
+                                                                                                         p.preferred_gender_cd,
+                                                                                                         'NBS_STD_GENDER_PARPT'))
+                   end          as preferred_gender,
                p.additional_gender_cd,
                p.occupation_cd,
+               case
+                   when (p.occupation_cd is not null or p.occupation_cd != '') then (select *
+                                                                                     from dbo.fn_get_value_by_cd_ques(p.occupation_cd, 'DEM139'))
+                   end          as primary_occupation,
                p.prim_lang_cd,
+               case
+                   when (p.prim_lang_cd is not null or p.prim_lang_cd != '') then (select *
+                                                                                   from dbo.fn_get_value_by_cd_ques(p.prim_lang_cd, 'DEM142'))
+                   end          as primary_language,
                p.multiple_birth_ind,
                p.adults_in_house_nbr,
                p.birth_order_nbr,
@@ -134,6 +184,10 @@ BEGIN
                                                   soundex(pn.first_nm)                                 AS [firstNmSndx],
                                                   pn.nm_use_cd                                         AS [nm_use_cd],
                                                   pn.nm_suffix                                         AS [nmSuffix],
+                                                  case
+                                                      when (pn.nm_suffix is not null or pn.nm_suffix != '')
+                                                          then (select * from dbo.fn_get_value_by_cd_ques(pn.nm_suffix, 'DEM107'))
+                                                      end                                              as name_suffix,
                                                   pn.nm_degree                                         AS [nmDegree],
                                                   pn.person_name_seq                                   AS [pn_person_name_seq],
                                                   pn.last_chg_time                                     AS [pn_last_chg_time]

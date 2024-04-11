@@ -25,17 +25,24 @@ databaseChangeLog:
       author: liquibase
       changes:
         - sqlFile:
-            path: src/main/resources/db/sp-provider-001.sql
+            path: src/main/resources/db/fn-get_value_by_cd_ques-001.sql
             splitStatements: false
   - changeSet:
       id: 5
       author: liquibase
       changes:
         - sqlFile:
-            path: src/main/resources/db/sp-patient-001.sql
+            path: src/main/resources/db/sp-provider-001.sql
             splitStatements: false
   - changeSet:
       id: 6
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/sp-patient-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 7
       author: liquibase
       changes:
         - sqlFile:
