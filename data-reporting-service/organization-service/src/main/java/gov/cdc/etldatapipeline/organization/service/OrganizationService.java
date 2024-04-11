@@ -1,12 +1,10 @@
 package gov.cdc.etldatapipeline.organization.service;
 
-import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationElasticSearch;
-import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationKey;
-import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationReporting;
 import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationSp;
 import gov.cdc.etldatapipeline.organization.model.odse.Organization;
 import gov.cdc.etldatapipeline.organization.repository.OrgRepository;
-import gov.cdc.etldatapipeline.organization.utils.DataProcessor;
+import gov.cdc.etldatapipeline.organization.transformer.OrganizationTransformers;
+import gov.cdc.etldatapipeline.organization.transformer.OrganizationType;
 import gov.cdc.etldatapipeline.organization.utils.StreamsSerdes;
 import gov.cdc.etldatapipeline.organization.utils.UtilHelper;
 import lombok.RequiredArgsConstructor;
@@ -39,11 +37,10 @@ public class OrganizationService {
     private String orgReportingOutputTopic;
 
     private final OrgRepository orgRepository;
+    private final OrganizationTransformers transformer;
 
     @Autowired
     public void processMessage(StreamsBuilder streamsBuilder) {
-
-        UtilHelper utilHelper = UtilHelper.getInstance();
         KStream<String, Set<OrganizationSp>> organizationKStream
                 = streamsBuilder.stream(orgTopicName, Consumed.with(Serdes.String(), Serdes.String()))
                 .map((key, value) -> new KeyValue<>(
@@ -56,9 +53,8 @@ public class OrganizationService {
 
         organizationKStream.flatMap((key, value) -> value.stream()
                         .map(p -> KeyValue.pair(
-                                utilHelper.buildAvroRecord(OrganizationKey.build(p)),
-                                utilHelper.buildAvroRecord(
-                                        DataProcessor.processOrganization(p, OrganizationReporting.build(p)))))
+                                transformer.buildOrganizationKey(p),
+                                transformer.processData(p, OrganizationType.ORGANIZATION_REPORTING)))
                         .collect(Collectors.toSet()))
                 .peek((key, value) ->
                         log.info("Organization Reporting : {}", value.toString()))
@@ -68,10 +64,8 @@ public class OrganizationService {
                                 StreamsSerdes.DataEnvelopeSerde()));
 
         organizationKStream.flatMap((key, value) -> value.stream()
-                        .map(p -> KeyValue.pair(
-                                utilHelper.buildAvroRecord(OrganizationKey.build(p)),
-                                utilHelper.buildAvroRecord(
-                                        DataProcessor.processOrganization(p, OrganizationElasticSearch.build(p)))))
+                        .map(p -> KeyValue.pair(transformer.buildOrganizationKey(p),
+                                transformer.processData(p, OrganizationType.ORGANIZATION_ELASTIC_SEARCH)))
                         .collect(Collectors.toSet()))
                 .peek((key, value) ->
                         log.info("Organization Elastic : {}", value.toString()))

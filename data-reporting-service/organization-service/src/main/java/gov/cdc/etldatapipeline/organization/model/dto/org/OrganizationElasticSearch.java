@@ -72,27 +72,6 @@ public class OrganizationElasticSearch implements DataRequiredFields {
     private Long lastChgUserId;
     private String lastChgTime;
 
-    public static OrganizationElasticSearch build(OrganizationSp orgSp) {
-        return OrganizationElasticSearch.builder()
-                        .organizationUid(orgSp.getOrganizationUid())
-                        .cd(orgSp.getCd())
-                        .statusCd(orgSp.getStatusCd())
-                        .statusTime(orgSp.getStatusTime())
-                        .versionCtrlNbr(orgSp.getVersionCtrlNbr())
-                        .edxInd(orgSp.getEdxInd())
-                        .recordStatusTime(orgSp.getRecordStatusTime())
-                        .localId(orgSp.getLocalId())
-                        .orgRecordStatusCd(orgSp.getRecordStatusCd())
-                        .description(orgSp.getDescription())
-                        .electronicInd(orgSp.getElectronicInd())
-                        .standIndClass(orgSp.getStandIndClass())
-                        .addUserId(orgSp.getAddUserId())
-                        .addTime(orgSp.getAddTime())
-                        .lastChgUserId(orgSp.getLastChgUserId())
-                        .lastChgTime(orgSp.getLastChgTime())
-                        .build();
-    }
-
     @Override
     public Set<String> getRequiredFields() {
         return Set.of("organizationUid");

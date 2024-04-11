@@ -49,24 +49,6 @@ public class OrganizationReporting implements DataRequiredFields {
     private String lastChgUserName;
     private String lastChgTime;
 
-    public static OrganizationReporting build(OrganizationSp orgSp) {
-        return OrganizationReporting.builder()
-                        .organizationUid(orgSp.getOrganizationUid())
-                        .localId(orgSp.getLocalId())
-                        .recordStatus(orgSp.getRecordStatusCd())
-                        .generalComments(orgSp.getDescription())
-                        .entryMethod(orgSp.getElectronicInd())
-                        .standIndClass(orgSp.getStandIndClass())
-                        .organizationName(orgSp.getOrganizationName())
-                        .addTime(orgSp.getAddTime())
-                        .addUserId(orgSp.getAddUserId())
-                        .lastChgUserId(orgSp.getLastChgUserId())
-                        .lastChgTime(orgSp.getLastChgTime())
-                        .addUserName(orgSp.getAddUserName())
-                        .lastChgUserName(orgSp.getLastChgUserName())
-                        .build();
-    }
-
     @Override
     public Set<String> getRequiredFields() {
         return Set.of("organizationUid");

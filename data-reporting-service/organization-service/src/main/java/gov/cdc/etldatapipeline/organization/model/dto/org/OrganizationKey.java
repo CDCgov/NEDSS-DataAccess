@@ -18,10 +18,6 @@ public class OrganizationKey implements DataRequiredFields {
     @JsonProperty("organization_uid")
     private Long orgUID;
 
-    public static OrganizationKey build(OrganizationSp p) {
-        return OrganizationKey.builder().orgUID(p.getOrganizationUid()).build();
-    }
-
     @Override
     public Set<String> getRequiredFields() {
         return Set.of("orgUID");

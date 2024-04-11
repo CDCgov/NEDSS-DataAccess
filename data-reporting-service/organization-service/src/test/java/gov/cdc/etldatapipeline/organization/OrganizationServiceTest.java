@@ -7,6 +7,7 @@ import gov.cdc.etldatapipeline.organization.model.avro.DataEnvelope;
 import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationSp;
 import gov.cdc.etldatapipeline.organization.repository.OrgRepository;
 import gov.cdc.etldatapipeline.organization.service.OrganizationService;
+import gov.cdc.etldatapipeline.organization.transformer.OrganizationTransformers;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.kafka.streams.*;
@@ -118,7 +119,7 @@ public class OrganizationServiceTest {
     }
 
     private OrganizationService getKafkaStreamService() {
-        OrganizationService ks = new OrganizationService(orgRepository);
+        OrganizationService ks = new OrganizationService(orgRepository, new OrganizationTransformers());
         ks.setOrgTopicName(orgTopic);
         ks.setOrgElasticSearchTopic(orgElasticTopic);
         ks.setOrgReportingOutputTopic(orgReportingTopic);

@@ -1,11 +1,13 @@
 package gov.cdc.etldatapipeline.organization.model.dto.org;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import gov.cdc.etldatapipeline.organization.utils.DataProcessor;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Data Model to capture the results of the stored procedure `sp_organization_event`
@@ -65,14 +67,5 @@ public class OrganizationSp {
     @Column(name = "organization_entity_id")
     private String organizationEntityId;
 
-    public <T> T processNestedJsonData(T obj) {
-        DataProcessor processor = new DataProcessor();
-        processor.processOrgAddress(organizationAddress, obj);
-        processor.processOrgPhone(organizationTelephone, obj);
-        processor.processOrgFax(organizationFax, obj);
-        processor.processOrgEntity(organizationEntityId, obj);
-        processor.processOrgName(organizationName, obj);
-        return obj;
-    }
 }
 
