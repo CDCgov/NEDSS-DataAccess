@@ -10,6 +10,7 @@ spring:
           topic-name: cdc.nbs_odse.dbo.Default.input
       output:
         investigation:
+          topic-names: "${spring.kafka.stream.output.investigation.topic-name},${spring.kafka.stream.output.investigation.topic-name-transformed},${spring.kafka.stream.output.investigation.topic-name-confirmation},${spring.kafka.stream.output.investigation.topic-name-notification},${spring.kafka.stream.output.investigation.topic-name-observation}"
           topic-name: cdc.nbs_odse.dbo.Investigation.output
           topic-name-transformed: cdc.nbs_odse.dbo.Investigation.output-transformed
           topic-name-confirmation: cdc.nbs_odse.dbo.Investigation.Confirmation

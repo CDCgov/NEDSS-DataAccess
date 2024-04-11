@@ -1,4 +1,4 @@
-package gov.cdc.etldatapipeline.commonutil.service;
+package gov.cdc.etldatapipeline.investigation.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;

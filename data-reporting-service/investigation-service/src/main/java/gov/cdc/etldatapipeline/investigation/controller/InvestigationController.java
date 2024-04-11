@@ -1,6 +1,6 @@
 package gov.cdc.etldatapipeline.investigation.controller;
 
-import gov.cdc.etldatapipeline.commonutil.service.KafkaProducerService;
+import gov.cdc.etldatapipeline.investigation.service.KafkaProducerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
