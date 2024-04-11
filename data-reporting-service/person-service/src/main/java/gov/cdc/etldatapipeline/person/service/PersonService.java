@@ -46,7 +46,7 @@ public class PersonService {
 
     @Autowired
     public void processMessage(StreamsBuilder streamsBuilder) {
-        PersonTransformers tx = new PersonTransformers();
+        PersonTransformers transformer = new PersonTransformers();
         KStream<String, Person> personKStream
                 = streamsBuilder.stream(personTopicName, Consumed.with(Serdes.String(), Serdes.String()))
                 .map((k, v) -> new KeyValue<>(
@@ -64,8 +64,8 @@ public class PersonService {
         // PATIENT_REPORTING
         patientStream.flatMap((k, v) -> v.stream()
                         .map(p -> KeyValue.pair(
-                                tx.buildPatientKey(p),
-                                tx.processData(p, PersonType.PATIENT_REPORTING)))
+                                transformer.buildPatientKey(p),
+                                transformer.processData(p, PersonType.PATIENT_REPORTING)))
                         .collect(Collectors.toSet()))
                 .peek((key, value) -> log.info("Patient Reporting : {}", value.toString()))
                 .to((key, v, recordContext) -> patientReportingOutputTopic,
@@ -76,8 +76,8 @@ public class PersonService {
         // PATIENT_ELASTIC_SEARCH
         patientStream.flatMap((k, v) -> v.stream()
                         .map(p -> KeyValue.pair(
-                                tx.buildPatientKey(p),
-                                tx.processData(p, PersonType.PATIENT_ELASTIC_SEARCH)))
+                                transformer.buildPatientKey(p),
+                                transformer.processData(p, PersonType.PATIENT_ELASTIC_SEARCH)))
                         .collect(Collectors.toSet()))
                 .peek((key, value) -> log.info("Patient Elastic : {}", value.toString()))
                 .to((key, v, recordContext) -> patientElasticSearchTopicName,
@@ -95,8 +95,8 @@ public class PersonService {
         providerStream
                 .flatMap((k, v) -> v.stream()
                         .map(p -> KeyValue.pair(
-                                tx.buildProviderKey(p),
-                                tx.processData(p, PersonType.PROVIDER_REPORTING)))
+                                transformer.buildProviderKey(p),
+                                transformer.processData(p, PersonType.PROVIDER_REPORTING)))
                         .collect(Collectors.toSet()))
                 .peek((key, value) -> log.info("Provider : {}", value.toString()))
                 .to((key, v, recordContext) -> providerReportingOutputTopic,
@@ -108,8 +108,8 @@ public class PersonService {
         providerStream
                 .flatMap((k, v) -> v.stream()
                         .map(p -> KeyValue.pair(
-                                tx.buildProviderKey(p),
-                                tx.processData(p, PersonType.PROVIDER_ELASTIC_SEARCH)))
+                                transformer.buildProviderKey(p),
+                                transformer.processData(p, PersonType.PROVIDER_ELASTIC_SEARCH)))
                         .collect(Collectors.toSet()))
                 .peek((key, value) -> log.info("Provider : {}", value.toString()))
                 .to((key, v, recordContext) -> providerElasticSearchOutputTopic,
