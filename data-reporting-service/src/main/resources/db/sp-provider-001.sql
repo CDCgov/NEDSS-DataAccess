@@ -1,4 +1,4 @@
-CREATE or ALTER PROCEDURE dbo.sp_provider_event @user_id_list varchar(max)
+CREATE OR ALTER PROCEDURE dbo.sp_provider_event @user_id_list varchar(max)
 AS
 BEGIN
 
@@ -101,8 +101,17 @@ BEGIN
                                                   STRING_ESCAPE(pn.first_nm, 'json')                   firstNm,
                                                   soundex(pn.first_nm)                                 firstNmSndx,
                                                   pn.nm_use_cd,
+                                                  --Target length check
                                                   pn.nm_suffix                                         nmSuffix,
+                                                  case
+                                                      when (pn.nm_suffix is not null or pn.nm_suffix != '')
+                                                          then (select * from dbo.fn_get_value_by_cd_ques(pn.nm_suffix, 'DEM107'))
+                                                      end          as                                  name_suffix,
                                                   pn.nm_prefix                                         nmPrefix,
+                                                  case
+                                                      when (pn.nm_prefix is not null or pn.nm_prefix != '')
+                                                          then (select * from dbo.fn_get_value_by_cd_ques(pn.nm_prefix, 'DEM101'))
+                                                      end          as                                  name_prefix,
                                                   pn.nm_degree                                         nmDegree,
                                                   pn.person_name_seq,
                                                   pn.last_chg_time AS                                  [pn_last_chg_time]
