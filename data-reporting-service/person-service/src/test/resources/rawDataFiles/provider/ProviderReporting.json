@@ -45,7 +45,7 @@
       {
         "type": "string",
         "optional": true,
-        "field": "provider_quick_code"
+        "field": "quick_code"
       },
       {
         "type": "string",
@@ -110,7 +110,7 @@
       {
         "type": "string",
         "optional": true,
-        "field": "country_code"
+        "field": "country"
       },
       {
         "type": "string",
@@ -197,14 +197,14 @@
     "zip": "30025",
     "county": "Gwinnett County",
     "county_code": "13135",
-    "country_code": "840",
+    "country": "United States",
     "address_comments": null,
     "phone_work": "2323222422",
     "phone_ext_work": "232",
     "phone_comments": null,
     "phone_cell": "2823252423",
     "email_work": "someone2@email.com",
-    "provider_quick_code": "12314286",
+    "quick_code": "12314286",
     "provider_registration_num": "86741517517",
     "provider_registration_num_auth": "3.16.740.1.113883.3.1147.1.1002",
     "first_name": "Suurma",

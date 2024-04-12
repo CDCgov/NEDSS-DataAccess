@@ -31,6 +31,9 @@ public interface PersonExtendedProps {
 
     void setCity(String city);
 
+    default void setWithinCityLimits(String withInCityLimits) {
+    }
+
     void setState(String state);
 
     void setStateCode(String stateCode);
@@ -43,6 +46,9 @@ public interface PersonExtendedProps {
     void setCountyCode(String county_code);
 
     default void setCountryCode(String countryCode) {
+    }
+
+    default void setCountry(String homeCountry) {
     }
 
     default void setHomeCountry(String homeCountry) {

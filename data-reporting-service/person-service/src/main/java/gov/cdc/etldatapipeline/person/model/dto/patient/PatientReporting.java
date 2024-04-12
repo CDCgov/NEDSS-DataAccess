@@ -6,16 +6,17 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import gov.cdc.etldatapipeline.person.model.dto.DataRequiredFields;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.util.Set;
 
+/**
+ * Data model for the Patient Reporting Table
+ */
 @Data
-@NoArgsConstructor
+@Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ToString(callSuper = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class PatientReporting implements PersonExtendedProps, DataRequiredFields {
     private Long patientUid;
@@ -147,40 +148,6 @@ public class PatientReporting implements PersonExtendedProps, DataRequiredFields
     private String raceWhiteGt3Ind;
     @JsonProperty("race_white_all")
     private String raceWhiteAll;
-
-    public PatientReporting constructObject(Patient p) {
-        setPatientUid(p.getPatientUid());
-        setAddlGenderInfo(p.getAdditionalGenderCd());
-        setAddUserId(p.getAddUserId());
-        setAgeReported(p.getAgeReported());
-        setAgeReportedUnit(p.getAgeReportedUnitCd());
-        setAddTime(p.getAddTime());
-        setBirth_sex(p.getBirthGenderCd());
-        setDob(p.getBirthTime());
-        setCurrentSex(p.getCurrSexCd());
-        setDeceasedIndicator(p.getDeceasedIndCd());
-        setDeceasedDate(p.getDeceasedTime());
-        setGeneralComments(p.getDescription());
-        setEntryMethod(p.getElectronicInd());
-        setEthnicity(p.getEthnicGroupInd());
-        setUnkEthnicRsn(p.getEthnicUnkReasonCd());
-        setLastChgUserId(p.getLastChgUserId());
-        setLastChgTime(p.getLastChgTime());
-        setLocalId(p.getLocalId());
-        setMaritalStatus(p.getMaritalStatusCd());
-        setPrimaryOccupation(p.getOccupationCd());
-        setPatientMprUid(p.getPersonParentUid());
-        setPreferredGender(p.getPreferredGenderCd());
-        setPrimaryLanguage(p.getPrimLangCd());
-        setRecordStatus(p.getRecordStatusCd());
-        setCurrSexUnkRsn(p.getSexUnkReasonCd());
-        setSpeaksEnglish(p.getSpeaksEnglishCd());
-
-        // Fn() - Auth_User
-        setAddUserName(p.getAddUserName());
-        setLastChgUserName(p.getLastChgUserName());
-        return this;
-    }
 
     /**
      * List of Required Fields

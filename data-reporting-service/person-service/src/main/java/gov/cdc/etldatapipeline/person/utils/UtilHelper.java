@@ -6,9 +6,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import gov.cdc.etldatapipeline.person.model.dto.DataProps.DataEnvelope;
-import gov.cdc.etldatapipeline.person.model.dto.DataProps.DataField;
-import gov.cdc.etldatapipeline.person.model.dto.DataProps.DataSchema;
+import gov.cdc.etldatapipeline.person.model.avro.DataEnvelope;
+import gov.cdc.etldatapipeline.person.model.avro.DataField;
+import gov.cdc.etldatapipeline.person.model.avro.DataSchema;
 import gov.cdc.etldatapipeline.person.model.dto.DataRequiredFields;
 import gov.cdc.etldatapipeline.person.model.odse.DebeziumMetadata;
 import lombok.NoArgsConstructor;
@@ -75,7 +75,7 @@ public class UtilHelper {
         return null;
     }
 
-    public <T extends DataRequiredFields> DataEnvelope constructDataEnvelope(T obj) {
+    public <T extends DataRequiredFields> DataEnvelope buildAvroRecord(T obj) {
         Set<DataField> dataFields = new HashSet<>();
         try {
             for (Field field : obj.getClass().getDeclaredFields()) {

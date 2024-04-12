@@ -6,16 +6,17 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import gov.cdc.etldatapipeline.person.model.dto.DataRequiredFields;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.util.Set;
 
+/**
+ * Data model for the Provider Reporting Table
+ */
 @Data
-@NoArgsConstructor
+@Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ToString(callSuper = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProviderReporting implements PersonExtendedProps, DataRequiredFields {
     private Long providerUid;
@@ -55,7 +56,7 @@ public class ProviderReporting implements PersonExtendedProps, DataRequiredField
     private String zip;
     private String county;
     private String countyCode;
-    private String countryCode;
+    private String country;
     private String addressComments;
 
 
@@ -66,31 +67,14 @@ public class ProviderReporting implements PersonExtendedProps, DataRequiredField
     private String phoneCell;
 
     //Email
-    private String emailWork;
+    @JsonProperty("email_work")
+    private String email;
 
     //Entity
+    @JsonProperty("quick_code")
     private String providerQuickCode;
     private String providerRegistrationNum;
     private String providerRegistrationNumAuth;
-
-    /***
-     * Transform the Name, Address,  Telephone, Email, EntityData(SSN), AddAuthUser, ChangeAuthUser
-     * @return Fully Transformed Provider Object
-     */
-    public ProviderReporting constructObject(Provider p) {
-        setProviderUid(p.getPersonUid());
-        setLocalId(p.getLocalId());
-        setRecordStatus(p.getRecordStatusCd());
-        setEntryMethod(p.getElectronicInd());
-        setGeneralComments(p.getDescription());
-        setAddUserId(p.getAddUserId());
-        setLastChgUserId(p.getLastChgUserId());
-        setAddUserName(p.getAddUserName());
-        setLastChgUserName(p.getLastChgUserName());
-        setLastChgTime(p.getLastChgTime());
-        setAddTime(p.getAddTime());
-        return this;
-    }
 
     /**
      * List of Required Fields
@@ -101,10 +85,4 @@ public class ProviderReporting implements PersonExtendedProps, DataRequiredField
     public Set<String> getRequiredFields() {
         return Set.of("providerUid");
     }
-
-    @Override
-    public void setEmail(String email) {
-        setEmailWork(email);
-    }
-
 }

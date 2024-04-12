@@ -509,7 +509,7 @@
     "county_code": "13135",
     "country_code": "840",
     "home_country": "United States",
-    "within_city_limits": null,
+    "within_city_limits": "Y",
     "addr_elp_cd": "H",
     "addr_elp_use_cd": "H",
     "addr_pl_uid": 10000010,

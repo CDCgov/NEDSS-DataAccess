@@ -8,7 +8,7 @@
     "nm_use_cd": "L",
     "nmSuffix": null,
     "nmDegree": null,
-    "person_uid": 10000008
+    "pn_person_uid": 10000008
   },
   {
     "lastNm": "Singgh",
@@ -19,7 +19,7 @@
     "nm_use_cd": "L",
     "nmSuffix": "Jr",
     "nmDegree": null,
-    "person_uid": 10000009
+    "pn_person_uid": 10000009
   },
   {
     "lastNm": "TestNm",
@@ -30,6 +30,6 @@
     "nm_use_cd": "L",
     "nmSuffix": "Jr",
     "nmDegree": null,
-    "person_uid": ""
+    "pn_person_uid": ""
   }
 ]

@@ -3,13 +3,13 @@
     "raceCd": "2028-9",
     "raceDescTxt": null,
     "raceCategoryCd": "2028-9",
-    "person_uid": 10000008
+    "pr_person_uid": 10000008
   },
   {
     "raceCd": "2028-9",
     "raceDescTxt": "Amer Indian",
     "raceCategoryCd": "2028-9",
-    "person_uid": 10000009
+    "pr_person_uid": 10000009
   },
   {
     "raceCd": ""

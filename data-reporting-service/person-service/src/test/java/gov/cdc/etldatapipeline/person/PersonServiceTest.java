@@ -2,17 +2,20 @@ package gov.cdc.etldatapipeline.person;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import gov.cdc.etldatapipeline.person.model.dto.DataProps.DataEnvelope;
+import gov.cdc.etldatapipeline.person.model.avro.DataEnvelope;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
-import gov.cdc.etldatapipeline.person.model.dto.patient.Patient;
+import gov.cdc.etldatapipeline.person.model.dto.patient.PatientElasticSearch;
 import gov.cdc.etldatapipeline.person.model.dto.patient.PatientReporting;
+import gov.cdc.etldatapipeline.person.model.dto.patient.PatientSp;
 import gov.cdc.etldatapipeline.person.model.dto.persondetail.*;
-import gov.cdc.etldatapipeline.person.model.dto.provider.Provider;
+import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderElasticSearch;
 import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderReporting;
+import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderSp;
 import gov.cdc.etldatapipeline.person.repository.PatientRepository;
 import gov.cdc.etldatapipeline.person.repository.ProviderRepository;
-import gov.cdc.etldatapipeline.person.service.KafkaStreamsService;
-import org.apache.commons.io.FileUtils;
+import gov.cdc.etldatapipeline.person.service.PersonService;
+import gov.cdc.etldatapipeline.person.transformer.PersonTransformers;
+import gov.cdc.etldatapipeline.person.transformer.PersonType;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.kafka.streams.*;
@@ -22,10 +25,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Properties;
 
@@ -33,13 +34,15 @@ import static gov.cdc.etldatapipeline.person.TestUtils.readFileData;
 import static org.mockito.ArgumentMatchers.anyString;
 
 @ExtendWith(MockitoExtension.class)
-public class KafkaStreamsServiceTest {
+public class PersonServiceTest {
 
     @Mock
     PatientRepository patientRepository;
 
     @Mock
     ProviderRepository providerRepository;
+
+    PersonTransformers tx = new PersonTransformers();
 
     private final String personTopic = "PersonTopic";
     private final String patientElasticTopic = "PatientElasticTopic";
@@ -51,10 +54,11 @@ public class KafkaStreamsServiceTest {
 
     @Test
     public void processPatientReportingData() {
-        Patient patient = constructPatient();
-        Mockito.when(patientRepository.computePatients(anyString())).thenReturn(List.of(patient));
+        PatientSp patientSp = constructPatient();
+        Mockito.when(patientRepository.computePatients(anyString())).thenReturn(List.of(patientSp));
         //Build expected unflattened Provider
-        PatientReporting expectedPf = new PatientReporting().constructObject(patient);
+        PatientReporting expectedPf
+                = (PatientReporting) tx.processData(patientSp, PersonType.PATIENT_REPORTING).getPayload();
         //Construct transformed patient
         constructPatPrvFull(expectedPf);
 
@@ -69,10 +73,11 @@ public class KafkaStreamsServiceTest {
 
     @Test
     public void processPatientElasticSearchData() {
-        Patient patient = constructPatient();
-        Mockito.when(patientRepository.computePatients(anyString())).thenReturn(List.of(patient));
+        PatientSp patientSp = constructPatient();
+        Mockito.when(patientRepository.computePatients(anyString())).thenReturn(List.of(patientSp));
         //Build expected unflattened Provider
-        PatientReporting expectedPf = new PatientReporting().constructObject(patient);
+        PatientElasticSearch expectedPf
+                = (PatientElasticSearch) tx.processData(patientSp, PersonType.PATIENT_ELASTIC_SEARCH).getPayload();
         //Construct transformed patient
         constructPatPrvFull(expectedPf);
 
@@ -87,11 +92,13 @@ public class KafkaStreamsServiceTest {
 
     @Test
     public void processProviderReportingData() {
-        Provider constructedProvider = constructProvider();
-        Mockito.when(providerRepository.computeProviders(anyString())).thenReturn(List.of(constructedProvider));
+        ProviderSp providerSp = constructProvider();
+        Mockito.when(providerRepository.computeProviders(anyString())).thenReturn(List.of(providerSp));
 
         //Build expected unflattened Provider
-        ProviderReporting expectedPf = new ProviderReporting().constructObject(constructedProvider);
+        ProviderReporting expectedPf
+                = (ProviderReporting) tx.processData(providerSp, PersonType.PROVIDER_REPORTING).getPayload();
+
         //Augment Provider with the flattened data
         constructPatPrvFull(expectedPf);
 
@@ -106,11 +113,13 @@ public class KafkaStreamsServiceTest {
 
     @Test
     public void processProviderElasticSearchData() {
-        Provider constructedProvider = constructProvider();
-        Mockito.when(providerRepository.computeProviders(anyString())).thenReturn(List.of(constructedProvider));
+        ProviderSp providerSp = constructProvider();
+        Mockito.when(providerRepository.computeProviders(anyString())).thenReturn(List.of(providerSp));
 
         //Build expected unflattened Provider
-        ProviderReporting expectedPf = new ProviderReporting().constructObject(constructedProvider);
+        ProviderElasticSearch expectedPf
+                = (ProviderElasticSearch) tx.processData(providerSp, PersonType.PROVIDER_ELASTIC_SEARCH).getPayload();
+
         //Augment Provider with the flattened data
         constructPatPrvFull(expectedPf);
 
@@ -138,12 +147,11 @@ public class KafkaStreamsServiceTest {
             String outputTopicName,
             String expectedValueFilePath,
             String expectedKeyFilePath) {
+        PersonService ks = getKafkaStreamService();
         StreamsBuilder streamsBuilder = new StreamsBuilder();
-        KafkaStreamsService ks = getKafkaStreamService();
         ks.processMessage(streamsBuilder);
         Topology topology = streamsBuilder.build();
         try (TopologyTestDriver topologyTestDriver = new TopologyTestDriver(topology, new Properties())) {
-
             TestInputTopic<String, String> inputTopic = topologyTestDriver
                     .createInputTopic(inputTopicName, new StringSerializer(), new StringSerializer());
 
@@ -160,10 +168,7 @@ public class KafkaStreamsServiceTest {
             DataEnvelope<DataEnvelope> actualValue
                     = objectMapper.readValue(actualData.get(0).value, dataEnvelopeTypeReference);
             Assertions.assertEquals(
-                    objectMapper.readValue(FileUtils.readFileToString(
-                                    new ClassPathResource(expectedValueFilePath).getFile(),
-                                    Charset.defaultCharset()),
-                            dataEnvelopeTypeReference),
+                    objectMapper.readValue(TestUtils.readFileData(expectedValueFilePath), dataEnvelopeTypeReference),
                     actualValue);
 
             //Validate the Patient Key
@@ -171,10 +176,7 @@ public class KafkaStreamsServiceTest {
                     = objectMapper.readValue(actualData.get(0).key, dataEnvelopeTypeReference);
             //Construct expected Patient Key
             Assertions.assertEquals(
-                    objectMapper.readValue(FileUtils.readFileToString(
-                                    new ClassPathResource(expectedKeyFilePath).getFile(),
-                                    Charset.defaultCharset()),
-                            dataEnvelopeTypeReference),
+                    objectMapper.readValue(TestUtils.readFileData(expectedKeyFilePath), dataEnvelopeTypeReference),
                     actualKey);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -182,8 +184,8 @@ public class KafkaStreamsServiceTest {
     }
 
 
-    private KafkaStreamsService getKafkaStreamService() {
-        KafkaStreamsService ks = new KafkaStreamsService(patientRepository, providerRepository);
+    private PersonService getKafkaStreamService() {
+        PersonService ks = new PersonService(patientRepository, providerRepository, new PersonTransformers());
         ks.setPersonTopicName(personTopic);
         ks.setPatientElasticSearchTopicName(patientElasticTopic);
         ks.setPatientReportingOutputTopic(patientReportingTopic);
@@ -192,107 +194,109 @@ public class KafkaStreamsServiceTest {
         return ks;
     }
 
-    private Patient constructPatient() {
-        Patient p = new Patient();
-        p.setPatientUid(10000001L);
+    private PatientSp constructPatient() {
         String filePathPrefix = "rawDataFiles/person/";
-        p.setNameNested(readFileData(filePathPrefix + "PersonName.json"));
-        p.setAddressNested(readFileData(filePathPrefix + "PersonAddress.json"));
-        p.setRaceNested(readFileData(filePathPrefix + "PersonRace.json"));
-        p.setTelephoneNested(readFileData(filePathPrefix + "PersonTelephone.json"));
-        p.setEntityDataNested(readFileData(filePathPrefix + "PersonEntityData.json"));
-        p.setEmailNested(readFileData(filePathPrefix + "PersonEmail.json"));
-        return p;
+        return PatientSp.builder()
+                .personUid(10000001L)
+                .nameNested(readFileData(filePathPrefix + "PersonName.json"))
+                .addressNested(readFileData(filePathPrefix + "PersonAddress.json"))
+                .raceNested(readFileData(filePathPrefix + "PersonRace.json"))
+                .telephoneNested(readFileData(filePathPrefix + "PersonTelephone.json"))
+                .entityDataNested(readFileData(filePathPrefix + "PersonEntityData.json"))
+                .emailNested(readFileData(filePathPrefix + "PersonEmail.json"))
+                .build();
     }
 
-    private Provider constructProvider() {
-        Provider p = new Provider();
-        p.setPersonUid(10000001L);
+    private ProviderSp constructProvider() {
         String filePathPrefix = "rawDataFiles/person/";
-        p.setNameNested(readFileData(filePathPrefix + "PersonName.json"));
-        p.setAddressNested(readFileData(filePathPrefix + "PersonAddress.json"));
-        p.setTelephoneNested(readFileData(filePathPrefix + "PersonTelephone.json"));
-        p.setEntityDataNested(readFileData(filePathPrefix + "PersonEntityData.json"));
-        p.setEmailNested(readFileData(filePathPrefix + "PersonEmail.json"));
-        return p;
+        return ProviderSp.builder()
+                .personUid(10000001L)
+                .nameNested(readFileData(filePathPrefix + "PersonName.json"))
+                .addressNested(readFileData(filePathPrefix + "PersonAddress.json"))
+                .telephoneNested(readFileData(filePathPrefix + "PersonTelephone.json"))
+                .entityDataNested(readFileData(filePathPrefix + "PersonEntityData.json"))
+                .emailNested(readFileData(filePathPrefix + "PersonEmail.json"))
+                .build();
     }
 
     private <T extends PersonExtendedProps> void constructPatPrvFull(T patProv) {
-        Name name = new Name();
-        name.setLastNm("Singgh");
-        name.setMiddleNm("Js");
-        name.setFirstNm("Suurma");
-        name.setNmSuffix("Jr");
-        name.updatePerson(patProv);
+        // Name
+        Name.builder()
+                .lastNm("Singgh")
+                .middleNm("Js")
+                .firstNm("Suurma")
+                .nmSuffix("Jr")
+                .build().updatePerson(patProv);
 
-        Address address = new Address();
-        address.setStreetAddr1("123 Main St.");
-        address.setStreetAddr2("");
-        address.setCity("Atlanta");
-        address.setZip("30025");
-        address.setCntyCd("13135");
-        address.setCounty("Gwinnett County");
-        address.setState("13");
-        address.setStateDesc("Georgia");
-        address.setCntryCd("840");
-        address.setHomeCountry("United States");
-        address.setBirthCountry("Canada");
-        address.updatePerson(patProv);
-
-        Phone workPhone = new Phone();
-        workPhone.setTelephoneNbr("2323222422");
-        workPhone.setExtensionTxt("232");
-        workPhone.setUseCd("WP");
-        workPhone.updatePerson(patProv);
-
-        Phone homePhone = new Phone();
-        homePhone.setTelephoneNbr("4562323222");
-        homePhone.setExtensionTxt("211");
-        homePhone.setUseCd("H");
-        homePhone.updatePerson(patProv);
+        // Address
+        Address.builder()
+                .streetAddr1("123 Main St.")
+                .streetAddr2("")
+                .city("Atlanta")
+                .zip("30025")
+                .cntyCd("13135")
+                .county("Gwinnett County")
+                .state("13")
+                .stateDesc("Georgia")
+                .cntryCd("840")
+                .homeCountry("United States")
+                .birthCountry("Canada")
+                .build()
+                .updatePerson(patProv);
 
 
-        Phone cellPhone = new Phone();
-        cellPhone.setTelephoneNbr("2823252423");
-        cellPhone.setUseCd("CP");
-        cellPhone.updatePerson(patProv);
+        // Work Phone
+        Phone.builder().telephoneNbr("2323222422").extensionTxt("232").cd("WP").build().updatePerson(patProv);
+
+        // Home Phone
+        Phone.builder().telephoneNbr("4562323222").extensionTxt("211").cd("H").build().updatePerson(patProv);
+
+        // Cell Phone
+        Phone.builder().telephoneNbr("2823252423").cd("CP").build().updatePerson(patProv);
+
+        // Race
+        Race.builder()
+                .raceCd("2028-9")
+                .raceCategoryCd("2028-9")
+                .raceDescTxt("Amer Indian")
+                .build()
+                .updatePerson(patProv);
 
 
-        Race race = new Race();
-        race.setRaceCd("2028-9");
-        race.setRaceCategoryCd("2028-9");
-        race.setRaceDescTxt("Amer Indian");
-        race.updatePerson(patProv);
+        // SSN
+        EntityData.builder()
+                .rootExtensionTxt("313431144414")
+                .assigningAuthorityCd("SSA")
+                .build()
+                .updatePerson(patProv);
 
 
-        EntityData ssa = new EntityData();
-        ssa.setRootExtensionTxt("313431144414");
-        ssa.setAssigningAuthorityCd("SSA");
-        ssa.updatePerson(patProv);
+        // Patient Number
+        EntityData.builder()
+                .typeCd("PN")
+                .rootExtensionTxt("56743114514")
+                .assigningAuthorityCd("2.16.740.1.113883.3.1147.1.1002")
+                .build()
+                .updatePerson(patProv);
 
+        //QEC
+        EntityData.builder()
+                .typeCd("QEC")
+                .rootExtensionTxt("12314286")
+                .build()
+                .updatePerson(patProv);
 
-        EntityData pn = new EntityData();
-        pn.setTypeCd("PN");
-        pn.setRootExtensionTxt("56743114514");
-        pn.setAssigningAuthorityCd("2.16.740.1.113883.3.1147.1.1002");
-        pn.updatePerson(patProv);
+        //RegNum
+        EntityData.builder()
+                .typeCd("PRN")
+                .rootExtensionTxt("86741517517")
+                .assigningAuthorityCd("3.16.740.1.113883.3.1147.1.1002")
+                .build()
+                .updatePerson(patProv);
 
+        // Email
+        Email.builder().emailAddress("someone2@email.com").build().updatePerson(patProv);
 
-        EntityData qec = new EntityData();
-        qec.setTypeCd("QEC");
-        qec.setRootExtensionTxt("12314286");
-        qec.updatePerson(patProv);
-
-        EntityData regNum = new EntityData();
-        regNum.setTypeCd("PRN");
-        regNum.setRootExtensionTxt("86741517517");
-        regNum.setAssigningAuthorityCd("3.16.740.1.113883.3.1147.1.1002");
-        regNum.updatePerson(patProv);
-
-
-        Email email = new Email();
-        email.setEmailAddress("someone2@email.com");
-        email.updatePerson(patProv);
     }
 
 }

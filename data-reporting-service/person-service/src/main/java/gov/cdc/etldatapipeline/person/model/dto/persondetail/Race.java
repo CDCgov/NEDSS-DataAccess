@@ -4,18 +4,20 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Race {
+public class Race implements ExtendPerson {
     private String raceCd;
     private String raceDescTxt;
     private String raceCategoryCd;
-    @JsonProperty("person_uid")
+    @JsonProperty("pr_person_uid")
     private Long personUid;
 
     public <T extends PersonExtendedProps> T updatePerson(T personFull) {

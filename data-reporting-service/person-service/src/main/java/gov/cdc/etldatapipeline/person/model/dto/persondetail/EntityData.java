@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.util.StringUtils;
@@ -12,7 +13,8 @@ import org.springframework.util.StringUtils;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class EntityData {
+@Builder
+public class EntityData implements ExtendPerson {
     @JsonProperty("entity_uid")
     private Long entityUid;
     private String typeCd;
@@ -20,7 +22,7 @@ public class EntityData {
     private String rootExtensionTxt;
     @JsonProperty("entity_id_seq")
     private Integer entityIdSeq;
-    @JsonProperty("ASSIGNING_AUTHORITY_CD")
+    @JsonProperty("assigning_authority_cd")
     private String assigningAuthorityCd;
 
     public <T extends PersonExtendedProps> T updatePerson(T personFull) {
