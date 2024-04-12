@@ -20,27 +20,28 @@ import java.util.Map;
 @EnableKafkaStreams
 public class KafkaStreamsConfig {
 
-	@Value("${spring.kafka.bootstrap-servers}")
-	private String bootstrapServers;
+    @Value("${spring.kafka.bootstrap-servers}")
+    private String bootstrapServers;
 
-	@Value("${spring.kafka.streams.application-id}")
-	private String applicationId;
+    @Value("${spring.kafka.streams.application-id}")
+    private String applicationId;
 
-	@Value("${spring.kafka.producer.key-serializer}")
-	private String keySerializer;
+    @Value("${spring.kafka.producer.key-serializer}")
+    private String keySerializer;
 
-	@Value("${spring.kafka.producer.value-serializer}")
-	private String valueSerializer;
+    @Value("${spring.kafka.producer.value-serializer}")
+    private String valueSerializer;
 
-	@Bean(name = KafkaStreamsDefaultConfiguration.DEFAULT_STREAMS_CONFIG_BEAN_NAME)
-	public KafkaStreamsConfiguration kStreamsConfigs() {
-		Map<String, Object> props = new HashMap<>();
-		props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-		props.put(StreamsConfig.APPLICATION_ID_CONFIG, applicationId);
-		props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, keySerializer);
-		props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, valueSerializer);
+    @Bean(name = KafkaStreamsDefaultConfiguration.DEFAULT_STREAMS_CONFIG_BEAN_NAME)
+    public KafkaStreamsConfiguration kStreamsConfigs() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        props.put(StreamsConfig.APPLICATION_ID_CONFIG, applicationId);
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, keySerializer);
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, valueSerializer);
+        //props.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, "http://localhost:8085");
 
-		return new KafkaStreamsConfiguration(props);
-	}
+        return new KafkaStreamsConfiguration(props);
+    }
 
 }

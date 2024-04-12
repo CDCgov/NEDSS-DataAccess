@@ -6,22 +6,18 @@ spring:
     stream:
       input:
         person:
-          topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Person
-        provider:
-          topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Provider.input
-        patient:
-          topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Patient.input
-        organization:
-          topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Organization.input
+          topic-name: nbs_Person
         defaultData:
-          topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Default.input
+          topic-name: nbs_default
       output:
-          provider:
-            topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Provider.output
-          patient:
-            topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Patient.output
-          organization:
-            topic-name: cdc.${DB_ODSE:nbs_odse}.dbo.Organization.output
+        providerElastic:
+          topic-name: ${PROVIDER_ELASTIC:nrt_provider_elastic}
+        providerReporting:
+          topic-name: ${PROVIDER_REPORTING:nrt_provider}
+        patientElastic:
+          topic-name: ${PATIENT_ELASTIC:nrt_patient_elastic}
+        patientReporting:
+          topic-name: ${PATIENT_REPORTING:nrt_patient}
 
     streams:
       application-id: debezium-cdc-consumer-app-1

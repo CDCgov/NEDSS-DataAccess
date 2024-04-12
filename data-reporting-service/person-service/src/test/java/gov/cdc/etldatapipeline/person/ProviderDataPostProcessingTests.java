@@ -1,35 +1,38 @@
 package gov.cdc.etldatapipeline.person;
 
-import gov.cdc.etldatapipeline.person.model.dto.provider.Provider;
-import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderFull;
-import org.apache.commons.io.FileUtils;
+import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderReporting;
+import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderSp;
+import gov.cdc.etldatapipeline.person.transformer.PersonTransformers;
+import gov.cdc.etldatapipeline.person.transformer.PersonType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
+import static gov.cdc.etldatapipeline.person.TestUtils.readFileData;
+
 public class ProviderDataPostProcessingTests {
+    private static final String FILE_PREFIX = "rawDataFiles/person/";
+    PersonTransformers tx = new PersonTransformers();
+
     @Test
     public void consolidatedProviderTransformationTest() {
 
         // Build the PatientProvider object with the json serialized data
-        Provider p = new Provider();
-        p.setName(readFileData("PersonName.json"));
-        p.setAddress(readFileData("PersonAddress.json"));
-        p.setTelephone(readFileData("PersonTelephone.json"));
-        p.setAddAuthNested(readFileData("PersonAddAuthUser.json"));
-        p.setChgAuthNested(readFileData("PersonChgAuthUser.json"));
-        p.setEntityData(readFileData("PersonEntityData.json"));
-        p.setEmail(readFileData("PersonEmail.json"));
+        ProviderSp p = ProviderSp.builder()
+                .personUid(10000001L)
+                .nameNested(readFileData(FILE_PREFIX + "PersonName.json"))
+                .addressNested(readFileData(FILE_PREFIX + "PersonAddress.json"))
+                .telephoneNested(readFileData(FILE_PREFIX + "PersonTelephone.json"))
+                .entityDataNested(readFileData(FILE_PREFIX + "PersonEntityData.json"))
+                .emailNested(readFileData(FILE_PREFIX + "PersonEmail.json"))
+                .build();
 
         // PatientProvider Fields to be processed
-        Function<ProviderFull, List<Object>> pDetailsFn = (pf) -> Arrays.asList(
+        Function<ProviderReporting, List<Object>> pDetailsFn = (pf) -> Arrays.asList(
                 pf.getLastNm(),
                 pf.getMiddleNm(),
                 pf.getFirstNm(),
@@ -42,27 +45,17 @@ public class ProviderDataPostProcessingTests {
                 pf.getCounty(),
                 pf.getStateCode(),
                 pf.getState(),
-                pf.getCountryCode(),
                 pf.getCountry(),
-                pf.getBirthCountry(),
                 pf.getPhoneWork(),
                 pf.getPhoneExtWork(),
-                pf.getPhoneHome(),
-                pf.getPhoneExtHome(),
                 pf.getPhoneCell(),
-                pf.getAddedBy(),
-                pf.getLastChangedBy(),
-                pf.getSsn(),
-                pf.getPatientNumber(),
-                pf.getPatientNumberAuth(),
                 pf.getProviderQuickCode(),
                 pf.getProviderRegistrationNum(),
                 pf.getProviderRegistrationNumAuth(),
                 pf.getEmail());
 
         // Process the respective field json to PatientProvider fields
-        ProviderFull pf = p.processProvider();
-        // Expected
+        ProviderReporting pf = (ProviderReporting) tx.processData(p, PersonType.PROVIDER_REPORTING).getPayload();
         List<Object> expected = Arrays.asList(
                 "Singgh",
                 "Js",
@@ -76,19 +69,10 @@ public class ProviderDataPostProcessingTests {
                 "Gwinnett County",
                 "13",
                 "Georgia",
-                "840",
                 "United States",
-                "Canada",
                 "2323222422",
                 "232",
-                "4562323222",
-                "211",
                 "2823252423",
-                10000000L,
-                470200741L,
-                "313431144414",
-                "56743114514",
-                "2.16.740.1.113883.3.1147.1.1002",
                 "12314286",
                 "86741517517",
                 "3.16.740.1.113883.3.1147.1.1002",
@@ -101,18 +85,20 @@ public class ProviderDataPostProcessingTests {
     public void PatientProviderNameTransformationTest() {
 
         // Build the PatientProvider object with the json serialized data
-        Provider personOp = new Provider();
-        personOp.setName(readFileData("PersonName.json"));
+        ProviderSp prov = ProviderSp.builder()
+                .personUid(10000001L)
+                .nameNested(readFileData(FILE_PREFIX + "PersonName.json"))
+                .build();
 
         // PatientProviderProvider Fields to be processed
-        Function<Provider, List<String>> pDetailsFn = (p) -> Arrays.asList(
+        Function<ProviderReporting, List<String>> pDetailsFn = (p) -> Arrays.asList(
                 p.getLastNm(),
                 p.getMiddleNm(),
                 p.getFirstNm(),
                 p.getNmSuffix());
         // Process the respective field json to PatientProviderProvider fields
-        ProviderFull pf = personOp.processProvider();
-        // Expected
+        ProviderReporting pf = (ProviderReporting) tx.processData(prov, PersonType.PROVIDER_REPORTING).getPayload();
+
         List<String> expected = Arrays.asList(
                 "Singgh",
                 "Js",
@@ -126,11 +112,13 @@ public class ProviderDataPostProcessingTests {
     public void PatientProviderAddressTransformationTest() {
 
         // Build the PatientProvider object with the json serialized data
-        Provider perOp = new Provider();
-        perOp.setAddress(readFileData("PersonAddress.json"));
+        ProviderSp prov = ProviderSp.builder()
+                .personUid(10000001L)
+                .addressNested(readFileData(FILE_PREFIX + "PersonAddress.json"))
+                .build();
 
         // PatientProvider Fields to be processed
-        Function<ProviderFull, List<String>> pDetailsFn = (p) -> Arrays.asList(
+        Function<ProviderReporting, List<String>> pDetailsFn = (p) -> Arrays.asList(
                 p.getStreetAddress1(),
                 p.getStreetAddress2(),
                 p.getCity(),
@@ -139,12 +127,9 @@ public class ProviderDataPostProcessingTests {
                 p.getCounty(),
                 p.getStateCode(),
                 p.getState(),
-                p.getCountryCode(),
-                p.getCountry(),
-                p.getBirthCountry());
+                p.getCountry());
         // Process the respective field json to PatientProvider fields
-        ProviderFull pf = perOp.processProvider();
-        // Expected
+        ProviderReporting pf = (ProviderReporting) tx.processData(prov, PersonType.PROVIDER_REPORTING).getPayload();
         List<String> expected = Arrays.asList(
                 "123 Main St.",
                 "",
@@ -154,9 +139,7 @@ public class ProviderDataPostProcessingTests {
                 "Gwinnett County",
                 "13",
                 "Georgia",
-                "840",
-                "United States",
-                "Canada");
+                "United States");
         // Validate the PatientProvider field processing
         Assertions.assertEquals(expected, pDetailsFn.apply(pf));
     }
@@ -165,74 +148,40 @@ public class ProviderDataPostProcessingTests {
     public void PatientProviderTelephoneTransformationTest() {
 
         // Build the PatientProvider object with the json serialized data
-        Provider personOp = new Provider();
-        personOp.setTelephone(readFileData("PersonTelephone.json"));
-
-        // PatientProvider Fields to be processed
-        Function<ProviderFull, List<String>> pDetailsFn = (p) -> Arrays.asList(
-                p.getPhoneWork(),
-                p.getPhoneExtWork(),
-                p.getPhoneHome(),
-                p.getPhoneExtHome(),
-                p.getPhoneCell());
+        ProviderSp prov = ProviderSp.builder()
+                .personUid(10000001L)
+                .telephoneNested(readFileData(FILE_PREFIX + "PersonTelephone.json"))
+                .build();
         // Process the respective field json to PatientProvider fields
-        ProviderFull pf = personOp.processProvider();
-        // Expected
-        List<String> expected = Arrays.asList(
-                "2323222422",
-                "232",
-                "4562323222",
-                "211",
-                "2823252423");
+        ProviderReporting pf = (ProviderReporting) tx.processData(prov, PersonType.PROVIDER_REPORTING).getPayload();
+        ProviderReporting expectedPf = ProviderReporting.builder()
+                .providerUid(10000001L)
+                .phoneWork("2323222422")
+                .phoneExtWork("232")
+                .phoneCell("2823252423")
+                .build();
         // Validate the PatientProvider field processing
-        Assertions.assertEquals(expected, pDetailsFn.apply(pf));
-    }
-
-    @Test
-    public void PatientProviderAddChangeAuthUserTransformationTest() {
-
-        // Build the PatientProvider object with the json serialized data
-        Provider personOp = new Provider();
-        personOp.setAddAuthNested(readFileData("PersonAddAuthUser.json"));
-        personOp.setChgAuthNested(readFileData("PersonChgAuthUser.json"));
-
-        // PatientProvider Fields to be processed
-        Function<ProviderFull, List<Long>> pDetailsFn = (p) -> Arrays.asList(
-                p.getAddedBy(),
-                p.getLastChangedBy());
-        // Process the respective field json to PatientProvider fields
-        ProviderFull pf = personOp.processProvider();
-        // Expected
-        List<Long> expected = Arrays.asList(
-                10000000L,
-                470200741L);
-        // Validate the PatientProvider field processing
-        Assertions.assertEquals(expected, pDetailsFn.apply(pf));
+        Assertions.assertEquals(expectedPf, pf);
     }
 
     @Test
     public void PatientProviderEntityDataTransformationTest() {
 
         // Build the PatientProvider object with the json serialized data
-        Provider personOp = new Provider();
-        personOp.setEntityData(readFileData("PersonEntityData.json"));
+        ProviderSp prov = ProviderSp.builder()
+                .personUid(10000001L)
+                .entityDataNested(readFileData(FILE_PREFIX + "PersonEntityData.json"))
+                .build();
 
         // PatientProvider Fields to be processed
-        Function<ProviderFull, List<String>> pDetailsFn = (p) -> Arrays.asList(
-                p.getSsn(),
-                p.getPatientNumber(),
-                p.getPatientNumberAuth(),
+        Function<ProviderReporting, List<String>> pDetailsFn = (p) -> Arrays.asList(
                 p.getProviderQuickCode(),
                 p.getProviderRegistrationNum(),
                 p.getProviderRegistrationNumAuth());
 
         // Process the respective field json to PatientProvider fields
-        ProviderFull pf = personOp.processProvider();
-        // Expected
+        ProviderReporting pf = (ProviderReporting) tx.processData(prov, PersonType.PROVIDER_REPORTING).getPayload();
         List<String> expected = List.of(
-                "313431144414",
-                "56743114514",
-                "2.16.740.1.113883.3.1147.1.1002",
                 "12314286",
                 "86741517517",
                 "3.16.740.1.113883.3.1147.1.1002");
@@ -244,28 +193,19 @@ public class ProviderDataPostProcessingTests {
     public void PatientProviderEmailTransformationTest() {
 
         // Build the PatientProvider object with the json serialized data
-        Provider personOp = new Provider();
-        personOp.setEmail(readFileData("PersonEmail.json"));
+        ProviderSp prov = ProviderSp.builder()
+                .personUid(10000001L)
+                .emailNested(readFileData(FILE_PREFIX + "PersonEmail.json"))
+                .build();
 
         // PatientProvider Fields to be processed
-        Function<ProviderFull, List<String>> pDetailsFn = (p) -> Collections.singletonList(p.getEmail());
+        Function<ProviderReporting, List<String>> pDetailsFn = (p) -> Collections.singletonList(p.getEmail());
 
         // Process the respective field json to PatientProvider fields
-        ProviderFull pf = personOp.processProvider();
-        // Expected
+        ProviderReporting pf = (ProviderReporting) tx.processData(prov, PersonType.PROVIDER_REPORTING).getPayload();
+
         List<String> expected = List.of("someone2@email.com");
         // Validate the PatientProvider field processing
         Assertions.assertEquals(expected, pDetailsFn.apply(pf));
-    }
-
-    private String readFileData(String fileName) {
-        String filePathPrefix = "src/test/resources/rawDataFiles/";
-        try {
-            return FileUtils.readFileToString(
-                    new File(filePathPrefix + fileName),
-                    Charset.defaultCharset());
-        } catch (IOException e) {
-            throw new RuntimeException("File Read failed : " + fileName);
-        }
     }
 }

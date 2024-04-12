@@ -1,0 +1,36 @@
+spring:
+  kafka:
+    stream:
+      input:
+        investigation:
+          topic-name: cdc.nbs_odse.dbo.Investigation
+        defaultData:
+          topic-name: cdc.nbs_odse.dbo.Default.input
+      output:
+        investigation:
+          topic-name: cdc.nbs_odse.dbo.Investigation.output
+          topic-name-transformed: cdc.nbs_odse.dbo.Investigation.output-transformed
+          topic-name-confirmation: cdc.nbs_odse.dbo.Investigation.Confirmation
+          topic-name-notification: cdc.nbs_odse.dbo.Investigation.Notification
+          topic-name-observation: cdc.nbs_odse.dbo.Investigation.Observation
+    streams:
+      application-id: debezium-cdc-consumer-app-1
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:localhost:9092}
+    admin:
+      auto-create: true
+  application:
+    name: data-reporting-service
+  datasource:
+    password: ${DB_PASSWORD:-fake.fake.fake.1234}
+    username: ${DB_USERNAME:-sa}
+    url: jdbc:sqlserver://${DB_URL:localhost}:1433;databaseName=${DB_ODSE:NBS_ODSE};encrypt=true;trustServerCertificate=true;
+  liquibase:
+    change-log: db/changelog/db.changelog-master.yaml
+logging:
+  # Only one config can be active at a time
+  config: classpath:logback-config.xml
+  file:
+    name: InvestigationService.log
+    path: ${DA_LOG_PATH:logs}
+server:
+  port: '8090'

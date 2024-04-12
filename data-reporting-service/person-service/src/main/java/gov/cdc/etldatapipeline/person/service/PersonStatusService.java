@@ -13,8 +13,8 @@ public class PersonStatusService {
     public PersonStatusService() {
     }
 
-    public ResponseEntity<String> getHealthStatus(){
-        LOG.info("Status OK");
-        return ResponseEntity.status(HttpStatus.OK).body("Status OK");
+    public ResponseEntity<String> getHealthStatus() {
+        LOG.info("Person Service Status OK");
+        return ResponseEntity.status(HttpStatus.OK).body("Person Service Status OK");
     }
 }

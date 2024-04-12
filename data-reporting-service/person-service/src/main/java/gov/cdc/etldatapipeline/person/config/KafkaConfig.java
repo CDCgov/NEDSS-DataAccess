@@ -16,20 +16,16 @@ import org.springframework.kafka.config.TopicBuilder;
 public class KafkaConfig {
     @Value("${spring.kafka.stream.input.person.topic-name}")
     private String personTopicName;
-    @Value("${spring.kafka.stream.input.provider.topic-name}")
-    private String providerInputTopicName;
-    @Value("${spring.kafka.stream.input.patient.topic-name}")
-    private String patientInputTopicName;
-    @Value("${spring.kafka.stream.input.organization.topic-name}")
-    private String organizationTopicName;
     @Value("${spring.kafka.stream.input.defaultData.topic-name}")
     private String defaultDataTopicName;
-    @Value("${spring.kafka.stream.output.provider.topic-name}")
-    private String providerAggregateTopicName;
-    @Value("${spring.kafka.stream.output.patient.topic-name}")
-    private String patientAggregateTopicName;
-    @Value("${spring.kafka.stream.output.organization.topic-name}")
-    private String organizationAggregateTopicName;
+    @Value("${spring.kafka.stream.output.providerElastic.topic-name}")
+    private String providerElasticSearchTopic;
+    @Value("${spring.kafka.stream.output.providerReporting.topic-name}")
+    private String providerReportingTopic;
+    @Value("${spring.kafka.stream.output.patientElastic.topic-name}")
+    private String patientElasticSearchTopic;
+    @Value("${spring.kafka.stream.output.patientReporting.topic-name}")
+    private String patientReportingTopic;
 
     @Bean
     public NewTopic createPersonTopicName() {
@@ -38,39 +34,27 @@ public class KafkaConfig {
     }
 
     @Bean
-    public NewTopic createInputProviderTopicName() {
-        log.info("Creating topic : " + providerInputTopicName);
-        return TopicBuilder.name(providerInputTopicName).build();
+    public NewTopic createPatientElasticTopicName() {
+        log.info("Creating topic : " + patientElasticSearchTopic);
+        return TopicBuilder.name(patientElasticSearchTopic).build();
     }
 
     @Bean
-    public NewTopic createAggregateProviderTopicName() {
-        log.info("Creating topic : " + providerAggregateTopicName);
-        return TopicBuilder.name(providerAggregateTopicName).build();
+    public NewTopic createPatientReportingTopicName() {
+        log.info("Creating topic : " + patientReportingTopic);
+        return TopicBuilder.name(patientReportingTopic).build();
     }
 
     @Bean
-    public NewTopic createOrganizationTopicName() {
-        log.info("Creating topic : " + organizationTopicName);
-        return TopicBuilder.name(organizationTopicName).build();
+    public NewTopic createProviderElasticSearchTopicName() {
+        log.info("Creating topic : " + providerElasticSearchTopic);
+        return TopicBuilder.name(providerElasticSearchTopic).build();
     }
 
     @Bean
-    public NewTopic createAggregateOrganizationTopicName() {
-        log.info("Creating topic : " + organizationAggregateTopicName);
-        return TopicBuilder.name(organizationAggregateTopicName).build();
-    }
-
-    @Bean
-    public NewTopic createInputPatientTopicName() {
-        log.info("Creating topic : " + patientInputTopicName);
-        return TopicBuilder.name(patientInputTopicName).build();
-    }
-
-    @Bean
-    public NewTopic createAggregatePatientTopicName() {
-        log.info("Creating topic : " + patientAggregateTopicName);
-        return TopicBuilder.name(patientAggregateTopicName).build();
+    public NewTopic createProviderReportingTopicName() {
+        log.info("Creating topic : " + providerReportingTopic);
+        return TopicBuilder.name(providerReportingTopic).build();
     }
 }
 
