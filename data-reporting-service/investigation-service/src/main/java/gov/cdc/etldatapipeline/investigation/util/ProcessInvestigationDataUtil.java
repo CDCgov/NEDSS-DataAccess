@@ -101,13 +101,13 @@ public class ProcessInvestigationDataUtil {
                     String typeCode = node.get("type_cd").asText();
 
                     if(typeCode.equals("STATE") && actIdSeq == 1) {
-                        investigationTransformed.setInvStateCaseId(node.get("root_extension_txt").asText());
+                        investigationTransformed.setInvStateCaseId(node.get("root_extension_txt").asLong());
                     }
                     if(typeCode.equals("CITY") && actIdSeq == 2) {
-                        investigationTransformed.setCityCountyCaseNbr(node.get("root_extension_txt").asText());
+                        investigationTransformed.setCityCountyCaseNbr(node.get("root_extension_txt").asLong());
                     }
                     if(typeCode.equals("LEGACY") && actIdSeq == 3) {
-                        investigationTransformed.setLegacyCaseId(node.get("root_extension_txt").asText());
+                        investigationTransformed.setLegacyCaseId(node.get("root_extension_txt").asLong());
                     }
                 }
             }

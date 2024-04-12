@@ -8,8 +8,8 @@ public class InvestigationTransformed {
     private Long physicianId;
     private Long patientId;
     private Long organizationId;
-    private String invStateCaseId;
-    private String cityCountyCaseNbr;
-    private String legacyCaseId;
+    private Long invStateCaseId;
+    private Long cityCountyCaseNbr;
+    private Long legacyCaseId;
     private Long phcInvFormId;
 }

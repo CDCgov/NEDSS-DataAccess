@@ -3,18 +3,17 @@ package gov.cdc.etldatapipeline.investigation.repository.model.output;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.time.Instant;
 import java.util.Set;
 
 @Data
-@Builder
+@NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class InvestigationReportingDatabaseModel implements DataRequiredFields {
-    private Long investigationUid;
+    private Long publicHealthCaseUid;
     private Long programJurisdictionOid;
     private String jurisdictionCode;
     private String jurisdictionCodeDescTxt;
@@ -29,33 +28,33 @@ public class InvestigationReportingDatabaseModel implements DataRequiredFields {
     private String jurisdictionCd;
     private String pregnantIndCd;
     private String localId;
-    private Instant rptFormCmpltTime;
-    private Instant activityToTime;
-    private Instant activityFromTime;
-    private Long addUserId;
-    private String addUserName;
-    private Instant addTime;
-    private Long lastChgUserId;
-    private String lastChgUserName;
-    private Instant lastChgTime;
+    private String rptFormCmpltTime;
+    private String activityToTime;
+    private String activityFromTime;
     private String currProcessStateCd;
     private String investigationStatusCd;
     private String recordStatusCd;
-    private Long notificationLocalId;
-    private Instant notificationAddTime;
+    private String notificationLocalId;
+    private String notificationAddTime;
     private String notificationRecordStatusCd;
-    private Instant notificationLastChgTime;
+    private String notificationLastChgTime;
     private Long investigatorId;
     private Long physicianId;
     private Long patientId;
     private Long organizationId;
-    private String invStateCaseId;
-    private String cityCountyCaseNbr;
-    private String legacyCaseId;
+    private Long invStateCaseId;
+    private Long cityCountyCaseNbr;
+    private Long legacyCaseId;
     private Long phcInvFormId;
+    private Long addUserId;
+    private String addUserName;
+    private String addTime;
+    private Long lastChgUserId;
+    private String lastChgUserName;
+    private String lastChgTime;
 
     @Override
     public Set<String> getRequiredFields() {
-        return Set.of("investigationUid");
+        return Set.of("publicHealthCaseUid");
     }
 }

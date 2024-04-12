@@ -13,6 +13,7 @@ public class InvestigationController {
     private final KafkaProducerService producerService;
     private final String topicName = "cdc.nbs_odse.dbo.Investigation";
 
+
     @PostMapping("/publish")
     public void publishMessageToKafka(@RequestBody String jsonData) {
         producerService.sendMessage(topicName, jsonData);

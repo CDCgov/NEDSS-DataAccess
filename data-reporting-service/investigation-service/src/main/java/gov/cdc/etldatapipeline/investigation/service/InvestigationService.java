@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import gov.cdc.etldatapipeline.investigation.repository.InvestigationRepository;
 import gov.cdc.etldatapipeline.investigation.repository.model.dto.Investigation;
 import gov.cdc.etldatapipeline.investigation.repository.model.dto.InvestigationTransformed;
+import gov.cdc.etldatapipeline.investigation.repository.model.dto.PublicHealthCaseUid;
 import gov.cdc.etldatapipeline.investigation.repository.model.output.InvestigationReportingDatabaseModel;
 import gov.cdc.etldatapipeline.investigation.util.JsonGenerator;
 import gov.cdc.etldatapipeline.investigation.util.ProcessInvestigationDataUtil;
@@ -14,7 +15,6 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.Produced;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.PropertyMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,12 +50,12 @@ public class InvestigationService {
         this.kafkaTemplate = kafkaTemplate;
         this.processDataUtil = processDataUtil;
         this.modelMapper = new ModelMapper();
-        modelMapper.addMappings(new PropertyMap<Investigation, InvestigationReportingDatabaseModel>() {
-            @Override
-            protected void configure() {
-                map().setInvestigationUid(source.getPublicHealthCaseUid());
-            }
-        });
+//        modelMapper.addMappings(new PropertyMap<Investigation, InvestigationReportingDatabaseModel>() {
+//            @Override
+//            protected void configure() {
+//                map().setInvestigationUid(source.getPublicHealthCaseUid());
+//            }
+//        });
     }
 
     @Autowired
@@ -74,20 +74,37 @@ public class InvestigationService {
             JsonNode payloadNode = jsonNode.get("payload").path("after");
             if (payloadNode != null && payloadNode.has("public_health_case_uid")) {
                 String publicHealthCaseUid = payloadNode.get("public_health_case_uid").asText();
+                PublicHealthCaseUid publicHealthCaseUidModel = new PublicHealthCaseUid();
+                publicHealthCaseUidModel.setPublicHealthCaseUid(payloadNode.get("public_health_case_uid").asLong());
                 logger.debug(topicDebugLog, publicHealthCaseUid, investigationTopic);
                 Optional<Investigation> investigationData = investigationRepository.computeInvestigations(publicHealthCaseUid);
                 Investigation investigationForReporting = investigationData.get();
-                InvestigationTransformed investigationTransformed = new InvestigationTransformed();
                 if(investigationData.isPresent()) {
-                    investigationTransformed = processDataUtil.transformInvestigationData(investigationData.get());
+                    InvestigationTransformed investigationTransformed = processDataUtil.transformInvestigationData(investigationData.get());
                     kafkaTemplate.send(investigationTopicOutputTransformed, investigationTransformed.toString());
+
+                    InvestigationReportingDatabaseModel reportingDatabaseModel = modelMapper.map(investigationForReporting, InvestigationReportingDatabaseModel.class);
+                    reportingDatabaseModel.setInvestigatorId(investigationTransformed.getInvestigatorId());
+                    reportingDatabaseModel.setPhysicianId(investigationTransformed.getPhysicianId());
+                    reportingDatabaseModel.setPatientId(investigationTransformed.getPatientId());
+                    reportingDatabaseModel.setOrganizationId(investigationTransformed.getOrganizationId());
+                    reportingDatabaseModel.setInvStateCaseId(investigationTransformed.getInvStateCaseId());
+                    reportingDatabaseModel.setCityCountyCaseNbr(investigationTransformed.getCityCountyCaseNbr());
+                    reportingDatabaseModel.setLegacyCaseId(investigationTransformed.getLegacyCaseId());
+                    reportingDatabaseModel.setPhcInvFormId(investigationTransformed.getPhcInvFormId());
+
+                    JsonGenerator jsonGenerator = new JsonGenerator();
+//                    DataEnvelope jsonSchema = jsonGenerator.generateSchema(reportingDatabaseModel);
+
+                    String jsonSchemaForKey = jsonGenerator.generateJson(publicHealthCaseUidModel);
+                    String jsonSchemaForValue = jsonGenerator.generateJson(reportingDatabaseModel);
+                    System.err.println(jsonSchemaForValue);
+
+                    kafkaTemplate.send("nbs_nrt_investigation", jsonSchemaForKey, jsonSchemaForValue);
+
                     return objectMapper.writeValueAsString(investigationData);
                 }
-                InvestigationReportingDatabaseModel reportingDatabaseModel = modelMapper.map(investigationForReporting, InvestigationReportingDatabaseModel.class);
-                modelMapper.map(investigationTransformed, InvestigationReportingDatabaseModel.class);
 
-                JsonGenerator jsonGenerator = new JsonGenerator();
-                jsonGenerator.generateSchema(reportingDatabaseModel);
             }
         } catch (Exception e) {
             logger.error("Error processing investigation: {}", e.getMessage());
