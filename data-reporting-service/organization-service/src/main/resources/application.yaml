@@ -11,7 +11,7 @@ spring:
           topic-name: nbs_Default
       output:
         organizationElastic:
-          topic-name: ${PROVIDER_ELASTIC:nrt_organization_elastic}
+          topic-name: ${PROVIDER_ELASTIC:elastic_nrt_organization}
         organizationReporting:
           topic-name: ${ORGANIZATION_REPORTING:nrt_organization}
 
