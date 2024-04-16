@@ -6,20 +6,15 @@ plugins {
 
 group = 'gov.cdc.etldatapipeline'
 version = '0.0.1-SNAPSHOT'
-apply plugin: "com.dipien.semantic-version"
 
 java {
     sourceCompatibility = '17'
 }
-buildscript {
-    repositories {
-        mavenCentral()
-        maven {
-            url "https://packages.confluent.io/maven"
-        }
-    }
-    dependencies {
-        classpath("com.dipien:semantic-version-gradle-plugin:2.0.0")
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://packages.confluent.io/maven"
     }
 }
 
