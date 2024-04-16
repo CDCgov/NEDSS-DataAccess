@@ -14,7 +14,7 @@ jobs:
     name: Build Person Reporting Service Container
     uses: CDCgov/NEDSS-Workflows/.github/workflows/Build-gradle-microservice-container.yaml@main
     with:
-      microservice_name: person-reporting-service
+      microservice_name: data-reporting-service
       dockerfile_relative_path: -f ./person-service/Dockerfile .
       environment_classifier: SNAPSHOT
       java_version: "17"
