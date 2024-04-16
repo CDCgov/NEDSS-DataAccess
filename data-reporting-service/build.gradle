@@ -8,6 +8,7 @@ buildscript {
     }
     dependencies {
         classpath "gradle.plugin.com.github.johnrengelman:shadow:7.1.2"
+        classpath("com.dipien:semantic-version-gradle-plugin:2.0.0")
         classpath "org.liquibase:liquibase-gradle-plugin:2.2.0"
     }
 }
@@ -24,6 +25,7 @@ plugins {
 
 group = 'gov.cdc.eltdatapipeline'
 version = '0.0.1-SNAPSHOT'
+apply plugin: "com.dipien.semantic-version"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
