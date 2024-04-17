@@ -25,7 +25,7 @@ jobs:
       GIT_USER_NAME: ${{secrets.GIT_USER_NAME}}
       HELM_TOKEN: ${{secrets.HELM_TOKEN}}
   call-build-organization-reporting-microservice-container-workflow:
-    name: Build Person Reporting Service Container
+    name: Build Organization Reporting Service Container
     uses: CDCgov/NEDSS-Workflows/.github/workflows/Build-gradle-microservice-container.yaml@main
     with:
       microservice_name: organization-reporting-service
