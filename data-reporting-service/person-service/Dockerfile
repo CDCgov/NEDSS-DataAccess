@@ -9,7 +9,7 @@ COPY . /usr/src/data-reporting-service/person-service
 #COPY . /usr/src/etldatapipeline
 WORKDIR /usr/src/data-reporting-service/person-service
 #Build ETL service along with any required libraries
-RUN ./gradlew :person-service:buildNeeded -x test --no-daemon
+RUN ./gradlew buildNeeded -x test --no-daemon
 FROM amazoncorretto:17
 COPY --from=builder /usr/src/data-reporting-service/person-service/build/libs/person-service*.jar person-service.jar
 # Run jar
