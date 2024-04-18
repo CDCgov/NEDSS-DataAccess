@@ -20,7 +20,7 @@ spring:
           topic-name: ${PATIENT_REPORTING:nrt_patient}
 
     streams:
-      application-id: debezium-cdc-consumer-app-1
+      application-id: ${KAFKA_CONSUMER_APP:person-reporting-consumer-app}
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:localhost:9092}
     consumer:
       key-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
@@ -28,7 +28,7 @@ spring:
     admin:
       auto-create: true
   application:
-    name: data-reporting-service
+    name: person-reporting-service
   datasource:
     password: ${DB_PASSWORD:-fake.fake.fake.1234}
     username: ${DB_USERNAME:-sa}
