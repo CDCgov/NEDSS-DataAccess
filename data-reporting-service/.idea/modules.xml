@@ -5,7 +5,6 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/gov.cdc.etldatapipeline.person-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/gov.cdc.etldatapipeline.person-service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/investigation-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/investigation-service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/organization-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/organization-service.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/organization-service.test.iml" filepath="$PROJECT_DIR$/.idea/modules/organization-service.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/person-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/person-service.main.iml" />
     </modules>
   </component>
