@@ -6,7 +6,7 @@ spring:
     stream:
       input:
         person:
-          topic-name: nbs_Person
+          topic-name: ${INPUT_TOPIC_PERSON:nbs_Person}
         defaultData:
           topic-name: nbs_default
       output:

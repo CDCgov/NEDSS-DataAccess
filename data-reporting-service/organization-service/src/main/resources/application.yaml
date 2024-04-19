@@ -6,7 +6,7 @@ spring:
     stream:
       input:
         organization:
-          topic-name: nbs_Organization
+          topic-name: ${INPUT_TOPIC_ORGANIZATION:nbs_Organization}
         defaultData:
           topic-name: nbs_Default
       output:
