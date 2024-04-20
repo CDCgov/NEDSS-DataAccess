@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/investigation-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/investigation-service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/organization-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/organization-service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/person-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/person-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/post-processing-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/post-processing-service.main.iml" />
     </modules>
   </component>
 </project>
