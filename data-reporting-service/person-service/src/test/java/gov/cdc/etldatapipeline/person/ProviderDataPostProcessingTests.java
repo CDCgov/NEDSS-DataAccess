@@ -37,6 +37,7 @@ public class ProviderDataPostProcessingTests {
                 pf.getMiddleNm(),
                 pf.getFirstNm(),
                 pf.getNmSuffix(),
+                pf.getNmDegree(),
                 pf.getStreetAddress1(),
                 pf.getStreetAddress2(),
                 pf.getCity(),
@@ -61,6 +62,7 @@ public class ProviderDataPostProcessingTests {
                 "Js",
                 "Suurma",
                 "Jr",
+                "MD",
                 "123 Main St.",
                 "",
                 "Atlanta",
@@ -95,7 +97,8 @@ public class ProviderDataPostProcessingTests {
                 p.getLastNm(),
                 p.getMiddleNm(),
                 p.getFirstNm(),
-                p.getNmSuffix());
+                p.getNmSuffix(),
+                p.getNmDegree());
         // Process the respective field json to PatientProviderProvider fields
         ProviderReporting pf = (ProviderReporting) tx.processData(prov, PersonType.PROVIDER_REPORTING).getPayload();
 
@@ -103,7 +106,8 @@ public class ProviderDataPostProcessingTests {
                 "Singgh",
                 "Js",
                 "Suurma",
-                "Jr");
+                "Jr",
+                "MD");
         // Validate the PatientProvider field processing
         Assertions.assertEquals(expected, pDetailsFn.apply(pf));
     }

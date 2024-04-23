@@ -43,7 +43,7 @@ public class ProviderReporting implements PersonExtendedProps, DataRequiredField
     @JsonProperty("name_prefix")
     private String nmPrefix;
     @JsonProperty("name_degree")
-    private String nameDegree;
+    private String nmDegree;
 
     //Address
     @JsonProperty("street_address_1")
