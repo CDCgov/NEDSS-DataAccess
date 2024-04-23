@@ -11,16 +11,16 @@ spring:
           topic-name: nbs_default
       output:
         providerElastic:
-          topic-name: ${PROVIDER_ELASTIC:nrt_provider_elastic}
+          topic-name: ${PROVIDER_ELASTIC:elastic_nrt_provider}
         providerReporting:
           topic-name: ${PROVIDER_REPORTING:nrt_provider}
         patientElastic:
-          topic-name: ${PATIENT_ELASTIC:nrt_patient_elastic}
+          topic-name: ${PATIENT_ELASTIC:elastic_nrt_patient}
         patientReporting:
           topic-name: ${PATIENT_REPORTING:nrt_patient}
 
     streams:
-      application-id: debezium-cdc-consumer-app-1
+      application-id: person-service-app-1
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:localhost:9092}
     consumer:
       key-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer

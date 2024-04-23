@@ -28,6 +28,8 @@ public class PatientSp {
     private String ageReported;
     @Column(name = "age_reported_unit_cd")
     private String ageReportedUnitCd;
+    @Column(name = "age_reported_unit")
+    private String ageReportedUnit;
     @Column(name = "additional_gender_cd")
     private String additionalGenderCd;
     @Column(name = "add_user_id")
@@ -60,8 +62,12 @@ public class PatientSp {
     private String childrenInHouseNbr;
     @Column(name = "curr_sex_cd")
     private String currSexCd;
+    @Column(name = "current_sex")
+    private String currentSex;
     @Column(name = "deceased_ind_cd")
     private String deceasedIndCd;
+    @Column(name = "deceased_indicator")
+    private String deceasedInd;
     @Column(name = "deceased_time")
     private String deceasedTime;
     @Column(name = "dedup_match_ind")
@@ -76,8 +82,12 @@ public class PatientSp {
     private String electronicInd;
     @Column(name = "ethnic_group_ind")
     private String ethnicGroupInd;
+    @Column(name = "ethnicity")
+    private String ethnicity;
     @Column(name = "ethnic_unk_reason_cd")
     private String ethnicUnkReasonCd;
+    @Column(name = "unk_ethnic_rsn")
+    private String ethnicUnkReason;
     @Column(name = "last_chg_time")
     private String lastChgTime;
     @Column(name = "last_chg_user_id")
@@ -88,10 +98,14 @@ public class PatientSp {
     private String localId;
     @Column(name = "marital_status_cd")
     private String maritalStatusCd;
+    @Column(name = "marital_status")
+    private String maritalStatus;
     @Column(name = "multiple_birth_ind")
     private String multipleBirthInd;
     @Column(name = "occupation_cd")
     private String occupationCd;
+    @Column(name = "primary_occupation")
+    private String primaryOccupation;
     @Column(name = "person_parent_uid")
     private Long personParentUid;
     @Column(name = "first_nm")
@@ -104,6 +118,8 @@ public class PatientSp {
     private String personNmSuffix;
     @Column(name = "preferred_gender_cd")
     private String preferredGenderCd;
+    @Column(name = "preferred_gender")
+    private String preferredGender;
     @Column(name = "prim_lang_cd")
     private String primLangCd;
     @Column(name = "record_status_cd")
@@ -114,6 +130,8 @@ public class PatientSp {
     private String statusCd;
     @Column(name = "speaks_english_cd")
     private String speaksEnglishCd;
+    @Column(name = "speaks_english")
+    private String speaksEnglish;
     @Column(name = "status_time")
     private String statusTime;
     @Column(name = "sex_unk_reason_cd")
