@@ -23,9 +23,9 @@ public class PersonSvcYmlPropertiesTest {
     void whenBindingYMLConfigFile_thenAllFieldsAreSet() {
         Assertions.assertEquals("nbs_default", kafkaConfig.getDefaultDataTopicName());
         Assertions.assertEquals("nbs_Person", kafkaConfig.getPersonTopicName());
-        Assertions.assertEquals("nrt_patient_elastic", kafkaConfig.getPatientElasticSearchTopic());
+        Assertions.assertEquals("elastic_nrt_patient", kafkaConfig.getPatientElasticSearchTopic());
         Assertions.assertEquals("nrt_patient", kafkaConfig.getPatientReportingTopic());
-        Assertions.assertEquals("nrt_provider_elastic", kafkaConfig.getProviderElasticSearchTopic());
+        Assertions.assertEquals("elastic_nrt_provider", kafkaConfig.getProviderElasticSearchTopic());
         Assertions.assertEquals("nrt_provider", kafkaConfig.getProviderReportingTopic());
     }
 
