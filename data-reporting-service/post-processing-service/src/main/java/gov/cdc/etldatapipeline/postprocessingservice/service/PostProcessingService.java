@@ -1,6 +1,5 @@
 package gov.cdc.etldatapipeline.postprocessingservice.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -17,6 +16,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -66,66 +66,64 @@ public class PostProcessingService {
             "${spring.kafka.topic.patient}"})
     public void postProcessKafkaMessage(String message,
                                         @Header(KafkaHeaders.RECEIVED_KEY) String key,
-                                        @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) throws JsonProcessingException {
+                                        @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
         Long id = extractIdFromMessage(key, topic);
         System.err.println("Printing inside common listener...." + id.toString());
         if(id != null) {
             idCache.computeIfAbsent(topic, k -> new CopyOnWriteArrayList<>()).add(id);
         }
-        System.err.println("Printing idCache map..." + idCache);
+        System.out.println("Printing idcache in common listener...." + idCache);
     }
 
     @Transactional
-    @Scheduled(fixedDelay = 5000)
-    protected void processCachedIds() {
+    @Scheduled(fixedDelay = 2000)
+    protected void processCachedIds() throws InterruptedException {
 
-        System.err.println("Running scheduled method... with batch size...." + idCache.size());
-
+        System.err.println("Printing idCache map inside scheduler..." + idCache);
 
         for (Map.Entry<String, List<Long>> entry : idCache.entrySet()) {
             String keyTopic = entry.getKey();
             List<Long> ids = entry.getValue();
+            System.out.println("Ids list is...." + ids);
+            idCache.put(keyTopic, new ArrayList<>());
+//            System.err.println("Ids list after removing from idCache..." + idCache.get(keyTopic));
 
 //            if (ids.size() >= BATCH_SIZE) {
-                System.err.println("Printing ids..." + ids);
-                System.err.println("Printing ids size..." + ids.size());
 //                if(keyTopic.contains("observation")) {
 //                    List<ObservationStoredProc> results = null;
 //                    for(ObservationStoredProc data : results) {
-////                        observationRepository.save(data);
-////                        idCache.remove(topic);
+//                        observationRepository.save(data);
+//                        idCache.remove(topic);
 //                    }
 //                }
 //                if(keyTopic.contains("organization")) {
 //                    List<InvestigationStoredProc> results = null;
 //                    for(InvestigationStoredProc data : results) {
-////                        organizationRepository.save(data);
-////                        idCache.remove(topic);
+//                        organizationRepository.save(data);
+//                        idCache.remove(topic);
 //                    }
 //                }
 //                if(keyTopic.contains("investigation")) {
 //                    List<InvestigationStoredProc> results = null;
 //                    for(InvestigationStoredProc data : results) {
-////                        investigationRepository.save(data);
-////                        idCache.remove(topic);
+//                        investigationRepository.save(data);
+//                        idCache.remove(topic);
 //                    }
-//                }
+
                 if(keyTopic.contains("patient")) {
                     String idsString = String.join(",", ids.stream().map(String::valueOf).collect(Collectors.toList()));
-                    System.err.println("Ids string is...." + idsString);
-//                    List<TestModel> results = testRepository.computeIds(idsString);
-                    //List<PatientStoredProc> results = patientRepository.executeStoredProcForPatientIds(idsString);
+
+
+//                    System.err.println("Ids string is...." + idsString);
+//                    Thread.sleep(30000);
                     patientRepository.executeStoredProcForPatientIds(idsString);
-//                    System.err.println("Printing computed results..." + results);
-//                    if(!results.isEmpty()) {
-//                        for(PatientStoredProc data : results) {
-//                            patientRepository.save(data);
-//                            idCache.remove(topic);
-//                        }
-//                        for(TestModel data : results) {
-//                            System.err.println("Saving test model to database..." + data.toString());
-//                        }
-                        idCache.remove(keyTopic);
+//                    System.err.println("Values before executing stored proc...." + idCache.get(keyTopic));
+//                    System.err.println("Executing stored proc....");
+//                    Thread.sleep(2000);
+//                    System.err.println("Values after executing sp before removing...." + idCache.get(keyTopic));
+//                    idCache.remove(keyTopic);
+//                    System.err.println("Values after after removing...." + idCache.get(keyTopic));
+//                    Thread.sleep(2000);
 //                    }
 //                    else {
 //                        log.error("Stored Proc returned empty results.");

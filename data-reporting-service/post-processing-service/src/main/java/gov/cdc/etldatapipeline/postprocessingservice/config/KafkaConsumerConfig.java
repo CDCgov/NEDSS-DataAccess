@@ -50,7 +50,7 @@ public class KafkaConsumerConfig {
         ConcurrentKafkaListenerContainerFactory<String, String> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
-//        factory.setConcurrency(maxConcurrency);
+        factory.setConcurrency(maxConcurrency);
         return  factory;
     }
 }

@@ -3,9 +3,9 @@
     <envs>
       <env name="DA_LOG_PATH" value="logs" />
       <env name="DB_ODSE" value="NBS_ODSE" />
-      <env name="DB_PASSWORD" value="ods" />
-      <env name="DB_URL" value="cdc-nbs-alabama-rds-mssql.czya31goozkz.us-east-1.rds.amazonaws.com" />
-      <env name="DB_USERNAME" value="nbs_ods" />
+      <env name="DB_PASSWORD" value="!461YA1zoNC$Cjgf" />
+      <env name="DB_URL" value="cdc-nbs-legacy-rds-mssql.czya31goozkz.us-east-1.rds.amazonaws.com" />
+      <env name="DB_USERNAME" value="admin" />
       <env name="KAFKA_BOOTSTRAP_SERVER" value="localhost:9092" />
     </envs>
     <module name="gov.cdc.etldatapipeline.person-service.main" />
