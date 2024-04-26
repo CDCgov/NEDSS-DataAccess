@@ -5,7 +5,6 @@ spring:
       observation: nrt_observation
       organization: nrt_organization
       patient: nrt_patient
-    group-id: nbs_nrt_post_processing
     consumer:
       maxPollIntervalMs: 30000
       maxConcurrency: 5
@@ -13,8 +12,7 @@ spring:
     admin:
       auto-create: true
   application:
-    name: data-reporting-service
-    batch-size: 5
+    name: data-reporting-post-processing-service
   datasource:
     password: ${DB_PASSWORD:-fake.fake.fake.1234}
     username: ${DB_USERNAME:-sa}
@@ -22,8 +20,6 @@ spring:
   jpa:
     properties:
       javax.persistence.query.timeout: -1
-#  liquibase:
-#    change-log: db/changelog/db.changelog-master.yaml
 #logging:
 #  # Only one config can be active at a time
 #  config: classpath:logback-config.xml

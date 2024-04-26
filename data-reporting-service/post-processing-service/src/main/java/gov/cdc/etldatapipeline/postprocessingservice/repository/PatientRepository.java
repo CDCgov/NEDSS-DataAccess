@@ -8,11 +8,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface  PatientRepository extends JpaRepository<PatientStoredProc, Long> {
-
-//    @Transactional
-//    @Modifying
-//    @Query(nativeQuery = true, value = "exec sp_nrt_patient_postprocessing :patientUids")
-
     @Procedure("sp_nrt_patient_postprocessing")
     void executeStoredProcForPatientIds(@Param("patientUids") String patientUids);
 }
