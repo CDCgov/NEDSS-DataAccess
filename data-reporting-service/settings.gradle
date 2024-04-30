@@ -1,1 +1,9 @@
 rootProject.name = 'data-reporting-service'
+
+include 'person-service'
+
+include 'organization-service'
+
+include 'investigation-service'
+
+include 'observation-service'
