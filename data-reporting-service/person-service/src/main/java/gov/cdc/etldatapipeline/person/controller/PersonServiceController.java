@@ -29,13 +29,13 @@ public class PersonServiceController {
     }
 
 
-    @GetMapping("/status")
+    @GetMapping("/reporting/person-svc/status")
     @ResponseBody
     public ResponseEntity<String> getDataPipelineStatusHealth() {
         return this.dataPipelineStatusSvc.getHealthStatus();
     }
 
-    @PostMapping(value = "/provider", consumes = "application/json", produces = "application/json")
+    @PostMapping(value = "/reporting/person-svc/provider", consumes = "application/json", produces = "application/json")
     @ResponseBody
     public ResponseEntity<String> postProvider(@RequestBody String payLoad) {
         try {
@@ -50,7 +50,7 @@ public class PersonServiceController {
         }
     }
 
-    @PostMapping(value = "/patient", consumes = "application/json", produces = "application/json")
+    @PostMapping(value = "/reporting/person-svc/patient", consumes = "application/json", produces = "application/json")
     @ResponseBody
     public ResponseEntity<String> postPatient(@RequestBody String payLoad) {
         try {
