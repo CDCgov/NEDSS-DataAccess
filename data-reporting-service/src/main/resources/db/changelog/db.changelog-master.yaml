@@ -18,7 +18,7 @@ databaseChangeLog:
       author: liquibase
       changes:
         - sqlFile:
-            path: src/main/resources/db/create_nrt_provider-001.sql.sql
+            path: src/main/resources/db/create_nrt_provider-001.sql
             splitStatements: false
   - changeSet:
       id: 4
@@ -74,5 +74,5 @@ databaseChangeLog:
       author: liquibase
       changes:
         - sqlFile:
-            path: src/main/resources/db/sp_nrt_patient_postprocessing-001.sql.sql
+            path: src/main/resources/db/sp_nrt_patient_postprocessing-001.sql
             splitStatements: false
