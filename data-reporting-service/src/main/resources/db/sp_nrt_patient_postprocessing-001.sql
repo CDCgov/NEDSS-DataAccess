@@ -1,4 +1,4 @@
-CREATE OR ALTER PROCEDURE dbo.sp_nrt_patient_postprocessing @id_list varchar(max)
+CREATE OR ALTER PROCEDURE dbo.sp_nrt_patient_postprocessing @id_list nvarchar(max)
 AS 
  BEGIN 
 

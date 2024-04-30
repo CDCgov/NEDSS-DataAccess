@@ -1,4 +1,4 @@
-CREATE OR ALTER PROCEDURE dbo.sp_patient_race_event @user_id_list varchar(max)
+CREATE or ALTER PROCEDURE dbo.sp_patient_race_event @user_id_list nvarchar(max)
 AS
 begin
 
@@ -6,7 +6,7 @@ BEGIN TRY
 
 SELECT
     pr.PERSON_UID AS   'PATIENT_UID',
-    RACE_CD,
+        RACE_CD,
     RACE_CODE.CODE_DESC_TXT,
     RACE_CATEGORY_CD,
     RACE_CODE.PARENT_IS_CD
@@ -118,7 +118,7 @@ with cte as (
 
 )
 update sppr
-set sppr.PATIENT_RACE_ALL = ltrim(cte1.CODE_DESC_TXT_List)
+set sppr.PATIENT_RACE_ALL = rtrim(ltrim(cte1.CODE_DESC_TXT_List))
     from  #TMP_S_PERSON_ROOT_RACE sppr,
 			 cte cte1
 where  sppr.PATIENT_UID = cte1.PATIENT_UID
@@ -142,7 +142,7 @@ with cte as (
 
 )
 update sppr
-set sppr.PATIENT_RACE_CALC_DETAILS = ltrim(cte1.CODE_DESC_TXT_List)
+set sppr.PATIENT_RACE_CALC_DETAILS = rtrim(ltrim(cte1.CODE_DESC_TXT_List))
     from  #TMP_S_PERSON_ROOT_RACE sppr,
 			 cte cte1
 where  sppr.PATIENT_UID = cte1.PATIENT_UID

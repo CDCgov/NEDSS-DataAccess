@@ -11,40 +11,68 @@ databaseChangeLog:
       author: liquibase
       changes:
         - sqlFile:
-            path: src/main/resources/db/fn-get_user_name-001.sql
+            path: src/main/resources/db/create_nrt_patient-001.sql
             splitStatements: false
   - changeSet:
       id: 3
       author: liquibase
       changes:
         - sqlFile:
-            path: src/main/resources/db/fn-get_value_by_cvg-001.sql
+            path: src/main/resources/db/create_nrt_provider-001.sql.sql
             splitStatements: false
   - changeSet:
       id: 4
       author: liquibase
       changes:
         - sqlFile:
-            path: src/main/resources/db/fn-get_value_by_cd_ques-001.sql
+            path: src/main/resources/db/fn-get_user_name-001.sql
             splitStatements: false
   - changeSet:
       id: 5
       author: liquibase
       changes:
         - sqlFile:
-            path: src/main/resources/db/sp-provider-001.sql
+            path: src/main/resources/db/fn_get_value_by_cvg-001.sql
             splitStatements: false
   - changeSet:
       id: 6
       author: liquibase
       changes:
         - sqlFile:
-            path: src/main/resources/db/sp-patient-001.sql
+            path: src/main/resources/db/fn_get_value_by_cd_ques-001.sql
             splitStatements: false
   - changeSet:
       id: 7
       author: liquibase
       changes:
         - sqlFile:
-            path: src/main/resources/db/sp-organization-001.sql
+            path: src/main/resources/db/sp-person-race-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 8
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/sp_provider_event-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 9
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/sp_patient_event-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 10
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/sp_organization_event-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 11
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/sp_nrt_patient_postprocessing-001.sql.sql
             splitStatements: false

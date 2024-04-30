@@ -1,4 +1,4 @@
-CREATE or ALTER PROCEDURE dbo.sp_organization_event @org_id_list varchar(max)
+CREATE or ALTER PROCEDURE dbo.sp_organization_event @org_id_list nvarchar(max)
 AS
 BEGIN
     BEGIN TRY
