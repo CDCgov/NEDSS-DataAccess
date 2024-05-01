@@ -2,9 +2,12 @@ spring:
   kafka:
     topic:
       investigation: nrt_investigation
+      investigation-confirmation: nrt_investigation_confirmation
+      investigation-notification: nrt_investigation_notification
       observation: nrt_observation
       organization: nrt_organization
       patient: nrt_patient
+      provider: nrt_provider
     consumer:
       maxPollIntervalMs: 30000
       maxConcurrency: 5
