@@ -6,18 +6,13 @@ buildscript {
             url "https://plugins.gradle.org/m2/"
         }
     }
-    dependencies {
-        classpath "gradle.plugin.com.github.johnrengelman:shadow:7.1.2"
-        classpath "org.liquibase:liquibase-gradle-plugin:2.2.0"
-    }
 }
 
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.1.5'
     id 'io.spring.dependency-management' version '1.1.3'
-    id 'com.github.johnrengelman.shadow' version '7.1.2'
-    id 'org.liquibase.gradle' version '2.2.0'
+    id 'org.liquibase.gradle' version '2.2.2'
 }
 
 //apply plugin: 'org.owasp.dependencycheck'
@@ -50,9 +45,9 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     // Liquibase
-    liquibaseRuntime 'org.liquibase:liquibase-core:4.24.0'
-    liquibaseRuntime 'info.picocli:picocli:4.6.3'
-    liquibaseRuntime 'com.microsoft.sqlserver:mssql-jdbc:12.2.0.jre11'
+    liquibaseRuntime 'org.liquibase:liquibase-core:4.27.0'
+    liquibaseRuntime 'info.picocli:picocli:4.7.5'
+    liquibaseRuntime 'com.microsoft.sqlserver:mssql-jdbc:12.6.1.jre11'
 }
 
 tasks.named('test') {
@@ -76,9 +71,15 @@ apply plugin: "org.liquibase.gradle"
 
 liquibase {
     activities {
-        main {
-            changelogFile './src/main/resources/db/changelog/db.changelog-master.yaml'
+        odse_main {
+            changelogFile './src/main/resources/db/changelog/db.odse.changelog-master.yaml'
             url "jdbc:sqlserver://${System.env.DB_URL}:1433;databaseName=${System.env.DB_ODSE};encrypt=true;trustServerCertificate=true"
+            username "${System.env.DB_USERNAME}"
+            password "${System.env.DB_PASSWORD}"
+        }
+        rdb_main {
+            changelogFile './src/main/resources/db/changelog/db.rdb.changelog-master.yaml'
+            url "jdbc:sqlserver://${System.env.DB_URL}:1433;databaseName=${System.env.DB_RDB};encrypt=true;trustServerCertificate=true"
             username "${System.env.DB_USERNAME}"
             password "${System.env.DB_PASSWORD}"
         }
