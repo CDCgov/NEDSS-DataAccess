@@ -36,6 +36,9 @@ public class Investigation {
     @Column(name = "case_class_cd")
     private String caseClassCd;
 
+    @Column(name = "inv_case_status")
+    private String invCaseStatus;
+
     @Column(name = "outbreak_name")
     private String outbreakName;
 
@@ -53,6 +56,9 @@ public class Investigation {
 
     @Column(name = "pregnant_ind_cd")
     private String pregnantIndCd;
+
+    @Column(name = "pregnant_ind")
+    private String pregnantInd;
 
     @Column(name = "local_id")
     private String localId;
@@ -87,11 +93,158 @@ public class Investigation {
     @Column(name = "curr_process_state_cd")
     private String currProcessStateCd;
 
+    @Column(name = "curr_process_state")
+    private String currProcessState;
+
     @Column(name = "investigation_status_cd")
     private String investigationStatusCd;
 
+    @Column(name = "investigation_status")
+    private String investigationStatus;
+
     @Column(name = "record_status_cd")
     private String recordStatusCd;
+
+    @Column(name = "shared_ind")
+    private String sharedInd;
+
+    @Column(name = "txt")
+    private String txt;
+
+    @Column(name = "effective_from_time")
+    private Instant effectiveFromTime;
+
+    @Column(name = "effective_to_time")
+    private Instant effectiveToTime;
+
+    @Column(name = "rpt_source_cd")
+    private String rptSourceCd;
+
+    @Column(name = "rpt_src_cd_desc")
+    private String rptSourceCdDesc;
+
+    @Column(name = "rpt_to_county_time")
+    private Instant rptToCountyTime;
+
+    @Column(name = "rpt_to_state_time")
+    private Instant rptToStateTime;
+
+    @Column(name = "mmwr_week")
+    private String mmwrWeek;
+
+    @Column(name = "mmwr_year")
+    private String mmwrYear;
+
+    @Column(name = "disease_imported_cd")
+    private String diseaseImportedCd;
+
+    @Column(name = "disease_imported_ind")
+    private String diseaseImportedInd;
+
+    @Column(name = "imported_country_cd")
+    private String importedCountryCd;
+
+    @Column(name = "imported_state_cd")
+    private String importedStateCd;
+
+    @Column(name = "imported_county_cd")
+    private String importedCountyCd;
+
+    //@Column(name = "import_frm_city_cd")
+    //private String importFrmCityCd;
+
+    @Column(name = "diagnosis_time")
+    private Instant diagnosisTime;
+
+    @Column(name = "hospitalized_admin_time")
+    private Instant hospitalizedAdminTime;
+
+    @Column(name = "hospitalized_discharge_time")
+    private Instant hospitalizedDischargeTime;
+
+    @Column(name = "hospitalized_duration_amt")
+    private Long hospitalizedDurationAmt;
+
+    @Column(name = "outbreak_ind")
+    private String outbreakInd;
+
+    @Column(name = "outbreak_ind_val")
+    private String outbreakIndVal;
+
+    @Column(name = "hospitalized_ind_cd")
+    private String hospitalizedIndCd;
+
+    @Column(name = "hospitalized_ind")
+    private String hospitalizedInd;
+
+    @Column(name = "transmission_mode_cd")
+    private String transmissionModeCd;
+
+    @Column(name = "transmission_mode")
+    private String transmissionMode;
+
+    @Column(name = "outcome_cd")
+    private String outcomeCd;
+
+    @Column(name = "die_frm_this_illness_ind")
+    private String dieFrmThisIllnessInd;
+
+    @Column(name = "day_care_ind_cd")
+    private String dayCareIndCd;
+
+    @Column(name = "day_care_ind")
+    private String dayCareInd;
+
+    @Column(name = "food_handler_ind_cd")
+    private String foodHandlerIndCd;
+
+    @Column(name = "food_handler_ind")
+    private String foodHandlerInd;
+
+    @Column(name = "deceased_time")
+    private Instant deceasedTime;
+
+    @Column(name = "pat_age_at_onset_unit_cd")
+    private String patAgeAtOnsetUnitCd;
+
+    @Column(name = "pat_age_at_onset_unit")
+    private String patAgeAtOnsetUnit;
+
+    @Column(name = "investigator_assigned_time")
+    private Instant investigatorAssignedTime;
+
+    @Column(name = "effective_duration_amt")
+    private String effectiveDurationAmt;
+
+    @Column(name = "effective_duration_unit_cd")
+    private String effectiveDurationUnitCd;
+
+    @Column(name = "illness_duration_unit")
+    private String illnessDurationUnit;
+
+    @Column(name = "infectious_from_date")
+    private Instant infectiousFromDate;
+
+    @Column(name = "infectious_to_date")
+    private Instant infectiousToDate;
+
+    @Column(name = "referral_basis_cd")
+    private String referralBasisCd;
+
+    @Column(name = "referral_basis")
+    private String referralBasis;
+
+    @Column(name = "inv_priority_cd")
+    private String invPriorityCd;
+
+    @Column(name = "coinfection_id")
+    private String coinfectionId;
+
+    //@Column(name = "outbreak_name_desc")
+    //private String outbreakNameDesc;
+
+    @Column(name = "program_area_description")
+    private String programAreaDescription;
 
     @Column(name = "notification_local_id")
     private Long notificationLocalId;

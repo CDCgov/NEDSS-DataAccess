@@ -100,7 +100,7 @@ public class InvestigationService {
                     String jsonSchemaForValue = jsonGenerator.generateJson(reportingDatabaseModel);
                     System.err.println(jsonSchemaForValue);
 
-                    kafkaTemplate.send("nbs_nrt_investigation", jsonSchemaForKey, jsonSchemaForValue);
+                    kafkaTemplate.send("nrt_investigation", jsonSchemaForKey, jsonSchemaForValue);
 
                     return objectMapper.writeValueAsString(investigationData);
                 }

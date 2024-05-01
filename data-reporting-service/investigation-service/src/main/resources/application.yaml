@@ -3,16 +3,14 @@ spring:
     stream:
       input:
         investigation:
-          topic-name: cdc.nbs_odse.dbo.Investigation
-        defaultData:
-          topic-name: cdc.nbs_odse.dbo.Default.input
+          topic-name: nbs_Public_health_case
       output:
         investigation:
-          topic-name: cdc.nbs_odse.dbo.Investigation.output
-          topic-name-transformed: cdc.nbs_odse.dbo.Investigation.output-transformed
-          topic-name-confirmation: cdc.nbs_odse.dbo.Investigation.Confirmation
-          topic-name-notification: cdc.nbs_odse.dbo.Investigation.Notification
-          topic-name-observation: cdc.nbs_odse.dbo.Investigation.Observation
+          topic-name: nrt_investigation
+          topic-name-transformed: investigation_output_transformed
+          topic-name-confirmation: nrt_investigation_confirmation
+          topic-name-notification: nrt_investigation_notification
+          topic-name-observation: nrt_investigation_observation
     streams:
       application-id: debezium-cdc-consumer-app-1
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:localhost:9092}
