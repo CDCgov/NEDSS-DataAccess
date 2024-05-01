@@ -30,6 +30,9 @@ public class ProcessInvestigationDataUtil {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
 
+    JsonGenerator jsonGenerator = new JsonGenerator();
+    PublicHealthCaseUid publicHealthCaseUidModel = new PublicHealthCaseUid();
+
     public InvestigationTransformed transformInvestigationData(Investigation investigation) {
 
         InvestigationTransformed investigationTransformed = new InvestigationTransformed();
@@ -128,13 +131,17 @@ public class ProcessInvestigationDataUtil {
                     String actTypeCode = node.get("act_type_cd").asText();
 
                     if(sourceClassCode.equals("NOTF") && actTypeCode.equals("Notification")) {
-                        investigationNotification.setInvestigationId(node.get("public_health_case_uid").asLong());
+                        investigationNotification.setPublicHealthCaseUid(node.get("public_health_case_uid").asLong());
                         notificationIds.add(node.get("source_act_uid").asLong());
                     }
                 }
                 for(Long id : notificationIds) {
                     investigationNotification.setNotificationId(id);
-                    kafkaTemplate.send(investigationNotificationOutputTopicName, investigationNotification.toString());
+                    publicHealthCaseUidModel.setPublicHealthCaseUid(investigationNotification.getPublicHealthCaseUid());
+                    String jsonSchemaForKey = jsonGenerator.generateJson(publicHealthCaseUidModel);
+                    String jsonSchemaForValue = jsonGenerator.generateJson(investigationNotification);
+                    //kafkaTemplate.send(investigationNotificationOutputTopicName, investigationNotification.toString());
+                    kafkaTemplate.send(investigationNotificationOutputTopicName, jsonSchemaForKey, jsonSchemaForValue);
                 }
             }
         } catch (Exception e) {
@@ -158,14 +165,18 @@ public class ProcessInvestigationDataUtil {
                     }
 
                     if(sourceClassCode.equals("OBS") && actTypeCode.equals("LabReport")) {
-                        investigationObservation.setInvestigationId(node.get("public_health_case_uid").asLong());
+                        investigationObservation.setPublicHealthCaseUid(node.get("public_health_case_uid").asLong());
                         observationIds.add(node.get("source_act_uid").asLong());
                     }
                 }
 
                 for(Long id : observationIds) {
                     investigationObservation.setObservationId(id);
-                    kafkaTemplate.send(investigationObservationOutputTopicName, investigationObservation.toString());
+                    publicHealthCaseUidModel.setPublicHealthCaseUid(investigationObservation.getPublicHealthCaseUid());
+                    String jsonSchemaForKey = jsonGenerator.generateJson(publicHealthCaseUidModel);
+                    String jsonSchemaForValue = jsonGenerator.generateJson(investigationObservation);
+                    kafkaTemplate.send(investigationObservationOutputTopicName, jsonSchemaForKey, jsonSchemaForValue);
+                    //kafkaTemplate.send(investigationObservationOutputTopicName, investigationObservation.toString());
                 }
             }
         } catch (Exception e) {
@@ -205,7 +216,7 @@ public class ProcessInvestigationDataUtil {
                     confirmationMethodMap.put(node.get("confirmation_method_cd").asText(), node.get("confirmation_method_desc_txt").asText());
                 }
             }
-            investigationConfirmation.setInvestigationId(investigationId);
+            investigationConfirmation.setPublicHealthCaseUid(investigationId);
 
             if(confirmationMethodTime == null) {
                 investigationConfirmation.setConfirmationMethodTime(phcLastChgTime);
@@ -213,7 +224,11 @@ public class ProcessInvestigationDataUtil {
             for(String key : confirmationMethodMap.keySet()) {
                 investigationConfirmation.setConfirmationMethodCd(key);
                 investigationConfirmation.setConfirmationMethodDescTxt(confirmationMethodMap.get(key));
-                kafkaTemplate.send(investigationConfirmationOutputTopicName, investigationConfirmation.toString());
+                publicHealthCaseUidModel.setPublicHealthCaseUid(investigationConfirmation.getPublicHealthCaseUid());
+                String jsonSchemaForKey = jsonGenerator.generateJson(publicHealthCaseUidModel);
+                String jsonSchemaForValue = jsonGenerator.generateJson(investigationConfirmation);
+                kafkaTemplate.send(investigationConfirmationOutputTopicName, jsonSchemaForKey, jsonSchemaForValue);
+                //kafkaTemplate.send(investigationConfirmationOutputTopicName, investigationConfirmation.toString());
             }
         } catch (Exception e) {
             logger.error("Error processing investigation confirmation method JSON array from investigation data: {}", e.getMessage());
