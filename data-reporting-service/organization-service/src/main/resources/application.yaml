@@ -6,17 +6,17 @@ spring:
     stream:
       input:
         organization:
-          topic-name: nbs_Organization
+          topic-name: ${INPUT_TOPIC_ORGANIZATION:nbs_Organization}
         defaultData:
           topic-name: nbs_Default
       output:
         organizationElastic:
-          topic-name: ${PROVIDER_ELASTIC:nrt_organization_elastic}
+          topic-name: ${PROVIDER_ELASTIC:elastic_nrt_organization}
         organizationReporting:
           topic-name: ${ORGANIZATION_REPORTING:nrt_organization}
 
     streams:
-      application-id: debezium-cdc-consumer-app-1
+      application-id:  ${KAFKA_CONSUMER_APP:org-reporting-consumer-app}
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:localhost:9092}
     consumer:
       key-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
@@ -24,7 +24,7 @@ spring:
     admin:
       auto-create: true
   application:
-    name: data-reporting-service
+    name: organization-reporting-service
   datasource:
     password: ${DB_PASSWORD:-fake.fake.fake.1234}
     username: ${DB_USERNAME:-sa}
