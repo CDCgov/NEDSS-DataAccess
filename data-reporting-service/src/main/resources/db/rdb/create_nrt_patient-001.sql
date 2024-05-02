@@ -1,8 +1,8 @@
--- rdb.dbo.nrt_patient definition
+-- dbo.nrt_patient definition
 
 -- drop table
 
--- drop table rdb.dbo.nrt_patient;
+-- drop table dbo.nrt_patient;
 
 use rdb;
 if not exists (select *
