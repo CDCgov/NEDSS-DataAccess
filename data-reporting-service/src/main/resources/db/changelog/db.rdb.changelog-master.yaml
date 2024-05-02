@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/create_nrt_patient-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 2
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/create_nrt_provider-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 3
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/sp_nrt_patient_postprocessing-001.sql
+            splitStatements: false

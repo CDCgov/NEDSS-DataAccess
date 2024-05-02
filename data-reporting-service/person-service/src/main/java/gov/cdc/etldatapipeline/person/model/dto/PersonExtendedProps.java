@@ -119,6 +119,96 @@ public interface PersonExtendedProps {
     default void setPrPersonUid(Long prPersonUid) {
     }
 
+    default void setSrteCodeDescTxt(String srteCodeDescTxt) {
+    }
+
+    default void setSrteParentIsCd(String srteParentIsCd) {
+    }
+
+    default void setRaceCalculated(String raceCalculated) {
+    }
+
+    default void setRaceCalcDetails(String raceCalcDetails) {
+    }
+
+    default void setRaceAll(String raceAll) {
+    }
+
+    default void setRaceAmerInd1(String raceAmerInd1) {
+    }
+
+    default void setRaceAmerInd2(String raceAmerInd2) {
+    }
+
+    default void setRaceAmerInd3(String raceAmerInd3) {
+    }
+
+    default void setRaceAmerIndGt3Ind(String raceAmerIndGt3Ind) {
+    }
+
+    default void setRaceAmerIndAll(String raceAmerIndAll) {
+    }
+
+    default void setRaceAsian1(String raceAsian1) {
+    }
+
+    default void setRaceAsian2(String raceAsian2) {
+    }
+
+    default void setRaceAsian3(String raceAsian3) {
+    }
+
+    default void setRaceAsianGt3Ind(String raceAsianGt3Ind) {
+    }
+
+    default void setRaceAsianAll(String raceAsianAll) {
+    }
+
+    default void setRaceBlack1(String raceBlack1) {
+    }
+
+    default void setRaceBlack2(String raceBlack2) {
+    }
+
+    default void setRaceBlack3(String raceBlack3) {
+    }
+
+    default void setRaceBlackGt3Ind(String raceBlackGt3Ind) {
+    }
+
+    default void setRaceBlackAll(String raceBlackAll) {
+    }
+
+    default void setRaceNatHi1(String raceNatHi1) {
+    }
+
+    default void setRaceNatHi2(String raceNatHi2) {
+    }
+
+    default void setRaceNatHi3(String raceNatHi3) {
+    }
+
+    default void setRaceNatHiGt3Ind(String raceNatHiGt3Ind) {
+    }
+
+    default void setRaceNatHiAll(String raceNatHiAll) {
+    }
+
+    default void setRaceWhite1(String raceWhite1) {
+    }
+
+    default void setRaceWhite2(String raceWhite2) {
+    }
+
+    default void setRaceWhite3(String raceWhite3) {
+    }
+
+    default void setRaceWhiteGt3Ind(String raceWhiteGt3Ind) {
+    }
+
+    default void setRaceWhiteAll(String raceWhiteAll) {
+    }
+
     default void setPatientNumber(String patientNumber) {
     }
 
