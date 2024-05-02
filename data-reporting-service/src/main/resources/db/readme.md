@@ -2,7 +2,8 @@
 
 ### Environment Variable set up
 
-From terminal execute following in running a local Database instance:
+The following environment variables assume a local Database instance with ODSE and RDB databases
+For any other instances, update the database url and credentials appropriately
 
 ```
 export DB_USERNAME=sa
@@ -11,9 +12,6 @@ export DB_URL=localhost
 export DB_ODSE=NBS_ODSE
 export DB_RDB=RDB
 ```
-
-Note: If you are running against a different instance,
-replace the values for Database credentials, url, odse and rdb database as appropriate
 
 ### Liquibase script execution
 
