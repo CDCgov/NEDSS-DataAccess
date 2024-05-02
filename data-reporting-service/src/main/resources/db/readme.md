@@ -1,4 +1,4 @@
-# Liquibase exectuion
+# Liquibase Execution
 
 ### Environment Variable set up
 
@@ -22,3 +22,13 @@ export DB_RDB=RDB
 * Run following to execute liquibase
 
     * ```./gradlew update```
+
+### Liquibase Error Handling
+
+<b>ValidationFailedException</b>: When change is made to existing change log. This can be handled by removing the conflicting id or revert the changes.
+To remove the id, the following command can be run:
+
+```
+delete from database.dbo.databasechangelog where id = 'id'
+```
+

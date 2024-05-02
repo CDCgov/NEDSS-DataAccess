@@ -1,14 +1,15 @@
--- rdb.dbo.nrt_provider definition
+-- dbo.nrt_provider definition
 
 -- drop table
 
--- drop table rdb.dbo.nrt_provider;
+-- drop table dbo.nrt_provider;
 
+use rdb;
 if not exists (select *
                from sysobjects
                where name = 'nrt_provider'
                  and xtype = 'U')
-create table rdb.dbo.nrt_provider
+create table dbo.nrt_provider
 (
     provider_uid                   bigint                                       not null primary key,
     local_id                       varchar(50)                                  null,

@@ -4,11 +4,12 @@
 
 -- drop table rdb.dbo.nrt_patient;
 
+use rdb;
 if not exists (select *
                from sysobjects
                where name = 'nrt_patient'
                  and xtype = 'U')
-create table rdb.dbo.nrt_patient
+create table dbo.nrt_patient
 (
     patient_uid           bigint                                       not null primary key,
     patient_mpr_uid       bigint                                       null,
