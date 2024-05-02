@@ -4,54 +4,54 @@ databaseChangeLog:
       author: liquibase
       changes:
         - sqlFile:
-            path: src/main/resources/db/db-general-001.sql
+            path: src/main/resources/db/odse/db-general-001.sql
             splitStatements: false
   - changeSet:
       id: 2
       author: liquibase
       changes:
         - sqlFile:
-            path: src/main/resources/db/fn-get_user_name-001.sql
+            path: src/main/resources/db/odse/fn-get_user_name-001.sql
             splitStatements: false
   - changeSet:
       id: 3
       author: liquibase
       changes:
         - sqlFile:
-            path: src/main/resources/db/fn_get_value_by_cvg-001.sql
+            path: src/main/resources/db/odse/fn_get_value_by_cvg-001.sql
             splitStatements: false
   - changeSet:
       id: 4
       author: liquibase
       changes:
         - sqlFile:
-            path: src/main/resources/db/fn_get_value_by_cd_ques-001.sql
+            path: src/main/resources/db/odse/fn_get_value_by_cd_ques-001.sql
             splitStatements: false
   - changeSet:
       id: 5
       author: liquibase
       changes:
         - sqlFile:
-            path: src/main/resources/db/sp_patient_race_event-001.sql
+            path: src/main/resources/db/odse/sp_patient_race_event-001.sql
             splitStatements: false
   - changeSet:
       id: 6
       author: liquibase
       changes:
         - sqlFile:
-            path: src/main/resources/db/sp_provider_event-001.sql
+            path: src/main/resources/db/odse/sp_provider_event-001.sql
             splitStatements: false
   - changeSet:
       id: 7
       author: liquibase
       changes:
         - sqlFile:
-            path: src/main/resources/db/sp_patient_event-001.sql
+            path: src/main/resources/db/odse/sp_patient_event-001.sql
             splitStatements: false
   - changeSet:
       id: 8
       author: liquibase
       changes:
         - sqlFile:
-            path: src/main/resources/db/sp_organization_event-001.sql
+            path: src/main/resources/db/odse/sp_organization_event-001.sql
             splitStatements: false

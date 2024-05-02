@@ -4,6 +4,10 @@
 
 -- drop table rdb.dbo.nrt_provider;
 
+if not exists (select *
+               from sysobjects
+               where name = 'nrt_provider'
+                 and xtype = 'U')
 create table rdb.dbo.nrt_provider
 (
     provider_uid                   bigint                                       not null primary key,
