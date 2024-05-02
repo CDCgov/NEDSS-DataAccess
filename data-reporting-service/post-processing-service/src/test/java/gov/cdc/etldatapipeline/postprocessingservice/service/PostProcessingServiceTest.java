@@ -14,10 +14,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.times;
@@ -58,14 +56,13 @@ public class PostProcessingServiceTest {
         String key = "{\"payload\":{\"patient_uid\":123}}";
         String topic = "dummy_patient";
 
-        List<Long> patientIds = Arrays.asList(postProcessingServiceMock.extractIdFromMessage(key, topic));
-        postProcessingServiceMock.idCache.put(topic, patientIds);
-
+        postProcessingServiceMock.postProcessPatientMessage(key, topic);
         postProcessingServiceMock.processCachedIds();
 
-        String expectedPatientIdsString = String.join(",", patientIds.stream().map(String::valueOf).collect(Collectors.toList()));
+        String expectedPatientIdsString = "123"; //String.join(",", patientIds.stream().map(String::valueOf).collect(Collectors.toList()));
         verify(patientRepositoryMock).executeStoredProcForPatientIds(expectedPatientIdsString);
         verify(patientRepositoryMock, times(1)).executeStoredProcForPatientIds("123");
+        assertTrue(postProcessingServiceMock.idCache.containsKey(topic));
 
         List<ILoggingEvent> logs = listAppender.list;
         assertEquals(3, logs.size());
@@ -115,14 +112,13 @@ public class PostProcessingServiceTest {
         String key = "{\"payload\":{\"organization_uid\":123}}";
         String topic = "dummy_organization";
 
-        List<Long> organizationIds = Arrays.asList(postProcessingServiceMock.extractIdFromMessage(key, topic));
-        postProcessingServiceMock.idCache.put(topic, organizationIds);
-
+        postProcessingServiceMock.postProcessOrganizationMessage(key, topic);
         postProcessingServiceMock.processCachedIds();
 
-        String expectedOrganizationIdsIdsString = String.join(",", organizationIds.stream().map(String::valueOf).collect(Collectors.toList()));
+        String expectedOrganizationIdsIdsString = "123"; //String.join(",", organizationIds.stream().map(String::valueOf).collect(Collectors.toList()));
         verify(organizationRepositoryMock).executeStoredProcForOrganizationIds(expectedOrganizationIdsIdsString);
         verify(organizationRepositoryMock, times(1)).executeStoredProcForOrganizationIds("123");
+        assertTrue(postProcessingServiceMock.idCache.containsKey(topic));
 
         List<ILoggingEvent> logs = listAppender.list;
         assertEquals(3, logs.size());

@@ -5,7 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.Data;
 
-
 /* THIS CLASS IS NOT BEING USED NOW BUT WE NEED THIS IN THE FUTURE
 WHEN WE SEND DATA BACK FROM THE STORED PROC FOR FURTHER PROCESSING.
 */
