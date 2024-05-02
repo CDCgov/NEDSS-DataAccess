@@ -29,14 +29,14 @@ public class OrganizationServiceController {
     }
 
 
-    @GetMapping("/status")
+    @GetMapping("/reporting/organization-svc/status")
     @ResponseBody
     public ResponseEntity<String> getDataPipelineStatusHealth() {
         return this.organizationStatusService.getHealthStatus();
     }
 
 
-    @PostMapping(value = "/organization", consumes = "application/json", produces = "application/json")
+    @PostMapping(value = "/reporting/organization-svc/produce", consumes = "application/json", produces = "application/json")
     @ResponseBody
     public ResponseEntity<String> postOrganization(@RequestBody String payLoad) {
         try {

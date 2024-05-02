@@ -11,12 +11,12 @@ spring:
             topic-name: cdc.nbs_odse.dbo.Observation.output
             topic-name-transformed: cdc.nbs_odse.dbo.Observation.output-transformed
     streams:
-      application-id: debezium-cdc-consumer-app-1
+      application-id: ${KAFKA_CONSUMER_APP:investigation-reporting-consumer-app}
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:localhost:9092}
     admin:
       auto-create: true
   application:
-    name: data-reporting-service
+    name: investigation-reporting-service
   datasource:
     password: ${DB_PASSWORD:-fake.fake.fake.1234}
     username: ${DB_USERNAME:-sa}

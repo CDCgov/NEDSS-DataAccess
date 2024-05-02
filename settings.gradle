@@ -1,0 +1,3 @@
+rootProject.name = 'data-access-service'
+
+include 'data-reporting-service'
