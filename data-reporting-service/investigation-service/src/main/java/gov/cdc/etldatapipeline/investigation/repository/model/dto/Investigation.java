@@ -21,8 +21,8 @@ public class Investigation {
     @Column(name = "jurisdiction_code")
     private String jurisdictionCode;
 
-    @Column(name = "jurisdiction_code_desc_txt")
-    private String jurisdictionCodeDescTxt;
+    @Column(name = "jurisdiction_nm")
+    private String jurisdictionNm;
 
     @Column(name = "mood_cd")
     private String moodCd;
@@ -239,6 +239,9 @@ public class Investigation {
 
     @Column(name = "coinfection_id")
     private String coinfectionId;
+
+    @Column(name = "contact_inv_txt")
+    private String contactInvTxt;
 
     //@Column(name = "outbreak_name_desc")
     //private String outbreakNameDesc;
