@@ -33,4 +33,16 @@ Example : ```data-reporting-service/person-service/Dockerfile```
     * [Person Service deployment](https://enquizit.sharepoint.com/:u:/r/sites/CDCNBSProject/Shared%20Documents/General/NBS%20Infrastructure/ArgoCD%20Deployments/dts1/person-reporting-service.yaml)
   * Update the name and helm environment variables as appropriate
   * Service should be published to the DTS1 EKS cluster
+
+
+###  Organization Service DTS1 deployment :
+
+- [Health Check](https://app.dts1.nbspreview.com/reporting/organization-svc/status)
+
+### Person Service DTS1 deployment:
+- [Health Check](https://app.dts1.nbspreview.com/reporting/person-svc/status)
+
+### DTS1 Microservice CloudWatch Logs
+- [CloudWatach Logs ](https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups/log-group/fluent-bit-cloudwatch)
+  - Search for the respective microservice in log streams (Eg: person-service)
   
