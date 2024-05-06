@@ -10,8 +10,13 @@ import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
+import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
+
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 
 @Slf4j
 @NoArgsConstructor
@@ -20,10 +25,19 @@ public class DataPostProcessor {
 
     public <T extends PersonExtendedProps> void processPersonName(String name, T pf) {
         if (!ObjectUtils.isEmpty(name)) {
-            Arrays.stream(utilHelper.deserializePayload(name, Name[].class))
+            List<Name> nameList = Arrays.stream(utilHelper.deserializePayload(name, Name[].class))
                     .filter(pName -> !ObjectUtils.isEmpty(pName.getPersonUid()))
-                    .max(Comparator.comparing(Name::getPersonUid))
-                    .map(n -> n.updatePerson(pf));
+                    .collect(groupingBy(Name::getPersonUid, TreeMap::new, toList()))
+                    .lastEntry()
+                    .getValue();
+            if (nameList.size() == 1) {
+                nameList.get(0).updatePerson(pf);
+            } else if (nameList.size() > 1) {
+                nameList.stream()
+                        .filter(pName -> !ObjectUtils.isEmpty(pName.getPersonNmSeq()))
+                        .max(Comparator.comparing(Name::getPersonNmSeq))
+                        .map(n -> n.updatePerson(pf));
+            }
         }
     }
 

@@ -91,7 +91,7 @@ public class PatientDataPostProcessingTests {
     }
 
     @Test
-    public void PatientProviderNameTransformationTest() {
+    public void PatientNameTransformationTest() {
 
         // Build the PatientProvider object with the json serialized data
         PatientSp perOp = PatientSp.builder()
@@ -115,6 +115,34 @@ public class PatientDataPostProcessingTests {
                 "Suurma",
                 "Jr");
         // Validate the PatientProvider field processing
+        Assertions.assertEquals(expected, pDetailsFn.apply(pf));
+    }
+
+    @Test
+    public void PatientNameTransformationSet2Test() {
+
+        // Build the PatientProvider object with the json serialized data
+        PatientSp perOp = PatientSp.builder()
+                .personUid(10000001L)
+                .nameNested(readFileData(FILE_PREFIX + "PersonName1.json"))
+                .build();
+
+        // Patient Fields to be processed
+        Function<PatientReporting, List<String>> pDetailsFn = (p) -> Arrays.asList(
+                p.getLastNm(),
+                p.getMiddleNm(),
+                p.getFirstNm(),
+                p.getNmSuffix());
+
+        // Process the respective field json to PatientProviderProvider fields
+        PatientReporting pf = (PatientReporting) tx.processData(perOp, PersonType.PATIENT_REPORTING).getPayload();
+
+        List<String> expected = Arrays.asList(
+                "jack",
+                "amy",
+                "beans",
+                "Sr");
+        // Validate the Patient field processing
         Assertions.assertEquals(expected, pDetailsFn.apply(pf));
     }
 

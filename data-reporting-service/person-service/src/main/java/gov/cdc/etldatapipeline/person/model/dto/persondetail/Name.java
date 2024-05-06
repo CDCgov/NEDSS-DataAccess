@@ -26,9 +26,9 @@ public class Name implements ExtendPerson {
     private String nmDegree;
     @JsonProperty("pn_person_uid")
     private Long personUid;
-    @JsonProperty("person_name_seq")
+    @JsonProperty("pn_person_name_seq")
     private String personNmSeq;
-    @JsonProperty("last_chg_time")
+    @JsonProperty("pn_last_chg_time")
     private String lastChgTime;
 
     public <T extends PersonExtendedProps> T updatePerson(T person) {
