@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ObservationController {
     private final KafkaProducerService producerService;
-    private final String topicName = "cdc.nbs_odse.dbo.Observation";
+    private final String topicName = "nbs_Observation";
 
     @Autowired
     public ObservationController(KafkaProducerService producerService) {

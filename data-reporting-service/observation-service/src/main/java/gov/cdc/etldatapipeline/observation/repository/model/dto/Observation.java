@@ -1,12 +1,10 @@
-package gov.cdc.etldatapipeline.observation.repository.model;
+package gov.cdc.etldatapipeline.observation.repository.model.dto;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.Instant;
 
 @Entity
 @Getter
@@ -51,13 +49,13 @@ public class Observation {
     private String localId;
 
     @Column(name = "activity_to_time")
-    private Instant activityToTime;
+    private String activityToTime;
 
     @Column(name = "effective_from_time")
-    private Instant effectiveFromTime;
+    private String effectiveFromTime;
 
     @Column(name = "rpt_to_state_time")
-    private Instant rptToStateTime;
+    private String rptToStateTime;
 
     @Column(name = "electronic_ind")
     private Character electronicInd;
@@ -78,16 +76,10 @@ public class Observation {
     private String lastChgUserName;
 
     @Column(name = "add_time")
-    private Instant addTime;
+    private String addTime;
 
     @Column(name = "last_chg_time")
-    private Instant lastChgTime;
-
-//    @Column(name = "observation_add_time")
-//    private Instant observationAddTime;
-//
-//    @Column(name = "observation_last_chg_time")
-//    private Instant observationLastChgTime;
+    private String lastChgTime;
 
     @Column(name = "person_participations")
     private String personParticipations;

@@ -3,15 +3,13 @@ spring:
     stream:
       input:
         observation:
-          topic-name: cdc.nbs_odse.dbo.Observation
-        defaultData:
-          topic-name: cdc.nbs_odse.dbo.Default.input
+          topic-name: nbs_Observation
       output:
           observation:
-            topic-name: cdc.nbs_odse.dbo.Observation.output
-            topic-name-transformed: cdc.nbs_odse.dbo.Observation.output-transformed
+            topic-name-reporting: nrt_observation
+            topic-name-es: elastic_search_observation
     streams:
-      application-id: ${KAFKA_CONSUMER_APP:investigation-reporting-consumer-app}
+      application-id: ${KAFKA_CONSUMER_APP:observation-reporting-consumer-app}
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:localhost:9092}
     admin:
       auto-create: true

@@ -15,11 +15,11 @@ public class KafkaConfig {
     @Value("${spring.kafka.stream.input.observation.topic-name}")
     private String observationTopicName;
 
-    @Value("${spring.kafka.stream.output.observation.topic-name}")
+    @Value("${spring.kafka.stream.output.observation.topic-name-reporting}")
     private String observationAggregateTopicName;
 
-    @Value("${spring.kafka.stream.output.observation.topic-name-transformed}")
-    public String observationTransformedOutputTopicName = "cdc.nbs_odse.dbo.Observation.output-transformed";
+    @Value("${spring.kafka.stream.output.observation.topic-name-es}")
+    public String observationTransformedOutputTopicName;
 
     @Bean
     public NewTopic createAggregateObservationTopicName() {

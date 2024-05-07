@@ -9,29 +9,21 @@ import org.springframework.kafka.config.TopicBuilder;
 @Configuration
 public class KafkaConfig {
 
-    @Value("${spring.kafka.stream.output.investigation.topic-name}")
-    private String investigationAggregateTopicName;
-
-    @Value("${spring.kafka.stream.output.investigation.topic-name-transformed}")
-    public String investigationTransformedOutputTopicName = "cdc.nbs_odse.dbo.Investigation.output-transformed";
+    @Value("${spring.kafka.stream.output.investigation.topic-name-reporting}")
+    public String investigationReportingOutputTopicName;
 
     @Value("${spring.kafka.stream.output.investigation.topic-name-confirmation}")
-    public String investigationConfirmationOutputTopicName = "cdc.nbs_odse.dbo.Investigation.Confirmation";
+    public String investigationConfirmationOutputTopicName;
 
     @Value("${spring.kafka.stream.output.investigation.topic-name-notification}")
-    public String investigationNotificationOutputTopicName = "cdc.nbs_odse.dbo.Investigation.Notification";
+    public String investigationNotificationOutputTopicName;
 
     @Value("${spring.kafka.stream.output.investigation.topic-name-observation}")
-    public String investigationObservationOutputTopicName = "cdc.nbs_odse.dbo.Investigation.output.Observation";
-
-    @Bean
-    public NewTopic createAggregateInvestigationTopicName() {
-        return TopicBuilder.name(investigationAggregateTopicName).build();
-    }
+    public String investigationObservationOutputTopicName;
 
     @Bean
     public NewTopic createInvestigationTransformedOutputTopic() {
-        return TopicBuilder.name(investigationTransformedOutputTopicName).build();
+        return TopicBuilder.name(investigationReportingOutputTopicName).build();
     }
 
     @Bean

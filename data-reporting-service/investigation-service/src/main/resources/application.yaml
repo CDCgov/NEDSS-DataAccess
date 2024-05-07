@@ -3,18 +3,16 @@ spring:
     stream:
       input:
         investigation:
-          topic-name: cdc.nbs_odse.dbo.Investigation
-        defaultData:
-          topic-name: cdc.nbs_odse.dbo.Default.input
+          topic-name: nbs_Investigation
       output:
         investigation:
-          topic-name: cdc.nbs_odse.dbo.Investigation.output
-          topic-name-transformed: cdc.nbs_odse.dbo.Investigation.output-transformed
-          topic-name-confirmation: cdc.nbs_odse.dbo.Investigation.Confirmation
-          topic-name-notification: cdc.nbs_odse.dbo.Investigation.Notification
-          topic-name-observation: cdc.nbs_odse.dbo.Investigation.Observation
+          topic-name-reporting: nrt_investigation
+          topic-name-es: elastic_search_investigation
+          topic-name-confirmation: nrt_investigation_confirmation
+          topic-name-notification: nrt_investigation_notification
+          topic-name-observation: nrt_investigation_observation
     streams:
-      application-id: ${KAFKA_CONSUMER_APP:investigation-reporting-consumer-app}
+      application-id: ${KAFKA_CONSUMER_APP:investigation-reporting-consumer-app-1}
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:localhost:9092}
     admin:
       auto-create: true

@@ -1,4 +1,4 @@
-package gov.cdc.etldatapipeline.observation.repository.model;
+package gov.cdc.etldatapipeline.observation.repository.model.dto;
 
 import lombok.*;
 

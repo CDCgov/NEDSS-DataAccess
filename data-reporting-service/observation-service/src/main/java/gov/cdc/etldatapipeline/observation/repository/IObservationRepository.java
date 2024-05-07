@@ -1,6 +1,6 @@
 package gov.cdc.etldatapipeline.observation.repository;
 
-import gov.cdc.etldatapipeline.observation.repository.model.Observation;
+import gov.cdc.etldatapipeline.observation.repository.model.dto.Observation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
