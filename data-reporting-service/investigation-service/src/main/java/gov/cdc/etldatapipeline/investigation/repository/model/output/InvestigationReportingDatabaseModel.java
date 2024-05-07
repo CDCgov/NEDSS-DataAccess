@@ -55,7 +55,10 @@ public class InvestigationReportingDatabaseModel implements DataRequiredFields {
     private String importedCountryCd;
     private String importedStateCd;
     private String importedCountyCd;
-    //private String importFrmCityCd;
+    private String importedFromCountry;
+    private String importedFromState;
+    private String importedFromCounty;
+    private String importedCityDescTxt;
     private Instant diagnosisTime;
     private Instant hospitalizedAdminTime;
     private Instant hospitalizedDischargeTime;
@@ -73,10 +76,14 @@ public class InvestigationReportingDatabaseModel implements DataRequiredFields {
     private String foodHandlerIndCd;
     private String foodHandlerInd;
     private Instant deceasedTime;
+    private String patAgeAtOnset;
     private String patAgeAtOnsetUnitCd;
     private String patAgeAtOnsetUnit;
+    private String detectionMethodDescTxt;
+    private String contactInvPriority;
+    private String contactInvStatus;
     private Instant investigatorAssignedTime;
-    private String effectiveDurationAmt;
+    private Long effectiveDurationAmt;
     private String effectiveDurationUnitCd;
     private String illnessDurationUnit;
     private Instant infectiousFromDate;
@@ -86,7 +93,6 @@ public class InvestigationReportingDatabaseModel implements DataRequiredFields {
     private String invPriorityCd;
     private String coinfectionId;
     private String contactInvTxt;
-    //private String outbreakNameDesc;
     private String programAreaDescription;
     private String notificationLocalId;
     private String notificationAddTime;

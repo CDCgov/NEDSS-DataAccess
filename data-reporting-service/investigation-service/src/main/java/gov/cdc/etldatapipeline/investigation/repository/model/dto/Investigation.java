@@ -150,8 +150,17 @@ public class Investigation {
     @Column(name = "imported_county_cd")
     private String importedCountyCd;
 
-    //@Column(name = "import_frm_city_cd")
-    //private String importFrmCityCd;
+    @Column(name = "imported_from_country")
+    private String importedFromCountry;
+
+    @Column(name = "imported_from_state")
+    private String importedFromState;
+
+    @Column(name = "imported_from_county")
+    private String importedFromCounty;
+
+    @Column(name = "imported_city_desc_txt")
+    private String importedCityDescTxt;
 
     @Column(name = "diagnosis_time")
     private Instant diagnosisTime;
@@ -204,17 +213,38 @@ public class Investigation {
     @Column(name = "deceased_time")
     private Instant deceasedTime;
 
+    @Column(name = "pat_age_at_onset")
+    private String patAgeAtOnset;
+
     @Column(name = "pat_age_at_onset_unit_cd")
     private String patAgeAtOnsetUnitCd;
 
     @Column(name = "pat_age_at_onset_unit")
     private String patAgeAtOnsetUnit;
 
+    @Column(name = "detection_method_cd")
+    private String detectionMethodCd;
+
+    @Column(name = "detection_method_desc_txt")
+    private String detectionMethodDescTxt;
+
+    @Column(name = "priority_cd")
+    private String priorityCd;
+
+    @Column(name = "contact_inv_priority")
+    private String contactInvPriority;
+
+    @Column(name = "contact_inv_status_cd")
+    private String contactInvStatusCd;
+
+    @Column(name = "contact_inv_status")
+    private String contactInvStatus;
+
     @Column(name = "investigator_assigned_time")
     private Instant investigatorAssignedTime;
 
     @Column(name = "effective_duration_amt")
-    private String effectiveDurationAmt;
+    private Long effectiveDurationAmt;
 
     @Column(name = "effective_duration_unit_cd")
     private String effectiveDurationUnitCd;
@@ -242,9 +272,6 @@ public class Investigation {
 
     @Column(name = "contact_inv_txt")
     private String contactInvTxt;
-
-    //@Column(name = "outbreak_name_desc")
-    //private String outbreakNameDesc;
 
     @Column(name = "program_area_description")
     private String programAreaDescription;
