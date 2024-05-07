@@ -1,6 +1,9 @@
 package gov.cdc.etldatapipeline.organization.config;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.streams.StreamsConfig;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,4 +45,8 @@ public class KafkaStreamsConfig {
         return new KafkaStreamsConfiguration(props);
     }
 
+    @Bean
+    public Producer<String, JsonNode> kafkaProducer() {
+        return new KafkaProducer<>(kStreamsConfigs().asProperties());
+    }
 }
