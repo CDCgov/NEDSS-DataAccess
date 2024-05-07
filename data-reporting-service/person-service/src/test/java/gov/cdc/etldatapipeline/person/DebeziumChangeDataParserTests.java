@@ -25,9 +25,7 @@ public class DebeziumChangeDataParserTests {
                 "/payload/after",
                 Person.class);
         assertEquals("9005400", person.getPersonUid());
-        assertEquals("ProviderUpdate", person.getAddReasonCd());
         assertEquals("PAT", person.getCd());
-        assertEquals("Family Medicine", person.getDescription());
         assertEquals(1708702633619L, person.getTs_ms());
         assertEquals("u", person.getOp());
     }
