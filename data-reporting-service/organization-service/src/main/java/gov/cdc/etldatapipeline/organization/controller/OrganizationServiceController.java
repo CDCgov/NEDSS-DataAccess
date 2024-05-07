@@ -3,31 +3,24 @@ package gov.cdc.etldatapipeline.organization.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.cdc.etldatapipeline.organization.config.KafkaConfig;
-import gov.cdc.etldatapipeline.organization.config.KafkaStreamsConfig;
 import gov.cdc.etldatapipeline.organization.service.OrganizationStatusService;
-import org.apache.kafka.clients.producer.KafkaProducer;
+import lombok.RequiredArgsConstructor;
+import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @RestController
+@RequiredArgsConstructor
 public class OrganizationServiceController {
 
     private final OrganizationStatusService organizationStatusService;
 
-    @Autowired
-    private KafkaStreamsConfig kafkaStreamsConfig;
+    private final KafkaConfig kafkaConfig;
 
-    @Autowired
-    private KafkaConfig kafkaConfig;
-
-    public OrganizationServiceController(OrganizationStatusService organizationStatusSvc) {
-        this.organizationStatusService = organizationStatusSvc;
-    }
-
+    private final Producer<String, JsonNode> producer;
 
     @GetMapping("/reporting/organization-svc/status")
     @ResponseBody
@@ -40,11 +33,8 @@ public class OrganizationServiceController {
     @ResponseBody
     public ResponseEntity<String> postOrganization(@RequestBody String payLoad) {
         try {
-            KafkaProducer<String, JsonNode> producer = new KafkaProducer<>(
-                    kafkaStreamsConfig.kStreamsConfigs().asProperties());
             producer.send(new ProducerRecord<>(kafkaConfig.getOrganizationTopic(),
                     UUID.randomUUID().toString(), new ObjectMapper().readTree(payLoad)));
-            producer.close();
             return ResponseEntity.ok("Produced : " + payLoad);
         } catch (Exception ex) {
             return ResponseEntity.internalServerError()

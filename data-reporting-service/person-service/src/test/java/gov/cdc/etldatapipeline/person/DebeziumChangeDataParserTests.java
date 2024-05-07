@@ -2,10 +2,10 @@ package gov.cdc.etldatapipeline.person;
 
 import gov.cdc.etldatapipeline.person.model.odse.Person;
 import gov.cdc.etldatapipeline.person.utils.UtilHelper;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static gov.cdc.etldatapipeline.person.TestUtils.readFileData;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DebeziumChangeDataParserTests {
 
@@ -15,7 +15,7 @@ public class DebeziumChangeDataParserTests {
                 readFileData("rawDataFiles/person/Person.json"),
                 "/payload",
                 Person.class);
-        Assertions.assertEquals("10000001", personId.getPersonUid());
+        assertEquals("10000001", personId.getPersonUid());
     }
 
     @Test
@@ -24,8 +24,11 @@ public class DebeziumChangeDataParserTests {
                 readFileData("rawDataFiles/person/PersonPatientChangeData.json"),
                 "/payload/after",
                 Person.class);
-        Assertions.assertEquals("9005400", person.getPersonUid());
-        Assertions.assertEquals(1708702633619L, person.getTs_ms());
-        Assertions.assertEquals("u", person.getOp());
+        assertEquals("9005400", person.getPersonUid());
+        assertEquals("ProviderUpdate", person.getAddReasonCd());
+        assertEquals("PAT", person.getCd());
+        assertEquals("Family Medicine", person.getDescription());
+        assertEquals(1708702633619L, person.getTs_ms());
+        assertEquals("u", person.getOp());
     }
 }
