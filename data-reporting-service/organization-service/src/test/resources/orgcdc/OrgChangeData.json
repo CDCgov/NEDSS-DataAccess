@@ -8,7 +8,7 @@
           {
             "type": "int64",
             "optional": false,
-            "field": "organizatoion_uid"
+            "field": "organization_uid"
           }
         ],
         "optional": true,
@@ -21,7 +21,7 @@
           {
             "type": "int64",
             "optional": false,
-            "field": "organizatoion_uid"
+            "field": "organization_uid"
           }
         ],
         "optional": true,

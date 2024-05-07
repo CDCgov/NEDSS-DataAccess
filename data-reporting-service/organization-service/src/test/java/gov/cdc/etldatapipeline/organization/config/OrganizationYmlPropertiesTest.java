@@ -1,5 +1,6 @@
 package gov.cdc.etldatapipeline.organization.config;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +21,12 @@ public class OrganizationYmlPropertiesTest {
 
     @Test
     void whenBindingYMLConfigFile_thenAllFieldsAreSet() {
-//        Assertions.assertEquals("nbs_Default", kafkaConfig.getDefaultDataTopic());
-//        Assertions.assertEquals("nbs_Organization", kafkaConfig.getOrganizationTopic());
-//        Assertions.assertEquals("nrt_organization_elastic", kafkaConfig.getOrganizationElasticSearchTopic());
-//        Assertions.assertEquals("nrt_organization", kafkaConfig.getOrganizationReportingTopic());
+
+        Assertions.assertEquals("nbs_Default", kafkaConfig.getDefaultDataTopic());
+        Assertions.assertEquals("nbs_Organization", kafkaConfig.getOrganizationTopic());
+        Assertions.assertEquals("nrt_organization_elastic", kafkaConfig.getOrganizationElasticSearchTopic());
+        Assertions.assertEquals("nrt_organization", kafkaConfig.getOrganizationReportingTopic());
+
     }
 
 }
