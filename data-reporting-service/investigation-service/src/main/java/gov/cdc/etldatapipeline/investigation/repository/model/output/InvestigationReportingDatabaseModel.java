@@ -45,7 +45,7 @@ public class InvestigationReportingDatabaseModel implements DataRequiredFields {
     private Instant effectiveFromTime;
     private Instant effectiveToTime;
     private String rptSourceCd;
-    private String rptSourceCdDesc;
+    private String rptSrcCdDesc;
     private Instant rptToCountyTime;
     private Instant rptToStateTime;
     private String mmwrWeek;
@@ -83,7 +83,7 @@ public class InvestigationReportingDatabaseModel implements DataRequiredFields {
     private String contactInvPriority;
     private String contactInvStatus;
     private Instant investigatorAssignedTime;
-    private Long effectiveDurationAmt;
+    private String effectiveDurationAmt;
     private String effectiveDurationUnitCd;
     private String illnessDurationUnit;
     private Instant infectiousFromDate;

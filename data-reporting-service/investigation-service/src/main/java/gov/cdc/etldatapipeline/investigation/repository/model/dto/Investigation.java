@@ -121,7 +121,7 @@ public class Investigation {
     private String rptSourceCd;
 
     @Column(name = "rpt_src_cd_desc")
-    private String rptSourceCdDesc;
+    private String rptSrcCdDesc;
 
     @Column(name = "rpt_to_county_time")
     private Instant rptToCountyTime;
@@ -244,7 +244,7 @@ public class Investigation {
     private Instant investigatorAssignedTime;
 
     @Column(name = "effective_duration_amt")
-    private Long effectiveDurationAmt;
+    private String effectiveDurationAmt;
 
     @Column(name = "effective_duration_unit_cd")
     private String effectiveDurationUnitCd;
