@@ -25,6 +25,10 @@ public interface PersonExtendedProps {
     default void setNmPrefix(String nmPrefix) {
     }
 
+    default void setAliasNickname(String aliasNickname) {
+
+    }
+
     void setStreetAddress1(String streetAddress1);
 
     void setStreetAddress2(String streetAddress2);

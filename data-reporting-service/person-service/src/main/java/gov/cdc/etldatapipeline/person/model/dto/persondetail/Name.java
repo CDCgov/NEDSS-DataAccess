@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Objects;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -41,6 +43,14 @@ public class Name implements ExtendPerson {
         person.setPersonNmSeq(this.personNmSeq);
         person.setNmUseCd(this.nmUseCd);
         person.setNmDegree(this.nmDegree);
+        return person;
+    }
+
+    public <T extends PersonExtendedProps> T updatePerson(T person, String cd) {
+        if (Objects.equals(cd, NameUseCd.LEGAL.getVal()))
+            updatePerson(person);
+        if (Objects.equals(cd, NameUseCd.ALIAS.getVal()))
+            person.setAliasNickname(firstNm);
         return person;
     }
 }

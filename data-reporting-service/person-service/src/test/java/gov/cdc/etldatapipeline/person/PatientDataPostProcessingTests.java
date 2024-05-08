@@ -104,7 +104,8 @@ public class PatientDataPostProcessingTests {
                 p.getLastNm(),
                 p.getMiddleNm(),
                 p.getFirstNm(),
-                p.getNmSuffix());
+                p.getNmSuffix(),
+                p.getAliasNickname());
         // Process the respective field json to PatientProviderProvider fields
         PatientReporting pf = (PatientReporting) tx.processData(perOp, PersonType.PATIENT_REPORTING).getPayload();
 
@@ -113,7 +114,8 @@ public class PatientDataPostProcessingTests {
                 "Singgh",
                 "Js",
                 "Suurma",
-                "Jr");
+                "Jr",
+                null);
         // Validate the PatientProvider field processing
         Assertions.assertEquals(expected, pDetailsFn.apply(pf));
     }
@@ -132,7 +134,8 @@ public class PatientDataPostProcessingTests {
                 p.getLastNm(),
                 p.getMiddleNm(),
                 p.getFirstNm(),
-                p.getNmSuffix());
+                p.getNmSuffix(),
+                p.getAliasNickname());
 
         // Process the respective field json to PatientProviderProvider fields
         PatientReporting pf = (PatientReporting) tx.processData(perOp, PersonType.PATIENT_REPORTING).getPayload();
@@ -141,7 +144,8 @@ public class PatientDataPostProcessingTests {
                 "jack",
                 "amy",
                 "beans",
-                "Sr");
+                "Sr",
+                "XEZD6SLFPRUJQGA52");
         // Validate the Patient field processing
         Assertions.assertEquals(expected, pDetailsFn.apply(pf));
     }
