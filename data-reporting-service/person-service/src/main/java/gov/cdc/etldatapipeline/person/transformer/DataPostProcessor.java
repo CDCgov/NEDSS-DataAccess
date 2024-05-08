@@ -2,6 +2,8 @@ package gov.cdc.etldatapipeline.person.transformer;
 
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
 import gov.cdc.etldatapipeline.person.model.dto.persondetail.*;
+import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderElasticSearch;
+import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderReporting;
 import gov.cdc.etldatapipeline.person.utils.UtilHelper;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,20 +12,52 @@ import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
+import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
+
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 
 @Slf4j
 @NoArgsConstructor
 public class DataPostProcessor {
     UtilHelper utilHelper = UtilHelper.getInstance();
 
+    /**
+     * 1. For patient name_use_cd = {L, AL}
+     * 2. For providers  name_use_cd = {L}
+     * - For every name array, get the json node with the max patient_uid and person_seq_num
+     *
+     * @param name Array of Json Objects with the history of the name changes
+     * @param pf   Transformed Patient/Provider Object
+     * @param <T>  Object extending PersonExtendedProps
+     */
     public <T extends PersonExtendedProps> void processPersonName(String name, T pf) {
         if (!ObjectUtils.isEmpty(name)) {
-            Arrays.stream(utilHelper.deserializePayload(name, Name[].class))
-                    .filter(pName -> !ObjectUtils.isEmpty(pName.getPersonUid()))
-                    .max(Comparator.comparing(Name::getPersonUid))
-                    .map(n -> n.updatePerson(pf));
+            NameUseCd[] nameUseCds = NameUseCd.values();
+            if (pf.getClass() == ProviderReporting.class || pf.getClass() == ProviderElasticSearch.class) {
+                nameUseCds = List.of(NameUseCd.LEGAL).toArray(NameUseCd[]::new);
+            }
+            Arrays.stream(nameUseCds).forEach(cd -> {
+                TreeMap<Long, List<Name>> nameMap = Arrays.stream(utilHelper.deserializePayload(name, Name[].class))
+                        .filter(pName -> !ObjectUtils.isEmpty(pName.getPersonUid()))
+                        // Filter by Name types: L-Legal, AL-Alias
+                        .filter(pName -> ObjectUtils.isEmpty(pName.getNmUseCd()) || pName.getNmUseCd().equals(cd.getVal()))
+                        // Sort by the getPersonUid and collect all the entries with max PersonUid to a List
+                        .collect(groupingBy(Name::getPersonUid, TreeMap::new, toList()));
+                // Get the last entry which is the max PersonUid
+                if (!nameMap.isEmpty()) {
+                    nameMap.lastEntry()
+                            .getValue()
+                            .stream()
+                            .filter(pName -> !ObjectUtils.isEmpty(pName.getPersonNmSeq()))
+                            // Get the entry with the max Person Name Sequence
+                            .max(Comparator.comparing(Name::getPersonNmSeq))
+                            .map(n -> n.updatePerson(pf, cd.getVal()));
+                }
+            });
         }
     }
 

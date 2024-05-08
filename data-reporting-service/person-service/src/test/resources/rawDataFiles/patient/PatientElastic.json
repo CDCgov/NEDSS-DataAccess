@@ -497,7 +497,7 @@
     "status_cd": null,
     "status_time": null,
     "version_ctrl_nbr": null,
-    "person_nm_seq": null,
+    "person_nm_seq": "2",
     "nm_use_cd": "L",
     "street_address1": "123 Main St.",
     "street_address2": "",

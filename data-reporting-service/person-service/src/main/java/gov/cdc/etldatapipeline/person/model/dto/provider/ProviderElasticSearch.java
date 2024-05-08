@@ -85,7 +85,6 @@ public class ProviderElasticSearch implements PersonExtendedProps, DataRequiredF
     private String nmDegree;
     @JsonProperty("person_name_seq")
     private String personNmSeq;
-    private String nmUseCd;
 
     //Address
     @JsonProperty("streetAddr1")

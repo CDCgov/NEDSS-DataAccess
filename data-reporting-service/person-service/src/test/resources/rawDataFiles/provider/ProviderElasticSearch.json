@@ -310,11 +310,6 @@
       {
         "type": "string",
         "optional": true,
-        "field": "nm_use_cd"
-      },
-      {
-        "type": "string",
-        "optional": true,
         "field": "birth_sex"
       },
       {
@@ -464,7 +459,6 @@
     "status_cd": null,
     "status_time": null,
     "version_ctrl_nbr": null,
-    "nm_use_cd": "L",
     "city": "Atlanta",
     "state": "Georgia",
     "zip": "30025",
@@ -491,7 +485,7 @@
     "nmSuffix": "Jr",
     "nmPrefix": null,
     "nmdegree": "MD",
-    "person_name_seq": null,
+    "person_name_seq": "2",
     "streetAddr1": "123 Main St.",
     "streetAddr2": "",
     "state_desc": "13",
