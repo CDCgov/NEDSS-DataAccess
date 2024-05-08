@@ -27,7 +27,7 @@ Example : ```data-reporting-service/person-service/Dockerfile```
 * Refer here for accessing ArgoCD : 
   * [ArgoCD setup](https://cdc-nbs.atlassian.net/wiki/spaces/NM/pages/664207380/SpringBoot+Java+MicroService+Deployment+Steps#Service-deployment-to-EKS-using-ArgoCd)
 * In ArgoCD, create a new App
-  * Edit the yaml to copy the paste the scripts from : 
+  * Edit the yaml to copy and paste the scripts from : 
     * [ArgoCD deployment yaml](https://enquizit.sharepoint.com/sites/CDCNBSProject/Shared%20Documents/Forms/AllItems.aspx)
   * Refer the following file :
     * [Person Service deployment](https://enquizit.sharepoint.com/:u:/r/sites/CDCNBSProject/Shared%20Documents/General/NBS%20Infrastructure/ArgoCD%20Deployments/dts1/person-reporting-service.yaml)
