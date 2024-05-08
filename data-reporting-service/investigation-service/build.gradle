@@ -34,6 +34,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     implementation 'org.apache.kafka:connect-api:3.7.0'
     implementation 'org.modelmapper:modelmapper:3.2.0'
+    implementation 'com.google.guava:guava:33.1.0-jre'
 
     if (findProject(':common-util')) {
         implementation project(':common-util')

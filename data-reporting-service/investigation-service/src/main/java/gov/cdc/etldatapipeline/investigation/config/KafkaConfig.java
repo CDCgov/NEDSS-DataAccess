@@ -9,6 +9,9 @@ import org.springframework.kafka.config.TopicBuilder;
 @Configuration
 public class KafkaConfig {
 
+    @Value("${spring.kafka.stream.input.investigation.topic-name}")
+    public String investigationInputTopicName;
+
     @Value("${spring.kafka.stream.output.investigation.topic-name-reporting}")
     public String investigationReportingOutputTopicName;
 
@@ -20,6 +23,11 @@ public class KafkaConfig {
 
     @Value("${spring.kafka.stream.output.investigation.topic-name-observation}")
     public String investigationObservationOutputTopicName;
+
+    @Bean
+    public NewTopic createInvestigationInputTopic() {
+        return TopicBuilder.name(investigationInputTopicName).build();
+    }
 
     @Bean
     public NewTopic createInvestigationTransformedOutputTopic() {

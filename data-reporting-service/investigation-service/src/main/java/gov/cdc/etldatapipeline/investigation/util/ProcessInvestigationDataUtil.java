@@ -188,6 +188,7 @@ public class ProcessInvestigationDataUtil {
         try {
             JsonNode investigationConfirmationMethodJsonArray = investigationConfirmationMethod != null ? objectMapper.readTree(investigationConfirmationMethod) : null;
             if(investigationConfirmationMethodJsonArray != null) {
+                InvestigationConfirmationMethodKey investigationConfirmationMethodKey = new InvestigationConfirmationMethodKey();
                 InvestigationConfirmationMethod investigationConfirmation = new InvestigationConfirmationMethod();
                 Long investigationId = null;
                 Map<String, String> confirmationMethodMap = new HashMap<>();
@@ -219,6 +220,7 @@ public class ProcessInvestigationDataUtil {
                 }
                 investigationConfirmation.setPublicHealthCaseUid(investigationId);
                 investigationKey.setPublicHealthCaseUid(investigationId);
+                investigationConfirmationMethodKey.setPublicHealthCaseUid(investigationId);
 
                 if(confirmationMethodTime == null) {
                     investigationConfirmation.setConfirmationMethodTime(phcLastChgTime);
@@ -226,9 +228,10 @@ public class ProcessInvestigationDataUtil {
                 for(String key : confirmationMethodMap.keySet()) {
                     investigationConfirmation.setConfirmationMethodCd(key);
                     investigationConfirmation.setConfirmationMethodDescTxt(confirmationMethodMap.get(key));
-//                    String jsonKey = jsonGenerator.generateStringJson(investigationKey);
+                    investigationConfirmationMethodKey.setConfirmationMethodCd(key);
+                    String jsonKey = jsonGenerator.generateStringJson(investigationConfirmationMethodKey);
                     String jsonValue = jsonGenerator.generateStringJson(investigationConfirmation);
-                    kafkaTemplate.send(investigationConfirmationOutputTopicName, jsonValue, jsonValue);
+                    kafkaTemplate.send(investigationConfirmationOutputTopicName, jsonKey, jsonValue);
                 }
             }
             else {

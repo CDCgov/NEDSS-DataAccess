@@ -2,8 +2,6 @@ package gov.cdc.etldatapipeline.investigation.repository.model.reporting;
 
 import lombok.Data;
 
-import java.time.Instant;
-
 @Data
 public class InvestigationReporting {
     private Long publicHealthCaseUid;
@@ -33,12 +31,12 @@ public class InvestigationReporting {
     private String recordStatusCd;
     private String sharedInd;
     private String txt;
-    private Instant effectiveFromTime;
-    private Instant effectiveToTime;
+    private String effectiveFromTime;
+    private String effectiveToTime;
     private String rptSourceCd;
     private String rptSrcCdDesc;
-    private Instant rptToCountyTime;
-    private Instant rptToStateTime;
+    private String rptToCountyTime;
+    private String rptToStateTime;
     private String mmwrWeek;
     private String mmwrYear;
     private String diseaseImportedCd;
@@ -50,9 +48,9 @@ public class InvestigationReporting {
     private String importedFromState;
     private String importedFromCounty;
     private String importedCityDescTxt;
-    private Instant diagnosisTime;
-    private Instant hospitalizedAdminTime;
-    private Instant hospitalizedDischargeTime;
+    private String diagnosisTime;
+    private String hospitalizedAdminTime;
+    private String hospitalizedDischargeTime;
     private Long hospitalizedDurationAmt;
     private String outbreakInd;
     private String outbreakIndVal;
@@ -66,19 +64,19 @@ public class InvestigationReporting {
     private String dayCareInd;
     private String foodHandlerIndCd;
     private String foodHandlerInd;
-    private Instant deceasedTime;
+    private String deceasedTime;
     private String patAgeAtOnset;
     private String patAgeAtOnsetUnitCd;
     private String patAgeAtOnsetUnit;
     private String detectionMethodDescTxt;
     private String contactInvPriority;
     private String contactInvStatus;
-    private Instant investigatorAssignedTime;
+    private String investigatorAssignedTime;
     private String effectiveDurationAmt;
     private String effectiveDurationUnitCd;
     private String illnessDurationUnit;
-    private Instant infectiousFromDate;
-    private Instant infectiousToDate;
+    private String infectiousFromDate;
+    private String infectiousToDate;
     private String referralBasisCd;
     private String referralBasis;
     private String invPriorityCd;
