@@ -18,8 +18,8 @@ public class ObservationReporting {
     private String activityToTime;
     private String effectiveFromTime;
     private String rptToStateTime;
-    private Character electronicInd;
-    private Short versionCtrlNbr;
+    private String electronicInd;
+    private Integer versionCtrlNbr;
     private Long orderingPersonId;
     private Long patientId;
     private Long resultObservationUid;
@@ -33,6 +33,5 @@ public class ObservationReporting {
     private Long lastChgUserId;
     private String lastChgUserName;
     private String lastChgTime;
-    private String refreshDatetime;
 
 }
