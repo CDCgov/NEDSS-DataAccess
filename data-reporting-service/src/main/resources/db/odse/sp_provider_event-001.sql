@@ -92,7 +92,7 @@ BEGIN
                                          AND tl.email_address IS NOT NULL
                                        FOR json path, INCLUDE_NULL_VALUES) AS email) AS email,
                               -- person names
-                              (SELECT (SELECT pn.person_uid    AS                                  [pn_person_uid],
+                              (SELECT (SELECT pn.person_uid      AS                                [pn_person_uid],
                                               STRING_ESCAPE(REPLACE(pn.last_nm, '-', ' '), 'json') lastNm,
                                               soundex(pn.last_nm)                                  lastNmSndx,
                                               STRING_ESCAPE(pn.middle_nm, 'json')                  middleNm,
@@ -104,15 +104,15 @@ BEGIN
                                               case
                                                   when (pn.nm_suffix is not null or pn.nm_suffix != '')
                                                       then (select * from dbo.fn_get_value_by_cd_ques(pn.nm_suffix, 'DEM107'))
-                                                  end          as                                  name_suffix,
+                                                  end            as                                name_suffix,
                                               pn.nm_prefix                                         nmPrefix,
                                               case
                                                   when (pn.nm_prefix is not null or pn.nm_prefix != '')
                                                       then (select * from dbo.fn_get_value_by_cd_ques(pn.nm_prefix, 'DEM101'))
-                                                  end          as                                  name_prefix,
+                                                  end            as                                name_prefix,
                                               pn.nm_degree                                         nmDegree,
-                                              pn.person_name_seq,
-                                              pn.last_chg_time AS                                  [pn_last_chg_time]
+                                              pn.person_name_seq AS                                [pn_person_name_seq],
+                                              pn.last_chg_time   AS                                [pn_last_chg_time]
                                        FROM nbs_odse.dbo.person_name pn WITH (NOLOCK)
                                        WHERE person_uid = p.person_uid
                                        FOR json path, INCLUDE_NULL_VALUES) AS name) AS name,

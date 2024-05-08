@@ -91,7 +91,7 @@ public class PatientDataPostProcessingTests {
     }
 
     @Test
-    public void PatientProviderNameTransformationTest() {
+    public void PatientNameTransformationTest() {
 
         // Build the PatientProvider object with the json serialized data
         PatientSp perOp = PatientSp.builder()
@@ -104,7 +104,8 @@ public class PatientDataPostProcessingTests {
                 p.getLastNm(),
                 p.getMiddleNm(),
                 p.getFirstNm(),
-                p.getNmSuffix());
+                p.getNmSuffix(),
+                p.getAliasNickname());
         // Process the respective field json to PatientProviderProvider fields
         PatientReporting pf = (PatientReporting) tx.processData(perOp, PersonType.PATIENT_REPORTING).getPayload();
 
@@ -113,8 +114,39 @@ public class PatientDataPostProcessingTests {
                 "Singgh",
                 "Js",
                 "Suurma",
-                "Jr");
+                "Jr",
+                null);
         // Validate the PatientProvider field processing
+        Assertions.assertEquals(expected, pDetailsFn.apply(pf));
+    }
+
+    @Test
+    public void PatientNameTransformationSet2Test() {
+
+        // Build the PatientProvider object with the json serialized data
+        PatientSp perOp = PatientSp.builder()
+                .personUid(10000001L)
+                .nameNested(readFileData(FILE_PREFIX + "PersonName1.json"))
+                .build();
+
+        // Patient Fields to be processed
+        Function<PatientReporting, List<String>> pDetailsFn = (p) -> Arrays.asList(
+                p.getLastNm(),
+                p.getMiddleNm(),
+                p.getFirstNm(),
+                p.getNmSuffix(),
+                p.getAliasNickname());
+
+        // Process the respective field json to PatientProviderProvider fields
+        PatientReporting pf = (PatientReporting) tx.processData(perOp, PersonType.PATIENT_REPORTING).getPayload();
+
+        List<String> expected = Arrays.asList(
+                "jack",
+                "amy",
+                "beans",
+                "Sr",
+                "XEZD6SLFPRUJQGA52");
+        // Validate the Patient field processing
         Assertions.assertEquals(expected, pDetailsFn.apply(pf));
     }
 

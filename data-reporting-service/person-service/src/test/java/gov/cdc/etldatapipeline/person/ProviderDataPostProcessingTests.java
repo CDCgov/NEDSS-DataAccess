@@ -24,7 +24,7 @@ public class ProviderDataPostProcessingTests {
         // Build the PatientProvider object with the json serialized data
         ProviderSp p = ProviderSp.builder()
                 .personUid(10000001L)
-                .nameNested(readFileData(FILE_PREFIX + "PersonName.json"))
+                .nameNested(readFileData(FILE_PREFIX + "ProviderName.json"))
                 .addressNested(readFileData(FILE_PREFIX + "PersonAddress.json"))
                 .telephoneNested(readFileData(FILE_PREFIX + "PersonTelephone.json"))
                 .entityDataNested(readFileData(FILE_PREFIX + "PersonEntityData.json"))
@@ -89,7 +89,7 @@ public class ProviderDataPostProcessingTests {
         // Build the PatientProvider object with the json serialized data
         ProviderSp prov = ProviderSp.builder()
                 .personUid(10000001L)
-                .nameNested(readFileData(FILE_PREFIX + "PersonName.json"))
+                .nameNested(readFileData(FILE_PREFIX + "ProviderName.json"))
                 .build();
 
         // PatientProviderProvider Fields to be processed
@@ -107,6 +107,35 @@ public class ProviderDataPostProcessingTests {
                 "Js",
                 "Suurma",
                 "Jr",
+                "MD");
+        // Validate the PatientProvider field processing
+        Assertions.assertEquals(expected, pDetailsFn.apply(pf));
+    }
+
+    @Test
+    public void PatientProviderNameTransformationSet2Test() {
+
+        // Build the PatientProvider object with the json serialized data
+        ProviderSp prov = ProviderSp.builder()
+                .personUid(10000001L)
+                .nameNested(readFileData(FILE_PREFIX + "PersonName1.json"))
+                .build();
+
+        // PatientProviderProvider Fields to be processed
+        Function<ProviderReporting, List<String>> pDetailsFn = (p) -> Arrays.asList(
+                p.getLastNm(),
+                p.getMiddleNm(),
+                p.getFirstNm(),
+                p.getNmSuffix(),
+                p.getNmDegree());
+        // Process the respective field json to PatientProviderProvider fields
+        ProviderReporting pf = (ProviderReporting) tx.processData(prov, PersonType.PROVIDER_REPORTING).getPayload();
+
+        List<String> expected = Arrays.asList(
+                "jack",
+                "amy",
+                "beans",
+                "Sr",
                 "MD");
         // Validate the PatientProvider field processing
         Assertions.assertEquals(expected, pDetailsFn.apply(pf));
