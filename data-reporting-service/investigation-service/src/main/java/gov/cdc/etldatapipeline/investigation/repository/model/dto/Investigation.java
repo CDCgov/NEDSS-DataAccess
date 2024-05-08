@@ -128,10 +128,10 @@ public class Investigation {
     private String rptToStateTime;
 
     @Column(name = "mmwr_week")
-    private Integer mmwrWeek;
+    private String mmwrWeek;
 
     @Column(name = "mmwr_year")
-    private Integer mmwrYear;
+    private String mmwrYear;
 
     @Column(name = "disease_imported_cd")
     private String diseaseImportedCd;
@@ -170,7 +170,7 @@ public class Investigation {
     private String hospitalizedDischargeTime;
 
     @Column(name = "hospitalized_duration_amt")
-    private Integer hospitalizedDurationAmt;
+    private String hospitalizedDurationAmt;
 
     @Column(name = "outbreak_ind")
     private String outbreakInd;
@@ -212,7 +212,7 @@ public class Investigation {
     private String deceasedTime;
 
     @Column(name = "pat_age_at_onset")
-    private Integer patAgeAtOnset;
+    private String patAgeAtOnset;
 
     @Column(name = "pat_age_at_onset_unit_cd")
     private String patAgeAtOnsetUnitCd;
@@ -242,7 +242,7 @@ public class Investigation {
     private String investigatorAssignedTime;
 
     @Column(name = "effective_duration_amt")
-    private Integer effectiveDurationAmt;
+    private String effectiveDurationAmt;
 
     @Column(name = "effective_duration_unit_cd")
     private String effectiveDurationUnitCd;

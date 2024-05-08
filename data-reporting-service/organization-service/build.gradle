@@ -36,14 +36,14 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
 
 
-    implementation project(':common-util')
+//    implementation project(':common-util')
 
-//    if (findProject(':common-util')) {
-//        implementation project(':common-util')
-//    } else {
-//        // this mostly needed when testing the app on idea
-//        implementation files('libs/common-util-0.0.1-SNAPSHOT.jar')
-//    }
+    if (findProject(':common-util')) {
+        implementation project(':common-util')
+    } else {
+        // this mostly needed when testing the app on idea
+        implementation files('libs/common-util-0.0.1-SNAPSHOT.jar')
+    }
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.apache.kafka:kafka-streams-test-utils:3.7.0'

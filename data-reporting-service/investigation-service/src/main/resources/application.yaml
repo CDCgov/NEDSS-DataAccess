@@ -3,7 +3,7 @@ spring:
     stream:
       input:
         investigation:
-          topic-name: nbs_Investigation
+          topic-name: nbs_Public_health_case
       output:
         investigation:
           topic-name-reporting: nrt_investigation

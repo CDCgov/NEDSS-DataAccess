@@ -103,6 +103,7 @@ public class CustomJsonGeneratorImpl {
         return switch (javaType.toLowerCase()) {
             case "long" -> "int64";
             case "integer", "int" -> "int32";
+            case "instant" -> "string";
             default -> javaType.toLowerCase();
         };
     }

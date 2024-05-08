@@ -2,6 +2,7 @@ package gov.cdc.etldatapipeline.investigation.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import gov.cdc.etldatapipeline.commonutil.json.CustomJsonGeneratorImpl;
 import gov.cdc.etldatapipeline.investigation.repository.model.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -20,15 +21,17 @@ public class ProcessInvestigationDataUtil {
     private static final Logger logger = LoggerFactory.getLogger(ProcessInvestigationDataUtil.class);
 
     @Value("${spring.kafka.stream.output.investigation.topic-name-confirmation}")
-    public String investigationConfirmationOutputTopicName = "cdc.nbs_odse.dbo.Investigation.Confirmation";
+    public String investigationConfirmationOutputTopicName;
 
     @Value("${spring.kafka.stream.output.investigation.topic-name-notification}")
-    public String investigationNotificationOutputTopicName = "cdc.nbs_odse.dbo.Investigation.Notification";
+    public String investigationNotificationOutputTopicName;
 
     @Value("${spring.kafka.stream.output.investigation.topic-name-observation}")
-    public String investigationObservationOutputTopicName = "cdc.nbs_odse.dbo.Investigation.output.Observation";
+    public String investigationObservationOutputTopicName;
 
     private final KafkaTemplate<String, String> kafkaTemplate;
+    InvestigationKey investigationKey = new InvestigationKey();
+    private final CustomJsonGeneratorImpl jsonGenerator = new CustomJsonGeneratorImpl();
 
     public InvestigationTransformed transformInvestigationData(Investigation investigation) {
 
@@ -126,15 +129,19 @@ public class ProcessInvestigationDataUtil {
                 for(JsonNode node : investigationNotificationIdsJsonArray) {
                     String sourceClassCode = node.get("source_class_cd").asText();
                     String actTypeCode = node.get("act_type_cd").asText();
+                    Long publicHealthCaseUid = node.get("public_health_case_uid").asLong();
+                    investigationKey.setPublicHealthCaseUid(publicHealthCaseUid);
 
                     if(sourceClassCode.equals("NOTF") && actTypeCode.equals("Notification")) {
-                        investigationNotification.setInvestigationId(node.get("public_health_case_uid").asLong());
+                        investigationNotification.setPublicHealthCaseUid(publicHealthCaseUid);
                         notificationIds.add(node.get("source_act_uid").asLong());
                     }
                 }
                 for(Long id : notificationIds) {
                     investigationNotification.setNotificationId(id);
-                    kafkaTemplate.send(investigationNotificationOutputTopicName, investigationNotification.toString());
+//                    String jsonKey = jsonGenerator.generateStringJson(investigationKey);
+                    String jsonValue = jsonGenerator.generateStringJson(investigationNotification);
+                    kafkaTemplate.send(investigationNotificationOutputTopicName, jsonValue, jsonValue);
                 }
             }
         } catch (Exception e) {
@@ -152,20 +159,24 @@ public class ProcessInvestigationDataUtil {
                 for(JsonNode node : investigationObservationIdsJsonArray) {
                     String sourceClassCode = node.get("source_class_cd").asText();
                     String actTypeCode = node.get("act_type_cd").asText();
+                    Long publicHealthCaseUid = node.get("public_health_case_uid").asLong();
+                    investigationKey.setPublicHealthCaseUid(publicHealthCaseUid);
 
                     if(sourceClassCode.equals("OBS") && actTypeCode.equals("PHCInvForm")) {
                         investigationTransformed.setPhcInvFormId(node.get("source_act_uid").asLong());
                     }
 
                     if(sourceClassCode.equals("OBS") && actTypeCode.equals("LabReport")) {
-                        investigationObservation.setInvestigationId(node.get("public_health_case_uid").asLong());
+                        investigationObservation.setPublicHealthCaseUid(publicHealthCaseUid);
                         observationIds.add(node.get("source_act_uid").asLong());
                     }
                 }
 
                 for(Long id : observationIds) {
                     investigationObservation.setObservationId(id);
-                    kafkaTemplate.send(investigationObservationOutputTopicName, investigationObservation.toString());
+//                    String jsonKey = jsonGenerator.generateStringJson(investigationKey);
+                    String jsonValue = jsonGenerator.generateStringJson(investigationObservation);
+                    kafkaTemplate.send(investigationObservationOutputTopicName, jsonValue, jsonValue);
                 }
             }
         } catch (Exception e) {
@@ -176,20 +187,21 @@ public class ProcessInvestigationDataUtil {
     private void transformInvestigationConfirmationMethod(String investigationConfirmationMethod, InvestigationTransformed investigationTransformed, ObjectMapper objectMapper) {
         try {
             JsonNode investigationConfirmationMethodJsonArray = investigationConfirmationMethod != null ? objectMapper.readTree(investigationConfirmationMethod) : null;
-            InvestigationConfirmationMethod investigationConfirmation = new InvestigationConfirmationMethod();
-            Long investigationId = null;
-            Map<String, String> confirmationMethodMap = new HashMap<>();
-            Instant confirmationMethodTime = null;
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            if(investigationConfirmationMethodJsonArray != null) {
+                InvestigationConfirmationMethod investigationConfirmation = new InvestigationConfirmationMethod();
+                Long investigationId = null;
+                Map<String, String> confirmationMethodMap = new HashMap<>();
+                Instant confirmationMethodTime = null;
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
-            // Redundant time variable in case if confirmation_method_time is null in all rows of the array
-            String phcLastChgTime = null;
+                // Redundant time variable in case if confirmation_method_time is null in all rows of the array
+                String phcLastChgTime = null;
 
 
-            if(investigationConfirmationMethodJsonArray != null && investigationConfirmationMethodJsonArray.isArray()) {
-                investigationId = investigationConfirmationMethodJsonArray.get(0).get("public_health_case_uid").asLong();
-                phcLastChgTime = investigationConfirmationMethodJsonArray.get(0).get("phc_last_chg_time").asText();
-                for(JsonNode node : investigationConfirmationMethodJsonArray) {
+                if(investigationConfirmationMethodJsonArray != null && investigationConfirmationMethodJsonArray.isArray()) {
+                    investigationId = investigationConfirmationMethodJsonArray.get(0).get("public_health_case_uid").asLong();
+                    phcLastChgTime = investigationConfirmationMethodJsonArray.get(0).get("phc_last_chg_time").asText();
+                    for(JsonNode node : investigationConfirmationMethodJsonArray) {
                         String confirmationMethodTimeString = node.get("confirmation_method_time").asText();
                         Instant currentInstant = null;
 
@@ -202,18 +214,25 @@ public class ProcessInvestigationDataUtil {
                         if (confirmationMethodTime == null || currentInstant.isAfter(confirmationMethodTime)) {
                             confirmationMethodTime = currentInstant;
                         }
-                    confirmationMethodMap.put(node.get("confirmation_method_cd").asText(), node.get("confirmation_method_desc_txt").asText());
+                        confirmationMethodMap.put(node.get("confirmation_method_cd").asText(), node.get("confirmation_method_desc_txt").asText());
+                    }
+                }
+                investigationConfirmation.setPublicHealthCaseUid(investigationId);
+                investigationKey.setPublicHealthCaseUid(investigationId);
+
+                if(confirmationMethodTime == null) {
+                    investigationConfirmation.setConfirmationMethodTime(phcLastChgTime);
+                }
+                for(String key : confirmationMethodMap.keySet()) {
+                    investigationConfirmation.setConfirmationMethodCd(key);
+                    investigationConfirmation.setConfirmationMethodDescTxt(confirmationMethodMap.get(key));
+//                    String jsonKey = jsonGenerator.generateStringJson(investigationKey);
+                    String jsonValue = jsonGenerator.generateStringJson(investigationConfirmation);
+                    kafkaTemplate.send(investigationConfirmationOutputTopicName, jsonValue, jsonValue);
                 }
             }
-            investigationConfirmation.setInvestigationId(investigationId);
-
-            if(confirmationMethodTime == null) {
-                investigationConfirmation.setConfirmationMethodTime(phcLastChgTime);
-            }
-            for(String key : confirmationMethodMap.keySet()) {
-                investigationConfirmation.setConfirmationMethodCd(key);
-                investigationConfirmation.setConfirmationMethodDescTxt(confirmationMethodMap.get(key));
-                kafkaTemplate.send(investigationConfirmationOutputTopicName, investigationConfirmation.toString());
+            else {
+                logger.info("InvestigationConfirmationMethod array is null.");
             }
         } catch (Exception e) {
             logger.error("Error processing investigation confirmation method JSON array from investigation data: {}", e.getMessage());
