@@ -10,9 +10,8 @@ Example : ```data-reporting-service/person-service/Dockerfile```
   * Reference ticket : https://cdc-nbs.atlassian.net/browse/CNAT-168
 
 ### Update the GitHub Actions file
-* update the GitHub Actions Workflow file in the root of the repository
-  * ```cd .github/workflows ```
-  * ```nano BuildReportingService.yaml```
+* Edit and update the GitHub Actions Workflow file in the root of the repository
+  * ```.github/workflows/Build-and-deploy-reporting-services.yaml ```
   * Make a section under `jobs` for the new microservice
   * Update the name of the action,  microservice_name and dockerfile_relative_path
   * In the on.push.branches section give a private branch name and test if checkins trigger a docker image build and publish to ECR
