@@ -12,6 +12,7 @@ import gov.cdc.etldatapipeline.observation.repository.model.reporting.Observatio
 import gov.cdc.etldatapipeline.observation.repository.model.dto.ObservationTransformed;
 import gov.cdc.etldatapipeline.observation.util.ProcessObservationDataUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.Consumed;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
+@Setter
 @RequiredArgsConstructor
 public class ObservationService {
     private static final Logger logger = LoggerFactory.getLogger(ObservationService.class);

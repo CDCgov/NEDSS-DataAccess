@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.cdc.etldatapipeline.observation.TestUtils;
 import gov.cdc.etldatapipeline.observation.repository.IObservationRepository;
-import gov.cdc.etldatapipeline.observation.repository.model.Observation;
+import gov.cdc.etldatapipeline.observation.repository.model.dto.Observation;
 import gov.cdc.etldatapipeline.observation.util.ProcessObservationDataUtil;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
@@ -107,8 +107,8 @@ class ObservationServiceTest {
     private ObservationService getObservationService(String inputTopicName, String outputTopicName, String transformedTopicName) {
         ObservationService observationService = new ObservationService(observationRepository, kafkaTemplate, new ProcessObservationDataUtil());
         observationService.setObservationTopic(inputTopicName);
-        observationService.setObservationTopicOutput(outputTopicName);
-        observationService.setObservationTopicOutputTransformed(transformedTopicName);
+        observationService.setObservationTopicOutputReporting(outputTopicName);
+        observationService.setObservationTopicOutputElasticSearch(transformedTopicName);
         return observationService;
     }
 

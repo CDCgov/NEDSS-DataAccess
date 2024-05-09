@@ -24,7 +24,7 @@ public class OrganizationYmlPropertiesTest {
 
         Assertions.assertEquals("nbs_Default", kafkaConfig.getDefaultDataTopic());
         Assertions.assertEquals("nbs_Organization", kafkaConfig.getOrganizationTopic());
-        Assertions.assertEquals("nrt_organization_elastic", kafkaConfig.getOrganizationElasticSearchTopic());
+        Assertions.assertEquals("elastic_nrt_organization", kafkaConfig.getOrganizationElasticSearchTopic());
         Assertions.assertEquals("nrt_organization", kafkaConfig.getOrganizationReportingTopic());
 
     }

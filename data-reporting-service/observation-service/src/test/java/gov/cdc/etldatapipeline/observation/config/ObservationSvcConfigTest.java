@@ -23,9 +23,9 @@ public class ObservationSvcConfigTest {
 
     @Test
     void testBindingYMLConfigFile_SetsAllFields() {
-        Assertions.assertEquals("cdc.nbs_odse.dbo.Observation", kafkaConfig.getObservationTopicName());
-        Assertions.assertEquals("cdc.nbs_odse.dbo.Observation.output", kafkaConfig.getObservationAggregateTopicName());
-        Assertions.assertEquals("cdc.nbs_odse.dbo.Observation.output-transformed", kafkaConfig.getObservationTransformedOutputTopicName());
+        Assertions.assertEquals("nbs_Observation", kafkaConfig.getObservationTopicName());
+        Assertions.assertEquals("nrt_observation", kafkaConfig.getObservationReportingOutputTopicName());
+        Assertions.assertEquals("elastic_search_observation", kafkaConfig.getObservationElasticSearchOutputTopicName());
     }
 
     @Configuration

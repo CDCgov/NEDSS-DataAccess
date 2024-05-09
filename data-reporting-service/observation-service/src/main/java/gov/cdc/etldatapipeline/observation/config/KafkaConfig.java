@@ -16,19 +16,19 @@ public class KafkaConfig {
     private String observationTopicName;
 
     @Value("${spring.kafka.stream.output.observation.topic-name-reporting}")
-    private String observationAggregateTopicName;
+    private String observationReportingOutputTopicName;
 
     @Value("${spring.kafka.stream.output.observation.topic-name-es}")
-    public String observationTransformedOutputTopicName;
+    public String observationElasticSearchOutputTopicName;
 
     @Bean
-    public NewTopic createAggregateObservationTopicName() {
-        return TopicBuilder.name(observationAggregateTopicName).build();
+    public NewTopic createObservationReportingOutputTopic() {
+        return TopicBuilder.name(observationReportingOutputTopicName).build();
     }
 
     @Bean
-    public NewTopic createObservationTransformedOutputTopic() {
-        return TopicBuilder.name(observationTransformedOutputTopicName).build();
+    public NewTopic createObservationElasticSearchOutputTopic() {
+        return TopicBuilder.name(observationElasticSearchOutputTopicName).build();
     }
 
 }
