@@ -14,9 +14,6 @@ spring:
           topic-name: ${PROVIDER_ELASTIC:elastic_nrt_organization}
         organizationReporting:
           topic-name: ${ORGANIZATION_REPORTING:nrt_organization}
-
-    streams:
-      application-id:  ${KAFKA_CONSUMER_APP:org-reporting-consumer-app}
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:localhost:9092}
     consumer:
       key-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer

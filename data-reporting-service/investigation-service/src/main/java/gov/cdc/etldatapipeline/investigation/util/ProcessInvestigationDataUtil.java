@@ -70,6 +70,9 @@ public class ProcessInvestigationDataUtil {
                     }
                 }
             }
+            else {
+                logger.info("PersonParticipations array is null.");
+            }
         } catch (Exception e) {
             logger.error("Error processing Person Participation JSON array from investigation data: {}", e.getMessage());
         }
@@ -88,6 +91,9 @@ public class ProcessInvestigationDataUtil {
                         investigationTransformed.setOrganizationId(node.get("entity_id").asLong());
                     }
                 }
+            }
+            else {
+                logger.info("OrganizationParticipations array is null.");
             }
         } catch (Exception e) {
             logger.error("Error processing Organization Participation JSON array from investigation data: {}", e.getMessage());
@@ -114,6 +120,9 @@ public class ProcessInvestigationDataUtil {
                     }
                 }
             }
+            else {
+                logger.info("ActIds array is null.");
+            }
         } catch (Exception e) {
             logger.error("Error processing Act Ids JSON array from investigation data: {}", e.getMessage());
         }
@@ -139,10 +148,12 @@ public class ProcessInvestigationDataUtil {
                 }
                 for(Long id : notificationIds) {
                     investigationNotification.setNotificationId(id);
-//                    String jsonKey = jsonGenerator.generateStringJson(investigationKey);
                     String jsonValue = jsonGenerator.generateStringJson(investigationNotification);
                     kafkaTemplate.send(investigationNotificationOutputTopicName, jsonValue, jsonValue);
                 }
+            }
+            else {
+                logger.info("InvestigationNotificationIds array is null.");
             }
         } catch (Exception e) {
             logger.error("Error processing Observation Notification Ids JSON array from investigation data: {}", e.getMessage());
@@ -174,10 +185,12 @@ public class ProcessInvestigationDataUtil {
 
                 for(Long id : observationIds) {
                     investigationObservation.setObservationId(id);
-//                    String jsonKey = jsonGenerator.generateStringJson(investigationKey);
                     String jsonValue = jsonGenerator.generateStringJson(investigationObservation);
                     kafkaTemplate.send(investigationObservationOutputTopicName, jsonValue, jsonValue);
                 }
+            }
+            else {
+                logger.info("InvestigationObservationIds array is null.");
             }
         } catch (Exception e) {
             logger.error("Error processing Observation Notification Ids JSON array from investigation data: {}", e.getMessage());
@@ -187,40 +200,38 @@ public class ProcessInvestigationDataUtil {
     private void transformInvestigationConfirmationMethod(String investigationConfirmationMethod, InvestigationTransformed investigationTransformed, ObjectMapper objectMapper) {
         try {
             JsonNode investigationConfirmationMethodJsonArray = investigationConfirmationMethod != null ? objectMapper.readTree(investigationConfirmationMethod) : null;
-            if(investigationConfirmationMethodJsonArray != null) {
-                InvestigationConfirmationMethodKey investigationConfirmationMethodKey = new InvestigationConfirmationMethodKey();
-                InvestigationConfirmationMethod investigationConfirmation = new InvestigationConfirmationMethod();
-                Long investigationId = null;
-                Map<String, String> confirmationMethodMap = new HashMap<>();
-                Instant confirmationMethodTime = null;
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            InvestigationConfirmationMethodKey investigationConfirmationMethodKey = new InvestigationConfirmationMethodKey();
+            InvestigationConfirmationMethod investigationConfirmation = new InvestigationConfirmationMethod();
+            Long publicHealthCaseUid;
+            Map<String, String> confirmationMethodMap = new HashMap<>();
+            Instant confirmationMethodTime = null;
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
-                // Redundant time variable in case if confirmation_method_time is null in all rows of the array
-                String phcLastChgTime = null;
+            // Redundant time variable in case if confirmation_method_time is null in all rows of the array
+            String phcLastChgTime = null;
 
 
-                if(investigationConfirmationMethodJsonArray != null && investigationConfirmationMethodJsonArray.isArray()) {
-                    investigationId = investigationConfirmationMethodJsonArray.get(0).get("public_health_case_uid").asLong();
-                    phcLastChgTime = investigationConfirmationMethodJsonArray.get(0).get("phc_last_chg_time").asText();
-                    for(JsonNode node : investigationConfirmationMethodJsonArray) {
-                        String confirmationMethodTimeString = node.get("confirmation_method_time").asText();
-                        Instant currentInstant = null;
+            if(investigationConfirmationMethodJsonArray != null && investigationConfirmationMethodJsonArray.isArray()) {
+                publicHealthCaseUid = investigationConfirmationMethodJsonArray.get(0).get("public_health_case_uid").asLong();
+                phcLastChgTime = investigationConfirmationMethodJsonArray.get(0).get("phc_last_chg_time").asText();
+                for(JsonNode node : investigationConfirmationMethodJsonArray) {
+                    String confirmationMethodTimeString = node.get("confirmation_method_time").asText();
+                    Instant currentInstant = null;
 
-                        // While getting data from JSON node, it is considered as literal String and that is why the null check
-                        // has equals for null String instead of null value.
-                        if(confirmationMethodTimeString != null && !confirmationMethodTimeString.equals("null")) {
-                            Date dateTime = sdf.parse(confirmationMethodTimeString);
-                            currentInstant = dateTime.toInstant();
-                        }
-                        if (confirmationMethodTime == null || currentInstant.isAfter(confirmationMethodTime)) {
-                            confirmationMethodTime = currentInstant;
-                        }
-                        confirmationMethodMap.put(node.get("confirmation_method_cd").asText(), node.get("confirmation_method_desc_txt").asText());
+                    // While getting data from JSON node, it is considered as literal String and that is why the null check
+                    // has equals for null String instead of null value.
+                    if(confirmationMethodTimeString != null && !confirmationMethodTimeString.equals("null")) {
+                        Date dateTime = sdf.parse(confirmationMethodTimeString);
+                        currentInstant = dateTime.toInstant();
                     }
+                    if (confirmationMethodTime == null || currentInstant.isAfter(confirmationMethodTime)) {
+                        confirmationMethodTime = currentInstant;
+                    }
+                    confirmationMethodMap.put(node.get("confirmation_method_cd").asText(), node.get("confirmation_method_desc_txt").asText());
                 }
-                investigationConfirmation.setPublicHealthCaseUid(investigationId);
-                investigationKey.setPublicHealthCaseUid(investigationId);
-                investigationConfirmationMethodKey.setPublicHealthCaseUid(investigationId);
+                investigationConfirmation.setPublicHealthCaseUid(publicHealthCaseUid);
+                investigationConfirmationMethodKey.setPublicHealthCaseUid(publicHealthCaseUid);
+
 
                 if(confirmationMethodTime == null) {
                     investigationConfirmation.setConfirmationMethodTime(phcLastChgTime);

@@ -16,6 +16,7 @@ import org.springframework.kafka.config.KafkaStreamsConfiguration;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Configuration
 @ConfigurationProperties
@@ -26,8 +27,7 @@ public class KafkaStreamsConfig {
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
 
-    @Value("${spring.kafka.streams.application-id}")
-    private String applicationId;
+    private String applicationId = UUID.randomUUID().toString();
 
     @Value("${spring.kafka.producer.key-serializer}")
     private String keySerializer;

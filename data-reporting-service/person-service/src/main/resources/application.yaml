@@ -19,8 +19,6 @@ spring:
         patientReporting:
           topic-name: ${PATIENT_REPORTING:nrt_patient}
 
-    streams:
-      application-id: ${KAFKA_CONSUMER_APP:person-reporting-consumer-app}
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:localhost:9092}
     consumer:
       key-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer

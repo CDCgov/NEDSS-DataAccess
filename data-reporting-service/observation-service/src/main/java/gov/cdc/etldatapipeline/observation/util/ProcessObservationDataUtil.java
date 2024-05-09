@@ -54,6 +54,9 @@ public class ProcessObservationDataUtil {
                     }
                 }
             }
+            else {
+                logger.info("PersonParticipations array is null.");
+            }
         } catch (Exception e) {
             logger.error("Error processing Person Participation JSON array from observation data: {}", e.getMessage());
         }
@@ -96,6 +99,9 @@ public class ProcessObservationDataUtil {
                     }
                 }
             }
+            else {
+                logger.info("OrganizationParticipations array is null.");
+            }
         } catch (Exception e) {
             logger.error("Error processing Organization Participation JSON array from observation data: {}", e.getMessage());
         }
@@ -125,6 +131,9 @@ public class ProcessObservationDataUtil {
                     }
                 }
             }
+            else {
+                logger.info("MaterialParticipations array is null.");
+            }
         } catch (Exception e) {
             logger.error("Error processing Material Participation JSON array from observation data: {}", e.getMessage());
         }
@@ -150,6 +159,9 @@ public class ProcessObservationDataUtil {
                         logger.error("obsDomainCdSt1: {} is not valid for the followupObservations", obsDomainCdSt1);
                     }
                 }
+            }
+            else {
+                logger.info("FollowupObservations array is null.");
             }
         } catch (Exception e) {
             logger.error("Error processing Followup Observations JSON array from observation data: {}", e.getMessage());

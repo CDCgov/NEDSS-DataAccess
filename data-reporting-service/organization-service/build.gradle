@@ -36,8 +36,6 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
 
 
-//    implementation project(':common-util')
-
     if (findProject(':common-util')) {
         implementation project(':common-util')
     } else {
