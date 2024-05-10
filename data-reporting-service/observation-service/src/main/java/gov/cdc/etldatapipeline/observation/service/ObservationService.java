@@ -72,8 +72,8 @@ public class ObservationService {
                     observationKey.setObservationUid(Long.valueOf(observationUid));
                     logger.debug(topicDebugLog, observationUid, observationTopic);
                     Optional<Observation> observationData = iObservationRepository.computeObservations(observationUid);
-                    ObservationReporting reportingModel = modelMapper.map(observationData.get(), ObservationReporting.class);
                     if(observationData.isPresent()) {
+                        ObservationReporting reportingModel = modelMapper.map(observationData.get(), ObservationReporting.class);
                         ObservationTransformed observationTransformed = processObservationDataUtil.transformObservationData(observationData.get());
                         buildReportingModelForTransformedData(reportingModel, observationTransformed);
                         pushKeyValuePairToKafka(observationKey, reportingModel, observationTopicOutputReporting);
@@ -94,7 +94,7 @@ public class ObservationService {
         kafkaTemplate.send(topicName, jsonKey, jsonValue);
     }
 
-    private void buildReportingModelForTransformedData(ObservationReporting reportingModel, ObservationTransformed observationTransformed) {
+    protected void buildReportingModelForTransformedData(ObservationReporting reportingModel, ObservationTransformed observationTransformed) {
         reportingModel.setOrderingPersonId(observationTransformed.getOrderingPersonId());
         reportingModel.setPatientId(observationTransformed.getPatientId());
         reportingModel.setPerformingOrganizationId(observationTransformed.getPerformingOrganizationId());
