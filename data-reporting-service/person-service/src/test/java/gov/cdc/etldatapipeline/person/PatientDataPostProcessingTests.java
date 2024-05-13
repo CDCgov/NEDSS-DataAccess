@@ -91,7 +91,7 @@ public class PatientDataPostProcessingTests {
     }
 
     @Test
-    public void PatientProviderNameTransformationTest() {
+    public void PatientNameTransformationTest() {
 
         // Build the PatientProvider object with the json serialized data
         PatientSp perOp = PatientSp.builder()
@@ -104,7 +104,8 @@ public class PatientDataPostProcessingTests {
                 p.getLastNm(),
                 p.getMiddleNm(),
                 p.getFirstNm(),
-                p.getNmSuffix());
+                p.getNmSuffix(),
+                p.getAliasNickname());
         // Process the respective field json to PatientProviderProvider fields
         PatientReporting pf = (PatientReporting) tx.processData(perOp, PersonType.PATIENT_REPORTING).getPayload();
 
@@ -113,8 +114,39 @@ public class PatientDataPostProcessingTests {
                 "Singgh",
                 "Js",
                 "Suurma",
-                "Jr");
+                "Jr",
+                null);
         // Validate the PatientProvider field processing
+        Assertions.assertEquals(expected, pDetailsFn.apply(pf));
+    }
+
+    @Test
+    public void PatientNameTransformationSet2Test() {
+
+        // Build the PatientProvider object with the json serialized data
+        PatientSp perOp = PatientSp.builder()
+                .personUid(10000001L)
+                .nameNested(readFileData(FILE_PREFIX + "PersonName1.json"))
+                .build();
+
+        // Patient Fields to be processed
+        Function<PatientReporting, List<String>> pDetailsFn = (p) -> Arrays.asList(
+                p.getLastNm(),
+                p.getMiddleNm(),
+                p.getFirstNm(),
+                p.getNmSuffix(),
+                p.getAliasNickname());
+
+        // Process the respective field json to PatientProviderProvider fields
+        PatientReporting pf = (PatientReporting) tx.processData(perOp, PersonType.PATIENT_REPORTING).getPayload();
+
+        List<String> expected = Arrays.asList(
+                "jack",
+                "amy",
+                "beans",
+                "Sr",
+                "XEZD6SLFPRUJQGA52");
+        // Validate the Patient field processing
         Assertions.assertEquals(expected, pDetailsFn.apply(pf));
     }
 
@@ -234,4 +266,81 @@ public class PatientDataPostProcessingTests {
         // Validate the PatientProvider field processing
         Assertions.assertEquals(expected, pDetailsFn.apply(pf));
     }
+
+    @Test
+    public void PatientRaceBreakdownTransformationTest() {
+
+        // Build the PatientProvider object with the json serialized data
+        PatientSp perOp = PatientSp.builder()
+                .personUid(10000001L)
+                .raceNested(readFileData(FILE_PREFIX + "PersonRace.json"))
+                .build();
+
+        // PatientProvider Fields to be processed
+        Function<PatientReporting, List<String>> pDetailsFn = (p) -> Arrays.asList(
+                p.getRaceCalculated(),
+                p.getRaceCalcDetails(),
+                p.getRaceAll(),
+                p.getRaceAmerInd1(),
+                p.getRaceAmerInd2(),
+                p.getRaceAmerInd3(),
+                p.getRaceAmerIndGt3Ind(),
+                p.getRaceAmerIndAll(),
+                p.getRaceAsian1(),
+                p.getRaceAsian2(),
+                p.getRaceAsian3(),
+                p.getRaceAsianGt3Ind(),
+                p.getRaceAsianAll(),
+                p.getRaceBlack1(),
+                p.getRaceBlack2(),
+                p.getRaceBlack3(),
+                p.getRaceBlackGt3Ind(),
+                p.getRaceBlackAll(),
+                p.getRaceNatHi1(),
+                p.getRaceNatHi2(),
+                p.getRaceNatHi3(),
+                p.getRaceNatHiGt3Ind(),
+                p.getRaceNatHiAll(),
+                p.getRaceWhite1(),
+                p.getRaceWhite2(),
+                p.getRaceWhite3(),
+                p.getRaceWhiteGt3Ind(),
+                p.getRaceWhiteAll());
+        // Process the respective field json to PatientProvider fields
+        PatientReporting pf = (PatientReporting) tx.processData(perOp, PersonType.PATIENT_REPORTING).getPayload();
+
+        // Expected
+        List<String> expected = Arrays.asList(
+                "Asian",
+                "Asian",
+                "Asian",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
+        // Validate the PatientProvider field processing
+        Assertions.assertEquals(expected, pDetailsFn.apply(pf));
+    }
+
 }

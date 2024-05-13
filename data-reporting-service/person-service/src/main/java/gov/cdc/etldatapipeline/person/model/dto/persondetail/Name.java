@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Objects;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -26,9 +28,9 @@ public class Name implements ExtendPerson {
     private String nmDegree;
     @JsonProperty("pn_person_uid")
     private Long personUid;
-    @JsonProperty("person_name_seq")
+    @JsonProperty("pn_person_name_seq")
     private String personNmSeq;
-    @JsonProperty("last_chg_time")
+    @JsonProperty("pn_last_chg_time")
     private String lastChgTime;
 
     public <T extends PersonExtendedProps> T updatePerson(T person) {
@@ -41,6 +43,14 @@ public class Name implements ExtendPerson {
         person.setPersonNmSeq(this.personNmSeq);
         person.setNmUseCd(this.nmUseCd);
         person.setNmDegree(this.nmDegree);
+        return person;
+    }
+
+    public <T extends PersonExtendedProps> T updatePerson(T person, String cd) {
+        if (Objects.equals(cd, NameUseCd.LEGAL.getVal()))
+            updatePerson(person);
+        if (Objects.equals(cd, NameUseCd.ALIAS.getVal()))
+            person.setAliasNickname(firstNm);
         return person;
     }
 }

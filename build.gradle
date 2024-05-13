@@ -1,0 +1,27 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath("com.dipien:semantic-version-gradle-plugin:2.0.0")
+    }
+}
+
+version = '1.0.1-SNAPSHOT'
+apply plugin: "com.dipien.semantic-version"
+
+subprojects {
+
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://packages.confluent.io/maven"
+        }
+    }
+
+    apply plugin: 'java'
+}
