@@ -45,24 +45,6 @@ public class PostProcessingService {
         }
     }
 
-//    @KafkaListener(topics = {"${spring.kafka.topic.investigation-confirmation}"})
-//    public void postProcessInvestigationConfirmationMessage(@Header(KafkaHeaders.RECEIVED_KEY) String key,
-//                                                            @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
-//        Long id = extractIdFromMessage(key, topic);
-//        if(id != null) {
-//            idCache.computeIfAbsent(topic, k -> new CopyOnWriteArrayList<>()).add(id);
-//        }
-//    }
-//
-//    @KafkaListener(topics = {"${spring.kafka.topic.investigation-notification}"})
-//    public void postProcessInvestigationNotificationMessage(@Header(KafkaHeaders.RECEIVED_KEY) String key,
-//                                                            @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
-//        Long id = extractIdFromMessage(key, topic);
-//        if(id != null) {
-//            idCache.computeIfAbsent(topic, k -> new CopyOnWriteArrayList<>()).add(id);
-//        }
-//    }
-
     @KafkaListener(topics = {"${spring.kafka.topic.organization}"})
     public void postProcessOrganizationMessage(@Header(KafkaHeaders.RECEIVED_KEY) String key,
                                                @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
