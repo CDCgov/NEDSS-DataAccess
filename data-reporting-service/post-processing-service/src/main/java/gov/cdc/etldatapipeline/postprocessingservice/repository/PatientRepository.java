@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface  PatientRepository extends JpaRepository<PatientStoredProc, Long> {
+public interface PatientRepository extends JpaRepository<PatientStoredProc, Long> {
     @Procedure("sp_nrt_patient_postprocessing")
     void executeStoredProcForPatientIds(@Param("patientUids") String patientUids);
 }
