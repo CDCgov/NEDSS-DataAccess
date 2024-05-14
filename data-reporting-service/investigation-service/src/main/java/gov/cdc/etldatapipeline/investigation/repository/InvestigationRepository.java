@@ -13,4 +13,7 @@ public interface InvestigationRepository extends JpaRepository<Investigation, St
 
     @Query(nativeQuery = true, value = "execute sp_investigation_event :investigation_uids")
     Optional<Investigation> computeInvestigations(@Param("investigation_uids") String investigationUids);
+
+    @Query(nativeQuery = true, value = "exec sp_public_health_case_fact_datamart_event :investigation_uids")
+    void populatePhcFact(@Param("investigation_uids") String phcIds);
 }
