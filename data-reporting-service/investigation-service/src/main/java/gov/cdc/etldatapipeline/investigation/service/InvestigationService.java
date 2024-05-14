@@ -53,15 +53,16 @@ public class InvestigationService {
     }
 
     public String processInvestigation(String value) {
+        String publicHealthCaseUid = "";
         try {
             ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
             JsonNode jsonNode = objectMapper.readTree(value);
             JsonNode payloadNode = jsonNode.get("payload").path("after");
             if (payloadNode != null && payloadNode.has("public_health_case_uid")) {
-                String publicHealthCaseUid = payloadNode.get("public_health_case_uid").asText();
+                publicHealthCaseUid = payloadNode.get("public_health_case_uid").asText();
 
                 // Calling sp_public_health_case_fact_datamart_event
-                logger.info("Executing stored proc with ids: {} to populate PHS fact datamart", publicHealthCaseUid);
+                logger.info("Executing stored proc with ids: {} to populate PHС fact datamart", publicHealthCaseUid);
                 investigationRepository.populatePhcFact(publicHealthCaseUid);
                 logger.info("Stored proc executed");
 
@@ -75,7 +76,9 @@ public class InvestigationService {
             }
 
         } catch (Exception e) {
-            logger.error("Error processing investigation: {}", e.getMessage());
+            String msg = "Error processing investigation" +
+                    (!publicHealthCaseUid.isEmpty() ? " for ids='" + publicHealthCaseUid + "': {}" : ": {}");
+            logger.error(msg, e.getMessage());
         }
         return null;
     }
