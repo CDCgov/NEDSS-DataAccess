@@ -3,6 +3,7 @@ package gov.cdc.etldatapipeline.postprocessingservice.service;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import gov.cdc.etldatapipeline.postprocessingservice.repository.InvestigationRepository;
 import gov.cdc.etldatapipeline.postprocessingservice.repository.OrganizationRepository;
 import gov.cdc.etldatapipeline.postprocessingservice.repository.PatientRepository;
 import gov.cdc.etldatapipeline.postprocessingservice.repository.ProviderRepository;
@@ -31,15 +32,16 @@ public class PostProcessingServiceTest {
     private ProviderRepository providerRepositoryMock;
     @Mock
     private OrganizationRepository organizationRepositoryMock;
+    @Mock
+    private InvestigationRepository investigationRepositoryMock;
 
     private ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
-//    Logger logger = (Logger) LoggerFactory.getLogger(PostProcessingService.class);
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
         postProcessingServiceMock = new PostProcessingService(patientRepositoryMock,
-                providerRepositoryMock, organizationRepositoryMock);
+                providerRepositoryMock, organizationRepositoryMock, investigationRepositoryMock);
         Logger logger = (Logger) LoggerFactory.getLogger(PostProcessingService.class);
         listAppender.start();
         logger.addAppender(listAppender);
@@ -59,9 +61,9 @@ public class PostProcessingServiceTest {
         postProcessingServiceMock.postProcessPatientMessage(key, topic);
         postProcessingServiceMock.processCachedIds();
 
-        String expectedPatientIdsString = "123"; //String.join(",", patientIds.stream().map(String::valueOf).collect(Collectors.toList()));
+        String expectedPatientIdsString = "123";
         verify(patientRepositoryMock).executeStoredProcForPatientIds(expectedPatientIdsString);
-        verify(patientRepositoryMock, times(1)).executeStoredProcForPatientIds("123");
+        verify(patientRepositoryMock, times(1)).executeStoredProcForPatientIds(expectedPatientIdsString);
         assertTrue(postProcessingServiceMock.idCache.containsKey(topic));
 
         List<ILoggingEvent> logs = listAppender.list;
@@ -87,9 +89,9 @@ public class PostProcessingServiceTest {
         postProcessingServiceMock.postProcessProviderMessage(key, topic);
         postProcessingServiceMock.processCachedIds();
 
-        String expectedProviderIdsString = "123"; //String.join(",", providerIds.stream().map(String::valueOf).collect(Collectors.toList()));
+        String expectedProviderIdsString = "123";
         verify(providerRepositoryMock).executeStoredProcForProviderIds(expectedProviderIdsString);
-        verify(providerRepositoryMock, times(1)).executeStoredProcForProviderIds("123");
+        verify(providerRepositoryMock, times(1)).executeStoredProcForProviderIds(expectedProviderIdsString);
         assertTrue(postProcessingServiceMock.idCache.containsKey(topic));
 
         List<ILoggingEvent> logs = listAppender.list;
@@ -115,9 +117,9 @@ public class PostProcessingServiceTest {
         postProcessingServiceMock.postProcessOrganizationMessage(key, topic);
         postProcessingServiceMock.processCachedIds();
 
-        String expectedOrganizationIdsIdsString = "123"; //String.join(",", organizationIds.stream().map(String::valueOf).collect(Collectors.toList()));
+        String expectedOrganizationIdsIdsString = "123";
         verify(organizationRepositoryMock).executeStoredProcForOrganizationIds(expectedOrganizationIdsIdsString);
-        verify(organizationRepositoryMock, times(1)).executeStoredProcForOrganizationIds("123");
+        verify(organizationRepositoryMock, times(1)).executeStoredProcForOrganizationIds(expectedOrganizationIdsIdsString);
         assertTrue(postProcessingServiceMock.idCache.containsKey(topic));
 
         List<ILoggingEvent> logs = listAppender.list;
@@ -129,6 +131,34 @@ public class PostProcessingServiceTest {
     public void testExtractIdFromOrganizationMessage() {
         String messageKey = "{\"payload\":{\"organization_uid\":123}}";
         String topic = "dummy_organization";
+        Long expectedId = 123L;
+        Long extractedId = postProcessingServiceMock.extractIdFromMessage(messageKey, topic);
+
+        assertEquals(expectedId, extractedId);
+    }
+
+    @Test
+    public void testPostProcessInvestigationMessage() {
+        String key = "{\"payload\":{\"public_health_case_uid\":123}}";
+        String topic = "dummy_investigation";
+
+        postProcessingServiceMock.postProcessInvestigationMessage(key, topic);
+        postProcessingServiceMock.processCachedIds();
+
+        String expectedPublicHealthCaseIdsString = "123";
+        verify(investigationRepositoryMock).executeStoredProcForPublicHealthCaseIds(expectedPublicHealthCaseIdsString);
+        verify(investigationRepositoryMock, times(1)).executeStoredProcForPublicHealthCaseIds(expectedPublicHealthCaseIdsString);
+        assertTrue(postProcessingServiceMock.idCache.containsKey(topic));
+
+        List<ILoggingEvent> logs = listAppender.list;
+        assertEquals(3, logs.size());
+        assertTrue(logs.get(2).getMessage().contains("Stored proc execution completed."));
+    }
+
+    @Test
+    public void testExtractIdFromInvestigationMessage() {
+        String messageKey = "{\"payload\":{\"public_health_case_uid\":123}}";
+        String topic = "dummy_investigation";
         Long expectedId = 123L;
         Long extractedId = postProcessingServiceMock.extractIdFromMessage(messageKey, topic);
 
@@ -149,9 +179,9 @@ public class PostProcessingServiceTest {
 
     @Test
     public void testExtractIdFromMessageException() {
-        String messageKey = "invalid_key";
-        String topic = "dummy_topic";
+        String invalidKey = "invalid_key";
+        String invalidTopic = "dummy_topic";
 
-        assertThrows(RuntimeException.class, () -> postProcessingServiceMock.extractIdFromMessage(messageKey, topic));
+        assertThrows(RuntimeException.class, () -> postProcessingServiceMock.extractIdFromMessage(invalidKey, invalidTopic));
     }
 }
