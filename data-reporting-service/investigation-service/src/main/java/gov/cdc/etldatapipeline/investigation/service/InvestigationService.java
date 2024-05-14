@@ -11,6 +11,7 @@ import gov.cdc.etldatapipeline.investigation.repository.model.dto.InvestigationT
 import gov.cdc.etldatapipeline.investigation.repository.model.reporting.InvestigationReporting;
 import gov.cdc.etldatapipeline.investigation.util.ProcessInvestigationDataUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.Consumed;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
+@Setter
 @RequiredArgsConstructor
 public class InvestigationService {
     private static final Logger logger = LoggerFactory.getLogger(InvestigationService.class);
@@ -42,9 +44,7 @@ public class InvestigationService {
     private final ModelMapper modelMapper = new ModelMapper();
     private final CustomJsonGeneratorImpl jsonGenerator = new CustomJsonGeneratorImpl();
 
-
     private String topicDebugLog = "Received Investigation ID: {} from topic: {}";
-
 
     @Autowired
     public void processMessage(StreamsBuilder streamsBuilder) {
@@ -57,25 +57,35 @@ public class InvestigationService {
     }
 
     public String processInvestigation(String value) {
+        String publicHealthCaseUid = "";
         try {
             ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
             JsonNode jsonNode = objectMapper.readTree(value);
             JsonNode payloadNode = jsonNode.get("payload").path("after");
             if (payloadNode != null && payloadNode.has("public_health_case_uid")) {
-                String publicHealthCaseUid = payloadNode.get("public_health_case_uid").asText();
+                publicHealthCaseUid = payloadNode.get("public_health_case_uid").asText();
                 investigationKey.setPublicHealthCaseUid(Long.valueOf(publicHealthCaseUid));
+
+                // Calling sp_public_health_case_fact_datamart_event
+                logger.info("Executing stored proc with ids: {} to populate PHС fact datamart", publicHealthCaseUid);
+                investigationRepository.populatePhcFact(publicHealthCaseUid);
+                logger.info("Stored proc executed");
+
                 logger.debug(topicDebugLog, publicHealthCaseUid, investigationTopic);
                 Optional<Investigation> investigationData = investigationRepository.computeInvestigations(publicHealthCaseUid);
-                InvestigationReporting reportingModel = modelMapper.map(investigationData.get(), InvestigationReporting.class);
                 if(investigationData.isPresent()) {
+                    InvestigationReporting reportingModel = modelMapper.map(investigationData.get(), InvestigationReporting.class);
                     InvestigationTransformed investigationTransformed = processDataUtil.transformInvestigationData(investigationData.get());
                     buildReportingModelForTransformedData(reportingModel, investigationTransformed);
                     pushKeyValuePairToKafka(investigationKey, reportingModel, investigationTopicReporting);
                     return objectMapper.writeValueAsString(investigationData.get());
                 }
             }
+
         } catch (Exception e) {
-            logger.error("Error processing investigation: {}", e.getMessage());
+            String msg = "Error processing investigation" +
+                    (!publicHealthCaseUid.isEmpty() ? " for ids='" + publicHealthCaseUid + "': {}" : ": {}");
+            logger.error(msg, e.getMessage());
         }
         return null;
     }
