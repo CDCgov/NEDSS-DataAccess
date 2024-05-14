@@ -8,6 +8,7 @@ import gov.cdc.etldatapipeline.investigation.repository.model.dto.Investigation;
 import gov.cdc.etldatapipeline.investigation.repository.model.dto.InvestigationTransformed;
 import gov.cdc.etldatapipeline.investigation.util.ProcessInvestigationDataUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.Consumed;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
+@Setter
 @RequiredArgsConstructor
 public class InvestigationService {
     private static final Logger logger = LoggerFactory.getLogger(InvestigationService.class);
@@ -57,20 +59,24 @@ public class InvestigationService {
             JsonNode payloadNode = jsonNode.get("payload").path("after");
             if (payloadNode != null && payloadNode.has("public_health_case_uid")) {
                 String publicHealthCaseUid = payloadNode.get("public_health_case_uid").asText();
+
+                // Calling sp_public_health_case_fact_datamart_event
+                logger.info("Executing stored proc with ids: {} to populate PHS fact datamart", publicHealthCaseUid);
+                investigationRepository.populatePhcFact(publicHealthCaseUid);
+                logger.info("Stored proc executed");
+
                 logger.debug(topicDebugLog, publicHealthCaseUid, investigationTopic);
                 Optional<Investigation> investigationData = investigationRepository.computeInvestigations(publicHealthCaseUid);
                 if(investigationData.isPresent()) {
                     InvestigationTransformed investigationTransformed = processDataUtil.transformInvestigationData(investigationData.get());
                     kafkaTemplate.send(investigationTopicOutputTransformed, investigationTransformed.toString());
-                    return objectMapper.writeValueAsString(investigationData);
+                    return objectMapper.writeValueAsString(investigationData.get());
                 }
             }
+
         } catch (Exception e) {
             logger.error("Error processing investigation: {}", e.getMessage());
         }
         return null;
     }
-
-
-
 }
