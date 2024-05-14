@@ -81,13 +81,13 @@ public class PostProcessingService {
                 idCache.put(keyTopic, new ArrayList<>());
                 if(keyTopic.contains("investigation")) {
                     String idsString = String.join(",", ids.stream().map(String::valueOf).collect(Collectors.toList()));
-                    logger.info("Processing the ids from the topic {} and calling the stored proc for patient: {}", keyTopic, idsString);
+                    logger.info("Processing the ids from the topic {} and calling the stored proc for investigation: {}", keyTopic, idsString);
                     investigationRepository.executeStoredProcForPublicHealthCaseIds(idsString);
                     logger.info("Stored proc execution completed.");
                 }
                 if(keyTopic.contains("organization")) {
                     String idsString = String.join(",", ids.stream().map(String::valueOf).collect(Collectors.toList()));
-                    logger.info("Processing the ids from the topic {} and calling the stored proc for patient: {}", keyTopic, idsString);
+                    logger.info("Processing the ids from the topic {} and calling the stored proc for organization: {}", keyTopic, idsString);
                     organizationRepository.executeStoredProcForOrganizationIds(idsString);
                     logger.info("Stored proc execution completed.");
                 }
@@ -99,7 +99,7 @@ public class PostProcessingService {
                 }
                 if(keyTopic.contains("provider")) {
                     String idsString = String.join(",", ids.stream().map(String::valueOf).collect(Collectors.toList()));
-                    logger.info("Processing the ids from the topic {} and calling the stored proc for patient: {}", keyTopic, idsString);
+                    logger.info("Processing the ids from the topic {} and calling the stored proc for provider: {}", keyTopic, idsString);
                     providerRepository.executeStoredProcForProviderIds(idsString);
                     logger.info("Stored proc execution completed.");
                 }

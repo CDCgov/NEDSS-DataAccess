@@ -63,7 +63,7 @@ public class PostProcessingServiceTest {
 
         String expectedPatientIdsString = "123";
         verify(patientRepositoryMock).executeStoredProcForPatientIds(expectedPatientIdsString);
-        verify(patientRepositoryMock, times(1)).executeStoredProcForPatientIds("123");
+        verify(patientRepositoryMock, times(1)).executeStoredProcForPatientIds(expectedPatientIdsString);
         assertTrue(postProcessingServiceMock.idCache.containsKey(topic));
 
         List<ILoggingEvent> logs = listAppender.list;
@@ -91,7 +91,7 @@ public class PostProcessingServiceTest {
 
         String expectedProviderIdsString = "123";
         verify(providerRepositoryMock).executeStoredProcForProviderIds(expectedProviderIdsString);
-        verify(providerRepositoryMock, times(1)).executeStoredProcForProviderIds("123");
+        verify(providerRepositoryMock, times(1)).executeStoredProcForProviderIds(expectedProviderIdsString);
         assertTrue(postProcessingServiceMock.idCache.containsKey(topic));
 
         List<ILoggingEvent> logs = listAppender.list;
@@ -119,7 +119,7 @@ public class PostProcessingServiceTest {
 
         String expectedOrganizationIdsIdsString = "123";
         verify(organizationRepositoryMock).executeStoredProcForOrganizationIds(expectedOrganizationIdsIdsString);
-        verify(organizationRepositoryMock, times(1)).executeStoredProcForOrganizationIds("123");
+        verify(organizationRepositoryMock, times(1)).executeStoredProcForOrganizationIds(expectedOrganizationIdsIdsString);
         assertTrue(postProcessingServiceMock.idCache.containsKey(topic));
 
         List<ILoggingEvent> logs = listAppender.list;
@@ -145,9 +145,9 @@ public class PostProcessingServiceTest {
         postProcessingServiceMock.postProcessInvestigationMessage(key, topic);
         postProcessingServiceMock.processCachedIds();
 
-        String expectedPatientIdsString = "123";
-        verify(investigationRepositoryMock).executeStoredProcForPublicHealthCaseIds(expectedPatientIdsString);
-        verify(investigationRepositoryMock, times(1)).executeStoredProcForPublicHealthCaseIds("123");
+        String expectedPublicHealthCaseIdsString = "123";
+        verify(investigationRepositoryMock).executeStoredProcForPublicHealthCaseIds(expectedPublicHealthCaseIdsString);
+        verify(investigationRepositoryMock, times(1)).executeStoredProcForPublicHealthCaseIds(expectedPublicHealthCaseIdsString);
         assertTrue(postProcessingServiceMock.idCache.containsKey(topic));
 
         List<ILoggingEvent> logs = listAppender.list;
