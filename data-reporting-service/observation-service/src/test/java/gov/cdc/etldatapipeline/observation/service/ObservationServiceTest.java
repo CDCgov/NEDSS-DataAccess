@@ -1,25 +1,29 @@
 package gov.cdc.etldatapipeline.observation.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import gov.cdc.etldatapipeline.observation.TestUtils;
+import gov.cdc.etldatapipeline.commonutil.json.CustomJsonGeneratorImpl;
 import gov.cdc.etldatapipeline.observation.repository.IObservationRepository;
-import gov.cdc.etldatapipeline.observation.repository.model.Observation;
+import gov.cdc.etldatapipeline.observation.repository.model.dto.Observation;
+import gov.cdc.etldatapipeline.observation.repository.model.dto.ObservationKey;
+import gov.cdc.etldatapipeline.observation.repository.model.dto.ObservationTransformed;
+import gov.cdc.etldatapipeline.observation.repository.model.reporting.ObservationReporting;
 import gov.cdc.etldatapipeline.observation.util.ProcessObservationDataUtil;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.*;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.modelmapper.ModelMapper;
 import org.springframework.kafka.core.KafkaTemplate;
 
 import java.util.Optional;
 import java.util.Properties;
 
+import static gov.cdc.etldatapipeline.observation.TestUtils.readFileData;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
@@ -28,28 +32,38 @@ class ObservationServiceTest {
     @Mock
     private IObservationRepository observationRepository;
 
-    @Mock KafkaTemplate<String, String> kafkaTemplate;
+    @Mock
+    private KafkaTemplate<String, String> kafkaTemplate;
 
     @Captor
     private ArgumentCaptor<String> topicCaptor;
 
     @Captor
+    private ArgumentCaptor<String> keyCaptor;
+
+    @Captor
     private ArgumentCaptor<String> messageCaptor;
 
+    private AutoCloseable closeable;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        closeable = MockitoAnnotations.openMocks(this);
     }
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    @AfterEach
+    void closeService() throws Exception {
+        closeable.close();
+    }
+
+    final ModelMapper modelMapper = new ModelMapper();
     ProcessObservationDataUtil transformer = new ProcessObservationDataUtil();
+    final CustomJsonGeneratorImpl jsonGenerator = new CustomJsonGeneratorImpl();
 
     @Test
     void testProcessMessage() {
         String observationTopic = "Observation";
         String observationTopicOutput = "ObservationOutput";
-        String observationTopicOutputTransformed = "ObservationOutputTransformed";
 
         // Mocked input data
         Long observationUid = 123456789L;
@@ -59,14 +73,8 @@ class ObservationServiceTest {
         Observation observation = constructObservation(observationUid, obsDomainCdSt);
         when(observationRepository.computeObservations(eq(String.valueOf(observationUid)))).thenReturn(Optional.of(observation));
 
-        final String expectedTransformed = transformer.transformObservationData(observation).toString();
+        validateData(observationTopic, observationTopicOutput, payload, observation);
 
-        validateData(observationTopic, observationTopicOutput,
-                observationTopicOutputTransformed, payload, observationUid);
-
-        verify(kafkaTemplate).send(topicCaptor.capture(), messageCaptor.capture());
-        assertEquals(observationTopicOutputTransformed, topicCaptor.getValue());
-        assertEquals(expectedTransformed, messageCaptor.getValue());
         verify(observationRepository).computeObservations(eq(String.valueOf(observationUid)));
     }
 
@@ -75,14 +83,17 @@ class ObservationServiceTest {
         Observation observation = new Observation();
         observation.setId(observationUid);
         observation.setObsDomainCdSt1(obsDomainCdSt1);
-        observation.setPersonParticipations(TestUtils.readFileData(filePathPrefix + "PersonParticipations.json"));
+        observation.setPersonParticipations(readFileData(filePathPrefix + "PersonParticipations.json"));
+        observation.setOrganizationParticipations(readFileData(filePathPrefix + "OrganizationParticipations.json"));
+        observation.setMaterialParticipations(readFileData(filePathPrefix + "MaterialParticipations.json"));
+        observation.setFollowupObservations(readFileData(filePathPrefix + "FollowupObservations.json"));
         return observation;
     }
 
-    private void validateData(String inputTopicName, String outputTopicName, String transformedTopicName,
-                              String payload, Long expectedUid) {
+    private void validateData(String inputTopicName, String outputTopicName,
+                              String payload, Observation observation) {
         StreamsBuilder builder = new StreamsBuilder();
-        final var observationService = getObservationService(inputTopicName, outputTopicName, transformedTopicName);
+        final var observationService = getObservationService(inputTopicName, outputTopicName);
         observationService.processMessage(builder);
 
         TopologyTestDriver testDriver = new TopologyTestDriver(builder.build(), new Properties());
@@ -90,27 +101,31 @@ class ObservationServiceTest {
         TestInputTopic<String, String> inputTopic = testDriver.createInputTopic(
                 inputTopicName, serdeString.serializer(), serdeString.serializer());
 
-        TestOutputTopic<String, String> outputTopic = testDriver.createOutputTopic(
-                outputTopicName, serdeString.deserializer(), serdeString.deserializer());
-
         inputTopic.pipeInput("100000001", payload);
-        KeyValue<String, String> result = outputTopic.readKeyValue();
-        try {
-            Observation actual = objectMapper.readValue(result.value, Observation.class);
-            assertEquals(expectedUid, actual.getId());
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
+
         testDriver.close();
+
+        ObservationKey observationKey = new ObservationKey();
+        observationKey.setObservationUid(observation.getId());
+
+        ObservationReporting reportingModel = modelMapper.map(observation, ObservationReporting.class);
+        final ObservationTransformed transformed = transformer.transformObservationData(observation);
+        observationService.buildReportingModelForTransformedData(reportingModel, transformed);
+
+        String expectedKey = jsonGenerator.generateStringJson(observationKey);
+        String expectedValue = jsonGenerator.generateStringJson(reportingModel);
+
+        verify(kafkaTemplate).send(topicCaptor.capture(), keyCaptor.capture(), messageCaptor.capture());
+        assertEquals(outputTopicName, topicCaptor.getValue());
+        assertEquals(expectedKey, keyCaptor.getValue());
+        assertEquals(expectedValue, messageCaptor.getValue());
     }
 
-    private ObservationService getObservationService(String inputTopicName, String outputTopicName, String transformedTopicName) {
-        ObservationService observationService = new ObservationService(observationRepository, kafkaTemplate, new ProcessObservationDataUtil());
+    private ObservationService getObservationService(String inputTopicName, String outputTopicName) {
+        ObservationService observationService = new ObservationService(observationRepository, kafkaTemplate, transformer);
         observationService.setObservationTopic(inputTopicName);
-        observationService.setObservationTopicOutput(outputTopicName);
-        observationService.setObservationTopicOutputTransformed(transformedTopicName);
+        observationService.setObservationTopicOutputReporting(outputTopicName);
         return observationService;
     }
-
 
 }

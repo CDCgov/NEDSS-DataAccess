@@ -16,7 +16,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -52,7 +55,8 @@ class OrganizationServiceControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
 
         assertEquals(mockProducer.history().size(), 1);
-        ProducerRecord<String, JsonNode> sentRecord = mockProducer.history().getLast();
+        List<ProducerRecord<String, JsonNode>> sentRecordList = mockProducer.history();
+        ProducerRecord<String, JsonNode> sentRecord = sentRecordList.get(sentRecordList.size() - 1);
         assertEquals("org-topic", sentRecord.topic());
         assertEquals(jsonNode, sentRecord.value());
         assertNotNull(sentRecord.key());

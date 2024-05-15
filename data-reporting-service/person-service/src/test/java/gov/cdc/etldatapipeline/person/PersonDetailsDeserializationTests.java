@@ -101,6 +101,7 @@ public class PersonDetailsDeserializationTests {
                 .nmSuffix("Jr")
                 .nmDegree("MD")
                 .personUid(10000009L)
+                .personNmSeq("2")
                 .build();
 
         assertEquals(3, name.length);

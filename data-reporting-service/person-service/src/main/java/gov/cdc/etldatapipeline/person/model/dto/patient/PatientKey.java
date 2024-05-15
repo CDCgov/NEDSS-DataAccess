@@ -2,7 +2,7 @@ package gov.cdc.etldatapipeline.person.model.dto.patient;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import gov.cdc.etldatapipeline.person.model.dto.DataRequiredFields;
+import gov.cdc.etldatapipeline.commonutil.model.DataRequiredFields;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;

@@ -1,7 +1,7 @@
 package gov.cdc.etldatapipeline.observation;
 
-import gov.cdc.etldatapipeline.observation.repository.model.Observation;
-import gov.cdc.etldatapipeline.observation.repository.model.ObservationTransformed;
+import gov.cdc.etldatapipeline.observation.repository.model.dto.Observation;
+import gov.cdc.etldatapipeline.observation.repository.model.dto.ObservationTransformed;
 import gov.cdc.etldatapipeline.observation.util.ProcessObservationDataUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

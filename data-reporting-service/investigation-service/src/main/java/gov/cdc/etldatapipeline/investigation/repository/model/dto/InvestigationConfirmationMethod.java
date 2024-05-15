@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class InvestigationConfirmationMethod {
-    private Long investigationId;
+    private Long publicHealthCaseUid;
     private String confirmationMethodCd;
     private String confirmationMethodDescTxt;
     private String confirmationMethodTime;

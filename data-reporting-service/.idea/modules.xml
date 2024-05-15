@@ -2,9 +2,17 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/common-util/NEDSS-DataAccess.data-reporting-service.common-util.main.iml" filepath="$PROJECT_DIR$/.idea/modules/common-util/NEDSS-DataAccess.data-reporting-service.common-util.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/common-util.main.iml" filepath="$PROJECT_DIR$/.idea/modules/common-util.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/common-util/data-reporting-service.common-util.main.iml" filepath="$PROJECT_DIR$/.idea/modules/common-util/data-reporting-service.common-util.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/investigation-service/data-reporting-service.investigation-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/investigation-service/data-reporting-service.investigation-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/observation-service/data-reporting-service.observation-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/observation-service/data-reporting-service.observation-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/organization-service/data-reporting-service.organization-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/organization-service/data-reporting-service.organization-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/person-service/data-reporting-service.person-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/person-service/data-reporting-service.person-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/common-util/gov.cdc.etldatapipeline.data-reporting-service.common-util.main.iml" filepath="$PROJECT_DIR$/.idea/modules/common-util/gov.cdc.etldatapipeline.data-reporting-service.common-util.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/gov.cdc.etldatapipeline.person-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/gov.cdc.etldatapipeline.person-service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/investigation-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/investigation-service.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/organization-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/organization-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/observation-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/observation-service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/person-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/person-service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/post-processing-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/post-processing-service.main.iml" />
     </modules>

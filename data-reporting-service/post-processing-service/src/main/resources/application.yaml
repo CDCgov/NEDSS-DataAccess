@@ -28,4 +28,4 @@ spring:
 #    name: PostProcessingService.log
 #    path: ${DA_LOG_PATH:logs}
 server:
-  port: '8090'
+  port: '8094'

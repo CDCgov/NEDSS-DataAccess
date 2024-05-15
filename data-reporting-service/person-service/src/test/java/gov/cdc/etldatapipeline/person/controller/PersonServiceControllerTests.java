@@ -9,13 +9,19 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class PersonServiceControllerTests {
 
@@ -49,7 +55,8 @@ public class PersonServiceControllerTests {
         assertEquals(HttpStatus.OK, response.getStatusCode());
 
         assertEquals(mockProducer.history().size(), 1);
-        ProducerRecord<String, JsonNode> sentRecord = mockProducer.history().getLast();
+        List<ProducerRecord<String, JsonNode>> sentRecordList = mockProducer.history();
+        ProducerRecord<String, JsonNode> sentRecord = sentRecordList.get(sentRecordList.size() - 1);
         assertEquals("person-topic", sentRecord.topic());
         assertEquals(jsonNode, sentRecord.value());
         assertNotNull(sentRecord.key());
@@ -67,7 +74,8 @@ public class PersonServiceControllerTests {
         assertEquals(HttpStatus.OK, response.getStatusCode());
 
         assertEquals(mockProducer.history().size(), 1);
-        ProducerRecord<String, JsonNode> sentRecord = mockProducer.history().getLast();
+        List<ProducerRecord<String, JsonNode>> sentRecordList = mockProducer.history();
+        ProducerRecord<String, JsonNode> sentRecord = sentRecordList.get(sentRecordList.size() - 1);
         assertEquals("person-topic", sentRecord.topic());
         assertEquals(jsonNode, sentRecord.value());
         assertNotNull(sentRecord.key());

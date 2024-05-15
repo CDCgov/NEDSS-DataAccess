@@ -11,11 +11,11 @@ spring:
           topic-name: nbs_default
       output:
         providerElastic:
-          topic-name: ${PROVIDER_ELASTIC:elastic_nrt_provider}
+          topic-name: ${PROVIDER_ELASTIC:elastic_search_provider}
         providerReporting:
           topic-name: ${PROVIDER_REPORTING:nrt_provider}
         patientElastic:
-          topic-name: ${PATIENT_ELASTIC:elastic_nrt_patient}
+          topic-name: ${PATIENT_ELASTIC:elastic_search_patient}
         patientReporting:
           topic-name: ${PATIENT_REPORTING:nrt_patient}
 
@@ -42,4 +42,4 @@ logging:
     name: PersonService.log
     path: ${DA_LOG_PATH:logs}
 server:
-  port: '8091'
+  port: '8092'

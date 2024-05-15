@@ -1,11 +1,11 @@
 package gov.cdc.etldatapipeline.organization.service;
 
+import gov.cdc.etldatapipeline.commonutil.json.StreamsSerdes;
 import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationSp;
 import gov.cdc.etldatapipeline.organization.model.odse.Organization;
 import gov.cdc.etldatapipeline.organization.repository.OrgRepository;
 import gov.cdc.etldatapipeline.organization.transformer.OrganizationTransformers;
 import gov.cdc.etldatapipeline.organization.transformer.OrganizationType;
-import gov.cdc.etldatapipeline.organization.utils.StreamsSerdes;
 import gov.cdc.etldatapipeline.organization.utils.UtilHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
