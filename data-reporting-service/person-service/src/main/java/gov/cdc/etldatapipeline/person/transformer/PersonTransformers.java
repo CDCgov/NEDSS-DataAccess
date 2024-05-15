@@ -1,6 +1,7 @@
 package gov.cdc.etldatapipeline.person.transformer;
 
-import gov.cdc.etldatapipeline.person.model.avro.DataEnvelope;
+import gov.cdc.etldatapipeline.commonutil.json.CustomJsonGeneratorImpl;
+import gov.cdc.etldatapipeline.commonutil.model.avro.DataEnvelope;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
 import gov.cdc.etldatapipeline.person.model.dto.patient.PatientElasticSearch;
 import gov.cdc.etldatapipeline.person.model.dto.patient.PatientKey;
@@ -10,27 +11,26 @@ import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderElasticSearch;
 import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderKey;
 import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderReporting;
 import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderSp;
-import gov.cdc.etldatapipeline.person.utils.UtilHelper;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PersonTransformers {
-    UtilHelper utilHelper = new UtilHelper();
+    private final CustomJsonGeneratorImpl jsonGenerator = new CustomJsonGeneratorImpl();
 
     public DataEnvelope buildPatientKey(PatientSp p) {
-        return utilHelper.buildAvroRecord(PatientKey.builder().patientUid(p.getPersonUid()).build());
+        return jsonGenerator.buildAvroRecord(PatientKey.builder().patientUid(p.getPersonUid()).build());
     }
 
     public DataEnvelope buildProviderKey(ProviderSp p) {
-        return utilHelper.buildAvroRecord(ProviderKey.builder().providerUid(p.getPersonUid()).build());
+        return jsonGenerator.buildAvroRecord(ProviderKey.builder().providerUid(p.getPersonUid()).build());
     }
 
     public DataEnvelope processData(PatientSp patientSp, PersonType personType) {
-        return utilHelper.buildAvroRecord(processData(patientSp, null, personType));
+        return jsonGenerator.buildAvroRecord(processData(patientSp, null, personType));
     }
 
     public DataEnvelope processData(ProviderSp providerSp, PersonType personType) {
-        return utilHelper.buildAvroRecord(processData(null, providerSp, personType));
+        return jsonGenerator.buildAvroRecord(processData(null, providerSp, personType));
     }
 
     public <T extends PersonExtendedProps> T processData(PatientSp patientSp, ProviderSp providerSp,

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class InvestigationController {
     private final KafkaProducerService producerService;
-    private final String topicName = "cdc.nbs_odse.dbo.Investigation";
+    private final String topicName = "nbs_Investigation";
 
     @PostMapping("/publish")
     public void publishMessageToKafka(@RequestBody String jsonData) {

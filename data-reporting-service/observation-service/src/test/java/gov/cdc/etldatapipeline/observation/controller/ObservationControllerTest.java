@@ -1,11 +1,6 @@
 package gov.cdc.etldatapipeline.observation.controller;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import gov.cdc.etldatapipeline.observation.service.KafkaProducerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -14,7 +9,11 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import gov.cdc.etldatapipeline.observation.service.KafkaProducerService;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class ObservationControllerTest {
 
@@ -41,6 +40,6 @@ public class ObservationControllerTest {
                         .content(jsonData))
                 .andExpect(status().isOk());
 
-        verify(kafkaProducerService).sendMessage(eq("cdc.nbs_odse.dbo.Observation"), anyString());
+        verify(kafkaProducerService).sendMessage(eq("nbs_Observation"), anyString());
     }
 }

@@ -1,20 +1,20 @@
 package gov.cdc.etldatapipeline.organization.transformer;
 
-import gov.cdc.etldatapipeline.organization.model.DataRequiredFields;
-import gov.cdc.etldatapipeline.organization.model.avro.DataEnvelope;
+import gov.cdc.etldatapipeline.commonutil.json.CustomJsonGeneratorImpl;
+import gov.cdc.etldatapipeline.commonutil.model.DataRequiredFields;
+import gov.cdc.etldatapipeline.commonutil.model.avro.DataEnvelope;
 import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationElasticSearch;
 import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationKey;
 import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationReporting;
 import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationSp;
-import gov.cdc.etldatapipeline.organization.utils.UtilHelper;
 import org.springframework.stereotype.Component;
 
 @Component
 public class OrganizationTransformers {
-    UtilHelper utilHelper = new UtilHelper();
+    private final CustomJsonGeneratorImpl jsonGenerator = new CustomJsonGeneratorImpl();
 
     public DataEnvelope buildOrganizationKey(OrganizationSp p) {
-        return utilHelper.buildAvroRecord(OrganizationKey.builder().orgUID(p.getOrganizationUid()).build());
+        return jsonGenerator.buildAvroRecord(OrganizationKey.builder().orgUID(p.getOrganizationUid()).build());
     }
 
     public DataEnvelope processData(OrganizationSp organizationSp, OrganizationType organizationType) {
@@ -29,7 +29,7 @@ public class OrganizationTransformers {
         processor.processOrgFax(organizationSp.getOrganizationFax(), transformedObj);
         processor.processOrgEntity(organizationSp.getOrganizationEntityId(), transformedObj);
         processor.processOrgName(organizationSp.getOrganizationName(), transformedObj);
-        return utilHelper.buildAvroRecord(transformedObj);
+        return jsonGenerator.buildAvroRecord(transformedObj);
     }
 
     public OrganizationElasticSearch buildOrganizationElasticSearch(OrganizationSp orgSp) {

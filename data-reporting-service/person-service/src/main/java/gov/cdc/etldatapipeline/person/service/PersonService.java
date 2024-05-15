@@ -1,14 +1,14 @@
 package gov.cdc.etldatapipeline.person.service;
 
+import gov.cdc.etldatapipeline.commonutil.json.StreamsSerdes;
 import gov.cdc.etldatapipeline.person.model.dto.patient.PatientSp;
 import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderSp;
 import gov.cdc.etldatapipeline.person.model.odse.Person;
 import gov.cdc.etldatapipeline.person.repository.PatientRepository;
 import gov.cdc.etldatapipeline.person.repository.ProviderRepository;
-import gov.cdc.etldatapipeline.person.utils.StreamsSerdes;
-import gov.cdc.etldatapipeline.person.utils.UtilHelper;
 import gov.cdc.etldatapipeline.person.transformer.PersonTransformers;
 import gov.cdc.etldatapipeline.person.transformer.PersonType;
+import gov.cdc.etldatapipeline.person.utils.UtilHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;

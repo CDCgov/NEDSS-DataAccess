@@ -11,12 +11,12 @@ spring:
           topic-name: nbs_Default
       output:
         organizationElastic:
-          topic-name: ${PROVIDER_ELASTIC:elastic_nrt_organization}
+          topic-name: ${PROVIDER_ELASTIC:elastic_search_organization}
         organizationReporting:
           topic-name: ${ORGANIZATION_REPORTING:nrt_organization}
 
     streams:
-      application-id:  ${KAFKA_CONSUMER_APP:org-reporting-consumer-app}
+      application-id: ${KAFKA_CONSUMER_APP:organization-reporting-consumer-app}
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:localhost:9092}
     consumer:
       key-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
@@ -38,4 +38,4 @@ logging:
     name: OrganizationService.log
     path: ${DA_LOG_PATH:logs}
 server:
-  port: '8092'
+  port: '8090'

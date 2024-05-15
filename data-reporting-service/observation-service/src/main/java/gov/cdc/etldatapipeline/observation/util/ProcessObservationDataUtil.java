@@ -2,8 +2,8 @@ package gov.cdc.etldatapipeline.observation.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import gov.cdc.etldatapipeline.observation.repository.model.Observation;
-import gov.cdc.etldatapipeline.observation.repository.model.ObservationTransformed;
+import gov.cdc.etldatapipeline.observation.repository.model.dto.Observation;
+import gov.cdc.etldatapipeline.observation.repository.model.dto.ObservationTransformed;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,9 +50,12 @@ public class ProcessObservationDataUtil {
                         }
                     }
                     else {
-                        logger.error("obsDomainCdSt1: {} is not valid", obsDomainCdSt1);
+                        logger.error("obsDomainCdSt1: {} is not valid for the personParticipations.", obsDomainCdSt1);
                     }
                 }
+            }
+            else {
+                logger.info("PersonParticipations array is null.");
             }
         } catch (Exception e) {
             logger.error("Error processing Person Participation JSON array from observation data: {}", e.getMessage());
@@ -92,9 +95,12 @@ public class ProcessObservationDataUtil {
                         }
                     }
                     else {
-                        logger.error("obsDomainCdSt1: {} is not valid", obsDomainCdSt1);
+                        logger.error("obsDomainCdSt1: {} is not valid for the organizationParticipations", obsDomainCdSt1);
                     }
                 }
+            }
+            else {
+                logger.info("OrganizationParticipations array is null.");
             }
         } catch (Exception e) {
             logger.error("Error processing Organization Participation JSON array from observation data: {}", e.getMessage());
@@ -121,9 +127,12 @@ public class ProcessObservationDataUtil {
                         }
                     }
                     else {
-                        logger.error("obsDomainCdSt1: {} is not valid", obsDomainCdSt1);
+                        logger.error("obsDomainCdSt1: {} is not valid for the materialParticipations", obsDomainCdSt1);
                     }
                 }
+            }
+            else {
+                logger.info("MaterialParticipations array is null.");
             }
         } catch (Exception e) {
             logger.error("Error processing Material Participation JSON array from observation data: {}", e.getMessage());
@@ -147,9 +156,12 @@ public class ProcessObservationDataUtil {
                         }
                     }
                     else {
-                        logger.error("obsDomainCdSt1: {} is not valid", obsDomainCdSt1);
+                        logger.error("obsDomainCdSt1: {} is not valid for the followupObservations", obsDomainCdSt1);
                     }
                 }
+            }
+            else {
+                logger.info("FollowupObservations array is null.");
             }
         } catch (Exception e) {
             logger.error("Error processing Followup Observations JSON array from observation data: {}", e.getMessage());

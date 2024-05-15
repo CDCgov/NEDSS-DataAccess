@@ -15,20 +15,20 @@ public class KafkaConfig {
     @Value("${spring.kafka.stream.input.observation.topic-name}")
     private String observationTopicName;
 
-    @Value("${spring.kafka.stream.output.observation.topic-name}")
-    private String observationAggregateTopicName;
+    @Value("${spring.kafka.stream.output.observation.topic-name-reporting}")
+    private String observationReportingOutputTopicName;
 
-    @Value("${spring.kafka.stream.output.observation.topic-name-transformed}")
-    public String observationTransformedOutputTopicName = "cdc.nbs_odse.dbo.Observation.output-transformed";
+    @Value("${spring.kafka.stream.output.observation.topic-name-es}")
+    public String observationElasticSearchOutputTopicName;
 
     @Bean
-    public NewTopic createAggregateObservationTopicName() {
-        return TopicBuilder.name(observationAggregateTopicName).build();
+    public NewTopic createObservationReportingOutputTopic() {
+        return TopicBuilder.name(observationReportingOutputTopicName).build();
     }
 
     @Bean
-    public NewTopic createObservationTransformedOutputTopic() {
-        return TopicBuilder.name(observationTransformedOutputTopicName).build();
+    public NewTopic createObservationElasticSearchOutputTopic() {
+        return TopicBuilder.name(observationElasticSearchOutputTopicName).build();
     }
 
 }

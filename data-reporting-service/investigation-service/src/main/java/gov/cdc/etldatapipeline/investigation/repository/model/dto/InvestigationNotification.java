@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class InvestigationNotification {
-    private Long investigationId;
+    private Long publicHealthCaseUid;
     private Long notificationId;
 }

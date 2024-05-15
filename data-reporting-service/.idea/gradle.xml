@@ -9,6 +9,20 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/common-util" />
+            <option value="$PROJECT_DIR$/investigation-service" />
+            <option value="$PROJECT_DIR$/observation-service" />
+            <option value="$PROJECT_DIR$/organization-service" />
+            <option value="$PROJECT_DIR$/person-service" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/common-util" />
+        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/common-util" />
           </set>
         </option>
       </GradleProjectSettings>
@@ -27,15 +41,6 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/observation-service" />
-          </set>
-        </option>
-      </GradleProjectSettings>
-      <GradleProjectSettings>
-        <option name="externalProjectPath" value="$PROJECT_DIR$/organization-service" />
-        <option name="gradleJvm" value="#JAVA_HOME" />
-        <option name="modules">
-          <set>
-            <option value="$PROJECT_DIR$/organization-service" />
           </set>
         </option>
       </GradleProjectSettings>
