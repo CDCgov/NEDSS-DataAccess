@@ -118,7 +118,7 @@ services:
       context: ./observation-service
       dockerfile: ./Dockerfile
     ports:
-      - 8094:8090
+      - 8094:8094
     depends_on:
       - broker
     container_name: observation-reporting-service
@@ -134,7 +134,7 @@ services:
       context: ./post-processing-service
       dockerfile: ./Dockerfile
     ports:
-      - 8095:8090
+      - 8095:8095
     depends_on:
       - broker
     container_name: post-processing-reporting-service
