@@ -8,6 +8,9 @@ spring:
           observation:
             topic-name-reporting: nrt_observation
             topic-name-es: elastic_search_observation
+
+    streams:
+      application-id: ${KAFKA_CONSUMER_APP:observation-reporting-consumer-app}
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:localhost:9092}
     admin:
       auto-create: true

@@ -10,7 +10,6 @@ import org.springframework.kafka.config.KafkaStreamsConfiguration;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 @Configuration
 @EnableKafkaStreams
@@ -19,7 +18,8 @@ public class KafkaStreamsConfig {
 	@Value("${spring.kafka.bootstrap-servers}")
 	private String bootstrapServers;
 
-	private String applicationId = UUID.randomUUID().toString();
+	@Value("${spring.kafka.streams.application-id}")
+	private String applicationId;
 
 	@Bean(name = KafkaStreamsDefaultConfiguration.DEFAULT_STREAMS_CONFIG_BEAN_NAME)
 	public KafkaStreamsConfiguration kStreamsConfigs() {

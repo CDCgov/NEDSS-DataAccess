@@ -68,7 +68,7 @@ public class CustomJsonGeneratorImpl {
                 fieldName = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName);
 
                 fieldNode.put("type", getType(field.getType().getSimpleName().toLowerCase()));
-                fieldNode.put("optional", !fieldName.equals("public_health_case_uid"));
+                fieldNode.put("optional", (!fieldName.equals("public_health_case_uid") || !fieldName.equals("observation_uid")));
                 fieldNode.put("field", fieldName);
                 fieldsArray.add(fieldNode);
             }
