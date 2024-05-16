@@ -1,13 +1,15 @@
 package gov.cdc.etldatapipeline.observation.controller;
 
 import gov.cdc.etldatapipeline.observation.service.KafkaProducerService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
+@Slf4j
 public class ObservationController {
     private final KafkaProducerService producerService;
 
@@ -17,6 +19,13 @@ public class ObservationController {
     @Autowired
     public ObservationController(KafkaProducerService producerService) {
         this.producerService = producerService;
+    }
+
+    @GetMapping("/reporting/observation-svc/status")
+    @ResponseBody
+    public ResponseEntity<String> getDataPipelineStatusHealth() {
+        log.info("Observation Service Status OK");
+        return ResponseEntity.status(HttpStatus.OK).body("Observation Service Status OK");
     }
 
     @PostMapping("/publish")

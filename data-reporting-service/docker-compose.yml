@@ -68,7 +68,7 @@ services:
   person-reporting-service:
     build:
       context: ./person-service
-      dockerfile: ./Dockerfile
+      dockerfile: ./docker-compose.Dockerfile
     ports:
       - 8091:8091
     depends_on:
@@ -84,7 +84,7 @@ services:
   organization-reporting-service:
     build:
       context: ./organization-service
-      dockerfile: ./Dockerfile
+      dockerfile: ./docker-compose.Dockerfile
     ports:
       - 8092:8092
     depends_on:
@@ -100,7 +100,7 @@ services:
   investigation-reporting-service:
     build:
       context: ./investigation-service
-      dockerfile: ./Dockerfile
+      dockerfile: ./docker-compose.Dockerfile
     ports:
       - 8093:8093
     depends_on:
@@ -116,7 +116,7 @@ services:
   observation-reporting-service:
     build:
       context: ./observation-service
-      dockerfile: ./Dockerfile
+      dockerfile: ./docker-compose.Dockerfile
     ports:
       - 8094:8094
     depends_on:
@@ -132,7 +132,7 @@ services:
   post-processing-reporting-service:
     build:
       context: ./post-processing-service
-      dockerfile: ./Dockerfile
+      dockerfile: ./docker-compose.Dockerfile
     ports:
       - 8095:8095
     depends_on:
