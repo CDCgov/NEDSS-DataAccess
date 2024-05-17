@@ -29,4 +29,4 @@ logging:
     name: ObservationService.log
     path: ${DA_LOG_PATH:logs}
 server:
-  port: '8091'
+  port: '8094'
