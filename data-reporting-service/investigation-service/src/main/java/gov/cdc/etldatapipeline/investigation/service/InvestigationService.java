@@ -52,8 +52,7 @@ public class InvestigationService {
                 .filter((k, v) -> v != null)
                 .mapValues((key, value) -> processInvestigation(value))
                 .filter((key, value) -> value != null)
-                .peek((key, value) -> logger.info("Received Investigation : " + value));
-        //.to(investigationTopicOutput, Produced.with(Serdes.String(), Serdes.String()));
+                .peek((key, value) -> logger.info("Received Investigation: {}", value));
     }
 
     public String processInvestigation(String value) {
@@ -67,9 +66,9 @@ public class InvestigationService {
                 investigationKey.setPublicHealthCaseUid(Long.valueOf(publicHealthCaseUid));
 
                 // Calling sp_public_health_case_fact_datamart_event
-//                logger.info("Executing stored proc with ids: {} to populate PHС fact datamart", publicHealthCaseUid);
-//                investigationRepository.populatePhcFact(publicHealthCaseUid);
-//                logger.info("Stored proc executed");
+                logger.info("Executing stored proc with ids: {} to populate PHС fact datamart", publicHealthCaseUid);
+                investigationRepository.populatePhcFact(publicHealthCaseUid);
+                logger.info("Stored proc executed");
 
                 logger.debug(topicDebugLog, publicHealthCaseUid, investigationTopic);
                 Optional<Investigation> investigationData = investigationRepository.computeInvestigations(publicHealthCaseUid);
@@ -81,7 +80,6 @@ public class InvestigationService {
                     return objectMapper.writeValueAsString(investigationData.get());
                 }
             }
-
         } catch (Exception e) {
             String msg = "Error processing investigation" +
                     (!publicHealthCaseUid.isEmpty() ? " for ids='" + publicHealthCaseUid + "': {}" : ": {}");

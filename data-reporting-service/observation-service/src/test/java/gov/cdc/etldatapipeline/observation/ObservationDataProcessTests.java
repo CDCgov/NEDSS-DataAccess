@@ -6,7 +6,7 @@ import gov.cdc.etldatapipeline.observation.util.ProcessObservationDataUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static gov.cdc.etldatapipeline.observation.TestUtils.readFileData;
+import static gov.cdc.etldatapipeline.commonutil.TestUtils.readFileData;
 
 public class ObservationDataProcessTests {
     private static final String FILE_PREFIX = "rawDataFiles/";

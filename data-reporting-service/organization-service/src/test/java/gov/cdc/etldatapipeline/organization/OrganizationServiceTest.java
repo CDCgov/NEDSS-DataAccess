@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
-import static gov.cdc.etldatapipeline.organization.TestUtils.readFileData;
+import static gov.cdc.etldatapipeline.commonutil.TestUtils.readFileData;
 import static org.mockito.ArgumentMatchers.anyString;
 
 @ExtendWith(MockitoExtension.class)

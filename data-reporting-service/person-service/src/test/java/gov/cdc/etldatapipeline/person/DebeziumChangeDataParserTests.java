@@ -4,7 +4,7 @@ import gov.cdc.etldatapipeline.person.model.odse.Person;
 import gov.cdc.etldatapipeline.person.utils.UtilHelper;
 import org.junit.jupiter.api.Test;
 
-import static gov.cdc.etldatapipeline.person.TestUtils.readFileData;
+import static gov.cdc.etldatapipeline.commonutil.TestUtils.readFileData;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DebeziumChangeDataParserTests {

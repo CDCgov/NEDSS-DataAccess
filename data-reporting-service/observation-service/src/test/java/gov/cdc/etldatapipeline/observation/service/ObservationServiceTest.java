@@ -23,7 +23,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import java.util.Optional;
 import java.util.Properties;
 
-import static gov.cdc.etldatapipeline.observation.TestUtils.readFileData;
+import static gov.cdc.etldatapipeline.commonutil.TestUtils.readFileData;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 

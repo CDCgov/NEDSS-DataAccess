@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
-import static gov.cdc.etldatapipeline.person.TestUtils.readFileData;
+import static gov.cdc.etldatapipeline.commonutil.TestUtils.readFileData;
 
 public class PatientDataPostProcessingTests {
     private static final String FILE_PREFIX = "rawDataFiles/person/";

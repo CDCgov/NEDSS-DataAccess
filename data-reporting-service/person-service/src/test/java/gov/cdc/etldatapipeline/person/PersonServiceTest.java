@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
-import static gov.cdc.etldatapipeline.person.TestUtils.readFileData;
+import static gov.cdc.etldatapipeline.commonutil.TestUtils.readFileData;
 import static org.mockito.ArgumentMatchers.anyString;
 
 @ExtendWith(MockitoExtension.class)
@@ -168,7 +168,7 @@ public class PersonServiceTest {
             DataEnvelope<DataEnvelope> actualValue
                     = objectMapper.readValue(actualData.get(0).value, dataEnvelopeTypeReference);
             Assertions.assertEquals(
-                    objectMapper.readValue(TestUtils.readFileData(expectedValueFilePath), dataEnvelopeTypeReference),
+                    objectMapper.readValue(readFileData(expectedValueFilePath), dataEnvelopeTypeReference),
                     actualValue);
 
             //Validate the Patient Key
@@ -176,7 +176,7 @@ public class PersonServiceTest {
                     = objectMapper.readValue(actualData.get(0).key, dataEnvelopeTypeReference);
             //Construct expected Patient Key
             Assertions.assertEquals(
-                    objectMapper.readValue(TestUtils.readFileData(expectedKeyFilePath), dataEnvelopeTypeReference),
+                    objectMapper.readValue(readFileData(expectedKeyFilePath), dataEnvelopeTypeReference),
                     actualKey);
         } catch (IOException e) {
             throw new RuntimeException(e);
