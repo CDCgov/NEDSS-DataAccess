@@ -14,8 +14,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -44,7 +43,7 @@ class InvestigationControllerTest {
                         .content(jsonData))
                 .andExpect(status().isOk());
 
-        verify(kafkaProducerService).sendMessage(eq("nbs_Investigation"), anyString());
+        verify(kafkaProducerService).sendMessage(isNull(), eq(jsonData));
     }
 
     @Test

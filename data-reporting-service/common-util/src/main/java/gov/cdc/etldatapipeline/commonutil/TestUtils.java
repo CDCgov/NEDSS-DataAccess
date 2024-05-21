@@ -1,4 +1,4 @@
-package gov.cdc.etldatapipeline.observation;
+package gov.cdc.etldatapipeline.commonutil;
 
 import org.apache.commons.io.FileUtils;
 import org.springframework.core.io.ClassPathResource;

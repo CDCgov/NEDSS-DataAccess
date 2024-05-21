@@ -6,12 +6,16 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -40,6 +44,17 @@ public class ObservationControllerTest {
                         .content(jsonData))
                 .andExpect(status().isOk());
 
-        verify(kafkaProducerService).sendMessage(eq("nbs_Observation"), anyString());
+        verify(kafkaProducerService).sendMessage(isNull(), eq(jsonData));
+    }
+
+    @Test
+    void getDataPipelineStatusHealthTest() {
+        final String responseBody = "Investigation Service Status OK";
+
+        ResponseEntity<String> response = observationController.getDataPipelineStatusHealth();
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(responseBody, response.getBody());
     }
 }
+
