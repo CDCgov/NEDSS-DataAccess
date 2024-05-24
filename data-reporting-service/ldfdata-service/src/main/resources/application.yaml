@@ -7,7 +7,6 @@ spring:
       output:
         ldfdata:
           topic-name-reporting: nrt_ldf_data
-          topic-name-es: elastic_search_ldf_data
 
     streams:
       application-id: ${KAFKA_CONSUMER_APP:ldfdata-reporting-consumer-app}

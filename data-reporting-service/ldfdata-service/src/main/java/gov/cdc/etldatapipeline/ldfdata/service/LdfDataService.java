@@ -73,7 +73,6 @@ public class LdfDataService {
                     pushKeyValuePairToKafka(ldfDataKey, ldfData.get(), ldfDataTopicReporting);
                     return objectMapper.writeValueAsString(ldfData.get());
                 }
-
             }
         } catch (Exception e) {
             String msg = "Error processing LDF data" + (
@@ -84,10 +83,8 @@ public class LdfDataService {
                             : ": {}"
             );
             logger.error(msg, e.getMessage());
-
         }
         return null;
-
     }
 
     private void pushKeyValuePairToKafka(LdfDataKey ldfDataKey, Object model, String topicName) {
@@ -95,5 +92,4 @@ public class LdfDataService {
         String jsonValue = jsonGenerator.generateStringJson(model);
         kafkaTemplate.send(topicName, jsonKey, jsonValue);
     }
-
 }
