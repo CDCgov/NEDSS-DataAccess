@@ -21,7 +21,7 @@ public class LdfDataController {
     @ResponseBody
     public ResponseEntity<String> getDataPipelineStatusHealth() {
         log.info("LdfData Service Status OK");
-        return ResponseEntity.status(HttpStatus.OK).body("LdfData Service Status OK");
+        return ResponseEntity.status(HttpStatus.OK).body("LdfData Preprocessing Service Status OK");
     }
 
     @PostMapping("/publish")

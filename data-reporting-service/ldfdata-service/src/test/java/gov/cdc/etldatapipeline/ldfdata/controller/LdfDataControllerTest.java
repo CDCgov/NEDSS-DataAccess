@@ -48,7 +48,7 @@ class LdfDataControllerTest {
 
     @Test
     void getDataPipelineStatusHealthTest() {
-        final String responseBody = "LdfData Service Status OK";
+        final String responseBody = "LdfData Preprocessing Service Status OK";
 
         ResponseEntity<String> response = ldfDataController.getDataPipelineStatusHealth();
         assertNotNull(response);
