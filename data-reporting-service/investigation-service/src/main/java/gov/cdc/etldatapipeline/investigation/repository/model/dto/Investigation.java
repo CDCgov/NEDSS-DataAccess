@@ -300,4 +300,10 @@ public class Investigation {
 
     @Column(name = "investigation_confirmation_method")
     private String investigationConfirmationMethod;
+
+    @Column(name = "investigation_case_answer")
+    private String investigationCaseAnswer;
+
+    @Column(name = "investigation_notifications")
+    private String investigationNotifications;
 }

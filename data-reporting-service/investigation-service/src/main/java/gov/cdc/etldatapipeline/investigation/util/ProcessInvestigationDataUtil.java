@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.cdc.etldatapipeline.commonutil.json.CustomJsonGeneratorImpl;
 import gov.cdc.etldatapipeline.investigation.repository.model.dto.*;
+import gov.cdc.etldatapipeline.investigation.repository.rdb.InvestigationCaseAnswerRepository;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +34,8 @@ public class ProcessInvestigationDataUtil {
     private final KafkaTemplate<String, String> kafkaTemplate;
     InvestigationKey investigationKey = new InvestigationKey();
     private final CustomJsonGeneratorImpl jsonGenerator = new CustomJsonGeneratorImpl();
+
+    private final InvestigationCaseAnswerRepository investigationCaseAnswerRepository;
 
     public InvestigationTransformed transformInvestigationData(Investigation investigation) {
 
@@ -250,6 +254,38 @@ public class ProcessInvestigationDataUtil {
             }
         } catch (Exception e) {
             logger.error("Error processing investigation confirmation method JSON array from investigation data: {}", e.getMessage());
+        }
+    }
+
+    @Transactional(transactionManager = "rdbTransactionManager")
+    public void processInvestigationPageCaseAnswer(Investigation investigation) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            String parentNode = investigation.getInvestigationCaseAnswer();
+            JsonNode investigationCaseAnswerJsonArray = parentNode != null ? objectMapper.readTree(parentNode) : null;
+
+            if(investigationCaseAnswerJsonArray != null && investigationCaseAnswerJsonArray.isArray()) {
+                String actUid = investigationCaseAnswerJsonArray.get(0).get("act_uid").asText();
+                System.err.println("act uid is..." + actUid);
+                List<InvestigationCaseAnswer> investigationCaseAnswerDataIfPresent = investigationCaseAnswerRepository.findByActUid(actUid);
+                List<InvestigationCaseAnswer> investigationCaseAnswerList = new ArrayList<>();
+                for(JsonNode node : investigationCaseAnswerJsonArray) {
+                    InvestigationCaseAnswer tempCaseAnswerObject = objectMapper.treeToValue(node, InvestigationCaseAnswer.class);
+                    investigationCaseAnswerList.add(tempCaseAnswerObject);
+                }
+                if(investigationCaseAnswerDataIfPresent.isEmpty()) {
+                    investigationCaseAnswerRepository.saveAll(investigationCaseAnswerList);
+                }
+                else {
+                    investigationCaseAnswerRepository.delete();
+                    investigationCaseAnswerRepository.saveAll(investigationCaseAnswerList);
+                }
+            }
+            else {
+                logger.info("InvestigationCaseAnswerJsonArray array is null.");
+            }
+        } catch (Exception e) {
+            logger.error("Error processing investigation case answer JSON array from investigation data: {}", e.getMessage());
         }
     }
 }
