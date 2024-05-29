@@ -170,7 +170,7 @@ public class InvestigationDataProcessingTests {
 
         transformer.transformInvestigationData(investigation);
 
-        when(investigationCaseAnswerRepository.findByActUid(String.valueOf(investigationUid))).thenReturn(new ArrayList<>());
+        when(investigationCaseAnswerRepository.findByActUid(investigationUid)).thenReturn(new ArrayList<>());
 
         List<InvestigationCaseAnswer> caseAnswers = new ArrayList<>();
         caseAnswers.add(caseAnswer);
@@ -178,8 +178,8 @@ public class InvestigationDataProcessingTests {
         when(objectMapper.treeToValue(any(JsonNode.class), eq(InvestigationCaseAnswer.class)))
                 .thenReturn(caseAnswer);
 
-        verify(investigationCaseAnswerRepository).findByActUid(String.valueOf(investigationUid));
-        verify(investigationCaseAnswerRepository, never()).deleteByActUid(anyString());
+        verify(investigationCaseAnswerRepository).findByActUid(investigationUid);
+        verify(investigationCaseAnswerRepository, never()).deleteByActUid(anyLong());
         verify(investigationCaseAnswerRepository).saveAll(anyList());
     }
 
@@ -195,7 +195,7 @@ public class InvestigationDataProcessingTests {
 
         List<InvestigationCaseAnswer> investigationCaseAnswerDataIfPresent = new ArrayList<>();
         investigationCaseAnswerDataIfPresent.add(new InvestigationCaseAnswer());
-        when(investigationCaseAnswerRepository.findByActUid(String.valueOf(investigationUid))).thenReturn(investigationCaseAnswerDataIfPresent);
+        when(investigationCaseAnswerRepository.findByActUid(investigationUid)).thenReturn(investigationCaseAnswerDataIfPresent);
 
         transformer.transformInvestigationData(investigation);
 
@@ -205,8 +205,8 @@ public class InvestigationDataProcessingTests {
         when(objectMapper.treeToValue(any(JsonNode.class), eq(InvestigationCaseAnswer.class)))
                 .thenReturn(caseAnswer);
 
-        verify(investigationCaseAnswerRepository).findByActUid(String.valueOf(investigationUid));
-        verify(investigationCaseAnswerRepository).deleteByActUid(String.valueOf(investigationUid));
+        verify(investigationCaseAnswerRepository).findByActUid(investigationUid);
+        verify(investigationCaseAnswerRepository).deleteByActUid(investigationUid);
         verify(investigationCaseAnswerRepository).saveAll(anyList());
     }
 
@@ -219,6 +219,6 @@ public class InvestigationDataProcessingTests {
 
         transformer.transformInvestigationData(investigation);
 
-        verify(investigationCaseAnswerRepository, never()).findByActUid(String.valueOf(investigationUid));
+        verify(investigationCaseAnswerRepository, never()).findByActUid(investigationUid);
     }
 }

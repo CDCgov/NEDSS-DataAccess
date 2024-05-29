@@ -40,6 +40,7 @@ public class ProcessInvestigationDataUtil {
 
     private final InvestigationCaseAnswerRepository investigationCaseAnswerRepository;
 
+    @Transactional(transactionManager = "rdbTransactionManager")
     public InvestigationTransformed transformInvestigationData(Investigation investigation) {
 
         InvestigationTransformed investigationTransformed = new InvestigationTransformed();
@@ -289,13 +290,12 @@ public class ProcessInvestigationDataUtil {
         }
     }
 
-    @Transactional(transactionManager = "rdbTransactionManager")
-    protected void processInvestigationPageCaseAnswer(String investigationCaseAnswer, ObjectMapper objectMapper) {
+    private void processInvestigationPageCaseAnswer(String investigationCaseAnswer, ObjectMapper objectMapper) {
         try {
             JsonNode investigationCaseAnswerJsonArray = investigationCaseAnswer != null ? objectMapper.readTree(investigationCaseAnswer) : null;
 
             if(investigationCaseAnswerJsonArray != null && investigationCaseAnswerJsonArray.isArray()) {
-                String actUid = investigationCaseAnswerJsonArray.get(0).get("act_uid").asText();
+                Long actUid = investigationCaseAnswerJsonArray.get(0).get("act_uid").asLong();
                 List<InvestigationCaseAnswer> investigationCaseAnswerDataIfPresent = investigationCaseAnswerRepository.findByActUid(actUid);
                 List<InvestigationCaseAnswer> investigationCaseAnswerList = new ArrayList<>();
 

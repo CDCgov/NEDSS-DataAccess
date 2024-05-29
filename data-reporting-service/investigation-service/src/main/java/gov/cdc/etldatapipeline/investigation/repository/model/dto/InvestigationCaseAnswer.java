@@ -69,7 +69,7 @@ public class InvestigationCaseAnswer {
 
     @JsonProperty("answer_group_seq_nbr")
     @Column(name = "answer_group_seq_nbr")
-    private int answerGroupSeqNbr;
+    private String answerGroupSeqNbr;
 
     @JsonProperty("question_label")
     @Column(name = "question_label")
@@ -89,7 +89,7 @@ public class InvestigationCaseAnswer {
 
     @JsonProperty("question_group_seq_nbr")
     @Column(name = "question_group_seq_nbr")
-    private int questionGroupSeqNbr;
+    private String questionGroupSeqNbr;
 
     @JsonProperty("data_type")
     @Column(name = "data_type")

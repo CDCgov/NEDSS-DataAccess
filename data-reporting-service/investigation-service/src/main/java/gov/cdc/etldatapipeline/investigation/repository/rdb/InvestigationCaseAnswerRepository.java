@@ -8,7 +8,7 @@ import java.util.List;
 
 @Repository
 public interface InvestigationCaseAnswerRepository extends JpaRepository<InvestigationCaseAnswer, Long> {
-    List<InvestigationCaseAnswer> findByActUid(String actUid);
+    List<InvestigationCaseAnswer> findByActUid(Long actUid);
 
-    void deleteByActUid(String actUid);
+    void deleteByActUid(Long actUid);
 }
