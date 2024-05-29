@@ -10,9 +10,5 @@ import java.util.List;
 public interface InvestigationCaseAnswerRepository extends JpaRepository<InvestigationCaseAnswer, Long> {
     List<InvestigationCaseAnswer> findByActUid(String actUid);
 
-    void deleteAllByActUid(String actUid);
-
     void deleteByActUid(String actUid);
-
-    void delete();
 }

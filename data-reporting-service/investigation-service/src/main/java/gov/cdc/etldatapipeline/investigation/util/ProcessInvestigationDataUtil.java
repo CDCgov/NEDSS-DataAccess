@@ -31,6 +31,9 @@ public class ProcessInvestigationDataUtil {
     @Value("${spring.kafka.stream.output.investigation.topic-name-observation}")
     public String investigationObservationOutputTopicName;
 
+    @Value("${spring.kafka.stream.output.investigation.topic-name-notifications}")
+    public String investigationNotificationsOutputTopicName;
+
     private final KafkaTemplate<String, String> kafkaTemplate;
     InvestigationKey investigationKey = new InvestigationKey();
     private final CustomJsonGeneratorImpl jsonGenerator = new CustomJsonGeneratorImpl();
@@ -48,8 +51,37 @@ public class ProcessInvestigationDataUtil {
         transformNotificationIds(investigation.getObservationNotificationIds(), objectMapper);
         transformObservationIds(investigation.getObservationNotificationIds(), investigationTransformed, objectMapper);
         transformInvestigationConfirmationMethod(investigation.getInvestigationConfirmationMethod(), investigationTransformed, objectMapper);
+        processInvestigationPageCaseAnswer(investigation.getInvestigationCaseAnswer(), objectMapper);
+        transformNotifications(investigation.getInvestigationNotifications(), objectMapper);
 
         return investigationTransformed;
+    }
+
+    private void transformNotifications(String investigationNotifications, ObjectMapper objectMapper) {
+        try {
+            JsonNode investigationNotificationsJsonArray = investigationNotifications != null ? objectMapper.readTree(investigationNotifications) : null;
+            InvestigationNotificationsKey investigationNotificationsKey = new InvestigationNotificationsKey();
+
+            if(investigationNotificationsJsonArray != null && investigationNotificationsJsonArray.isArray()) {
+                for(JsonNode node : investigationNotificationsJsonArray) {
+                    Long actUid = node.get("source_act_uid").asLong();
+                    Long publicHealthCaseUid = node.get("public_health_case_uid").asLong();
+                    investigationNotificationsKey.setSourceActUid(actUid);
+                    investigationNotificationsKey.setPublicHealthCaseUid(publicHealthCaseUid);
+
+                    InvestigationNotifications tempInvestigationNotificationsObject = objectMapper.treeToValue(node, InvestigationNotifications.class);
+
+                    String jsonKey = jsonGenerator.generateStringJson(investigationNotificationsKey);
+                    String jsonValue = jsonGenerator.generateStringJson(tempInvestigationNotificationsObject);
+                    kafkaTemplate.send(investigationNotificationsOutputTopicName, jsonKey, jsonValue);
+                }
+            }
+            else {
+                logger.info("InvestigationNotifications array is null.");
+            }
+        } catch (Exception e) {
+            logger.error("Error processing Notifications JSON array from investigation data: {}", e.getMessage());
+        }
     }
 
 
@@ -258,26 +290,25 @@ public class ProcessInvestigationDataUtil {
     }
 
     @Transactional(transactionManager = "rdbTransactionManager")
-    public void processInvestigationPageCaseAnswer(Investigation investigation) {
+    protected void processInvestigationPageCaseAnswer(String investigationCaseAnswer, ObjectMapper objectMapper) {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            String parentNode = investigation.getInvestigationCaseAnswer();
-            JsonNode investigationCaseAnswerJsonArray = parentNode != null ? objectMapper.readTree(parentNode) : null;
+            JsonNode investigationCaseAnswerJsonArray = investigationCaseAnswer != null ? objectMapper.readTree(investigationCaseAnswer) : null;
 
             if(investigationCaseAnswerJsonArray != null && investigationCaseAnswerJsonArray.isArray()) {
                 String actUid = investigationCaseAnswerJsonArray.get(0).get("act_uid").asText();
-                System.err.println("act uid is..." + actUid);
                 List<InvestigationCaseAnswer> investigationCaseAnswerDataIfPresent = investigationCaseAnswerRepository.findByActUid(actUid);
                 List<InvestigationCaseAnswer> investigationCaseAnswerList = new ArrayList<>();
+
                 for(JsonNode node : investigationCaseAnswerJsonArray) {
                     InvestigationCaseAnswer tempCaseAnswerObject = objectMapper.treeToValue(node, InvestigationCaseAnswer.class);
                     investigationCaseAnswerList.add(tempCaseAnswerObject);
                 }
+
                 if(investigationCaseAnswerDataIfPresent.isEmpty()) {
                     investigationCaseAnswerRepository.saveAll(investigationCaseAnswerList);
                 }
                 else {
-                    investigationCaseAnswerRepository.delete();
+                    investigationCaseAnswerRepository.deleteByActUid(actUid);
                     investigationCaseAnswerRepository.saveAll(investigationCaseAnswerList);
                 }
             }

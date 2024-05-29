@@ -28,6 +28,7 @@ public class InvestigationSvcConfigTest {
         Assertions.assertEquals("nrt_investigation_confirmation", kafkaConfig.getInvestigationConfirmationOutputTopicName());
         Assertions.assertEquals("nrt_investigation_notification", kafkaConfig.getInvestigationNotificationOutputTopicName());
         Assertions.assertEquals("nrt_investigation_observation", kafkaConfig.getInvestigationObservationOutputTopicName());
+        Assertions.assertEquals("nrt_notifications", kafkaConfig.getNotificationsOutputTopicName());
     }
 
     @Configuration

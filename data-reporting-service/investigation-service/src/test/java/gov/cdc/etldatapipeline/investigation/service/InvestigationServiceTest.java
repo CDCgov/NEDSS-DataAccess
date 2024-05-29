@@ -1,10 +1,11 @@
 package gov.cdc.etldatapipeline.investigation.service;
 
 import gov.cdc.etldatapipeline.commonutil.json.CustomJsonGeneratorImpl;
-import gov.cdc.etldatapipeline.investigation.repository.InvestigationRepository;
+import gov.cdc.etldatapipeline.investigation.repository.odse.InvestigationRepository;
 import gov.cdc.etldatapipeline.investigation.repository.model.dto.Investigation;
 import gov.cdc.etldatapipeline.investigation.repository.model.dto.InvestigationKey;
 import gov.cdc.etldatapipeline.investigation.repository.model.reporting.InvestigationReporting;
+import gov.cdc.etldatapipeline.investigation.repository.rdb.InvestigationCaseAnswerRepository;
 import gov.cdc.etldatapipeline.investigation.util.ProcessInvestigationDataUtil;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
@@ -31,6 +32,9 @@ class InvestigationServiceTest {
     private InvestigationRepository investigationRepository;
 
     @Mock
+    private InvestigationCaseAnswerRepository investigationCaseAnswerRepository;
+
+    @Mock
     KafkaTemplate<String, String> kafkaTemplate;
 
     @Captor
@@ -48,7 +52,7 @@ class InvestigationServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        transformer = new ProcessInvestigationDataUtil(kafkaTemplate);
+        transformer = new ProcessInvestigationDataUtil(kafkaTemplate, investigationCaseAnswerRepository);
     }
 
     @Test

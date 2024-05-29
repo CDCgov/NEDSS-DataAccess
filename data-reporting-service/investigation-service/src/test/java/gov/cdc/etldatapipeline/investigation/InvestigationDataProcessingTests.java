@@ -1,6 +1,10 @@
 package gov.cdc.etldatapipeline.investigation;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.cdc.etldatapipeline.investigation.repository.model.dto.*;
+import gov.cdc.etldatapipeline.investigation.repository.rdb.InvestigationCaseAnswerRepository;
 import gov.cdc.etldatapipeline.investigation.util.ProcessInvestigationDataUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,22 +12,28 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.modelmapper.ModelMapper;
 import org.springframework.kafka.core.KafkaTemplate;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import static gov.cdc.etldatapipeline.commonutil.TestUtils.readFileData;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.*;
 
 public class InvestigationDataProcessingTests {
     @Mock
     KafkaTemplate<String, String> kafkaTemplate;
+
+    @Mock
+    InvestigationCaseAnswerRepository investigationCaseAnswerRepository;
+
+    @Mock
+    private ObjectMapper objectMapper;
 
     @Captor
     private ArgumentCaptor<String> topicCaptor;
@@ -38,6 +48,7 @@ public class InvestigationDataProcessingTests {
     private static final String CONFIRMATION_TOPIC = "confirmationTopic";
     private static final String OBSERVATION_TOPIC = "observationTopic";
     private static final String NOTIFICATION_TOPIC = "notificationTopic";
+    private static final String NOTIFICATIONS_TOPIC = "notificationsTopic";
     private static final Long investigationUid = 234567890L;
 
     ProcessInvestigationDataUtil transformer;
@@ -48,7 +59,7 @@ public class InvestigationDataProcessingTests {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        transformer = new ProcessInvestigationDataUtil(kafkaTemplate);
+        transformer = new ProcessInvestigationDataUtil(kafkaTemplate, investigationCaseAnswerRepository);
     }
 
     @Test
@@ -120,5 +131,94 @@ public class InvestigationDataProcessingTests {
 
         assertTrue(containsWords.apply(actualCombined, nDetailsFn.apply(notification)));
         assertTrue(containsWords.apply(actualCombined, oDetailsFn.apply(observation)));
+    }
+
+    @Test
+    public void testNotifications() {
+        Investigation investigation = new Investigation();
+
+        investigation.setPublicHealthCaseUid(investigationUid);
+        investigation.setInvestigationNotifications(readFileData(FILE_PREFIX + "InvestigationNotifications.json"));
+        transformer.investigationNotificationsOutputTopicName = NOTIFICATIONS_TOPIC;
+
+        InvestigationNotifications notifications = new InvestigationNotifications();
+        notifications.setPublicHealthCaseUid(investigationUid);
+        notifications.setSourceActUid(263748597L);
+
+        transformer.transformInvestigationData(investigation);
+        verify(kafkaTemplate, times (1)).send(topicCaptor.capture(), keyCaptor.capture(), messageCaptor.capture());
+        assertEquals(NOTIFICATIONS_TOPIC, topicCaptor.getValue());
+
+        Function<InvestigationNotifications, List<String>> nDetailsFn = (n) -> Arrays.asList(
+                String.valueOf(n.getPublicHealthCaseUid()),
+                String.valueOf(n.getSourceActUid()));
+
+        String actualCombined = String.join(" ",messageCaptor.getAllValues());
+
+        assertTrue(containsWords.apply(actualCombined, nDetailsFn.apply(notifications)));
+    }
+
+    @Test
+    public void testInvestigationCaseAnswer() throws JsonProcessingException {
+        Investigation investigation = new Investigation();
+
+        investigation.setPublicHealthCaseUid(investigationUid);
+        investigation.setInvestigationCaseAnswer(readFileData(FILE_PREFIX + "InvestigationCaseAnswer.json"));
+
+        InvestigationCaseAnswer caseAnswer = new InvestigationCaseAnswer();
+        caseAnswer.setActUid(investigationUid);
+
+        transformer.transformInvestigationData(investigation);
+
+        when(investigationCaseAnswerRepository.findByActUid(String.valueOf(investigationUid))).thenReturn(new ArrayList<>());
+
+        List<InvestigationCaseAnswer> caseAnswers = new ArrayList<>();
+        caseAnswers.add(caseAnswer);
+
+        when(objectMapper.treeToValue(any(JsonNode.class), eq(InvestigationCaseAnswer.class)))
+                .thenReturn(caseAnswer);
+
+        verify(investigationCaseAnswerRepository).findByActUid(String.valueOf(investigationUid));
+        verify(investigationCaseAnswerRepository, never()).deleteByActUid(anyString());
+        verify(investigationCaseAnswerRepository).saveAll(anyList());
+    }
+
+    @Test
+    public void testInvestigationCaseAnswerExistingRecords() throws JsonProcessingException {
+        Investigation investigation = new Investigation();
+
+        investigation.setPublicHealthCaseUid(investigationUid);
+        investigation.setInvestigationCaseAnswer(readFileData(FILE_PREFIX + "InvestigationCaseAnswer.json"));
+
+        InvestigationCaseAnswer caseAnswer = new InvestigationCaseAnswer();
+        caseAnswer.setActUid(investigationUid);
+
+        List<InvestigationCaseAnswer> investigationCaseAnswerDataIfPresent = new ArrayList<>();
+        investigationCaseAnswerDataIfPresent.add(new InvestigationCaseAnswer());
+        when(investigationCaseAnswerRepository.findByActUid(String.valueOf(investigationUid))).thenReturn(investigationCaseAnswerDataIfPresent);
+
+        transformer.transformInvestigationData(investigation);
+
+        List<InvestigationCaseAnswer> caseAnswers = new ArrayList<>();
+        caseAnswers.add(caseAnswer);
+
+        when(objectMapper.treeToValue(any(JsonNode.class), eq(InvestigationCaseAnswer.class)))
+                .thenReturn(caseAnswer);
+
+        verify(investigationCaseAnswerRepository).findByActUid(String.valueOf(investigationUid));
+        verify(investigationCaseAnswerRepository).deleteByActUid(String.valueOf(investigationUid));
+        verify(investigationCaseAnswerRepository).saveAll(anyList());
+    }
+
+    @Test
+    public void testInvestigationCaseAnswerInvalidJson() {
+        Investigation investigation = new Investigation();
+
+        investigation.setPublicHealthCaseUid(investigationUid);
+        investigation.setInvestigationCaseAnswer("{ invalid json }");
+
+        transformer.transformInvestigationData(investigation);
+
+        verify(investigationCaseAnswerRepository, never()).findByActUid(String.valueOf(investigationUid));
     }
 }

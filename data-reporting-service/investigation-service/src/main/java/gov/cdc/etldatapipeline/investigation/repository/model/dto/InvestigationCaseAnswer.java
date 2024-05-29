@@ -1,10 +1,7 @@
 package gov.cdc.etldatapipeline.investigation.repository.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 
 
@@ -12,17 +9,19 @@ import lombok.Data;
 @Entity
 @Table(name = "nrt_page_case_answer")
 public class InvestigationCaseAnswer {
+
+    @Id
     @JsonProperty("nbs_case_answer_uid")
     @Column(name = "nbs_case_answer_uid")
-    private String nbsCaseAnswerUid;
+    private Long nbsCaseAnswerUid;
 
     @JsonProperty("nbs_ui_metadata_uid")
     @Column(name = "nbs_ui_metadata_uid")
-    private String nbsUiMetadataUid;
+    private Long nbsUiMetadataUid;
 
     @JsonProperty("nbs_rdb_metadata_uid")
     @Column(name = "nbs_rdb_metadata_uid")
-    private String nbsRdbMetadataUid;
+    private Long nbsRdbMetadataUid;
 
     @JsonProperty("rdb_table_nm")
     @Column(name = "rdb_table_nm")
@@ -34,20 +33,15 @@ public class InvestigationCaseAnswer {
 
     @JsonProperty("code_set_group_id")
     @Column(name = "code_set_group_id")
-    private String codeSetGroupId;
+    private Long codeSetGroupId;
 
     @JsonProperty("answer_txt")
     @Column(name = "answer_txt")
     private String answerTxt;
 
-//    @JsonProperty("page_case_uid_text")
-//    @Column(name = "page_case_uid_text")
-//    private String pageCaseUidText;
-
-    @Id
     @JsonProperty("act_uid")
     @Column(name = "act_uid")
-    private String actUid;
+    private Long actUid;
 
     @JsonProperty("record_status_cd")
     @Column(name = "record_status_cd")
@@ -55,7 +49,7 @@ public class InvestigationCaseAnswer {
 
     @JsonProperty("nbs_question_uid")
     @Column(name = "nbs_question_uid")
-    private String nbsQuestionUid;
+    private Long nbsQuestionUid;
 
     @JsonProperty("investigation_form_cd")
     @Column(name = "investigation_form_cd")
@@ -75,7 +69,7 @@ public class InvestigationCaseAnswer {
 
     @JsonProperty("answer_group_seq_nbr")
     @Column(name = "answer_group_seq_nbr")
-    private String answerGroupSeqNbr;
+    private int answerGroupSeqNbr;
 
     @JsonProperty("question_label")
     @Column(name = "question_label")
@@ -95,7 +89,7 @@ public class InvestigationCaseAnswer {
 
     @JsonProperty("question_group_seq_nbr")
     @Column(name = "question_group_seq_nbr")
-    private String questionGroupSeqNbr;
+    private int questionGroupSeqNbr;
 
     @JsonProperty("data_type")
     @Column(name = "data_type")

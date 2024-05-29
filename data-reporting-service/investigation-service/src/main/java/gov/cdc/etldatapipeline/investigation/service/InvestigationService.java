@@ -74,7 +74,6 @@ public class InvestigationService {
                 Optional<Investigation> investigationData = investigationRepository.computeInvestigations(publicHealthCaseUid);
                 if(investigationData.isPresent()) {
                     InvestigationReporting reportingModel = modelMapper.map(investigationData.get(), InvestigationReporting.class);
-                    processDataUtil.processInvestigationPageCaseAnswer(investigationData.get());
                     InvestigationTransformed investigationTransformed = processDataUtil.transformInvestigationData(investigationData.get());
                     buildReportingModelForTransformedData(reportingModel, investigationTransformed);
                     pushKeyValuePairToKafka(investigationKey, reportingModel, investigationTopicReporting);
