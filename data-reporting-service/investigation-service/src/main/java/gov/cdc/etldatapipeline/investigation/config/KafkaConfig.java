@@ -28,6 +28,9 @@ public class KafkaConfig {
     @Value("${spring.kafka.stream.output.investigation.topic-name-observation}")
     public String investigationObservationOutputTopicName;
 
+    @Value("${spring.kafka.stream.output.investigation.topic-name-notifications}")
+    public String notificationsOutputTopicName;
+
     @Bean
     public NewTopic createInvestigationInputTopic() {
         return TopicBuilder.name(investigationInputTopicName).build();
@@ -51,5 +54,10 @@ public class KafkaConfig {
     @Bean
     public NewTopic createInvestigationObservationOutputTopic() {
         return TopicBuilder.name(investigationObservationOutputTopicName).build();
+    }
+
+    @Bean
+    public NewTopic createInvestigationNotificationsOutputTopic() {
+        return TopicBuilder.name(notificationsOutputTopicName).build();
     }
 }

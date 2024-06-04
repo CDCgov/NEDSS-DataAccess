@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.cdc.etldatapipeline.commonutil.json.CustomJsonGeneratorImpl;
 import gov.cdc.etldatapipeline.investigation.repository.model.dto.*;
+import gov.cdc.etldatapipeline.investigation.repository.rdb.InvestigationCaseAnswerRepository;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,10 +31,16 @@ public class ProcessInvestigationDataUtil {
     @Value("${spring.kafka.stream.output.investigation.topic-name-observation}")
     public String investigationObservationOutputTopicName;
 
+    @Value("${spring.kafka.stream.output.investigation.topic-name-notifications}")
+    public String investigationNotificationsOutputTopicName;
+
     private final KafkaTemplate<String, String> kafkaTemplate;
     InvestigationKey investigationKey = new InvestigationKey();
     private final CustomJsonGeneratorImpl jsonGenerator = new CustomJsonGeneratorImpl();
 
+    private final InvestigationCaseAnswerRepository investigationCaseAnswerRepository;
+
+    @Transactional(transactionManager = "rdbTransactionManager")
     public InvestigationTransformed transformInvestigationData(Investigation investigation) {
 
         InvestigationTransformed investigationTransformed = new InvestigationTransformed();
@@ -44,8 +52,37 @@ public class ProcessInvestigationDataUtil {
         transformNotificationIds(investigation.getObservationNotificationIds(), objectMapper);
         transformObservationIds(investigation.getObservationNotificationIds(), investigationTransformed, objectMapper);
         transformInvestigationConfirmationMethod(investigation.getInvestigationConfirmationMethod(), investigationTransformed, objectMapper);
+        processInvestigationPageCaseAnswer(investigation.getInvestigationCaseAnswer(), objectMapper);
+        transformNotifications(investigation.getInvestigationNotifications(), objectMapper);
 
         return investigationTransformed;
+    }
+
+    private void transformNotifications(String investigationNotifications, ObjectMapper objectMapper) {
+        try {
+            JsonNode investigationNotificationsJsonArray = investigationNotifications != null ? objectMapper.readTree(investigationNotifications) : null;
+            InvestigationNotificationsKey investigationNotificationsKey = new InvestigationNotificationsKey();
+
+            if(investigationNotificationsJsonArray != null && investigationNotificationsJsonArray.isArray()) {
+                for(JsonNode node : investigationNotificationsJsonArray) {
+                    Long actUid = node.get("source_act_uid").asLong();
+                    Long publicHealthCaseUid = node.get("public_health_case_uid").asLong();
+                    investigationNotificationsKey.setSourceActUid(actUid);
+                    investigationNotificationsKey.setPublicHealthCaseUid(publicHealthCaseUid);
+
+                    InvestigationNotifications tempInvestigationNotificationsObject = objectMapper.treeToValue(node, InvestigationNotifications.class);
+
+                    String jsonKey = jsonGenerator.generateStringJson(investigationNotificationsKey);
+                    String jsonValue = jsonGenerator.generateStringJson(tempInvestigationNotificationsObject);
+                    kafkaTemplate.send(investigationNotificationsOutputTopicName, jsonKey, jsonValue);
+                }
+            }
+            else {
+                logger.info("InvestigationNotifications array is null.");
+            }
+        } catch (Exception e) {
+            logger.error("Error processing Notifications JSON array from investigation data: {}", e.getMessage());
+        }
     }
 
 
@@ -250,6 +287,36 @@ public class ProcessInvestigationDataUtil {
             }
         } catch (Exception e) {
             logger.error("Error processing investigation confirmation method JSON array from investigation data: {}", e.getMessage());
+        }
+    }
+
+    private void processInvestigationPageCaseAnswer(String investigationCaseAnswer, ObjectMapper objectMapper) {
+        try {
+            JsonNode investigationCaseAnswerJsonArray = investigationCaseAnswer != null ? objectMapper.readTree(investigationCaseAnswer) : null;
+
+            if(investigationCaseAnswerJsonArray != null && investigationCaseAnswerJsonArray.isArray()) {
+                Long actUid = investigationCaseAnswerJsonArray.get(0).get("act_uid").asLong();
+                List<InvestigationCaseAnswer> investigationCaseAnswerDataIfPresent = investigationCaseAnswerRepository.findByActUid(actUid);
+                List<InvestigationCaseAnswer> investigationCaseAnswerList = new ArrayList<>();
+
+                for(JsonNode node : investigationCaseAnswerJsonArray) {
+                    InvestigationCaseAnswer tempCaseAnswerObject = objectMapper.treeToValue(node, InvestigationCaseAnswer.class);
+                    investigationCaseAnswerList.add(tempCaseAnswerObject);
+                }
+
+                if(investigationCaseAnswerDataIfPresent.isEmpty()) {
+                    investigationCaseAnswerRepository.saveAll(investigationCaseAnswerList);
+                }
+                else {
+                    investigationCaseAnswerRepository.deleteByActUid(actUid);
+                    investigationCaseAnswerRepository.saveAll(investigationCaseAnswerList);
+                }
+            }
+            else {
+                logger.info("InvestigationCaseAnswerJsonArray array is null.");
+            }
+        } catch (Exception e) {
+            logger.error("Error processing investigation case answer JSON array from investigation data: {}", e.getMessage());
         }
     }
 }

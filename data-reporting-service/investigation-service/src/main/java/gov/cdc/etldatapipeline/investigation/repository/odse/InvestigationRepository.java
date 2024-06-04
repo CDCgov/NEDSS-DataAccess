@@ -1,4 +1,4 @@
-package gov.cdc.etldatapipeline.investigation.repository;
+package gov.cdc.etldatapipeline.investigation.repository.odse;
 
 import gov.cdc.etldatapipeline.investigation.repository.model.dto.Investigation;
 import org.springframework.data.jpa.repository.JpaRepository;

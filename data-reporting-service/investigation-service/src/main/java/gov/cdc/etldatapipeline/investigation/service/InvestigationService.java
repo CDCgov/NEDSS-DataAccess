@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import gov.cdc.etldatapipeline.commonutil.json.CustomJsonGeneratorImpl;
-import gov.cdc.etldatapipeline.investigation.repository.InvestigationRepository;
+import gov.cdc.etldatapipeline.investigation.repository.odse.InvestigationRepository;
 import gov.cdc.etldatapipeline.investigation.repository.model.dto.Investigation;
 import gov.cdc.etldatapipeline.investigation.repository.model.dto.InvestigationKey;
 import gov.cdc.etldatapipeline.investigation.repository.model.dto.InvestigationTransformed;
@@ -78,6 +78,9 @@ public class InvestigationService {
                     buildReportingModelForTransformedData(reportingModel, investigationTransformed);
                     pushKeyValuePairToKafka(investigationKey, reportingModel, investigationTopicReporting);
                     return objectMapper.writeValueAsString(investigationData.get());
+                }
+                else {
+                    logger.info("Investigation data is not present for the id: {}", publicHealthCaseUid);
                 }
             }
         } catch (Exception e) {
