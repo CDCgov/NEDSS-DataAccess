@@ -1,7 +1,10 @@
 package gov.cdc.etldatapipeline.organization.service;
 
 import gov.cdc.etldatapipeline.commonutil.json.StreamsSerdes;
+import gov.cdc.etldatapipeline.commonutil.model.DataRequiredFields;
 import gov.cdc.etldatapipeline.commonutil.model.avro.DataEnvelope;
+import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationKey;
+import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationReporting;
 import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationSp;
 import gov.cdc.etldatapipeline.organization.model.odse.Organization;
 import gov.cdc.etldatapipeline.organization.repository.OrgRepository;
@@ -44,10 +47,10 @@ public class OrganizationService {
     private final OrgRepository orgRepository;
     private final OrganizationTransformers transformer;
 
-    private KafkaTemplate<StreamsSerdes.DataEnvelopeSerde, StreamsSerdes.DataEnvelopeSerde> dataEnvelopeKafkaTemplate;
+    private KafkaTemplate<String, String> dataEnvelopeKafkaTemplate;
 
     @Autowired
-    public OrganizationService(OrgRepository orgRepository, OrganizationTransformers transformer, KafkaTemplate<StreamsSerdes.DataEnvelopeSerde, StreamsSerdes.DataEnvelopeSerde> dataEnvelopeKafkaTemplate) {
+    public OrganizationService(OrgRepository orgRepository, OrganizationTransformers transformer, KafkaTemplate<String,String> dataEnvelopeKafkaTemplate) {
         this.orgRepository = orgRepository;
         this.transformer = transformer;
         this.dataEnvelopeKafkaTemplate = dataEnvelopeKafkaTemplate;
@@ -82,15 +85,15 @@ public class OrganizationService {
                 Set<OrganizationSp> organizations = orgRepository.computeAllOrganizations(organization.getOrganizationUid());
 
                 organizations.forEach(org -> {
-                    DataEnvelope reportingKey = transformer.buildOrganizationKey(org);
-                    DataEnvelope reportingData = transformer.processData(org, OrganizationType.ORGANIZATION_REPORTING);
+                    String reportingKey = transformer.buildOrganizationKey(org);
+                    String reportingData = transformer.processData(org, OrganizationType.ORGANIZATION_REPORTING);
                     dataEnvelopeKafkaTemplate.send(orgReportingOutputTopic, reportingKey, reportingData);
                     log.info("Organization Reporting: {}", reportingData.toString());
 
-                    DataEnvelope elasticKey = transformer.buildOrganizationKey(org);
-                    DataEnvelope elasticData = transformer.processData(org, OrganizationType.ORGANIZATION_ELASTIC_SEARCH);
+                    String elasticKey = transformer.buildOrganizationKey(org);
+                    String elasticData = transformer.processData(org, OrganizationType.ORGANIZATION_ELASTIC_SEARCH);
                     dataEnvelopeKafkaTemplate.send(orgElasticSearchTopic, elasticKey, elasticData);
-                    log.info("Organization Elastic: {}", elasticData.toString());
+                    log.info("Organization Elastic: {}", elasticData!= null ? elasticData.toString() : "");
                 });
             }
         } catch (Exception e) {

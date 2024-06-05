@@ -1,7 +1,10 @@
 package gov.cdc.etldatapipeline.organization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import gov.cdc.etldatapipeline.commonutil.json.CustomJsonGeneratorImpl;
+import gov.cdc.etldatapipeline.commonutil.model.DataRequiredFields;
 import gov.cdc.etldatapipeline.commonutil.model.avro.DataEnvelope;
+import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationKey;
 import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationSp;
 import gov.cdc.etldatapipeline.organization.repository.OrgRepository;
 import gov.cdc.etldatapipeline.organization.service.OrganizationService;
@@ -32,7 +35,7 @@ public class OrganizationServiceTest {
     private OrganizationTransformers transformer;
 
     @Mock
-    private KafkaTemplate<String, DataEnvelope> kafkaTemplate;
+    private KafkaTemplate<String, String> kafkaTemplate;
 
     private OrganizationService organizationService;
 
@@ -45,8 +48,7 @@ public class OrganizationServiceTest {
 
     @BeforeEach
     public void setUp() {
-        organizationService = new OrganizationService(orgRepository, transformer);
-        organizationService.setKafkaTemplate(kafkaTemplate);
+        organizationService = new OrganizationService(orgRepository, transformer, kafkaTemplate);
     }
 
     @Test
@@ -63,7 +65,9 @@ public class OrganizationServiceTest {
 //                "orgtransformed/OrgKey.json");
 
         DataEnvelope reportingData = new DataEnvelope();
-        Mockito.when(transformer.processData(orgSp, OrganizationType.ORGANIZATION_REPORTING)).thenReturn(reportingData);
+        OrganizationKey organizationKey = OrganizationKey.builder().orgUID(orgSp.getOrganizationUid()).build();
+        Mockito.when(transformer.buildOrganizationKey(orgSp)).thenReturn( new CustomJsonGeneratorImpl().buildAvroRecord(organizationKey));
+        Mockito.when(transformer.processData(orgSp, OrganizationType.ORGANIZATION_REPORTING)).thenReturn(new ObjectMapper().writeValueAsString(reportingData));
 
         validateDataTransformation("orgcdc/OrgChangeData.json", orgReportingTopic, reportingData);
     }
@@ -88,7 +92,9 @@ public class OrganizationServiceTest {
         Mockito.when(orgRepository.computeAllOrganizations(anyString())).thenReturn(Set.of(orgSp));
 
         DataEnvelope elasticData = new DataEnvelope();
-        Mockito.when(transformer.processData(orgSp, OrganizationType.ORGANIZATION_ELASTIC_SEARCH)).thenReturn(elasticData);
+        OrganizationKey organizationKey = OrganizationKey.builder().orgUID(orgSp.getOrganizationUid()).build();
+        Mockito.when(transformer.buildOrganizationKey(orgSp)).thenReturn( new CustomJsonGeneratorImpl().buildAvroRecord(organizationKey));
+        Mockito.when(transformer.processData(orgSp, OrganizationType.ORGANIZATION_ELASTIC_SEARCH)).thenReturn(new ObjectMapper().writeValueAsString(elasticData));
 
         validateDataTransformation("orgcdc/OrgChangeData.json", orgElasticTopic, elasticData);
     }
@@ -110,10 +116,10 @@ public class OrganizationServiceTest {
 
         organizationService.processMessage(changeData, expectedTopic);
 
-        ArgumentCaptor<DataEnvelope> dataCaptor = ArgumentCaptor.forClass(DataEnvelope.class);
+        ArgumentCaptor<String> dataCaptor = ArgumentCaptor.forClass(String.class);
         Mockito.verify(kafkaTemplate, Mockito.times(1)).send(Mockito.eq(expectedTopic), dataCaptor.capture());
 
-        DataEnvelope actualData = dataCaptor.getValue();
+        String actualData = dataCaptor.getValue();
         assertEquals(expectedData, actualData);
     }
 

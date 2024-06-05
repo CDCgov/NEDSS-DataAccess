@@ -17,7 +17,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class CustomJsonGeneratorImpl {
-    public <T extends DataRequiredFields> DataEnvelope buildAvroRecord(T obj) {
+    public <T extends DataRequiredFields> String buildAvroRecord(T obj) {
         Set<DataField> dataFields = new HashSet<>();
         try {
             for (Field field : obj.getClass().getDeclaredFields()) {
@@ -35,7 +35,13 @@ public class CustomJsonGeneratorImpl {
         } catch (Exception e) {
             throw new RuntimeException("Error building schema record: ", e);
         }
-        return new DataEnvelope(new DataSchema("struct", dataFields), obj);
+        ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+        try{
+        return objectMapper.writeValueAsString(new DataEnvelope(new DataSchema("struct", dataFields), obj));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public String generateStringJson(Object model) {

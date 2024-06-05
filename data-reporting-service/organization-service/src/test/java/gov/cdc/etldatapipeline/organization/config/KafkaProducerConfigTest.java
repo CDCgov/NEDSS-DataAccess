@@ -34,7 +34,7 @@ class KafkaProducerConfigTest {
 
         // Act
         var target =
-                kafkaProducerConfig.producerFactory();
+                kafkaProducerConfig.jsonProducerFactory();
 
         // Assert
         Assertions.assertNotNull(target);
@@ -45,7 +45,7 @@ class KafkaProducerConfigTest {
 
         // Act
         var target =
-                kafkaProducerConfig.kafkaTemplate();
+                kafkaProducerConfig.dataEnvelopeKafkaTemplate();
 
         // Assert
         Assertions.assertNotNull(target);

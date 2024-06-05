@@ -13,11 +13,11 @@ import org.springframework.stereotype.Component;
 public class OrganizationTransformers {
     private final CustomJsonGeneratorImpl jsonGenerator = new CustomJsonGeneratorImpl();
 
-    public DataEnvelope buildOrganizationKey(OrganizationSp p) {
-        return jsonGenerator.buildAvroRecord(OrganizationKey.builder().orgUID(p.getOrganizationUid()).build());
+    public String buildOrganizationKey(OrganizationSp p) {
+        return jsonGenerator.generateStringJson(OrganizationKey.builder().orgUID(p.getOrganizationUid()).build());
     }
 
-    public DataEnvelope processData(OrganizationSp organizationSp, OrganizationType organizationType) {
+    public String processData(OrganizationSp organizationSp, OrganizationType organizationType) {
         DataRequiredFields transformedObj =
                 switch (organizationType) {
                     case ORGANIZATION_REPORTING -> buildOrganizationReporting(organizationSp);

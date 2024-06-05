@@ -1,7 +1,7 @@
 spring:
   kafka:
     producer:
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      value-serializer: org.springframework.kafka.support.serializer.StringOrBytesSerializer
       key-serializer: org.springframework.kafka.support.serializer.StringOrBytesSerializer
 
     input:
