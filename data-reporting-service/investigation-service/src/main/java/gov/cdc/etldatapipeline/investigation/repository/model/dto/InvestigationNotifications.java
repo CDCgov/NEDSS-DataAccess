@@ -100,6 +100,14 @@ public class InvestigationNotifications {
 
     @JsonProperty("local_patient_uid")
     @Column(name = "local_patient_uid")
-    private String localPatientUid;
+    private Long localPatientUid;
+
+    @JsonProperty("condition_cd")
+    @Column(name = "condition_cd")
+    private String conditionCd;
+
+    @JsonProperty("condition_desc")
+    @Column(name = "condition_desc")
+    private String conditionDesc;
 }
 

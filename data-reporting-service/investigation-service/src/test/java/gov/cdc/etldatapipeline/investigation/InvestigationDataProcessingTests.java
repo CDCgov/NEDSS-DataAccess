@@ -47,7 +47,6 @@ public class InvestigationDataProcessingTests {
     private static final String FILE_PREFIX = "rawDataFiles/";
     private static final String CONFIRMATION_TOPIC = "confirmationTopic";
     private static final String OBSERVATION_TOPIC = "observationTopic";
-    private static final String NOTIFICATION_TOPIC = "notificationTopic";
     private static final String NOTIFICATIONS_TOPIC = "notificationsTopic";
     private static final Long investigationUid = 234567890L;
 
@@ -104,24 +103,15 @@ public class InvestigationDataProcessingTests {
 
         investigation.setPublicHealthCaseUid(investigationUid);
         investigation.setObservationNotificationIds(readFileData(FILE_PREFIX + "ObservationNotificationIds.json"));
-        transformer.investigationNotificationOutputTopicName = NOTIFICATION_TOPIC;
         transformer.investigationObservationOutputTopicName = OBSERVATION_TOPIC;
-
-        InvestigationNotification notification = new InvestigationNotification();
-        notification.setPublicHealthCaseUid(investigationUid);
-        notification.setNotificationId(263748597L);
 
         InvestigationObservation observation = new InvestigationObservation();
         observation.setPublicHealthCaseUid(investigationUid);
         observation.setObservationId(263748596L);
 
         transformer.transformInvestigationData(investigation);
-        verify(kafkaTemplate, times (2)).send(topicCaptor.capture(), keyCaptor.capture(), messageCaptor.capture());
+        verify(kafkaTemplate).send(topicCaptor.capture(), keyCaptor.capture(), messageCaptor.capture());
         assertEquals(OBSERVATION_TOPIC, topicCaptor.getValue());
-
-        Function<InvestigationNotification, List<String>> nDetailsFn = (n) -> Arrays.asList(
-                String.valueOf(n.getPublicHealthCaseUid()),
-                String.valueOf(n.getNotificationId()));
 
         Function<InvestigationObservation, List<String>> oDetailsFn = (o) -> Arrays.asList(
                 String.valueOf(o.getPublicHealthCaseUid()),
@@ -129,7 +119,6 @@ public class InvestigationDataProcessingTests {
 
         String actualCombined = String.join(" ",messageCaptor.getAllValues());
 
-        assertTrue(containsWords.apply(actualCombined, nDetailsFn.apply(notification)));
         assertTrue(containsWords.apply(actualCombined, oDetailsFn.apply(observation)));
     }
 
@@ -144,6 +133,8 @@ public class InvestigationDataProcessingTests {
         InvestigationNotifications notifications = new InvestigationNotifications();
         notifications.setPublicHealthCaseUid(investigationUid);
         notifications.setSourceActUid(263748597L);
+        notifications.setLocalPatientUid(75395128L);
+        notifications.setConditionCd("11065");
 
         transformer.transformInvestigationData(investigation);
         verify(kafkaTemplate, times (1)).send(topicCaptor.capture(), keyCaptor.capture(), messageCaptor.capture());
@@ -151,7 +142,9 @@ public class InvestigationDataProcessingTests {
 
         Function<InvestigationNotifications, List<String>> nDetailsFn = (n) -> Arrays.asList(
                 String.valueOf(n.getPublicHealthCaseUid()),
-                String.valueOf(n.getSourceActUid()));
+                String.valueOf(n.getSourceActUid()),
+                String.valueOf(n.getLocalPatientUid()),
+                n.getConditionCd());
 
         String actualCombined = String.join(" ",messageCaptor.getAllValues());
 

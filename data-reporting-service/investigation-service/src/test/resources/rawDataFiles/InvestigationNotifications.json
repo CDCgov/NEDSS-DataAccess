@@ -23,6 +23,8 @@
     "notif_last_chg_user_name": "Zor-El, Kara",
     "notif_last_chg_time": "2024-05-29T16:05:44.523",
     "local_patient_id": "ABC7539512AB01",
-    "local_patient_uid": 75395128
+    "local_patient_uid": 75395128,
+    "condition_cd": "11065",
+    "condition_desc": "Novel Coronavirus"
   }
 ]

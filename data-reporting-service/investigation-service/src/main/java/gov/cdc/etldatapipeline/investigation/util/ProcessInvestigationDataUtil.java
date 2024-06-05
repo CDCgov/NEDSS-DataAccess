@@ -25,9 +25,6 @@ public class ProcessInvestigationDataUtil {
     @Value("${spring.kafka.stream.output.investigation.topic-name-confirmation}")
     public String investigationConfirmationOutputTopicName;
 
-    @Value("${spring.kafka.stream.output.investigation.topic-name-notification}")
-    public String investigationNotificationOutputTopicName;
-
     @Value("${spring.kafka.stream.output.investigation.topic-name-observation}")
     public String investigationObservationOutputTopicName;
 
@@ -49,9 +46,8 @@ public class ProcessInvestigationDataUtil {
         transformPersonParticipations(investigation.getPersonParticipations(), investigationTransformed, objectMapper);
         transformOrganizationParticipations(investigation.getOrganizationParticipations(), investigationTransformed, objectMapper);
         transformActIds(investigation.getActIds(), investigationTransformed, objectMapper);
-        transformNotificationIds(investigation.getObservationNotificationIds(), objectMapper);
         transformObservationIds(investigation.getObservationNotificationIds(), investigationTransformed, objectMapper);
-        transformInvestigationConfirmationMethod(investigation.getInvestigationConfirmationMethod(), investigationTransformed, objectMapper);
+        transformInvestigationConfirmationMethod(investigation.getInvestigationConfirmationMethod(), objectMapper);
         processInvestigationPageCaseAnswer(investigation.getInvestigationCaseAnswer(), objectMapper);
         transformNotifications(investigation.getInvestigationNotifications(), objectMapper);
 
@@ -165,38 +161,6 @@ public class ProcessInvestigationDataUtil {
         }
     }
 
-    private void transformNotificationIds(String observationNotificationIds, ObjectMapper objectMapper) {
-        try {
-            JsonNode investigationNotificationIdsJsonArray = observationNotificationIds != null ? objectMapper.readTree(observationNotificationIds) : null;
-            InvestigationNotification investigationNotification = new InvestigationNotification();
-            List<Long> notificationIds = new ArrayList<>();
-
-            if(investigationNotificationIdsJsonArray != null && investigationNotificationIdsJsonArray.isArray()) {
-                for(JsonNode node : investigationNotificationIdsJsonArray) {
-                    String sourceClassCode = node.get("source_class_cd").asText();
-                    String actTypeCode = node.get("act_type_cd").asText();
-                    Long publicHealthCaseUid = node.get("public_health_case_uid").asLong();
-                    investigationKey.setPublicHealthCaseUid(publicHealthCaseUid);
-
-                    if(sourceClassCode.equals("NOTF") && actTypeCode.equals("Notification")) {
-                        investigationNotification.setPublicHealthCaseUid(publicHealthCaseUid);
-                        notificationIds.add(node.get("source_act_uid").asLong());
-                    }
-                }
-                for(Long id : notificationIds) {
-                    investigationNotification.setNotificationId(id);
-                    String jsonValue = jsonGenerator.generateStringJson(investigationNotification);
-                    kafkaTemplate.send(investigationNotificationOutputTopicName, jsonValue, jsonValue);
-                }
-            }
-            else {
-                logger.info("InvestigationNotificationIds array is null.");
-            }
-        } catch (Exception e) {
-            logger.error("Error processing Observation Notification Ids JSON array from investigation data: {}", e.getMessage());
-        }
-    }
-
     private void transformObservationIds(String observationNotificationIds, InvestigationTransformed investigationTransformed, ObjectMapper objectMapper) {
         try {
             JsonNode investigationObservationIdsJsonArray = observationNotificationIds != null ? objectMapper.readTree(observationNotificationIds) : null;
@@ -230,11 +194,11 @@ public class ProcessInvestigationDataUtil {
                 logger.info("InvestigationObservationIds array is null.");
             }
         } catch (Exception e) {
-            logger.error("Error processing Observation Notification Ids JSON array from investigation data: {}", e.getMessage());
+            logger.error("Error processing Observation Ids JSON array from investigation data: {}", e.getMessage());
         }
     }
 
-    private void transformInvestigationConfirmationMethod(String investigationConfirmationMethod, InvestigationTransformed investigationTransformed, ObjectMapper objectMapper) {
+    private void transformInvestigationConfirmationMethod(String investigationConfirmationMethod, ObjectMapper objectMapper) {
         try {
             JsonNode investigationConfirmationMethodJsonArray = investigationConfirmationMethod != null ? objectMapper.readTree(investigationConfirmationMethod) : null;
             InvestigationConfirmationMethodKey investigationConfirmationMethodKey = new InvestigationConfirmationMethodKey();
