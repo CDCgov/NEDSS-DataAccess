@@ -92,7 +92,7 @@ class InvestigationServiceTest {
         String expectedKey = jsonGenerator.generateStringJson(investigationKey);
         String expectedValue = jsonGenerator.generateStringJson(reportingModel);
 
-        verify(kafkaTemplate, times(5)).send(topicCaptor.capture(), keyCaptor.capture(), messageCaptor.capture());
+        verify(kafkaTemplate, times(4)).send(topicCaptor.capture(), keyCaptor.capture(), messageCaptor.capture());
         assertEquals(outputTopicName, topicCaptor.getValue());
         assertEquals(expectedKey, keyCaptor.getValue());
         assertEquals(expectedValue, messageCaptor.getValue());

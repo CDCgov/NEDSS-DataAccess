@@ -9,7 +9,6 @@ spring:
           topic-name-reporting: nrt_investigation
           topic-name-es: elastic_search_investigation
           topic-name-confirmation: nrt_investigation_confirmation
-          topic-name-notification: nrt_investigation_notification
           topic-name-observation: nrt_investigation_observation
           topic-name-notifications: nrt_notifications
     streams:
