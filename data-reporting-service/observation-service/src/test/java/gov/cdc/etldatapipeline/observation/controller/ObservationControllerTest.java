@@ -13,9 +13,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -49,7 +49,7 @@ public class ObservationControllerTest {
 
     @Test
     void getDataPipelineStatusHealthTest() {
-        final String responseBody = "Investigation Service Status OK";
+        final String responseBody = "Observation Service Status OK";
 
         ResponseEntity<String> response = observationController.getDataPipelineStatusHealth();
         assertNotNull(response);

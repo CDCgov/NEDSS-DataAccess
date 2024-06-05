@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 public class InvestigationController {
     private final KafkaProducerService producerService;
 
-    @Value("${spring.kafka.stream.input.investigation.topic-name}")
+    @Value("${spring.kafka.input.topic-name}")
     private String topicName;
 
     @GetMapping("/reporting/investigation-svc/status")

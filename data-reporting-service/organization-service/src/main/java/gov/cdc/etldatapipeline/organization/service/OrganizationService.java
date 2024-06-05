@@ -1,78 +1,101 @@
 package gov.cdc.etldatapipeline.organization.service;
 
 import gov.cdc.etldatapipeline.commonutil.json.StreamsSerdes;
+import gov.cdc.etldatapipeline.commonutil.model.avro.DataEnvelope;
 import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationSp;
 import gov.cdc.etldatapipeline.organization.model.odse.Organization;
 import gov.cdc.etldatapipeline.organization.repository.OrgRepository;
 import gov.cdc.etldatapipeline.organization.transformer.OrganizationTransformers;
 import gov.cdc.etldatapipeline.organization.transformer.OrganizationType;
 import gov.cdc.etldatapipeline.organization.utils.UtilHelper;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.streams.KeyValue;
-import org.apache.kafka.streams.StreamsBuilder;
-import org.apache.kafka.streams.kstream.Consumed;
-import org.apache.kafka.streams.kstream.KStream;
-import org.apache.kafka.streams.kstream.Produced;
+import org.apache.kafka.common.errors.SerializationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.annotation.RetryableTopic;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.retrytopic.DltStrategy;
+import org.springframework.kafka.retrytopic.TopicSuffixingStrategy;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.kafka.support.serializer.DeserializationException;
+import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 
 @Service
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 @Setter
 @Slf4j
 public class OrganizationService {
-    @Value("#{kafkaConfig.getOrganizationTopic()}")
+    @Value("${spring.kafka.input.topic-name}")
     private String orgTopicName;
-    @Value("#{kafkaConfig.getOrganizationElasticSearchTopic()}")
+
+    @Value("${spring.kafka.output.organizationElastic.topic-name}")
     private String orgElasticSearchTopic;
-    @Value("#{kafkaConfig.getOrganizationReportingTopic()}")
+
+    @Value("${spring.kafka.output.organizationReporting.topic-name}")
     private String orgReportingOutputTopic;
 
     private final OrgRepository orgRepository;
     private final OrganizationTransformers transformer;
 
+    private KafkaTemplate<StreamsSerdes.DataEnvelopeSerde, StreamsSerdes.DataEnvelopeSerde> dataEnvelopeKafkaTemplate;
+
     @Autowired
-    public void processMessage(StreamsBuilder streamsBuilder) {
-        KStream<String, Set<OrganizationSp>> organizationKStream
-                = streamsBuilder.stream(orgTopicName, Consumed.with(Serdes.String(), Serdes.String()))
-                .map((key, value) -> new KeyValue<>(
-                        key,
-                        UtilHelper.getInstance().deserializePayload(value, "/payload/after", Organization.class)))
-                // KStream<String, Organization>
-                .filter((key, value) -> value != null)
-                .peek((key, value) -> log.info("Received Organization : " + value.getOrganizationUid()))
-                .mapValues(value -> orgRepository.computeAllOrganizations(value.getOrganizationUid()));
+    public OrganizationService(OrgRepository orgRepository, OrganizationTransformers transformer, KafkaTemplate<StreamsSerdes.DataEnvelopeSerde, StreamsSerdes.DataEnvelopeSerde> dataEnvelopeKafkaTemplate) {
+        this.orgRepository = orgRepository;
+        this.transformer = transformer;
+        this.dataEnvelopeKafkaTemplate = dataEnvelopeKafkaTemplate;
+    }
 
-        organizationKStream.flatMap((key, value) -> value.stream()
-                        .map(p -> KeyValue.pair(
-                                transformer.buildOrganizationKey(p),
-                                transformer.processData(p, OrganizationType.ORGANIZATION_REPORTING)))
-                        .collect(Collectors.toSet()))
-                .peek((key, value) ->
-                        log.info("Organization Reporting : {}", value.toString()))
-                .to((key, value, recordContext) -> orgReportingOutputTopic,
-                        Produced.with(
-                                StreamsSerdes.DataEnvelopeSerde(),
-                                StreamsSerdes.DataEnvelopeSerde()));
+    @RetryableTopic(
+            attempts = "${spring.kafka.consumer.max-retry}",
+            autoCreateTopics = "false",
+            dltStrategy = DltStrategy.FAIL_ON_ERROR,
+            retryTopicSuffix = "${spring.kafka.dlq.retry-suffix}",
+            dltTopicSuffix = "${spring.kafka.dlq.dlq-suffix}",
+            // retry topic name, such as topic-retry-1, topic-retry-2, etc
+            topicSuffixingStrategy = TopicSuffixingStrategy.SUFFIX_WITH_INDEX_VALUE,
+            // time to wait before attempting to retry
+            backoff = @Backoff(delay = 1000, multiplier = 2.0),
+            exclude = {
+                    SerializationException.class,
+                    DeserializationException.class,
+                    RuntimeException.class
+            }
+    )
+    @KafkaListener(
+            topics = "${spring.kafka.input.topic-name}"
+    )
+    public void processMessage(String message,
+                               @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
+        try {
+            Organization organization = UtilHelper.getInstance().deserializePayload(message, "/payload/after", Organization.class);
+            System.err.println("Organization incoming is..." + organization);
+            if (organization != null) {
+                log.info("Received Organization: {}", organization.getOrganizationUid());
+                Set<OrganizationSp> organizations = orgRepository.computeAllOrganizations(organization.getOrganizationUid());
 
-        organizationKStream.flatMap((key, value) -> value.stream()
-                        .map(p -> KeyValue.pair(transformer.buildOrganizationKey(p),
-                                transformer.processData(p, OrganizationType.ORGANIZATION_ELASTIC_SEARCH)))
-                        .collect(Collectors.toSet()))
-                .peek((key, value) ->
-                        log.info("Organization Elastic : {}", value.toString()))
-                .to((key, value, recordContext) -> orgElasticSearchTopic,
-                        Produced.with(
-                                StreamsSerdes.DataEnvelopeSerde(),
-                                StreamsSerdes.DataEnvelopeSerde()));
+                organizations.forEach(org -> {
+                    DataEnvelope reportingKey = transformer.buildOrganizationKey(org);
+                    DataEnvelope reportingData = transformer.processData(org, OrganizationType.ORGANIZATION_REPORTING);
+                    dataEnvelopeKafkaTemplate.send(orgReportingOutputTopic, reportingKey, reportingData);
+                    log.info("Organization Reporting: {}", reportingData.toString());
 
+                    DataEnvelope elasticKey = transformer.buildOrganizationKey(org);
+                    DataEnvelope elasticData = transformer.processData(org, OrganizationType.ORGANIZATION_ELASTIC_SEARCH);
+                    dataEnvelopeKafkaTemplate.send(orgElasticSearchTopic, elasticKey, elasticData);
+                    log.info("Organization Elastic: {}", elasticData.toString());
+                });
+            }
+        } catch (Exception e) {
+            log.error("Error processing organization message: {}", e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 }

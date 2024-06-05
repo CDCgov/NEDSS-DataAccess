@@ -3,22 +3,27 @@ spring:
     producer:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       key-serializer: org.springframework.kafka.support.serializer.StringOrBytesSerializer
-    stream:
-      input:
-        organization:
-          topic-name: ${INPUT_TOPIC_ORGANIZATION:nbs_Organization}
-        defaultData:
-          topic-name: nbs_Default
-      output:
-        organizationElastic:
-          topic-name: ${PROVIDER_ELASTIC:elastic_search_organization}
-        organizationReporting:
-          topic-name: ${ORGANIZATION_REPORTING:nrt_organization}
 
-    streams:
-      application-id: ${KAFKA_CONSUMER_APP:organization-reporting-consumer-app}
+    input:
+      topic-name: ${INPUT_TOPIC_ORGANIZATION:nbs_Organization}
+      defaultData:
+        topic-name: nbs_Default
+    output:
+      organizationElastic:
+        topic-name: ${PROVIDER_ELASTIC:elastic_search_organization}
+      organizationReporting:
+        topic-name: ${ORGANIZATION_REPORTING:nrt_organization}
+    dlq:
+      topic-name-dlq: nrt_organization_dlq
+      retry-suffix: _retry
+      dlq-suffix: _dlt
+
+
+    group-id: ${KAFKA_CONSUMER_APP:organization-reporting-consumer-app}
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:localhost:9092}
     consumer:
+      max-retry: 3
+      maxPollIntervalMs: 30000
       key-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
     admin:

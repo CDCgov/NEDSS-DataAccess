@@ -8,20 +8,25 @@ import gov.cdc.etldatapipeline.commonutil.json.CustomJsonGeneratorImpl;
 import gov.cdc.etldatapipeline.observation.repository.IObservationRepository;
 import gov.cdc.etldatapipeline.observation.repository.model.dto.Observation;
 import gov.cdc.etldatapipeline.observation.repository.model.dto.ObservationKey;
-import gov.cdc.etldatapipeline.observation.repository.model.reporting.ObservationReporting;
 import gov.cdc.etldatapipeline.observation.repository.model.dto.ObservationTransformed;
+import gov.cdc.etldatapipeline.observation.repository.model.reporting.ObservationReporting;
 import gov.cdc.etldatapipeline.observation.util.ProcessObservationDataUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.streams.StreamsBuilder;
-import org.apache.kafka.streams.kstream.Consumed;
+import org.apache.kafka.common.errors.SerializationException;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.annotation.RetryableTopic;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.retrytopic.DltStrategy;
+import org.springframework.kafka.retrytopic.TopicSuffixingStrategy;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.kafka.support.serializer.DeserializationException;
+import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -32,14 +37,18 @@ import java.util.Optional;
 public class ObservationService {
     private static final Logger logger = LoggerFactory.getLogger(ObservationService.class);
 
-    @Value("${spring.kafka.stream.input.observation.topic-name}")
+    @Value("${spring.kafka.input.topic-name}")
     private String observationTopic;
 
-    @Value("${spring.kafka.stream.output.observation.topic-name-reporting}")
+    @Value("${spring.kafka.output.topic-name-reporting}")
     public String observationTopicOutputReporting;
 
-    @Value("${spring.kafka.stream.output.observation.topic-name-es}")
+    @Value("${spring.kafka.output.topic-name-es}")
     public String observationTopicOutputElasticSearch;
+
+    @Value("${spring.kafka.dlq.topic-name-dlq}")
+    public String observationTopicOutputDlq;
+
 
     private final IObservationRepository iObservationRepository;
     private String topicDebugLog = "Received Observation ID: {} from topic: {}";
@@ -50,13 +59,29 @@ public class ObservationService {
     private final CustomJsonGeneratorImpl jsonGenerator = new CustomJsonGeneratorImpl();
 
 
-    @Autowired
-    public void processMessage(StreamsBuilder streamsBuilder) {
-        streamsBuilder.stream(observationTopic, Consumed.with(Serdes.String(), Serdes.String()))
-                .filter((k, v) -> v != null)
-                .mapValues((key, value) -> processObservation(value))
-                .filter((key, value) -> value != null)
-                .peek((key, value) -> logger.info("Received Observation : " + value));
+    @RetryableTopic(
+            attempts = "${spring.kafka.consumer.max-retry}",
+            autoCreateTopics = "false",
+            dltStrategy = DltStrategy.FAIL_ON_ERROR,
+            retryTopicSuffix = "${spring.kafka.dlq.retry-suffix}",
+            dltTopicSuffix = "${spring.kafka.dlq.dlq-suffix}",
+            // retry topic name, such as topic-retry-1, topic-retry-2, etc
+            topicSuffixingStrategy = TopicSuffixingStrategy.SUFFIX_WITH_INDEX_VALUE,
+            // time to wait before attempting to retry
+            backoff = @Backoff(delay = 1000, multiplier = 2.0),
+            exclude = {
+                    SerializationException.class,
+                    DeserializationException.class,
+                    RuntimeException.class
+            }
+    )
+    @KafkaListener(
+            topics = "${spring.kafka.input.topic-name}"
+    )
+    public void processMessage(String message,
+                               @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
+        logger.debug(topicDebugLog, message, topic);
+        processObservation(message);
     }
 
     private String processObservation(String value) {
@@ -82,7 +107,9 @@ public class ObservationService {
                 }
             }
         } catch (Exception e) {
+//            kafkaTemplate.send(observationTopicOutputDlq, value);
             logger.error("Error processing observation: {}", e.getMessage());
+            throw new RuntimeException(e);
         }
         return null;
     }
