@@ -1,48 +1,14 @@
 package gov.cdc.etldatapipeline.commonutil.json;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.base.CaseFormat;
-import gov.cdc.etldatapipeline.commonutil.model.DataRequiredFields;
-import gov.cdc.etldatapipeline.commonutil.model.avro.DataEnvelope;
-import gov.cdc.etldatapipeline.commonutil.model.avro.DataField;
-import gov.cdc.etldatapipeline.commonutil.model.avro.DataSchema;
 
 import java.lang.reflect.Field;
-import java.util.HashSet;
-import java.util.Set;
 
 public class CustomJsonGeneratorImpl {
-    public <T extends DataRequiredFields> String buildAvroRecord(T obj) {
-        Set<DataField> dataFields = new HashSet<>();
-        try {
-            for (Field field : obj.getClass().getDeclaredFields()) {
-                DataField dataField = new DataField();
-                if (field.isAnnotationPresent(JsonProperty.class)) {
-                    dataField.setField(field.getAnnotation(JsonProperty.class).value());
-                } else {
-                    dataField.setField(PropertyNamingStrategies.SnakeCaseStrategy.INSTANCE.translate(field.getName()));
-                }
-                dataField.setOptional(
-                        obj.getRequiredFields() == null || !obj.getRequiredFields().contains(field.getName()));
-                dataField.setType(getType(field.getType().getSimpleName().toLowerCase()));
-                dataFields.add(dataField);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Error building schema record: ", e);
-        }
-        ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-        try{
-        return objectMapper.writeValueAsString(new DataEnvelope(new DataSchema("struct", dataFields), obj));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 
     public String generateStringJson(Object model) {
         try {
@@ -74,7 +40,8 @@ public class CustomJsonGeneratorImpl {
                 fieldName = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName);
 
                 fieldNode.put("type", getType(field.getType().getSimpleName().toLowerCase()));
-                fieldNode.put("optional", (!fieldName.equals("public_health_case_uid") || !fieldName.equals("observation_uid")));
+                fieldNode.put("optional", (!fieldName.equals("public_health_case_uid")
+                        || !fieldName.equals("observation_uid") || !fieldName.equals("organization_uid")));
                 fieldNode.put("field", fieldName);
                 fieldsArray.add(fieldNode);
             }

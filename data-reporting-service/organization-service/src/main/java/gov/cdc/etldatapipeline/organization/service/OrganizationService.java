@@ -1,10 +1,5 @@
 package gov.cdc.etldatapipeline.organization.service;
 
-import gov.cdc.etldatapipeline.commonutil.json.StreamsSerdes;
-import gov.cdc.etldatapipeline.commonutil.model.DataRequiredFields;
-import gov.cdc.etldatapipeline.commonutil.model.avro.DataEnvelope;
-import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationKey;
-import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationReporting;
 import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationSp;
 import gov.cdc.etldatapipeline.organization.model.odse.Organization;
 import gov.cdc.etldatapipeline.organization.repository.OrgRepository;
@@ -31,13 +26,9 @@ import java.util.Set;
 
 
 @Service
-//@RequiredArgsConstructor
 @Setter
 @Slf4j
 public class OrganizationService {
-    @Value("${spring.kafka.input.topic-name}")
-    private String orgTopicName;
-
     @Value("${spring.kafka.output.organizationElastic.topic-name}")
     private String orgElasticSearchTopic;
 
@@ -47,13 +38,13 @@ public class OrganizationService {
     private final OrgRepository orgRepository;
     private final OrganizationTransformers transformer;
 
-    private KafkaTemplate<String, String> dataEnvelopeKafkaTemplate;
+    private KafkaTemplate<String, String> kafkaTemplate;
 
     @Autowired
-    public OrganizationService(OrgRepository orgRepository, OrganizationTransformers transformer, KafkaTemplate<String,String> dataEnvelopeKafkaTemplate) {
+    public OrganizationService(OrgRepository orgRepository, OrganizationTransformers transformer, KafkaTemplate<String,String> kafkaTemplate) {
         this.orgRepository = orgRepository;
         this.transformer = transformer;
-        this.dataEnvelopeKafkaTemplate = dataEnvelopeKafkaTemplate;
+        this.kafkaTemplate = kafkaTemplate;
     }
 
     @RetryableTopic(
@@ -79,20 +70,19 @@ public class OrganizationService {
                                @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
         try {
             Organization organization = UtilHelper.getInstance().deserializePayload(message, "/payload/after", Organization.class);
-            System.err.println("Organization incoming is..." + organization);
             if (organization != null) {
-                log.info("Received Organization: {}", organization.getOrganizationUid());
+                log.info("Received OrganizationUid: {} from topic: {}", organization.getOrganizationUid(), topic);
                 Set<OrganizationSp> organizations = orgRepository.computeAllOrganizations(organization.getOrganizationUid());
 
                 organizations.forEach(org -> {
                     String reportingKey = transformer.buildOrganizationKey(org);
                     String reportingData = transformer.processData(org, OrganizationType.ORGANIZATION_REPORTING);
-                    dataEnvelopeKafkaTemplate.send(orgReportingOutputTopic, reportingKey, reportingData);
+                    kafkaTemplate.send(orgReportingOutputTopic, reportingKey, reportingData);
                     log.info("Organization Reporting: {}", reportingData.toString());
 
                     String elasticKey = transformer.buildOrganizationKey(org);
                     String elasticData = transformer.processData(org, OrganizationType.ORGANIZATION_ELASTIC_SEARCH);
-                    dataEnvelopeKafkaTemplate.send(orgElasticSearchTopic, elasticKey, elasticData);
+                    kafkaTemplate.send(orgElasticSearchTopic, elasticKey, elasticData);
                     log.info("Organization Elastic: {}", elasticData!= null ? elasticData.toString() : "");
                 });
             }

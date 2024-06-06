@@ -1,7 +1,6 @@
 package gov.cdc.etldatapipeline.organization.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import gov.cdc.etldatapipeline.commonutil.json.StreamsSerdes;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,7 +36,7 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public ProducerFactory<StreamsSerdes.DataEnvelopeSerde, StreamsSerdes.DataEnvelopeSerde> dataEnvelopeProducerFactory() {
+    public ProducerFactory<String, String> producerFactory() {
         final Map<String, Object> config = new HashMap<>();
         config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -48,8 +47,9 @@ public class KafkaProducerConfig {
 
     @Bean
     @Primary
-    public KafkaTemplate<StreamsSerdes.DataEnvelopeSerde, StreamsSerdes.DataEnvelopeSerde> dataEnvelopeKafkaTemplate() {
+    public KafkaTemplate<String, String> kafkaTemplate() {
         // set factory for both producer and consumer
-        return new KafkaTemplate<>(dataEnvelopeProducerFactory());
+        return new KafkaTemplate<>(producerFactory());
     }
+
 }

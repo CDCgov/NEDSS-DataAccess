@@ -45,7 +45,7 @@ class KafkaProducerConfigTest {
 
         // Act
         var target =
-                kafkaProducerConfig.dataEnvelopeKafkaTemplate();
+                kafkaProducerConfig.kafkaTemplate();
 
         // Assert
         Assertions.assertNotNull(target);
