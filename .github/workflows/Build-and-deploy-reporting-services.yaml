@@ -5,7 +5,8 @@ on:
       - main
       - master
       - rel-**
-      - CNDIT-* # ToDo: Delete this before merge to main
+      # Uncomment the following line only to test the build deploy from private branches.
+      #- CNDIT-* 
     paths-ignore:
       - "docker-compose.yml"
       - "**.md"
