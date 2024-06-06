@@ -3,10 +3,7 @@ package gov.cdc.etldatapipeline.postprocessingservice.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import gov.cdc.etldatapipeline.postprocessingservice.repository.InvestigationRepository;
-import gov.cdc.etldatapipeline.postprocessingservice.repository.OrganizationRepository;
-import gov.cdc.etldatapipeline.postprocessingservice.repository.PatientRepository;
-import gov.cdc.etldatapipeline.postprocessingservice.repository.ProviderRepository;
+import gov.cdc.etldatapipeline.postprocessingservice.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,39 +33,19 @@ public class PostProcessingService {
     private final ProviderRepository providerRepository;
     private final OrganizationRepository organizationRepository;
     private final InvestigationRepository investigationRepository;
+    private final NotificationRepository notificationRepository;
 
-    @KafkaListener(topics = {"${spring.kafka.topic.investigation}"})
-    public void postProcessInvestigationMessage(@Header(KafkaHeaders.RECEIVED_KEY) String key,
-                                                @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
+    @KafkaListener(topics = {
+            "${spring.kafka.topic.investigation}",
+            "${spring.kafka.topic.organization}",
+            "${spring.kafka.topic.patient}",
+            "${spring.kafka.topic.provider}",
+            "${spring.kafka.topic.notification}"
+    })
+    public void postProcessMessage(@Header(KafkaHeaders.RECEIVED_KEY) String key,
+                                   @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
         Long id = extractIdFromMessage(key, topic);
-        if(id != null) {
-            idCache.computeIfAbsent(topic, k -> new CopyOnWriteArrayList<>()).add(id);
-        }
-    }
-
-    @KafkaListener(topics = {"${spring.kafka.topic.organization}"})
-    public void postProcessOrganizationMessage(@Header(KafkaHeaders.RECEIVED_KEY) String key,
-                                               @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
-        Long id = extractIdFromMessage(key, topic);
-        if(id != null) {
-            idCache.computeIfAbsent(topic, k -> new CopyOnWriteArrayList<>()).add(id);
-        }
-    }
-
-    @KafkaListener(topics = {"${spring.kafka.topic.patient}"})
-    public void postProcessPatientMessage(@Header(KafkaHeaders.RECEIVED_KEY) String key,
-                                          @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
-        Long id = extractIdFromMessage(key, topic);
-        if(id != null) {
-            idCache.computeIfAbsent(topic, k -> new CopyOnWriteArrayList<>()).add(id);
-        }
-    }
-
-    @KafkaListener(topics = {"${spring.kafka.topic.provider}"})
-    public void postProcessProviderMessage(@Header(KafkaHeaders.RECEIVED_KEY) String key,
-                                          @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
-        Long id = extractIdFromMessage(key, topic);
-        if(id != null) {
+        if (id != null) {
             idCache.computeIfAbsent(topic, k -> new CopyOnWriteArrayList<>()).add(id);
         }
     }
@@ -80,34 +58,24 @@ public class PostProcessingService {
                 List<Long> ids = entry.getValue();
                 idCache.put(keyTopic, new ArrayList<>());
                 if(keyTopic.contains("investigation")) {
-                    String idsString = String.join(",", ids.stream().map(String::valueOf).collect(Collectors.toList()));
-                    logger.info("Processing the ids from the topic {} and calling the stored proc for investigation: {}", keyTopic, idsString);
-                    investigationRepository.executeStoredProcForPublicHealthCaseIds(idsString);
-                    logger.info("Stored proc execution completed.");
+                    processTopic(keyTopic, ids, investigationRepository::executeStoredProcForPublicHealthCaseIds, "investigation");
                 }
                 if(keyTopic.contains("organization")) {
-                    String idsString = String.join(",", ids.stream().map(String::valueOf).collect(Collectors.toList()));
-                    logger.info("Processing the ids from the topic {} and calling the stored proc for organization: {}", keyTopic, idsString);
-                    organizationRepository.executeStoredProcForOrganizationIds(idsString);
-                    logger.info("Stored proc execution completed.");
+                    processTopic(keyTopic, ids, organizationRepository::executeStoredProcForOrganizationIds, "organization");
                 }
                 if(keyTopic.contains("patient")) {
-                    String idsString = String.join(",", ids.stream().map(String::valueOf).collect(Collectors.toList()));
-                    logger.info("Processing the ids from the topic {} and calling the stored proc for patient: {}", keyTopic, idsString);
-                    patientRepository.executeStoredProcForPatientIds(idsString);
-                    logger.info("Stored proc execution completed.");
+                    processTopic(keyTopic, ids, patientRepository::executeStoredProcForPatientIds, "patient");
                 }
                 if(keyTopic.contains("provider")) {
-                    String idsString = String.join(",", ids.stream().map(String::valueOf).collect(Collectors.toList()));
-                    logger.info("Processing the ids from the topic {} and calling the stored proc for provider: {}", keyTopic, idsString);
-                    providerRepository.executeStoredProcForProviderIds(idsString);
-                    logger.info("Stored proc execution completed.");
+                    processTopic(keyTopic, ids, providerRepository::executeStoredProcForProviderIds, "provider");
+                }
+                if(keyTopic.contains("notifications")) {
+                    processTopic(keyTopic, ids, notificationRepository::executeStoredProcForNotificationIds, "notifications");
                 }
             }
             else {
                 logger.info("No ids to process from the topics.");
             }
-
         }
     }
 
@@ -129,9 +97,21 @@ public class PostProcessingService {
             if(topic.contains("investigation")) {
                 id = jsonNode.get("payload").get("public_health_case_uid").asLong();
             }
+            if(topic.contains("notifications")) {
+                id = jsonNode.get("payload").get("notification_uid").asLong();
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         return id;
+    }
+
+    private void processTopic(String keyTopic, List<Long> ids, Consumer<String> repositoryMethod, String entity) {
+        if(keyTopic.contains(entity)) {
+            String idsString = ids.stream().map(String::valueOf).collect(Collectors.joining(","));
+            logger.info("Processing the ids from the topic {} and calling the stored proc for {}: {}", keyTopic, entity, idsString);
+            repositoryMethod.accept(idsString);
+            logger.info("Stored proc execution completed.");
+        }
     }
 }
