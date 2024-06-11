@@ -19,6 +19,7 @@
     "other_value_ind_cd": "F",
     "unit_type_cd": null,
     "mask": null,
+    "block_nm": null,
     "question_group_seq_nbr": null,
     "data_type": "CODED",
     "last_chg_time": "2024-05-29T16:05:44.537"
@@ -43,6 +44,7 @@
     "other_value_ind_cd": null,
     "unit_type_cd": null,
     "mask": "TXT",
+    "block_nm": "BLOCK_8",
     "question_group_seq_nbr": null,
     "data_type": "TEXT",
     "last_chg_time": "2024-05-29T16:05:44.537"
@@ -51,8 +53,8 @@
     "nbs_case_answer_uid": 1236,
     "nbs_ui_metadata_uid": 65497312,
     "nbs_rdb_metadata_uid": 41201012,
-    "rdb_table_nm": "D_INV_ADMINISTRATIVE",
-    "rdb_column_nm": "ADM_INNC_NOTIFICATION_DT",
+    "rdb_table_nm": "D_INV_CLINICAL",
+    "rdb_column_nm": "CLN_FDD_Q_160",
     "code_set_group_id": null,
     "answer_txt": "05\/15\/2024",
     "act_uid": 234567890,
@@ -67,6 +69,7 @@
     "other_value_ind_cd": null,
     "unit_type_cd": null,
     "mask": "DATE",
+    "block_nm": null,
     "question_group_seq_nbr": null,
     "data_type": "DATE",
     "last_chg_time": "2024-05-29T16:05:44.537"

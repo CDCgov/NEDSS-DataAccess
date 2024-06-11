@@ -14,11 +14,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -28,12 +27,16 @@ import java.util.stream.Collectors;
 public class PostProcessingService {
     private static final Logger logger = LoggerFactory.getLogger(PostProcessingService.class);
     final Map<String, List<Long>> idCache = new ConcurrentHashMap<>();
+    final Map<Long, String> idVals = new ConcurrentHashMap<>();
 
     private final PatientRepository patientRepository;
     private final ProviderRepository providerRepository;
     private final OrganizationRepository organizationRepository;
     private final InvestigationRepository investigationRepository;
     private final NotificationRepository notificationRepository;
+    private final PageBuilderRepository pageBuilderRepository;
+
+    static final String SP_EXECUTION_COMPLETED = "Stored proc execution completed.";
 
     @KafkaListener(topics = {
             "${spring.kafka.topic.investigation}",
@@ -57,20 +60,25 @@ public class PostProcessingService {
                 String keyTopic = entry.getKey();
                 List<Long> ids = entry.getValue();
                 idCache.put(keyTopic, new ArrayList<>());
-                if(keyTopic.contains("investigation")) {
-                    processTopic(keyTopic, ids, investigationRepository::executeStoredProcForPublicHealthCaseIds, "investigation");
-                }
                 if(keyTopic.contains("organization")) {
-                    processTopic(keyTopic, ids, organizationRepository::executeStoredProcForOrganizationIds, "organization");
-                }
-                if(keyTopic.contains("patient")) {
-                    processTopic(keyTopic, ids, patientRepository::executeStoredProcForPatientIds, "patient");
+                    processTopic(keyTopic, ids, organizationRepository::executeStoredProcForOrganizationIds, "organization", "sp_nrt_organization_postprocessing");
                 }
                 if(keyTopic.contains("provider")) {
-                    processTopic(keyTopic, ids, providerRepository::executeStoredProcForProviderIds, "provider");
+                    processTopic(keyTopic, ids, providerRepository::executeStoredProcForProviderIds, "provider", "sp_nrt_provider_postprocessing");
+                }
+                if(keyTopic.contains("patient")) {
+                    processTopic(keyTopic, ids, patientRepository::executeStoredProcForPatientIds, "patient", "sp_nrt_patient_postprocessing");
+                }
+                if(keyTopic.contains("investigation")) {
+                    processTopic(keyTopic, ids, investigationRepository::executeStoredProcForPublicHealthCaseIds, "investigation","sp_nrt_investigation_postprocessing");
+                    ids.forEach(id -> {
+                        if (idVals.containsKey(id)) {
+                            processId(id, idVals.get(id), pageBuilderRepository::executeStoredProcForPageBuilder, "case answers","sp_page_builder_postprocessing");
+                        }
+                    });
                 }
                 if(keyTopic.contains("notifications")) {
-                    processTopic(keyTopic, ids, notificationRepository::executeStoredProcForNotificationIds, "notifications");
+                    processTopic(keyTopic, ids, notificationRepository::executeStoredProcForNotificationIds, "notifications", "sp_nrt_notification_postprocessing");
                 }
             }
             else {
@@ -95,7 +103,9 @@ public class PostProcessingService {
                 id = jsonNode.get("payload").get("organization_uid").asLong();
             }
             if(topic.contains("investigation")) {
-                id = jsonNode.get("payload").get("public_health_case_uid").asLong();
+                final Long phcUid = id = jsonNode.get("payload").get("public_health_case_uid").asLong();
+                Optional.ofNullable(jsonNode.get("payload").get("rdb_table_name_list"))
+                        .ifPresent(node -> idVals.put(phcUid, node.asText()));
             }
             if(topic.contains("notifications")) {
                 id = jsonNode.get("payload").get("notification_uid").asLong();
@@ -106,12 +116,18 @@ public class PostProcessingService {
         return id;
     }
 
-    private void processTopic(String keyTopic, List<Long> ids, Consumer<String> repositoryMethod, String entity) {
+    private void processTopic(String keyTopic, List<Long> ids, Consumer<String> repositoryMethod, String entity, String proc) {
         if(keyTopic.contains(entity)) {
             String idsString = ids.stream().map(String::valueOf).collect(Collectors.joining(","));
-            logger.info("Processing the ids from the topic {} and calling the stored proc for {}: {}", keyTopic, entity, idsString);
+            logger.info("Processing the {} message topic: {}. Calling stored proc: {}('{}')", entity, keyTopic, proc, idsString);
             repositoryMethod.accept(idsString);
-            logger.info("Stored proc execution completed.");
+            logger.info(SP_EXECUTION_COMPLETED);
         }
+    }
+
+    private void processId(Long id, String vals,BiConsumer<Long, String> repositoryMethod, String entity, String proc) {
+            logger.info("Processing PHC ID for {}. Calling stored proc: {}({}, '{}')", entity, proc, id, vals);
+            repositoryMethod.accept(id, vals);
+            logger.info(SP_EXECUTION_COMPLETED);
     }
 }

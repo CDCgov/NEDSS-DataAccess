@@ -115,6 +115,7 @@ class InvestigationServiceTest {
         investigation.setObservationNotificationIds(readFileData(filePathPrefix + "ObservationNotificationIds.json"));
         investigation.setOrganizationParticipations(readFileData(filePathPrefix + "OrganizationParticipations.json"));
         investigation.setPersonParticipations(readFileData(filePathPrefix + "PersonParticipations.json"));
+        investigation.setInvestigationCaseAnswer(readFileData(filePathPrefix + "InvestigationCaseAnswer.json"));
         return investigation;
     }
 
@@ -127,6 +128,7 @@ class InvestigationServiceTest {
         reporting.setOrganizationId(34865315L);    // OrganizationParticipations.json, entity_id for type_cd=OrgAsReporterOfPHC
         reporting.setInvStateCaseId("12-345-678"); // ActIds.json, root_extension_txt for type_cd=STATE
         reporting.setPhcInvFormId(263748598L);     // ObservationNotificationIds.json, source_act_uid for act_type_cd=PHCInvForm
+        reporting.setRdbTableNameList("D_INV_CLINICAL,D_INV_ADMINISTRATIVE"); // InvestigationCaseAnswer.json, rdb_table_nm
         return reporting;
     }
 }

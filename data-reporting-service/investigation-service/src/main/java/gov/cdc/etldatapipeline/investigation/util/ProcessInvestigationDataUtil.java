@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -48,7 +49,7 @@ public class ProcessInvestigationDataUtil {
         transformActIds(investigation.getActIds(), investigationTransformed, objectMapper);
         transformObservationIds(investigation.getObservationNotificationIds(), investigationTransformed, objectMapper);
         transformInvestigationConfirmationMethod(investigation.getInvestigationConfirmationMethod(), objectMapper);
-        processInvestigationPageCaseAnswer(investigation.getInvestigationCaseAnswer(), objectMapper);
+        processInvestigationPageCaseAnswer(investigation.getInvestigationCaseAnswer(), investigationTransformed, objectMapper);
         transformNotifications(investigation.getInvestigationNotifications(), objectMapper);
 
         return investigationTransformed;
@@ -254,7 +255,7 @@ public class ProcessInvestigationDataUtil {
         }
     }
 
-    private void processInvestigationPageCaseAnswer(String investigationCaseAnswer, ObjectMapper objectMapper) {
+    private void processInvestigationPageCaseAnswer(String investigationCaseAnswer, InvestigationTransformed investigationTransformed, ObjectMapper objectMapper) {
         try {
             JsonNode investigationCaseAnswerJsonArray = investigationCaseAnswer != null ? objectMapper.readTree(investigationCaseAnswer) : null;
 
@@ -275,6 +276,10 @@ public class ProcessInvestigationDataUtil {
                     investigationCaseAnswerRepository.deleteByActUid(actUid);
                     investigationCaseAnswerRepository.saveAll(investigationCaseAnswerList);
                 }
+
+                String rdbTblNms = String.join(",", investigationCaseAnswerList.stream()
+                                .map(InvestigationCaseAnswer::getRdbTableNm).collect(Collectors.toSet()));
+                investigationTransformed.setRdbTableNameList(rdbTblNms);
             }
             else {
                 logger.info("InvestigationCaseAnswerJsonArray array is null.");

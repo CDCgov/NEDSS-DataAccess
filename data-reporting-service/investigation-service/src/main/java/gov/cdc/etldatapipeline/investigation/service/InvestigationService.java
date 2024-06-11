@@ -107,5 +107,6 @@ public class InvestigationService {
         reportingModel.setCityCountyCaseNbr(investigationTransformed.getCityCountyCaseNbr());
         reportingModel.setLegacyCaseId(investigationTransformed.getLegacyCaseId());
         reportingModel.setPhcInvFormId(investigationTransformed.getPhcInvFormId());
+        reportingModel.setRdbTableNameList(investigationTransformed.getRdbTableNameList());
     }
 }

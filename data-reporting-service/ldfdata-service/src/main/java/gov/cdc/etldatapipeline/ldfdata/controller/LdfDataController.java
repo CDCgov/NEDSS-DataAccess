@@ -24,7 +24,7 @@ public class LdfDataController {
         return ResponseEntity.status(HttpStatus.OK).body("LdfData Preprocessing Service Status OK");
     }
 
-    @PostMapping("/publish")
+    @PostMapping("/reporting/ldfdata-svc/publish")
     public void publishMessageToKafka(@RequestBody String jsonData) {
         producerService.sendMessage(topicName, jsonData);
     }
