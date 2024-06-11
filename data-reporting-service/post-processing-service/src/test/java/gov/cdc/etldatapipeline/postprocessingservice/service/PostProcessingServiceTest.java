@@ -35,6 +35,8 @@ public class PostProcessingServiceTest {
     private InvestigationRepository investigationRepositoryMock;
     @Mock
     private NotificationRepository notificationRepositoryMock;
+    @Mock
+    private PageBuilderRepository pageBuilderRepositoryMock;
 
     private final ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
 
@@ -42,7 +44,7 @@ public class PostProcessingServiceTest {
     public void setUp() {
         MockitoAnnotations.openMocks(this);
         postProcessingServiceMock = new PostProcessingService(patientRepositoryMock, providerRepositoryMock,
-                organizationRepositoryMock, investigationRepositoryMock, notificationRepositoryMock);
+                organizationRepositoryMock, investigationRepositoryMock, notificationRepositoryMock, pageBuilderRepositoryMock);
         Logger logger = (Logger) LoggerFactory.getLogger(PostProcessingService.class);
         listAppender.start();
         logger.addAppender(listAppender);
@@ -64,12 +66,11 @@ public class PostProcessingServiceTest {
 
         String expectedPatientIdsString = "123";
         verify(patientRepositoryMock).executeStoredProcForPatientIds(expectedPatientIdsString);
-        verify(patientRepositoryMock, times(1)).executeStoredProcForPatientIds(expectedPatientIdsString);
         assertTrue(postProcessingServiceMock.idCache.containsKey(topic));
 
         List<ILoggingEvent> logs = listAppender.list;
         assertEquals(3, logs.size());
-        assertTrue(logs.get(2).getMessage().contains("Stored proc execution completed."));
+        assertTrue(logs.get(2).getMessage().contains(PostProcessingService.SP_EXECUTION_COMPLETED));
     }
 
     @Test
@@ -92,12 +93,11 @@ public class PostProcessingServiceTest {
 
         String expectedProviderIdsString = "123";
         verify(providerRepositoryMock).executeStoredProcForProviderIds(expectedProviderIdsString);
-        verify(providerRepositoryMock, times(1)).executeStoredProcForProviderIds(expectedProviderIdsString);
         assertTrue(postProcessingServiceMock.idCache.containsKey(topic));
 
         List<ILoggingEvent> logs = listAppender.list;
         assertEquals(3, logs.size());
-        assertTrue(logs.get(2).getMessage().contains("Stored proc execution completed."));
+        assertTrue(logs.get(2).getMessage().contains(PostProcessingService.SP_EXECUTION_COMPLETED));
     }
 
     @Test
@@ -120,12 +120,11 @@ public class PostProcessingServiceTest {
 
         String expectedOrganizationIdsIdsString = "123";
         verify(organizationRepositoryMock).executeStoredProcForOrganizationIds(expectedOrganizationIdsIdsString);
-        verify(organizationRepositoryMock, times(1)).executeStoredProcForOrganizationIds(expectedOrganizationIdsIdsString);
         assertTrue(postProcessingServiceMock.idCache.containsKey(topic));
 
         List<ILoggingEvent> logs = listAppender.list;
         assertEquals(3, logs.size());
-        assertTrue(logs.get(2).getMessage().contains("Stored proc execution completed."));
+        assertTrue(logs.get(2).getMessage().contains(PostProcessingService.SP_EXECUTION_COMPLETED));
     }
 
     @Test
@@ -148,12 +147,11 @@ public class PostProcessingServiceTest {
 
         String expectedPublicHealthCaseIdsString = "123";
         verify(investigationRepositoryMock).executeStoredProcForPublicHealthCaseIds(expectedPublicHealthCaseIdsString);
-        verify(investigationRepositoryMock, times(1)).executeStoredProcForPublicHealthCaseIds(expectedPublicHealthCaseIdsString);
         assertTrue(postProcessingServiceMock.idCache.containsKey(topic));
 
         List<ILoggingEvent> logs = listAppender.list;
         assertEquals(3, logs.size());
-        assertTrue(logs.get(2).getMessage().contains("Stored proc execution completed."));
+        assertTrue(logs.get(2).getMessage().contains(PostProcessingService.SP_EXECUTION_COMPLETED));
     }
 
     @Test
@@ -176,12 +174,11 @@ public class PostProcessingServiceTest {
 
         String expectedNotificationIdsString = "123";
         verify(notificationRepositoryMock).executeStoredProcForNotificationIds(expectedNotificationIdsString);
-        verify(notificationRepositoryMock, times(1)).executeStoredProcForNotificationIds(expectedNotificationIdsString);
         assertTrue(postProcessingServiceMock.idCache.containsKey(topic));
 
         List<ILoggingEvent> logs = listAppender.list;
         assertEquals(3, logs.size());
-        assertTrue(logs.get(2).getMessage().contains("Stored proc execution completed."));
+        assertTrue(logs.get(2).getMessage().contains(PostProcessingService.SP_EXECUTION_COMPLETED));
     }
 
     @Test
@@ -192,6 +189,25 @@ public class PostProcessingServiceTest {
         Long extractedId = postProcessingServiceMock.extractIdFromMessage(messageKey, topic);
 
         assertEquals(expectedId, extractedId);
+    }
+
+    @Test
+    public void testPostProcessPageBuilder() {
+        String key = "{\"payload\":{\"public_health_case_uid\":123, \"rdb_table_name_list\":\"D_INV_CLINICAL,D_INV_ADMINISTRATIVE\"}}";
+        String topic = "dummy_investigation";
+
+        postProcessingServiceMock.postProcessMessage(key, topic);
+        postProcessingServiceMock.processCachedIds();
+
+        Long expectedPublicHealthCaseId = 123L;
+        String expectedRdbTableNames = "D_INV_CLINICAL,D_INV_ADMINISTRATIVE";
+        verify(pageBuilderRepositoryMock).executeStoredProcForPageBuilder(expectedPublicHealthCaseId, expectedRdbTableNames);
+        assertTrue(postProcessingServiceMock.idVals.containsKey(expectedPublicHealthCaseId));
+        assertTrue(postProcessingServiceMock.idVals.containsValue(expectedRdbTableNames));
+
+        List<ILoggingEvent> logs = listAppender.list;
+        assertEquals(5, logs.size());
+        assertTrue(logs.get(4).getMessage().contains(PostProcessingService.SP_EXECUTION_COMPLETED));
     }
 
     @Test
@@ -215,7 +231,6 @@ public class PostProcessingServiceTest {
         String expectedNotificationIdsString = "234,235";
 
         verify(organizationRepositoryMock).executeStoredProcForOrganizationIds(expectedOrganizationIdsIdsString);
-        verify(organizationRepositoryMock, times(1)).executeStoredProcForOrganizationIds(expectedOrganizationIdsIdsString);
         assertTrue(postProcessingServiceMock.idCache.containsKey(orgTopic));
 
         verify(notificationRepositoryMock).executeStoredProcForNotificationIds(expectedNotificationIdsString);

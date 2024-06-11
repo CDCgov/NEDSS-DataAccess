@@ -190,7 +190,8 @@ public class InvestigationDataProcessingTests {
         investigationCaseAnswerDataIfPresent.add(new InvestigationCaseAnswer());
         when(investigationCaseAnswerRepository.findByActUid(investigationUid)).thenReturn(investigationCaseAnswerDataIfPresent);
 
-        transformer.transformInvestigationData(investigation);
+        InvestigationTransformed investigationTransformed = transformer.transformInvestigationData(investigation);
+        assertEquals("D_INV_CLINICAL,D_INV_ADMINISTRATIVE", investigationTransformed.getRdbTableNameList());
 
         List<InvestigationCaseAnswer> caseAnswers = new ArrayList<>();
         caseAnswers.add(caseAnswer);

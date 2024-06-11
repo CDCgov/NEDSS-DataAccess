@@ -87,6 +87,10 @@ public class InvestigationCaseAnswer {
     @Column(name = "mask")
     private String mask;
 
+    @JsonProperty("block_nm")
+    @Column(name = "block_nm")
+    private String blockNm;
+
     @JsonProperty("question_group_seq_nbr")
     @Column(name = "question_group_seq_nbr")
     private String questionGroupSeqNbr;

@@ -12,4 +12,5 @@ public class InvestigationTransformed {
     private String cityCountyCaseNbr;
     private String legacyCaseId;
     private Long phcInvFormId;
+    private String rdbTableNameList;
 }
