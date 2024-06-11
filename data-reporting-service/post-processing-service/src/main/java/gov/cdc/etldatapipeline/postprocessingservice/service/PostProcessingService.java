@@ -61,24 +61,24 @@ public class PostProcessingService {
                 List<Long> ids = entry.getValue();
                 idCache.put(keyTopic, new ArrayList<>());
                 if(keyTopic.contains("organization")) {
-                    processTopic(keyTopic, ids, organizationRepository::executeStoredProcForOrganizationIds, "organization");
+                    processTopic(keyTopic, ids, organizationRepository::executeStoredProcForOrganizationIds, "organization", "sp_nrt_organization_postprocessing");
                 }
                 if(keyTopic.contains("provider")) {
-                    processTopic(keyTopic, ids, providerRepository::executeStoredProcForProviderIds, "provider");
+                    processTopic(keyTopic, ids, providerRepository::executeStoredProcForProviderIds, "provider", "sp_nrt_provider_postprocessing");
                 }
                 if(keyTopic.contains("patient")) {
-                    processTopic(keyTopic, ids, patientRepository::executeStoredProcForPatientIds, "patient");
+                    processTopic(keyTopic, ids, patientRepository::executeStoredProcForPatientIds, "patient", "sp_nrt_patient_postprocessing");
                 }
                 if(keyTopic.contains("investigation")) {
-                    processTopic(keyTopic, ids, investigationRepository::executeStoredProcForPublicHealthCaseIds, "investigation");
+                    processTopic(keyTopic, ids, investigationRepository::executeStoredProcForPublicHealthCaseIds, "investigation","sp_nrt_investigation_postprocessing");
                     ids.forEach(id -> {
                         if (idVals.containsKey(id)) {
-                            processId(id, idVals.get(id), pageBuilderRepository::executeStoredProcForPageBuilder, "case answers");
+                            processId(id, idVals.get(id), pageBuilderRepository::executeStoredProcForPageBuilder, "case answers","sp_page_builder_postprocessing");
                         }
                     });
                 }
                 if(keyTopic.contains("notifications")) {
-                    processTopic(keyTopic, ids, notificationRepository::executeStoredProcForNotificationIds, "notifications");
+                    processTopic(keyTopic, ids, notificationRepository::executeStoredProcForNotificationIds, "notifications", "sp_nrt_notification_postprocessing");
                 }
             }
             else {
@@ -116,17 +116,17 @@ public class PostProcessingService {
         return id;
     }
 
-    private void processTopic(String keyTopic, List<Long> ids, Consumer<String> repositoryMethod, String entity) {
+    private void processTopic(String keyTopic, List<Long> ids, Consumer<String> repositoryMethod, String entity, String proc) {
         if(keyTopic.contains(entity)) {
             String idsString = ids.stream().map(String::valueOf).collect(Collectors.joining(","));
-            logger.info("Processing the ids from the topic '{}' and calling the stored proc for {}: {}", keyTopic, entity, idsString);
+            logger.info("Processing the {} message topic: {}. Calling stored proc: {}('{}')", entity, keyTopic, proc, idsString);
             repositoryMethod.accept(idsString);
             logger.info(SP_EXECUTION_COMPLETED);
         }
     }
 
-    private void processId(Long id, String vals,BiConsumer<Long, String> repositoryMethod, String entity) {
-            logger.info("Processing id and calling the stored proc for {}: {}, '{}'", entity, id, vals);
+    private void processId(Long id, String vals,BiConsumer<Long, String> repositoryMethod, String entity, String proc) {
+            logger.info("Processing PHC ID for {}. Calling stored proc: {}({}, '{}')", entity, proc, id, vals);
             repositoryMethod.accept(id, vals);
             logger.info(SP_EXECUTION_COMPLETED);
     }
