@@ -27,7 +27,7 @@ dependencies {
     implementation 'commons-io:commons-io:2.15.0'
     implementation 'com.microsoft.sqlserver:mssql-jdbc:12.3.0.jre17-preview'
     annotationProcessor 'org.projectlombok:lombok'
-
+    implementation 'com.google.guava:guava:33.1.0-jre'
 
     if (findProject(':common-util')) {
         implementation project(':common-util')

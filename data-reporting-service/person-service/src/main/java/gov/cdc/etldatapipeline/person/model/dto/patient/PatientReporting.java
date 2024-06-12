@@ -6,8 +6,10 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import gov.cdc.etldatapipeline.commonutil.model.DataRequiredFields;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
@@ -16,6 +18,8 @@ import java.util.Set;
  */
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class PatientReporting implements PersonExtendedProps, DataRequiredFields {

@@ -1,7 +1,5 @@
 package gov.cdc.etldatapipeline.organization.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.cdc.etldatapipeline.organization.service.OrganizationStatusService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,10 +20,12 @@ class OrganizationServiceControllerTest {
     @Mock
     private OrganizationStatusService dataPipelineStatusService;
 
-    private KafkaTemplate<String, JsonNode> mockKafkaTemplate;
+    @Mock
+    private KafkaTemplate<String, String> mockKafkaTemplate;
 
     @InjectMocks
     private OrganizationServiceController controller;
+
 
     @BeforeEach
     public void setup() {
@@ -36,7 +36,6 @@ class OrganizationServiceControllerTest {
     @Test
     public void testPostOrganization() throws Exception {
         String payload = "{\"payload\": {\"after\": {\"organization_uid\": \"10036000\"}}}";
-        JsonNode jsonNode = new ObjectMapper().readTree(payload);
 
         ResponseEntity<String> response = controller.postOrganization(payload);
 

@@ -1,5 +1,7 @@
 package gov.cdc.etldatapipeline.organization;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.cdc.etldatapipeline.commonutil.json.CustomJsonGeneratorImpl;
 import gov.cdc.etldatapipeline.commonutil.model.avro.DataEnvelope;
@@ -41,7 +43,6 @@ public class OrganizationServiceTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private final String orgElasticTopic = "OrgElasticTopic";
     private final String orgReportingTopic = "OrgReportingTopic";
 
 
@@ -60,11 +61,12 @@ public class OrganizationServiceTest {
         Mockito.when(transformer.buildOrganizationKey(orgSp)).thenReturn(new CustomJsonGeneratorImpl().generateStringJson(organizationKey));
         Mockito.when(transformer.processData(orgSp, OrganizationType.ORGANIZATION_REPORTING)).thenReturn(new ObjectMapper().writeValueAsString(reportingData));
 
-        validateDataTransformation("orgcdc/OrgChangeData.json", orgReportingTopic, reportingData);
+        validateDataTransformation("orgcdc/OrgChangeData.json", orgReportingTopic);
     }
 
-    private void validateDataTransformation(String changeDataFilePath, String expectedTopic, DataEnvelope expectedData) throws Exception {
+    private void validateDataTransformation(String changeDataFilePath, String expectedTopic) throws JsonProcessingException {
         String changeData = readFileData(changeDataFilePath);
+        String expectedKey = readFileData("orgtransformed/OrgKey.json");
 
         organizationService.processMessage(changeData, expectedTopic);
 
@@ -74,9 +76,10 @@ public class OrganizationServiceTest {
 
         verify(kafkaTemplate, Mockito.times(2)).send(topicCaptor.capture(), keyCaptor.capture(), valueCaptor.capture());
 
-        assertEquals(null, topicCaptor.getValue());
-        assertEquals("{\"schema\":{\"type\":\"struct\",\"fields\":[{\"type\":\"int64\",\"optional\":true,\"field\":\"organization_uid\"}]},\"payload\":{\"organization_uid\":10036000}}", keyCaptor.getValue());
-        assertEquals(null, valueCaptor.getValue());
+        JsonNode expectedJsonNode = objectMapper.readTree(expectedKey);
+        JsonNode actualJsonNode = objectMapper.readTree(keyCaptor.getValue());
+
+        assertEquals(expectedJsonNode, actualJsonNode);
     }
 
 }

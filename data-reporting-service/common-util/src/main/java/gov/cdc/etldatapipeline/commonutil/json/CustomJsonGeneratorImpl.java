@@ -1,5 +1,6 @@
 package gov.cdc.etldatapipeline.commonutil.json;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -35,13 +36,12 @@ public class CustomJsonGeneratorImpl {
             for (Field field : modelClass.getDeclaredFields()) {
                 ObjectNode fieldNode = objectMapper.createObjectNode();
 
-                String fieldName = field.getName();
-
-                fieldName = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName);
+                String fieldName = getFieldName(field);
 
                 fieldNode.put("type", getType(field.getType().getSimpleName().toLowerCase()));
                 fieldNode.put("optional", (!fieldName.equals("public_health_case_uid")
-                        || !fieldName.equals("observation_uid") || !fieldName.equals("organization_uid")));
+                        && !fieldName.equals("observation_uid") && !fieldName.equals("organization_uid")
+                        && !fieldName.equals("patient_uid") && !fieldName.equals("provider_uid")));
                 fieldNode.put("field", fieldName);
                 fieldsArray.add(fieldNode);
             }
@@ -59,9 +59,7 @@ public class CustomJsonGeneratorImpl {
             Class<?> modelClass = model.getClass();
             for (java.lang.reflect.Field field : modelClass.getDeclaredFields()) {
                 field.setAccessible(true);
-                String fieldName = field.getName();
-
-                fieldName = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName);
+                String fieldName = getFieldName(field);
 
                 payloadNode.put(fieldName, objectMapper.valueToTree(field.get(model)));
             }
@@ -70,6 +68,14 @@ public class CustomJsonGeneratorImpl {
         }
 
         return payloadNode;
+    }
+
+    private static String getFieldName(Field field) {
+        if (field.isAnnotationPresent(JsonProperty.class)) {
+            return field.getAnnotation(JsonProperty.class).value();
+        } else {
+            return CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, field.getName());
+        }
     }
 
     private static String getType(String javaType) {
