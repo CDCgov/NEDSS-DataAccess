@@ -41,19 +41,19 @@ public class PatientDataPostProcessingTests {
         String processedData = tx.processData(pat, PersonType.PATIENT_REPORTING);
         JsonNode payloadNode = objectMapper.readTree(processedData).get("payload");
 
-        List<String> actual = Arrays.asList(payloadNode.get("last_nm").asText(),
-                payloadNode.get("middle_nm").asText(),
-                payloadNode.get("first_nm").asText(),
-                payloadNode.get("nm_suffix").asText(),
-                payloadNode.get("street_address1").asText(),
-                payloadNode.get("street_address2").asText(),
+        List<String> actual = Arrays.asList(payloadNode.get("last_name").asText(),
+                payloadNode.get("middle_name").asText(),
+                payloadNode.get("first_name").asText(),
+                payloadNode.get("name_suffix").asText(),
+                payloadNode.get("street_address_1").asText(),
+                payloadNode.get("street_address_2").asText(),
                 payloadNode.get("city").asText(),
                 payloadNode.get("zip").asText(),
                 payloadNode.get("county_code").asText(),
                 payloadNode.get("county").asText(),
                 payloadNode.get("state_code").asText(),
                 payloadNode.get("state").asText(),
-                payloadNode.get("home_country").asText(),
+                payloadNode.get("country").asText(),
                 payloadNode.get("birth_country").asText(),
                 payloadNode.get("phone_work").asText(),
                 payloadNode.get("phone_ext_work").asText(),
@@ -107,10 +107,10 @@ public class PatientDataPostProcessingTests {
         String processedData = tx.processData(perOp, PersonType.PATIENT_REPORTING);
         JsonNode payloadNode = objectMapper.readTree(processedData).get("payload");
 
-        List<String> actual = Arrays.asList(payloadNode.get("last_nm").asText(),
-                payloadNode.get("middle_nm").asText(),
-                payloadNode.get("first_nm").asText(),
-                payloadNode.get("nm_suffix").asText(),
+        List<String> actual = Arrays.asList(payloadNode.get("last_name").asText(),
+                payloadNode.get("middle_name").asText(),
+                payloadNode.get("first_name").asText(),
+                payloadNode.get("name_suffix").asText(),
                 payloadNode.get("alias_nickname").asText());
 
         // Expected
@@ -133,22 +133,14 @@ public class PatientDataPostProcessingTests {
                 .nameNested(readFileData(FILE_PREFIX + "PersonName1.json"))
                 .build();
 
-        // Patient Fields to be processed
-        Function<PatientReporting, List<String>> pDetailsFn = (p) -> Arrays.asList(
-                p.getLastNm(),
-                p.getMiddleNm(),
-                p.getFirstNm(),
-                p.getNmSuffix(),
-                p.getAliasNickname());
-
         // Process the respective field json to PatientProviderProvider fields
         String processedData = tx.processData(perOp, PersonType.PATIENT_REPORTING);
         JsonNode payloadNode = objectMapper.readTree(processedData).get("payload");
 
-        List<String> actual = Arrays.asList(payloadNode.get("last_nm").asText(),
-                payloadNode.get("middle_nm").asText(),
-                payloadNode.get("first_nm").asText(),
-                payloadNode.get("nm_suffix").asText(),
+        List<String> actual = Arrays.asList(payloadNode.get("last_name").asText(),
+                payloadNode.get("middle_name").asText(),
+                payloadNode.get("first_name").asText(),
+                payloadNode.get("name_suffix").asText(),
                 payloadNode.get("alias_nickname").asText());
 
         List<String> expected = Arrays.asList(
@@ -174,15 +166,15 @@ public class PatientDataPostProcessingTests {
         String processedData = tx.processData(perOp, PersonType.PATIENT_REPORTING);
         JsonNode payloadNode = objectMapper.readTree(processedData).get("payload");
 
-        List<String> actual = Arrays.asList(payloadNode.get("street_address1").asText(),
-                payloadNode.get("street_address2").asText(),
+        List<String> actual = Arrays.asList(payloadNode.get("street_address_1").asText(),
+                payloadNode.get("street_address_2").asText(),
                 payloadNode.get("city").asText(),
                 payloadNode.get("zip").asText(),
                 payloadNode.get("county_code").asText(),
                 payloadNode.get("county").asText(),
                 payloadNode.get("state_code").asText(),
                 payloadNode.get("state").asText(),
-                payloadNode.get("home_country").asText(),
+                payloadNode.get("country").asText(),
                 payloadNode.get("birth_country").asText());
 
         // Expected

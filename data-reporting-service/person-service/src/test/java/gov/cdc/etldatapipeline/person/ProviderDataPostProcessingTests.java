@@ -37,13 +37,13 @@ public class ProviderDataPostProcessingTests {
         String processedData = tx.processData(p, PersonType.PROVIDER_REPORTING);
         JsonNode payloadNode = objectMapper.readTree(processedData).get("payload");
 
-        List<String> actual = Arrays.asList(payloadNode.get("last_nm").asText(),
-                payloadNode.get("middle_nm").asText(),
-                payloadNode.get("first_nm").asText(),
-                payloadNode.get("nm_suffix").asText(),
-                payloadNode.get("nm_degree").asText(),
-                payloadNode.get("street_address1").asText(),
-                payloadNode.get("street_address2").asText(),
+        List<String> actual = Arrays.asList(payloadNode.get("last_name").asText(),
+                payloadNode.get("middle_name").asText(),
+                payloadNode.get("first_name").asText(),
+                payloadNode.get("name_suffix").asText(),
+                payloadNode.get("name_degree").asText(),
+                payloadNode.get("street_address_1").asText(),
+                payloadNode.get("street_address_2").asText(),
                 payloadNode.get("city").asText(),
                 payloadNode.get("zip").asText(),
                 payloadNode.get("county_code").asText(),
@@ -54,10 +54,10 @@ public class ProviderDataPostProcessingTests {
                 payloadNode.get("phone_work").asText(),
                 payloadNode.get("phone_ext_work").asText(),
                 payloadNode.get("phone_cell").asText(),
-                payloadNode.get("provider_quick_code").asText(),
+                payloadNode.get("quick_code").asText(),
                 payloadNode.get("provider_registration_num").asText(),
                 payloadNode.get("provider_registration_num_auth").asText(),
-                payloadNode.get("email").asText());
+                payloadNode.get("email_work").asText());
 
         List<Object> expected = Arrays.asList(
                 "Singgh",
@@ -98,11 +98,11 @@ public class ProviderDataPostProcessingTests {
         String processedData = tx.processData(prov, PersonType.PROVIDER_REPORTING);
         JsonNode payloadNode = objectMapper.readTree(processedData).get("payload");
 
-        List<String> actual = Arrays.asList(payloadNode.get("last_nm").asText(),
-                payloadNode.get("middle_nm").asText(),
-                payloadNode.get("first_nm").asText(),
-                payloadNode.get("nm_suffix").asText(),
-                payloadNode.get("nm_degree").asText());
+        List<String> actual = Arrays.asList(payloadNode.get("last_name").asText(),
+                payloadNode.get("middle_name").asText(),
+                payloadNode.get("first_name").asText(),
+                payloadNode.get("name_suffix").asText(),
+                payloadNode.get("name_degree").asText());
 
         List<String> expected = Arrays.asList(
                 "Singgh",
@@ -127,11 +127,11 @@ public class ProviderDataPostProcessingTests {
         String processedData = tx.processData(prov, PersonType.PROVIDER_REPORTING);
         JsonNode payloadNode = objectMapper.readTree(processedData).get("payload");
 
-        List<String> actual = Arrays.asList(payloadNode.get("last_nm").asText(),
-                payloadNode.get("middle_nm").asText(),
-                payloadNode.get("first_nm").asText(),
-                payloadNode.get("nm_suffix").asText(),
-                payloadNode.get("nm_degree").asText());
+        List<String> actual = Arrays.asList(payloadNode.get("last_name").asText(),
+                payloadNode.get("middle_name").asText(),
+                payloadNode.get("first_name").asText(),
+                payloadNode.get("name_suffix").asText(),
+                payloadNode.get("name_degree").asText());
 
         List<String> expected = Arrays.asList(
                 "jack",
@@ -156,8 +156,8 @@ public class ProviderDataPostProcessingTests {
         String processedData = tx.processData(prov, PersonType.PROVIDER_REPORTING);
         JsonNode payloadNode = objectMapper.readTree(processedData).get("payload");
 
-        List<String> actual = Arrays.asList(payloadNode.get("street_address1").asText(),
-                payloadNode.get("street_address2").asText(),
+        List<String> actual = Arrays.asList(payloadNode.get("street_address_1").asText(),
+                payloadNode.get("street_address_2").asText(),
                 payloadNode.get("city").asText(),
                 payloadNode.get("zip").asText(),
                 payloadNode.get("county_code").asText(),
@@ -220,7 +220,7 @@ public class ProviderDataPostProcessingTests {
         String processedData = tx.processData(prov, PersonType.PROVIDER_REPORTING);
         JsonNode payloadNode = objectMapper.readTree(processedData).get("payload");
 
-        List<String> actual = List.of(payloadNode.get("provider_quick_code").asText(),
+        List<String> actual = List.of(payloadNode.get("quick_code").asText(),
                 payloadNode.get("provider_registration_num").asText(),
                 payloadNode.get("provider_registration_num_auth").asText());
 
@@ -245,7 +245,7 @@ public class ProviderDataPostProcessingTests {
         String processedData = tx.processData(prov, PersonType.PROVIDER_REPORTING);
         JsonNode payloadNode = objectMapper.readTree(processedData).get("payload");
 
-        List<String> actual = List.of(payloadNode.get("email").asText());
+        List<String> actual = List.of(payloadNode.get("email_work").asText());
 
         List<String> expected = List.of("someone2@email.com");
         // Validate the PatientProvider field processing
