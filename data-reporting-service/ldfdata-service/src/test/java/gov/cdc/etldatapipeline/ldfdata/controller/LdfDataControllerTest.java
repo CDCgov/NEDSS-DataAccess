@@ -38,7 +38,7 @@ class LdfDataControllerTest {
     void publishMessageToKafkaTest() throws Exception  {
         String jsonData = "{\"key\":\"value\"}";
 
-        mockMvc.perform(post("/publish")
+        mockMvc.perform(post("/reporting/ldfdata-svc/publish")
                         .contentType("application/json")
                         .content(jsonData))
                 .andExpect(status().isOk());

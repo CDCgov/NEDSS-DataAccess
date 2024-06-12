@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.cdc.etldatapipeline.commonutil.json.CustomJsonGeneratorImpl;
 import gov.cdc.etldatapipeline.investigation.repository.model.dto.*;
+import gov.cdc.etldatapipeline.investigation.repository.rdb.InvestigationCaseAnswerRepository;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Component;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -29,10 +32,16 @@ public class ProcessInvestigationDataUtil {
     @Value("${spring.kafka.output.topic-name-observation}")
     public String investigationObservationOutputTopicName;
 
+    @Value("${spring.kafka.output.topic-name-notifications}")
+    public String investigationNotificationsOutputTopicName;
+
     private final KafkaTemplate<String, String> kafkaTemplate;
     InvestigationKey investigationKey = new InvestigationKey();
     private final CustomJsonGeneratorImpl jsonGenerator = new CustomJsonGeneratorImpl();
 
+    private final InvestigationCaseAnswerRepository investigationCaseAnswerRepository;
+
+    @Transactional(transactionManager = "rdbTransactionManager")
     public InvestigationTransformed transformInvestigationData(Investigation investigation) {
 
         InvestigationTransformed investigationTransformed = new InvestigationTransformed();
@@ -41,11 +50,39 @@ public class ProcessInvestigationDataUtil {
         transformPersonParticipations(investigation.getPersonParticipations(), investigationTransformed, objectMapper);
         transformOrganizationParticipations(investigation.getOrganizationParticipations(), investigationTransformed, objectMapper);
         transformActIds(investigation.getActIds(), investigationTransformed, objectMapper);
-        transformNotificationIds(investigation.getObservationNotificationIds(), objectMapper);
         transformObservationIds(investigation.getObservationNotificationIds(), investigationTransformed, objectMapper);
-        transformInvestigationConfirmationMethod(investigation.getInvestigationConfirmationMethod(), investigationTransformed, objectMapper);
+        transformInvestigationConfirmationMethod(investigation.getInvestigationConfirmationMethod(), objectMapper);
+        processInvestigationPageCaseAnswer(investigation.getInvestigationCaseAnswer(), investigationTransformed, objectMapper);
+        transformNotifications(investigation.getInvestigationNotifications(), objectMapper);
 
         return investigationTransformed;
+    }
+
+    private void transformNotifications(String investigationNotifications, ObjectMapper objectMapper) {
+        try {
+            JsonNode investigationNotificationsJsonArray = investigationNotifications != null ? objectMapper.readTree(investigationNotifications) : null;
+            InvestigationNotificationsKey investigationNotificationsKey = new InvestigationNotificationsKey();
+
+            if(investigationNotificationsJsonArray != null && investigationNotificationsJsonArray.isArray()) {
+                for(JsonNode node : investigationNotificationsJsonArray) {
+                    Long actUid = node.get("source_act_uid").asLong();
+                    Long publicHealthCaseUid = node.get("public_health_case_uid").asLong();
+                    investigationNotificationsKey.setSourceActUid(actUid);
+                    investigationNotificationsKey.setPublicHealthCaseUid(publicHealthCaseUid);
+
+                    InvestigationNotifications tempInvestigationNotificationsObject = objectMapper.treeToValue(node, InvestigationNotifications.class);
+
+                    String jsonKey = jsonGenerator.generateStringJson(investigationNotificationsKey);
+                    String jsonValue = jsonGenerator.generateStringJson(tempInvestigationNotificationsObject);
+                    kafkaTemplate.send(investigationNotificationsOutputTopicName, jsonKey, jsonValue);
+                }
+            }
+            else {
+                logger.info("InvestigationNotifications array is null.");
+            }
+        } catch (Exception e) {
+            logger.error("Error processing Notifications JSON array from investigation data: {}", e.getMessage());
+        }
     }
 
 
@@ -128,38 +165,6 @@ public class ProcessInvestigationDataUtil {
         }
     }
 
-    private void transformNotificationIds(String observationNotificationIds, ObjectMapper objectMapper) {
-        try {
-            JsonNode investigationNotificationIdsJsonArray = observationNotificationIds != null ? objectMapper.readTree(observationNotificationIds) : null;
-            InvestigationNotification investigationNotification = new InvestigationNotification();
-            List<Long> notificationIds = new ArrayList<>();
-
-            if(investigationNotificationIdsJsonArray != null && investigationNotificationIdsJsonArray.isArray()) {
-                for(JsonNode node : investigationNotificationIdsJsonArray) {
-                    String sourceClassCode = node.get("source_class_cd").asText();
-                    String actTypeCode = node.get("act_type_cd").asText();
-                    Long publicHealthCaseUid = node.get("public_health_case_uid").asLong();
-                    investigationKey.setPublicHealthCaseUid(publicHealthCaseUid);
-
-                    if(sourceClassCode.equals("NOTF") && actTypeCode.equals("Notification")) {
-                        investigationNotification.setPublicHealthCaseUid(publicHealthCaseUid);
-                        notificationIds.add(node.get("source_act_uid").asLong());
-                    }
-                }
-                for(Long id : notificationIds) {
-                    investigationNotification.setNotificationId(id);
-                    String jsonValue = jsonGenerator.generateStringJson(investigationNotification);
-                    kafkaTemplate.send(investigationNotificationOutputTopicName, jsonValue, jsonValue);
-                }
-            }
-            else {
-                logger.info("InvestigationNotificationIds array is null.");
-            }
-        } catch (Exception e) {
-            logger.error("Error processing Observation Notification Ids JSON array from investigation data: {}", e.getMessage());
-        }
-    }
-
     private void transformObservationIds(String observationNotificationIds, InvestigationTransformed investigationTransformed, ObjectMapper objectMapper) {
         try {
             JsonNode investigationObservationIdsJsonArray = observationNotificationIds != null ? objectMapper.readTree(observationNotificationIds) : null;
@@ -193,11 +198,11 @@ public class ProcessInvestigationDataUtil {
                 logger.info("InvestigationObservationIds array is null.");
             }
         } catch (Exception e) {
-            logger.error("Error processing Observation Notification Ids JSON array from investigation data: {}", e.getMessage());
+            logger.error("Error processing Observation Ids JSON array from investigation data: {}", e.getMessage());
         }
     }
 
-    private void transformInvestigationConfirmationMethod(String investigationConfirmationMethod, InvestigationTransformed investigationTransformed, ObjectMapper objectMapper) {
+    private void transformInvestigationConfirmationMethod(String investigationConfirmationMethod, ObjectMapper objectMapper) {
         try {
             JsonNode investigationConfirmationMethodJsonArray = investigationConfirmationMethod != null ? objectMapper.readTree(investigationConfirmationMethod) : null;
             InvestigationConfirmationMethodKey investigationConfirmationMethodKey = new InvestigationConfirmationMethodKey();
@@ -250,6 +255,40 @@ public class ProcessInvestigationDataUtil {
             }
         } catch (Exception e) {
             logger.error("Error processing investigation confirmation method JSON array from investigation data: {}", e.getMessage());
+        }
+    }
+
+    private void processInvestigationPageCaseAnswer(String investigationCaseAnswer, InvestigationTransformed investigationTransformed, ObjectMapper objectMapper) {
+        try {
+            JsonNode investigationCaseAnswerJsonArray = investigationCaseAnswer != null ? objectMapper.readTree(investigationCaseAnswer) : null;
+
+            if(investigationCaseAnswerJsonArray != null && investigationCaseAnswerJsonArray.isArray()) {
+                Long actUid = investigationCaseAnswerJsonArray.get(0).get("act_uid").asLong();
+                List<InvestigationCaseAnswer> investigationCaseAnswerDataIfPresent = investigationCaseAnswerRepository.findByActUid(actUid);
+                List<InvestigationCaseAnswer> investigationCaseAnswerList = new ArrayList<>();
+
+                for(JsonNode node : investigationCaseAnswerJsonArray) {
+                    InvestigationCaseAnswer tempCaseAnswerObject = objectMapper.treeToValue(node, InvestigationCaseAnswer.class);
+                    investigationCaseAnswerList.add(tempCaseAnswerObject);
+                }
+
+                if(investigationCaseAnswerDataIfPresent.isEmpty()) {
+                    investigationCaseAnswerRepository.saveAll(investigationCaseAnswerList);
+                }
+                else {
+                    investigationCaseAnswerRepository.deleteByActUid(actUid);
+                    investigationCaseAnswerRepository.saveAll(investigationCaseAnswerList);
+                }
+
+                String rdbTblNms = String.join(",", investigationCaseAnswerList.stream()
+                                .map(InvestigationCaseAnswer::getRdbTableNm).collect(Collectors.toSet()));
+                investigationTransformed.setRdbTableNameList(rdbTblNms);
+            }
+            else {
+                logger.info("InvestigationCaseAnswerJsonArray array is null.");
+            }
+        } catch (Exception e) {
+            logger.error("Error processing investigation case answer JSON array from investigation data: {}", e.getMessage());
         }
     }
 }

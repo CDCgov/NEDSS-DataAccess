@@ -6,6 +6,7 @@ spring:
       organization: nrt_organization
       patient: nrt_patient
       provider: nrt_provider
+      notification: nrt_notifications
     consumer:
       maxPollIntervalMs: 30000
       maxConcurrency: 5

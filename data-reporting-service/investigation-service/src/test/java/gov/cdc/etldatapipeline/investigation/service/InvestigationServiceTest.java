@@ -1,10 +1,11 @@
 package gov.cdc.etldatapipeline.investigation.service;
 
 import gov.cdc.etldatapipeline.commonutil.json.CustomJsonGeneratorImpl;
-import gov.cdc.etldatapipeline.investigation.repository.InvestigationRepository;
+import gov.cdc.etldatapipeline.investigation.repository.odse.InvestigationRepository;
 import gov.cdc.etldatapipeline.investigation.repository.model.dto.Investigation;
 import gov.cdc.etldatapipeline.investigation.repository.model.dto.InvestigationKey;
 import gov.cdc.etldatapipeline.investigation.repository.model.reporting.InvestigationReporting;
+import gov.cdc.etldatapipeline.investigation.repository.rdb.InvestigationCaseAnswerRepository;
 import gov.cdc.etldatapipeline.investigation.util.ProcessInvestigationDataUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,9 @@ class InvestigationServiceTest {
     private InvestigationRepository investigationRepository;
 
     @Mock
+    private InvestigationCaseAnswerRepository investigationCaseAnswerRepository;
+
+    @Mock
     KafkaTemplate<String, String> kafkaTemplate;
 
     @Captor
@@ -45,7 +49,7 @@ class InvestigationServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        transformer = new ProcessInvestigationDataUtil(kafkaTemplate);
+        transformer = new ProcessInvestigationDataUtil(kafkaTemplate, investigationCaseAnswerRepository);
     }
 
     @Test
@@ -77,7 +81,7 @@ class InvestigationServiceTest {
         String expectedKey = jsonGenerator.generateStringJson(investigationKey);
         String expectedValue = jsonGenerator.generateStringJson(reportingModel);
 
-        verify(kafkaTemplate, times(5)).send(topicCaptor.capture(), keyCaptor.capture(), messageCaptor.capture());
+        verify(kafkaTemplate, times(4)).send(topicCaptor.capture(), keyCaptor.capture(), messageCaptor.capture());
         assertEquals(outputTopicName, topicCaptor.getValue());
         assertEquals(expectedKey, keyCaptor.getValue());
         assertEquals(expectedValue, messageCaptor.getValue());
@@ -100,6 +104,7 @@ class InvestigationServiceTest {
         investigation.setObservationNotificationIds(readFileData(filePathPrefix + "ObservationNotificationIds.json"));
         investigation.setOrganizationParticipations(readFileData(filePathPrefix + "OrganizationParticipations.json"));
         investigation.setPersonParticipations(readFileData(filePathPrefix + "PersonParticipations.json"));
+        investigation.setInvestigationCaseAnswer(readFileData(filePathPrefix + "InvestigationCaseAnswer.json"));
         return investigation;
     }
 
@@ -112,6 +117,7 @@ class InvestigationServiceTest {
         reporting.setOrganizationId(34865315L);    // OrganizationParticipations.json, entity_id for type_cd=OrgAsReporterOfPHC
         reporting.setInvStateCaseId("12-345-678"); // ActIds.json, root_extension_txt for type_cd=STATE
         reporting.setPhcInvFormId(263748598L);     // ObservationNotificationIds.json, source_act_uid for act_type_cd=PHCInvForm
+        reporting.setRdbTableNameList("D_INV_CLINICAL,D_INV_ADMINISTRATIVE"); // InvestigationCaseAnswer.json, rdb_table_nm
         return reporting;
     }
 }

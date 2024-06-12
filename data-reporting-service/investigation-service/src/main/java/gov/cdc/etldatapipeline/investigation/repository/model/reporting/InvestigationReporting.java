@@ -95,6 +95,7 @@ public class InvestigationReporting {
     private String cityCountyCaseNbr;
     private String legacyCaseId;
     private Long phcInvFormId;
+    private String rdbTableNameList;
     private Long addUserId;
     private String addUserName;
     private String addTime;
