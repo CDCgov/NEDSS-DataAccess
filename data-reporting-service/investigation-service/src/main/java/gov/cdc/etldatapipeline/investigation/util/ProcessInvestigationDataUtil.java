@@ -26,9 +26,6 @@ public class ProcessInvestigationDataUtil {
     @Value("${spring.kafka.output.topic-name-confirmation}")
     public String investigationConfirmationOutputTopicName;
 
-    @Value("${spring.kafka.output.topic-name-notification}")
-    public String investigationNotificationOutputTopicName;
-
     @Value("${spring.kafka.output.topic-name-observation}")
     public String investigationObservationOutputTopicName;
 
