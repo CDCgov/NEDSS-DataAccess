@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 public class ObservationController {
     private final KafkaProducerService producerService;
 
-    @Value("${spring.kafka.stream.input.observation.topic-name}")
+    @Value("${spring.kafka.input.topic-name}")
     private String observationTopic;
 
     @Autowired

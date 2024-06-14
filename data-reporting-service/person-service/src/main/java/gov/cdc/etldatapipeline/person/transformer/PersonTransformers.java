@@ -1,7 +1,6 @@
 package gov.cdc.etldatapipeline.person.transformer;
 
 import gov.cdc.etldatapipeline.commonutil.json.CustomJsonGeneratorImpl;
-import gov.cdc.etldatapipeline.commonutil.model.avro.DataEnvelope;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
 import gov.cdc.etldatapipeline.person.model.dto.patient.PatientElasticSearch;
 import gov.cdc.etldatapipeline.person.model.dto.patient.PatientKey;
@@ -17,20 +16,20 @@ import org.springframework.stereotype.Component;
 public class PersonTransformers {
     private final CustomJsonGeneratorImpl jsonGenerator = new CustomJsonGeneratorImpl();
 
-    public DataEnvelope buildPatientKey(PatientSp p) {
-        return jsonGenerator.buildAvroRecord(PatientKey.builder().patientUid(p.getPersonUid()).build());
+    public String buildPatientKey(PatientSp p) {
+        return jsonGenerator.generateStringJson(PatientKey.builder().patientUid(p.getPersonUid()).build());
     }
 
-    public DataEnvelope buildProviderKey(ProviderSp p) {
-        return jsonGenerator.buildAvroRecord(ProviderKey.builder().providerUid(p.getPersonUid()).build());
+    public String buildProviderKey(ProviderSp p) {
+        return jsonGenerator.generateStringJson(ProviderKey.builder().providerUid(p.getPersonUid()).build());
     }
 
-    public DataEnvelope processData(PatientSp patientSp, PersonType personType) {
-        return jsonGenerator.buildAvroRecord(processData(patientSp, null, personType));
+    public String processData(PatientSp patientSp, PersonType personType) {
+        return jsonGenerator.generateStringJson(processData(patientSp, null, personType));
     }
 
-    public DataEnvelope processData(ProviderSp providerSp, PersonType personType) {
-        return jsonGenerator.buildAvroRecord(processData(null, providerSp, personType));
+    public String processData(ProviderSp providerSp, PersonType personType) {
+        return jsonGenerator.generateStringJson(processData(null, providerSp, personType));
     }
 
     public <T extends PersonExtendedProps> T processData(PatientSp patientSp, ProviderSp providerSp,

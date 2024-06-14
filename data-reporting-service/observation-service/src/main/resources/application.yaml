@@ -1,17 +1,20 @@
 spring:
   kafka:
-    stream:
-      input:
-        observation:
-          topic-name: nbs_Observation
-      output:
-          observation:
-            topic-name-reporting: nrt_observation
-            topic-name-es: elastic_search_observation
+    input:
+      topic-name: nbs_Observation
+    output:
+      topic-name-reporting: nrt_observation
+      topic-name-es: elastic_search_observation
+    dlq:
+      topic-name-dlq: nrt_observation_dlq
+      retry-suffix: _retry
+      dlq-suffix: _dlt
 
-    streams:
-      application-id: ${KAFKA_CONSUMER_APP:observation-reporting-consumer-app}
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:localhost:9092}
+    group-id: ${KAFKA_CONSUMER_APP:observation-reporting-consumer-app}
+    consumer:
+        max-retry: 3
+        maxPollIntervalMs: 30000
     admin:
       auto-create: true
   application:

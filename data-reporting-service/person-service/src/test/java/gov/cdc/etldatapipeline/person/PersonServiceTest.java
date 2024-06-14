@@ -1,8 +1,8 @@
 package gov.cdc.etldatapipeline.person;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import gov.cdc.etldatapipeline.commonutil.model.avro.DataEnvelope;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
 import gov.cdc.etldatapipeline.person.model.dto.patient.PatientElasticSearch;
 import gov.cdc.etldatapipeline.person.model.dto.patient.PatientReporting;
@@ -16,22 +16,22 @@ import gov.cdc.etldatapipeline.person.repository.ProviderRepository;
 import gov.cdc.etldatapipeline.person.service.PersonService;
 import gov.cdc.etldatapipeline.person.transformer.PersonTransformers;
 import gov.cdc.etldatapipeline.person.transformer.PersonType;
-import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.common.serialization.StringSerializer;
-import org.apache.kafka.streams.*;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.kafka.core.KafkaTemplate;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import static gov.cdc.etldatapipeline.commonutil.TestUtils.readFileData;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class PersonServiceTest {
@@ -42,23 +42,33 @@ public class PersonServiceTest {
     @Mock
     ProviderRepository providerRepository;
 
+    @Mock
+    private KafkaTemplate<String, String> kafkaTemplate;
+
+    private PersonService personService;
+
     PersonTransformers tx = new PersonTransformers();
 
     private final String personTopic = "PersonTopic";
-    private final String patientElasticTopic = "PatientElasticTopic";
-    private final String patientReportingTopic = "PatientReportingTopic";
-    private final String providerElasticTopic = "ProviderElasticTopic";
-    private final String providerReportingTopic = "ProviderReportingTopic";
+
+    private final String providerTopic = "ProviderTopic";
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    @BeforeEach
+    public void setUp() {
+        personService = new PersonService(patientRepository, providerRepository, tx, kafkaTemplate);
+    }
 
     @Test
-    public void processPatientReportingData() {
+    public void processPatientReportingData() throws JsonProcessingException {
         PatientSp patientSp = constructPatient();
         Mockito.when(patientRepository.computePatients(anyString())).thenReturn(List.of(patientSp));
-        //Build expected unflattened Provider
-        PatientReporting expectedPf
-                = (PatientReporting) tx.processData(patientSp, PersonType.PATIENT_REPORTING).getPayload();
+
+        String processedData = tx.processData(patientSp, PersonType.PATIENT_REPORTING);
+        JsonNode payloadNode = objectMapper.readTree(processedData).get("payload");
+        PatientReporting expectedPf = objectMapper.treeToValue(payloadNode, PatientReporting.class);
+
         //Construct transformed patient
         constructPatPrvFull(expectedPf);
 
@@ -66,18 +76,20 @@ public class PersonServiceTest {
         validateDataTransformation(
                 readFileData("rawDataFiles/person/PersonPatientChangeData.json"),
                 personTopic,
-                patientReportingTopic,
                 "rawDataFiles/patient/PatientReporting.json",
-                "rawDataFiles/patient/PatientKey.json");
+                "rawDataFiles/patient/PatientKey.json", 0);
     }
 
     @Test
-    public void processPatientElasticSearchData() {
+    public void processPatientElasticSearchData() throws JsonProcessingException {
         PatientSp patientSp = constructPatient();
         Mockito.when(patientRepository.computePatients(anyString())).thenReturn(List.of(patientSp));
+
         //Build expected unflattened Provider
-        PatientElasticSearch expectedPf
-                = (PatientElasticSearch) tx.processData(patientSp, PersonType.PATIENT_ELASTIC_SEARCH).getPayload();
+        String processedData = tx.processData(patientSp, PersonType.PATIENT_ELASTIC_SEARCH);
+        JsonNode payloadNode = objectMapper.readTree(processedData).get("payload");
+        PatientElasticSearch expectedPf = objectMapper.treeToValue(payloadNode, PatientElasticSearch.class);
+
         //Construct transformed patient
         constructPatPrvFull(expectedPf);
 
@@ -85,19 +97,20 @@ public class PersonServiceTest {
         validateDataTransformation(
                 readFileData("rawDataFiles/person/PersonPatientChangeData.json"),
                 personTopic,
-                patientElasticTopic,
                 "rawDataFiles/patient/PatientElastic.json",
-                "rawDataFiles/patient/PatientKey.json");
+                "rawDataFiles/patient/PatientKey.json", 1);
     }
 
     @Test
-    public void processProviderReportingData() {
+    public void processProviderReportingData() throws JsonProcessingException {
         ProviderSp providerSp = constructProvider();
+        Mockito.when(patientRepository.computePatients(anyString())).thenReturn(new ArrayList<>());
         Mockito.when(providerRepository.computeProviders(anyString())).thenReturn(List.of(providerSp));
 
         //Build expected unflattened Provider
-        ProviderReporting expectedPf
-                = (ProviderReporting) tx.processData(providerSp, PersonType.PROVIDER_REPORTING).getPayload();
+        String processedData = tx.processData(providerSp, PersonType.PROVIDER_REPORTING);
+        JsonNode payloadNode = objectMapper.readTree(processedData).get("payload");
+        ProviderReporting expectedPf = objectMapper.treeToValue(payloadNode, ProviderReporting.class);
 
         //Augment Provider with the flattened data
         constructPatPrvFull(expectedPf);
@@ -106,19 +119,20 @@ public class PersonServiceTest {
         validateDataTransformation(
                 readFileData("rawDataFiles/person/PersonProviderChangeData.json"),
                 personTopic,
-                providerReportingTopic,
                 "rawDataFiles/provider/ProviderReporting.json",
-                "rawDataFiles/provider/ProviderKey.json");
+                "rawDataFiles/provider/ProviderKey.json", 0);
     }
 
     @Test
-    public void processProviderElasticSearchData() {
+    public void processProviderElasticSearchData() throws JsonProcessingException {
         ProviderSp providerSp = constructProvider();
+        Mockito.when(patientRepository.computePatients(anyString())).thenReturn(new ArrayList<>());
         Mockito.when(providerRepository.computeProviders(anyString())).thenReturn(List.of(providerSp));
 
         //Build expected unflattened Provider
-        ProviderElasticSearch expectedPf
-                = (ProviderElasticSearch) tx.processData(providerSp, PersonType.PROVIDER_ELASTIC_SEARCH).getPayload();
+        String processedData = tx.processData(providerSp, PersonType.PROVIDER_ELASTIC_SEARCH);
+        JsonNode payloadNode = objectMapper.readTree(processedData).get("payload");
+        ProviderElasticSearch expectedPf = objectMapper.treeToValue(payloadNode, ProviderElasticSearch.class);
 
         //Augment Provider with the flattened data
         constructPatPrvFull(expectedPf);
@@ -126,72 +140,37 @@ public class PersonServiceTest {
         // Validate Patient Reporting Data Transformation
         validateDataTransformation(
                 readFileData("rawDataFiles/person/PersonProviderChangeData.json"),
-                personTopic,
-                providerElasticTopic,
+                providerTopic,
                 "rawDataFiles/provider/ProviderElasticSearch.json",
-                "rawDataFiles/provider/ProviderKey.json");
+                "rawDataFiles/provider/ProviderKey.json", 1);
     }
 
-    /**
-     * Create a mock Kafka cluster and do stream processing of the Patient/Provider data
-     *
-     * @param incomingChangeData    Debezium Change Data
-     * @param inputTopicName        Input Topic to monitor
-     * @param outputTopicName       Output Topic to produce the transformed data
-     * @param expectedValueFilePath Expected transformed Json Value Data in the DataEnvelope format
-     * @param expectedKeyFilePath   Expected transformed Json Key Data in the DataEnvelope format
-     */
     private void validateDataTransformation(
             String incomingChangeData,
             String inputTopicName,
-            String outputTopicName,
             String expectedValueFilePath,
-            String expectedKeyFilePath) {
-        PersonService ks = getKafkaStreamService();
-        StreamsBuilder streamsBuilder = new StreamsBuilder();
-        ks.processMessage(streamsBuilder);
-        Topology topology = streamsBuilder.build();
-        try (TopologyTestDriver topologyTestDriver = new TopologyTestDriver(topology, new Properties())) {
-            TestInputTopic<String, String> inputTopic = topologyTestDriver
-                    .createInputTopic(inputTopicName, new StringSerializer(), new StringSerializer());
+            String expectedKeyFilePath,
+            int indexForKafkaValue) throws JsonProcessingException {
 
-            TestOutputTopic<String, String> outputTopic = topologyTestDriver
-                    .createOutputTopic(outputTopicName, new StringDeserializer(), new StringDeserializer());
-            inputTopic.pipeInput("10000001", incomingChangeData);
-            List<KeyValue<String, String>> actualData = outputTopic.readKeyValuesToList();
-            Assertions.assertNotNull(actualData);
+        String expectedKey = readFileData(expectedKeyFilePath);
+        String expectedValue = readFileData(expectedValueFilePath);
 
-            //Validate the Provider Payload
-            TypeReference<DataEnvelope> dataEnvelopeTypeReference = new TypeReference<>() {
-            };
+        personService.processMessage(incomingChangeData, inputTopicName);
 
-            DataEnvelope<DataEnvelope> actualValue
-                    = objectMapper.readValue(actualData.get(0).value, dataEnvelopeTypeReference);
-            Assertions.assertEquals(
-                    objectMapper.readValue(readFileData(expectedValueFilePath), dataEnvelopeTypeReference),
-                    actualValue);
+        ArgumentCaptor<String> topicCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> keyCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> valueCaptor = ArgumentCaptor.forClass(String.class);
 
-            //Validate the Patient Key
-            DataEnvelope<DataEnvelope> actualKey
-                    = objectMapper.readValue(actualData.get(0).key, dataEnvelopeTypeReference);
-            //Construct expected Patient Key
-            Assertions.assertEquals(
-                    objectMapper.readValue(readFileData(expectedKeyFilePath), dataEnvelopeTypeReference),
-                    actualKey);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+        verify(kafkaTemplate, Mockito.times(2)).send(topicCaptor.capture(), keyCaptor.capture(), valueCaptor.capture());
 
+        JsonNode expectedKeyJsonNode = objectMapper.readTree(expectedKey);
+        JsonNode expectedValueJsonNode = objectMapper.readTree(expectedValue);
+        JsonNode actualKeyJsonNode = objectMapper.readTree(keyCaptor.getValue());
+        JsonNode actualValueJsonNode = objectMapper.readTree(valueCaptor.getAllValues().get(indexForKafkaValue));
 
-    private PersonService getKafkaStreamService() {
-        PersonService ks = new PersonService(patientRepository, providerRepository, new PersonTransformers());
-        ks.setPersonTopicName(personTopic);
-        ks.setPatientElasticSearchTopicName(patientElasticTopic);
-        ks.setPatientReportingOutputTopic(patientReportingTopic);
-        ks.setProviderReportingOutputTopic(providerReportingTopic);
-        ks.setProviderElasticSearchOutputTopic(providerElasticTopic);
-        return ks;
+        assertEquals(expectedKeyJsonNode, actualKeyJsonNode);
+        assertEquals(expectedValueJsonNode, actualValueJsonNode);
+
     }
 
     private PatientSp constructPatient() {

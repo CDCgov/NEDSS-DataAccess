@@ -7,9 +7,6 @@ import gov.cdc.etldatapipeline.investigation.repository.model.dto.InvestigationK
 import gov.cdc.etldatapipeline.investigation.repository.model.reporting.InvestigationReporting;
 import gov.cdc.etldatapipeline.investigation.repository.rdb.InvestigationCaseAnswerRepository;
 import gov.cdc.etldatapipeline.investigation.util.ProcessInvestigationDataUtil;
-import org.apache.kafka.common.serialization.Serde;
-import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.streams.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -19,10 +16,10 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.kafka.core.KafkaTemplate;
 
 import java.util.Optional;
-import java.util.Properties;
 
 import static gov.cdc.etldatapipeline.commonutil.TestUtils.readFileData;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -73,17 +70,9 @@ class InvestigationServiceTest {
 
     private void validateData(String inputTopicName, String outputTopicName,
                               String payload, Investigation investigation) {
-        StreamsBuilder builder = new StreamsBuilder();
 
         final var investigationService = getInvestigationService(inputTopicName, outputTopicName);
-        investigationService.processMessage(builder);
-
-        TopologyTestDriver testDriver = new TopologyTestDriver(builder.build(), new Properties());
-        final Serde<String> serdeString = Serdes.String();
-        TestInputTopic<String, String> inputTopic = testDriver.createInputTopic(
-                inputTopicName, serdeString.serializer(), serdeString.serializer());
-        inputTopic.pipeInput("100000001", payload);
-        testDriver.close();
+        investigationService.processMessage(payload, inputTopicName);
 
         InvestigationKey investigationKey = new InvestigationKey();
         investigationKey.setPublicHealthCaseUid(investigation.getPublicHealthCaseUid());

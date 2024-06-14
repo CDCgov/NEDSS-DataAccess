@@ -1,26 +1,27 @@
 package gov.cdc.etldatapipeline.organization.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import gov.cdc.etldatapipeline.organization.config.KafkaConfig;
 import gov.cdc.etldatapipeline.organization.service.OrganizationStatusService;
-import lombok.RequiredArgsConstructor;
-import org.apache.kafka.clients.producer.Producer;
-import org.apache.kafka.clients.producer.ProducerRecord;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @RestController
-@RequiredArgsConstructor
 public class OrganizationServiceController {
 
     private final OrganizationStatusService organizationStatusService;
 
-    private final KafkaConfig kafkaConfig;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
-    private final Producer<String, JsonNode> producer;
+    @Value("${spring.kafka.input.topic-name}")
+    private String orgTopicName = "nbs_Organization";
+
+    public OrganizationServiceController(OrganizationStatusService organizationStatusService, KafkaTemplate<String, String> kafkaTemplate) {
+        this.organizationStatusService = organizationStatusService;
+        this.kafkaTemplate = kafkaTemplate;
+    }
 
     @GetMapping("/reporting/organization-svc/status")
     @ResponseBody
@@ -29,12 +30,12 @@ public class OrganizationServiceController {
     }
 
 
-    @PostMapping(value = "/reporting/organization-svc/produce", consumes = "application/json", produces = "application/json")
+    @PostMapping(value = "/reporting/organization-svc/produce")
     @ResponseBody
     public ResponseEntity<String> postOrganization(@RequestBody String payLoad) {
         try {
-            producer.send(new ProducerRecord<>(kafkaConfig.getOrganizationTopic(),
-                    UUID.randomUUID().toString(), new ObjectMapper().readTree(payLoad)));
+            kafkaTemplate.send(orgTopicName,
+                    UUID.randomUUID().toString(), payLoad);
             return ResponseEntity.ok("Produced : " + payLoad);
         } catch (Exception ex) {
             return ResponseEntity.internalServerError()

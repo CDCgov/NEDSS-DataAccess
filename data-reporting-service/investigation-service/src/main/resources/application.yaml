@@ -1,19 +1,23 @@
 spring:
   kafka:
-    stream:
-      input:
-        investigation:
-          topic-name: nbs_Public_health_case
-      output:
-        investigation:
-          topic-name-reporting: nrt_investigation
-          topic-name-es: elastic_search_investigation
-          topic-name-confirmation: nrt_investigation_confirmation
-          topic-name-observation: nrt_investigation_observation
-          topic-name-notifications: nrt_notifications
-    streams:
-      application-id: ${KAFKA_CONSUMER_APP:investigation-reporting-consumer-app}
+    input:
+      topic-name: nbs_Public_health_case
+    output:
+      topic-name-reporting: nrt_investigation
+      topic-name-es: elastic_search_investigation
+      topic-name-confirmation: nrt_investigation_confirmation
+      topic-name-observation: nrt_investigation_observation
+      topic-name-notifications: nrt_notifications
+    dlq:
+      topic-name-dlq: nrt_investigation_dlq
+      retry-suffix: _retry
+      dlq-suffix: _dlt
+
+    group-id: ${KAFKA_CONSUMER_APP:investigation-reporting-consumer-app}
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:localhost:9092}
+    consumer:
+      max-retry: 3
+      maxPollIntervalMs: 30000
     admin:
       auto-create: true
   application:

@@ -23,13 +23,13 @@ import java.util.stream.Collectors;
 public class ProcessInvestigationDataUtil {
     private static final Logger logger = LoggerFactory.getLogger(ProcessInvestigationDataUtil.class);
 
-    @Value("${spring.kafka.stream.output.investigation.topic-name-confirmation}")
+    @Value("${spring.kafka.output.topic-name-confirmation}")
     public String investigationConfirmationOutputTopicName;
 
-    @Value("${spring.kafka.stream.output.investigation.topic-name-observation}")
+    @Value("${spring.kafka.output.topic-name-observation}")
     public String investigationObservationOutputTopicName;
 
-    @Value("${spring.kafka.stream.output.investigation.topic-name-notifications}")
+    @Value("${spring.kafka.output.topic-name-notifications}")
     public String investigationNotificationsOutputTopicName;
 
     private final KafkaTemplate<String, String> kafkaTemplate;

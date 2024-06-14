@@ -7,9 +7,6 @@ import gov.cdc.etldatapipeline.observation.repository.model.dto.ObservationKey;
 import gov.cdc.etldatapipeline.observation.repository.model.dto.ObservationTransformed;
 import gov.cdc.etldatapipeline.observation.repository.model.reporting.ObservationReporting;
 import gov.cdc.etldatapipeline.observation.util.ProcessObservationDataUtil;
-import org.apache.kafka.common.serialization.Serde;
-import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.streams.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +18,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.kafka.core.KafkaTemplate;
 
 import java.util.Optional;
-import java.util.Properties;
 
 import static gov.cdc.etldatapipeline.commonutil.TestUtils.readFileData;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -92,18 +88,8 @@ class ObservationServiceTest {
 
     private void validateData(String inputTopicName, String outputTopicName,
                               String payload, Observation observation) {
-        StreamsBuilder builder = new StreamsBuilder();
         final var observationService = getObservationService(inputTopicName, outputTopicName);
-        observationService.processMessage(builder);
-
-        TopologyTestDriver testDriver = new TopologyTestDriver(builder.build(), new Properties());
-        final Serde<String> serdeString = Serdes.String();
-        TestInputTopic<String, String> inputTopic = testDriver.createInputTopic(
-                inputTopicName, serdeString.serializer(), serdeString.serializer());
-
-        inputTopic.pipeInput("100000001", payload);
-
-        testDriver.close();
+        observationService.processMessage(payload, inputTopicName);
 
         ObservationKey observationKey = new ObservationKey();
         observationKey.setObservationUid(observation.getId());

@@ -16,10 +16,10 @@ import java.util.Set;
 public class OrganizationKey implements DataRequiredFields {
     @NonNull
     @JsonProperty("organization_uid")
-    private Long orgUID;
+    private Long organizationUid;
 
     @Override
     public Set<String> getRequiredFields() {
-        return Set.of("orgUID");
+        return Set.of("organizationUid");
     }
 }
