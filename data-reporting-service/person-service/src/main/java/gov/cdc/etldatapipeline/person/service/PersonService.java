@@ -97,29 +97,28 @@ public class PersonService {
                     kafkaTemplate.send(patientElasticSearchTopicName, elasticKey, elasticData);
                     log.info("Patient Elastic: {}", elasticData != null ? elasticData.toString() : "");
                 });
+
+                if(person.getCd() != null && person.getCd().equalsIgnoreCase("PRV")) {
+                    List<ProviderSp> providerDataFromStoredProc = providerRepository.computeProviders(person.getPersonUid());
+
+                    providerDataFromStoredProc.forEach(provider -> {
+                        String reportingKey = transformer.buildProviderKey(provider);
+                        String reportingData = transformer.processData(provider, PersonType.PROVIDER_REPORTING);
+                        kafkaTemplate.send(providerReportingOutputTopic, reportingKey, reportingData);
+                        log.info("Provider Reporting: {}", reportingData.toString());
+
+                        String elasticKey = transformer.buildProviderKey(provider);
+                        String elasticData = transformer.processData(provider, PersonType.PROVIDER_ELASTIC_SEARCH);
+                        kafkaTemplate.send(providerElasticSearchOutputTopic, elasticKey, elasticData);
+                        log.info("Provider Elastic: {}", elasticData!= null ? elasticData.toString() : "");
+                    });
+                }
+                else {
+                    log.debug("There is no provider to process in the incoming data.");
+                }
             }
             else {
                 log.debug("Incoming data doesn't contain payload: {}", message);
-            }
-
-            if(person.getCd() != null && person.getCd().equalsIgnoreCase("PRV")) {
-                List<ProviderSp> providerDataFromStoredProc = providerRepository.computeProviders(person.getPersonUid());
-
-                providerDataFromStoredProc.forEach(provider -> {
-                    String reportingKey = transformer.buildProviderKey(provider);
-                    String reportingData = transformer.processData(provider, PersonType.PROVIDER_REPORTING);
-                    kafkaTemplate.send(providerReportingOutputTopic, reportingKey, reportingData);
-                    log.info("Provider Reporting: {}", reportingData.toString());
-
-                    String elasticKey = transformer.buildProviderKey(provider);
-                    String elasticData = transformer.processData(provider, PersonType.PROVIDER_ELASTIC_SEARCH);
-                    kafkaTemplate.send(providerElasticSearchOutputTopic, elasticKey, elasticData);
-                    log.info("Provider Elastic: {}", elasticData!= null ? elasticData.toString() : "");
-                });
-
-            }
-            else {
-                log.debug("There is no provider to process in the incoming data.");
             }
         } catch (Exception e) {
             log.error("Error processing person message: {}", e.getMessage());

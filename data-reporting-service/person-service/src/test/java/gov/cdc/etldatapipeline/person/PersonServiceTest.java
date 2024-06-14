@@ -4,9 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
+import gov.cdc.etldatapipeline.person.model.dto.patient.PatientElasticSearch;
 import gov.cdc.etldatapipeline.person.model.dto.patient.PatientReporting;
 import gov.cdc.etldatapipeline.person.model.dto.patient.PatientSp;
 import gov.cdc.etldatapipeline.person.model.dto.persondetail.*;
+import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderElasticSearch;
+import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderReporting;
 import gov.cdc.etldatapipeline.person.model.dto.provider.ProviderSp;
 import gov.cdc.etldatapipeline.person.repository.PatientRepository;
 import gov.cdc.etldatapipeline.person.repository.ProviderRepository;
@@ -22,6 +25,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.kafka.core.KafkaTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static gov.cdc.etldatapipeline.commonutil.TestUtils.readFileData;
@@ -47,6 +51,8 @@ public class PersonServiceTest {
 
     private final String personTopic = "PersonTopic";
 
+    private final String providerTopic = "ProviderTopic";
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
@@ -71,7 +77,7 @@ public class PersonServiceTest {
                 readFileData("rawDataFiles/person/PersonPatientChangeData.json"),
                 personTopic,
                 "rawDataFiles/patient/PatientReporting.json",
-                "rawDataFiles/patient/PatientKey.json");
+                "rawDataFiles/patient/PatientKey.json", 0);
     }
 
     @Test
@@ -82,7 +88,7 @@ public class PersonServiceTest {
         //Build expected unflattened Provider
         String processedData = tx.processData(patientSp, PersonType.PATIENT_ELASTIC_SEARCH);
         JsonNode payloadNode = objectMapper.readTree(processedData).get("payload");
-        PatientReporting expectedPf = objectMapper.treeToValue(payloadNode, PatientReporting.class);
+        PatientElasticSearch expectedPf = objectMapper.treeToValue(payloadNode, PatientElasticSearch.class);
 
         //Construct transformed patient
         constructPatPrvFull(expectedPf);
@@ -92,18 +98,19 @@ public class PersonServiceTest {
                 readFileData("rawDataFiles/person/PersonPatientChangeData.json"),
                 personTopic,
                 "rawDataFiles/patient/PatientElastic.json",
-                "rawDataFiles/patient/PatientKey.json");
+                "rawDataFiles/patient/PatientKey.json", 1);
     }
 
     @Test
     public void processProviderReportingData() throws JsonProcessingException {
         ProviderSp providerSp = constructProvider();
+        Mockito.when(patientRepository.computePatients(anyString())).thenReturn(new ArrayList<>());
         Mockito.when(providerRepository.computeProviders(anyString())).thenReturn(List.of(providerSp));
 
         //Build expected unflattened Provider
         String processedData = tx.processData(providerSp, PersonType.PROVIDER_REPORTING);
         JsonNode payloadNode = objectMapper.readTree(processedData).get("payload");
-        PatientReporting expectedPf = objectMapper.treeToValue(payloadNode, PatientReporting.class);
+        ProviderReporting expectedPf = objectMapper.treeToValue(payloadNode, ProviderReporting.class);
 
         //Augment Provider with the flattened data
         constructPatPrvFull(expectedPf);
@@ -113,18 +120,19 @@ public class PersonServiceTest {
                 readFileData("rawDataFiles/person/PersonProviderChangeData.json"),
                 personTopic,
                 "rawDataFiles/provider/ProviderReporting.json",
-                "rawDataFiles/provider/ProviderKey.json");
+                "rawDataFiles/provider/ProviderKey.json", 0);
     }
 
     @Test
     public void processProviderElasticSearchData() throws JsonProcessingException {
         ProviderSp providerSp = constructProvider();
+        Mockito.when(patientRepository.computePatients(anyString())).thenReturn(new ArrayList<>());
         Mockito.when(providerRepository.computeProviders(anyString())).thenReturn(List.of(providerSp));
 
         //Build expected unflattened Provider
         String processedData = tx.processData(providerSp, PersonType.PROVIDER_ELASTIC_SEARCH);
         JsonNode payloadNode = objectMapper.readTree(processedData).get("payload");
-        PatientReporting expectedPf = objectMapper.treeToValue(payloadNode, PatientReporting.class);
+        ProviderElasticSearch expectedPf = objectMapper.treeToValue(payloadNode, ProviderElasticSearch.class);
 
         //Augment Provider with the flattened data
         constructPatPrvFull(expectedPf);
@@ -132,21 +140,20 @@ public class PersonServiceTest {
         // Validate Patient Reporting Data Transformation
         validateDataTransformation(
                 readFileData("rawDataFiles/person/PersonProviderChangeData.json"),
-                personTopic,
+                providerTopic,
                 "rawDataFiles/provider/ProviderElasticSearch.json",
-                "rawDataFiles/provider/ProviderKey.json");
+                "rawDataFiles/provider/ProviderKey.json", 1);
     }
 
     private void validateDataTransformation(
             String incomingChangeData,
             String inputTopicName,
             String expectedValueFilePath,
-            String expectedKeyFilePath) throws JsonProcessingException {
+            String expectedKeyFilePath,
+            int indexForKafkaValue) throws JsonProcessingException {
 
         String expectedKey = readFileData(expectedKeyFilePath);
         String expectedValue = readFileData(expectedValueFilePath);
-
-        System.out.println(expectedKey);
 
         personService.processMessage(incomingChangeData, inputTopicName);
 
@@ -156,12 +163,13 @@ public class PersonServiceTest {
 
         verify(kafkaTemplate, Mockito.times(2)).send(topicCaptor.capture(), keyCaptor.capture(), valueCaptor.capture());
 
-        JsonNode expectedJsonNode = objectMapper.readTree(expectedKey);
-        JsonNode actualJsonNode = objectMapper.readTree(keyCaptor.getValue());
+        JsonNode expectedKeyJsonNode = objectMapper.readTree(expectedKey);
+        JsonNode expectedValueJsonNode = objectMapper.readTree(expectedValue);
+        JsonNode actualKeyJsonNode = objectMapper.readTree(keyCaptor.getValue());
+        JsonNode actualValueJsonNode = objectMapper.readTree(valueCaptor.getAllValues().get(indexForKafkaValue));
 
-//        assertEquals(outputTopicName, topicCaptor.getValue());
-        assertEquals(expectedJsonNode, actualJsonNode);
-//        assertEquals(expectedValue, valueCaptor.getValue());
+        assertEquals(expectedKeyJsonNode, actualKeyJsonNode);
+        assertEquals(expectedValueJsonNode, actualValueJsonNode);
 
     }
 
