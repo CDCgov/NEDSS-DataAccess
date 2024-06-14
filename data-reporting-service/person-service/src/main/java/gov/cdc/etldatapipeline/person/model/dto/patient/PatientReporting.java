@@ -4,14 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import gov.cdc.etldatapipeline.commonutil.model.DataRequiredFields;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Set;
 
 /**
  * Data model for the Patient Reporting Table
@@ -22,7 +19,7 @@ import java.util.Set;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class PatientReporting implements PersonExtendedProps, DataRequiredFields {
+public class PatientReporting implements PersonExtendedProps {
     private Long patientUid;
     private String addlGenderInfo;
     private String ageReported;
@@ -152,13 +149,4 @@ public class PatientReporting implements PersonExtendedProps, DataRequiredFields
     private String raceWhiteGt3Ind;
     @JsonProperty("race_white_all")
     private String raceWhiteAll;
-
-    /**
-     * List of Required Fields
-     *
-     * @return Required Fields
-     */
-    public Set<String> getRequiredFields() {
-        return Set.of("patientUid");
-    }
 }

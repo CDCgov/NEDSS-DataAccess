@@ -4,17 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import gov.cdc.etldatapipeline.commonutil.model.DataRequiredFields;
 import lombok.Builder;
 import lombok.Data;
-
-import java.util.Set;
 
 @Data
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class OrganizationElasticSearch implements DataRequiredFields {
+public class OrganizationElasticSearch {
     private long organizationUid;
     private String cd;
     private String statusCd;
@@ -71,9 +68,4 @@ public class OrganizationElasticSearch implements DataRequiredFields {
     private String addTime;
     private Long lastChgUserId;
     private String lastChgTime;
-
-    @Override
-    public Set<String> getRequiredFields() {
-        return Set.of("organizationUid");
-    }
 }

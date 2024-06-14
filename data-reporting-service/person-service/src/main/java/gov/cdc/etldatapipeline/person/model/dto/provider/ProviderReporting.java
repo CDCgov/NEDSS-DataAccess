@@ -4,14 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import gov.cdc.etldatapipeline.commonutil.model.DataRequiredFields;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Set;
 
 /**
  * Data model for the Provider Reporting Table
@@ -22,7 +19,7 @@ import java.util.Set;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ProviderReporting implements PersonExtendedProps, DataRequiredFields {
+public class ProviderReporting implements PersonExtendedProps {
     private Long providerUid;
     private String localId;
     private String recordStatus;
@@ -79,14 +76,4 @@ public class ProviderReporting implements PersonExtendedProps, DataRequiredField
     private String providerQuickCode;
     private String providerRegistrationNum;
     private String providerRegistrationNumAuth;
-
-    /**
-     * List of Required Fields
-     *
-     * @return Required Fields
-     */
-    @Override
-    public Set<String> getRequiredFields() {
-        return Set.of("providerUid");
-    }
 }
