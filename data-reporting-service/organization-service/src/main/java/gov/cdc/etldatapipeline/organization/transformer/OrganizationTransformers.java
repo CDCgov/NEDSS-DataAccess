@@ -1,7 +1,6 @@
 package gov.cdc.etldatapipeline.organization.transformer;
 
 import gov.cdc.etldatapipeline.commonutil.json.CustomJsonGeneratorImpl;
-import gov.cdc.etldatapipeline.commonutil.model.DataRequiredFields;
 import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationElasticSearch;
 import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationKey;
 import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationReporting;
@@ -17,7 +16,7 @@ public class OrganizationTransformers {
     }
 
     public String processData(OrganizationSp organizationSp, OrganizationType organizationType) {
-        DataRequiredFields transformedObj =
+        Object transformedObj =
                 switch (organizationType) {
                     case ORGANIZATION_REPORTING -> buildOrganizationReporting(organizationSp);
                     case ORGANIZATION_ELASTIC_SEARCH -> buildOrganizationElasticSearch(organizationSp);

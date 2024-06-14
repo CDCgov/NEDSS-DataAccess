@@ -4,14 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import gov.cdc.etldatapipeline.commonutil.model.DataRequiredFields;
 import gov.cdc.etldatapipeline.person.model.dto.PersonExtendedProps;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Set;
 
 /**
  * Data model for the Provider Reporting Table
@@ -22,7 +19,7 @@ import java.util.Set;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ProviderElasticSearch implements PersonExtendedProps, DataRequiredFields {
+public class ProviderElasticSearch implements PersonExtendedProps {
     private Long personUid;
     private Long providerUid;
     private String additionalGenderCd;
@@ -128,13 +125,4 @@ public class ProviderElasticSearch implements PersonExtendedProps, DataRequiredF
     private Long entityUid;
     private Integer entityIdSeq;
     private String assigningAuthorityCd;
-
-    /**
-     * List of Required Fields
-     *
-     * @return Required Fields
-     */
-    public Set<String> getRequiredFields() {
-        return Set.of("patientUid");
-    }
 }

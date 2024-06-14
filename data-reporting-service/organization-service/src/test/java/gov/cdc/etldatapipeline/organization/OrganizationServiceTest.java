@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.cdc.etldatapipeline.commonutil.json.CustomJsonGeneratorImpl;
-import gov.cdc.etldatapipeline.commonutil.model.avro.DataEnvelope;
 import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationKey;
 import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationSp;
 import gov.cdc.etldatapipeline.organization.repository.OrgRepository;
@@ -56,10 +55,9 @@ public class OrganizationServiceTest {
         OrganizationSp orgSp = objectMapper.readValue(readFileData("orgcdc/orgSp.json"), OrganizationSp.class);
         Mockito.when(orgRepository.computeAllOrganizations(anyString())).thenReturn(Set.of(orgSp));
 
-        DataEnvelope reportingData = new DataEnvelope();
         OrganizationKey organizationKey = OrganizationKey.builder().organizationUid(orgSp.getOrganizationUid()).build();
         Mockito.when(transformer.buildOrganizationKey(orgSp)).thenReturn(new CustomJsonGeneratorImpl().generateStringJson(organizationKey));
-        Mockito.when(transformer.processData(orgSp, OrganizationType.ORGANIZATION_REPORTING)).thenReturn(new ObjectMapper().writeValueAsString(reportingData));
+        Mockito.when(transformer.processData(orgSp, OrganizationType.ORGANIZATION_REPORTING)).thenReturn(new ObjectMapper().writeValueAsString(""));
 
         validateDataTransformation("orgcdc/OrgChangeData.json", orgReportingTopic);
     }
