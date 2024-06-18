@@ -1,0 +1,212 @@
+databaseChangeLog:
+  - changeSet:
+      id: 000
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/000-db-general-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 001
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/001-create_nrt_batch_log-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 002
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/002-create_nrt_organization-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 003
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/003-create_nrt_organization_key-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 004
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/004-create_nrt_provider-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 005
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/005-create_nrt_provider_key.sql
+            splitStatements: false
+  - changeSet:
+      id: 006
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/006-create_nrt_patient-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 007
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/007-create_nrt_patient_key-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 008
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/008-create_nrt_investigation-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 009
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/009-create_nrt_investigation_key-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 010
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/010-create_nrt_investigation_confirmation-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 011
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/011-create_nrt_confirmation_method_key-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 012
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/012-create_nrt_investigation_observation-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 013
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/013-create_nrt_notifications-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 014
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/014-create_nrt_notification_key-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 015
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/015-create_nrt_page_case_answer-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 016
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/016-create_nrt_ldf_data_key-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 017
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/017-create_nrt_ldf_group_key-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 018
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/018-create_nrt_observation-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 019
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/019-fn_get_record_status-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 020
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/020-sp_nrt_organization_postprocessing-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 021
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/021-sp_nrt_provider_postprocessing-001.sql
+            splitStatements: false
+
+  - changeSet:
+      id: 022
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/022-sp_nrt_patient_postprocessing-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 023
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/023-sp_nrt_investigation_postprocessing-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 024
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/024-sp_nrt_notification_postprocessing-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 025
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/025-sp_s_pagebuilder_postprocessing-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 026
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/026-sp_l_pagebuilder_postprocessing-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 027
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/027-sp_d_pagebuilder_postprocessing-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 028
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/028-sp_sld_investigation_repeat_postprocessing-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 029
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/029-sp_page_builder_postprocessing-001.sql
+            splitStatements: false
