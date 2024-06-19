@@ -11,7 +11,7 @@ logging:
   #  Only one config can be active at a time
   config: classpath:logback-config.xml
   file:
-    name: PersonService.log
+    name: DataReportingService.log
     path: ${DA_LOG_PATH:logs}
 server:
   port: '8090'
