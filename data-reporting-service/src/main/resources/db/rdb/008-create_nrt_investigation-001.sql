@@ -1,6 +1,5 @@
 USE RDB;
-drop table if exists dbo.nrt_investigation;
-
+IF NOT EXISTS (SELECT 1 FROM sysobjects WHERE name = 'nrt_investigation' and xtype = 'U')
 CREATE TABLE dbo.nrt_investigation (
     public_health_case_uid        bigint                                          NOT NULL PRIMARY KEY,
     program_jurisdiction_oid      bigint                                          NULL,

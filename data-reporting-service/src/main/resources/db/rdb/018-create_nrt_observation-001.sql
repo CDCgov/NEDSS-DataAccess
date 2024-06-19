@@ -1,6 +1,5 @@
 USE RDB;
-drop table if exists dbo.nrt_observation;
-
+IF NOT EXISTS (SELECT 1 FROM sysobjects WHERE name = 'nrt_observation' and xtype = 'U')
 CREATE TABLE dbo.nrt_observation
 (
     observation_uid            bigint                                          NOT NULL PRIMARY KEY,

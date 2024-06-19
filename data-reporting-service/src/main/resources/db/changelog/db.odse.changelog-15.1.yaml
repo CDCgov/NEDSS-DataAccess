@@ -1,132 +1,132 @@
 databaseChangeLog:
   - changeSet:
-      id: 000
+      id: 0
       author: liquibase
       changes:
         - sqlFile:
             path: src/main/resources/db/odse/000-db-general-001.sql
             splitStatements: false
   - changeSet:
-      id: 001
+      id: 1
       author: liquibase
       changes:
         - sqlFile:
             path: src/main/resources/db/odse/001-fn_get_value_by_cd_ques-001.sql
             splitStatements: false
   - changeSet:
-      id: 002
+      id: 2
       author: liquibase
       changes:
         - sqlFile:
             path: src/main/resources/db/odse/002-fn_get_value_by_cvg-001.sql
             splitStatements: false
   - changeSet:
-      id: 003
+      id: 3
       author: liquibase
       changes:
         - sqlFile:
             path: src/main/resources/db/odse/003-fn-get_user_name-001.sql
             splitStatements: false
   - changeSet:
-      id: 004
+      id: 4
       author: liquibase
       changes:
         - sqlFile:
             path: src/main/resources/db/odse/004-fn_get_value_by_cd_codeset-001.sql
             splitStatements: false
   - changeSet:
-      id: 005
+      id: 5
       author: liquibase
       changes:
         - sqlFile:
             path: src/main/resources/db/odse/005-sp_organization_event-001.sql
             splitStatements: false
   - changeSet:
-      id: 006
+      id: 6
       author: liquibase
       changes:
         - sqlFile:
             path: src/main/resources/db/odse/006-sp_provider_event-001.sql
             splitStatements: false
   - changeSet:
-      id: 007
+      id: 7
       author: liquibase
       changes:
         - sqlFile:
-            path: src/main/resources/db/odse/007-sp_patient_event-001.sql
+            path: src/main/resources/db/odse/007-sp_patient_race_event-001.sql
             splitStatements: false
   - changeSet:
-      id: 008
+      id: 8
       author: liquibase
       changes:
         - sqlFile:
-            path: src/main/resources/db/odse/008-sp_patient_race_event-001.sql
+            path: src/main/resources/db/odse/008-sp_patient_event-001.sql
             splitStatements: false
   - changeSet:
-      id: 009
+      id: 9
       author: liquibase
       changes:
         - sqlFile:
             path: src/main/resources/db/odse/009-sp_observation_event-001.sql
             splitStatements: false
   - changeSet:
-      id: 010
+      id: 10
       author: liquibase
       changes:
         - sqlFile:
             path: src/main/resources/db/odse/010-sp_investigation_event-001.sql
             splitStatements: false
   - changeSet:
-      id: 011
+      id: 11
       author: liquibase
       changes:
         - sqlFile:
             path: src/main/resources/db/odse/011-sp_ldf_provider_event-001.sql
             splitStatements: false
   - changeSet:
-      id: 012
+      id: 12
       author: liquibase
       changes:
         - sqlFile:
             path: src/main/resources/db/odse/012-sp_ldf_organization_event-001.sql
             splitStatements: false
   - changeSet:
-      id: 013
+      id: 13
       author: liquibase
       changes:
         - sqlFile:
             path: src/main/resources/db/odse/013-sp_ldf_patient_event-001.sql
             splitStatements: false
   - changeSet:
-      id: 014
+      id: 14
       author: liquibase
       changes:
         - sqlFile:
             path: src/main/resources/db/odse/014-sp_ldf_observation_event-001.sql
             splitStatements: false
   - changeSet:
-      id: 015
+      id: 15
       author: liquibase
       changes:
         - sqlFile:
             path: src/main/resources/db/odse/015-sp_ldf_phc_event-001.sql
             splitStatements: false
   - changeSet:
-      id: 016
+      id: 16
       author: liquibase
       changes:
         - sqlFile:
             path: src/main/resources/db/odse/016-sp_ldf_intervention_event-001.sql
             splitStatements: false
   - changeSet:
-      id: 017
+      id: 17
       author: liquibase
       changes:
         - sqlFile:
             path: src/main/resources/db/odse/017-sp_ldf_data_event-001.sql
             splitStatements: false
   - changeSet:
-      id: 018
+      id: 18
       author: liquibase
       changes:
         - sqlFile:

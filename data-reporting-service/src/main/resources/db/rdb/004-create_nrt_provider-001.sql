@@ -1,6 +1,5 @@
 use rdb;
-drop table if exists dbo.nrt_provider;
-
+IF NOT EXISTS (SELECT 1 FROM sysobjects WHERE name = 'nrt_provider' and xtype = 'U')
 create table dbo.nrt_provider
 (
     provider_uid                   bigint                                       not null primary key,

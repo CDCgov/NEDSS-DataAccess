@@ -1,9 +1,7 @@
-CREATE OR ALTER function [dbo].[\
-
-] (
+CREATE OR ALTER function dbo.fn_get_value_by_cd_codeset(
     @srte_code nvarchar(200),
     @unique_cd nvarchar(200)
-    )
+)
     returns table
         as return
 

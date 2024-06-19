@@ -1,7 +1,5 @@
 CREATE OR ALTER PROCEDURE dbo.sp_ldf_organization_event @ldf_uid_list nvarchar(max), @bus_obj_uid_list nvarchar(max)
-
-AS 
-
+AS
 Begin
 	
  BEGIN TRY

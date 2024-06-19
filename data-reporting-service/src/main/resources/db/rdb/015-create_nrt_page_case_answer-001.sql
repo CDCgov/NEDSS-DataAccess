@@ -1,6 +1,5 @@
 USE RDB;
-drop table if exists dbo.nrt_page_case_answer;
-
+IF NOT EXISTS (SELECT 1 FROM sysobjects WHERE name = 'nrt_page_case_answer' and xtype = 'U')
 CREATE TABLE dbo.nrt_page_case_answer
 (
     act_uid                bigint                                          NOT NULL,

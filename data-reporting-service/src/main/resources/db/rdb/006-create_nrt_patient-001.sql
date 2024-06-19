@@ -1,6 +1,5 @@
 use rdb;
-drop table if exists dbo.nrt_patient;
-
+IF NOT EXISTS (SELECT 1 FROM sysobjects WHERE name = 'nrt_patient' and xtype = 'U')
 create table dbo.nrt_patient
 (
     patient_uid           bigint                                       not null primary key,

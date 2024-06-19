@@ -1,6 +1,5 @@
 USE RDB;
-drop table if exists dbo.nrt_organization;
-
+IF NOT EXISTS (SELECT 1 FROM sysobjects WHERE name = 'nrt_organization' and xtype = 'U')
 CREATE TABLE dbo.nrt_organization
 (
     organization_uid   bigint                                          NOT NULL,

@@ -1,6 +1,5 @@
 CREATE OR ALTER PROCEDURE dbo.sp_patient_event @user_id_list nvarchar(max)
 AS
-
 BEGIN
 
     create table #temp_race_table

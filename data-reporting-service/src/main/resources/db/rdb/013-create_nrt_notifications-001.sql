@@ -1,6 +1,5 @@
 USE RDB;
-drop table if exists dbo.nrt_notifications;
-
+IF NOT EXISTS (SELECT 1 FROM sysobjects WHERE name = 'nrt_notifications' and xtype = 'U')
 CREATE TABLE dbo.nrt_notifications (
     source_act_uid           bigint                                          NOT NULL,
     public_health_case_uid   bigint                                          NULL,

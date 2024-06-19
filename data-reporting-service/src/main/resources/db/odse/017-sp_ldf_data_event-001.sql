@@ -9,12 +9,9 @@ begin
 			else if  @bus_obj_nm = 'PHC'  exec dbo.sp_ldf_phc_event @ldf_uid, @bus_obj_uid_list 
 			else if  @bus_obj_nm = 'VAC'  exec dbo.sp_ldf_intervention_event @ldf_uid, @bus_obj_uid_list 
 	end try
-	
-
 
 	BEGIN CATCH
-  
-     
+
      IF @@TRANCOUNT > 0   ROLLBACK TRANSACTION;
   
     	DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE(); 

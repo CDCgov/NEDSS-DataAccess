@@ -1,6 +1,5 @@
 USE RDB;
-drop table if exists dbo.nrt_batch_log;
-
+IF NOT EXISTS (SELECT 1 FROM sysobjects WHERE name = 'nrt_batch_log' and xtype = 'U')
 CREATE TABLE dbo.nrt_batch_log(
     batch_id          bigint IDENTITY(1,1) NOT NULL PRIMARY KEY,
     batch_start_time  datetime DEFAULT (getdate()) NULL,
