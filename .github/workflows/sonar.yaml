@@ -11,11 +11,6 @@ on:
   pull_request:
     paths:
       - "data-reporting-service/**"
-#      - "data-reporting-service/**"
-#      - "data-reporting-service/**"
-#      - "data-reporting-service/**"
-#      - "data-reporting-service/**"
-      - "data-reporting-service/**"
       - ".github/workflows/sonar.yaml"
       - "build.gradle"
       - "settings.gradle"
