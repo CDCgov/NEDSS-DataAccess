@@ -109,7 +109,7 @@ CREATE TABLE dbo.nrt_investigation (
     nac_add_time                  datetime                                        NULL,
     person_as_reporter_uid        bigint                                          NULL,
     hospital_uid                  bigint                                          NULL,
-    ordering_facilty_uid          bigint                                          NULL,
+    ordering_facility_uid          bigint                                          NULL,
     refresh_datetime              datetime2(7) GENERATED ALWAYS AS ROW START      NOT NULL,
     max_datetime                  datetime2(7) GENERATED ALWAYS AS ROW END HIDDEN NOT NULL,
     PERIOD FOR SYSTEM_TIME (refresh_datetime, max_datetime)
