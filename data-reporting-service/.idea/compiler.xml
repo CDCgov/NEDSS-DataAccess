@@ -6,12 +6,18 @@
       <profile name="Gradle Imported" enabled="true">
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar" />
+        </processorPath>
+        <module name="data-reporting-service.organization-service.main" />
+      </profile>
+      <profile name="Gradle Imported" enabled="true">
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.30/f195ee86e6c896ea47a1d39defbe20eb59cd149d/lombok-1.18.30.jar" />
         </processorPath>
         <module name="data-reporting-service.person-service.main" />
         <module name="NEDSS-DataAccess.data-reporting-service.common-util.main" />
         <module name="data-reporting-service.investigation-service.main" />
-        <module name="data-reporting-service.organization-service.main" />
         <module name="data-reporting-service.observation-service.main" />
       </profile>
     </annotationProcessing>
