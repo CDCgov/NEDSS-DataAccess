@@ -1,4 +1,4 @@
-CREATE or ALTER PROCEDURE dbo.sp_patient_race_event @user_id_list nvarchar(max)
+CREATE OR ALTER PROCEDURE dbo.sp_patient_race_event @user_id_list nvarchar(max)
 AS
 begin
 
@@ -856,4 +856,4 @@ begin
 
     select * from #tmp_s_person_race_out;
 
-END
+END;

@@ -56,7 +56,6 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           ./gradlew :person-service:clean :person-service:build :person-service:jacocoTestReport :person-service:sonar
-
       - name: Publish Testing Reports
         uses: actions/upload-artifact@v4
         with:

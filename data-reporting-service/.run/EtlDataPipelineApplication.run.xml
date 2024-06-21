@@ -3,6 +3,7 @@
     <envs>
       <env name="DA_LOG_PATH" value="logs" />
       <env name="DB_ODSE" value="NBS_ODSE" />
+      <env name="DB_RDB" value="RDB" />
       <env name="DB_PASSWORD" value="fake.fake.fake.1234" />
       <env name="DB_URL" value="localhost" />
       <env name="DB_USERNAME" value="sa" />
