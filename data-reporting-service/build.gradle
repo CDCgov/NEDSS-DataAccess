@@ -93,6 +93,6 @@ sonarqube {
         property "sonar.projectKey", "CDCgov_NEDSS-DataAccess"
         property "sonar.organization", "cdcgov"
         property "sonar.host.url", "https://sonarcloud.io"
-        property "sonar.coverage.jacoco.xmlReportPaths", "${rootDir}/hl7-parser/build/reports/jacoco/test/jacocoTestReport.xml,${rootDir}/coverage-report/build/jacoco/testCodeCoverageReport/testCodeCoverageReport.xml,${rootDir}/data-reporting-service/build/customJacocoReportDir/test/jacocoTestReport.xml,${rootDir}/data-processing-service/build/customJacocoReportDir/test/jacocoTestReport.xml"
+        property "sonar.coverage.jacoco.xmlReportPaths", "${rootDir}/coverage-report/build/jacoco/testCodeCoverageReport/testCodeCoverageReport.xml,${rootDir}/build/customJacocoReportDir/test/jacocoTestReport.xml"
     }
 }
