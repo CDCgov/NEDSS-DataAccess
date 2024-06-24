@@ -101,7 +101,7 @@ services:
   investigation-reporting-service:
     build:
       context: ./
-      dockerfile: investigation-service/Dockerfile-original
+      dockerfile: investigation-service/Dockerfile
     ports:
       - 8093:8093
     depends_on:

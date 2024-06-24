@@ -7,8 +7,8 @@ COPY build.gradle /usr/src/data-reporting-service/build.gradle
 COPY settings.gradle /usr/src/data-reporting-service/settings.gradle
 
 # Copy sources
-COPY common-util /usr/src/data-reporting-service/common-util
-COPY investigation-service /usr/src/data-reporting-service/investigation-service
+COPY data-reporting-service/common-util /usr/src/data-reporting-service/common-util
+COPY data-reporting-service/investigation-service /usr/src/data-reporting-service/investigation-service
 
 WORKDIR /usr/src/data-reporting-service
 
