@@ -1,10 +1,14 @@
 FROM amazoncorretto:17 as builder
 
+#Copy project config
+COPY gradle /usr/src/data-reporting-service/gradle
+COPY gradlew /usr/src/data-reporting-service/gradlew
+COPY build.gradle /usr/src/data-reporting-service/build.gradle
+COPY settings.gradle /usr/src/data-reporting-service/settings.gradle
+
 #Copy sources
 COPY data-reporting-service/common-util /usr/src/data-reporting-service/common-util
 COPY data-reporting-service/investigation-service /usr/src/data-reporting-service/investigation-service
-COPY gradle /usr/src/data-reporting-service/gradle
-COPY gradlew /usr/src/data-reporting-service/gradlew
 
 #cd to investigation-service
 WORKDIR /usr/src/data-reporting-service
