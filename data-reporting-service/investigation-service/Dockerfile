@@ -16,9 +16,6 @@ WORKDIR /usr/src/data-reporting-service
 #Build investigation service along with any required libraries
 RUN ./gradlew buildNeeded -x test --no-daemon
 FROM amazoncorretto:17
-RUN pwd
-RUN ls /usr/src/data-reporting-service/
-RUN ls /usr/src/data-reporting-service/investigation-service
 COPY --from=builder /usr/src/data-reporting-service/build/libs/investigation-service*.jar investigation-service.jar
 
 # Run jar
