@@ -17,7 +17,9 @@ WORKDIR /usr/src/data-reporting-service
 RUN ./gradlew buildNeeded -x test --no-daemon
 FROM amazoncorretto:17
 RUN pwd
-COPY --from=builder /usr/src/data-reporting-service/investigation-service/build/libs/investigation-service*.jar investigation-service.jar
+RUN ls /usr/src/data-reporting-service/
+RUN ls /usr/src/data-reporting-service/investigation-service
+COPY --from=builder /usr/src/data-reporting-service/build/libs/investigation-service*.jar investigation-service.jar
 
 # Run jar
 ENTRYPOINT ["java", "-jar", "investigation-service.jar"]
