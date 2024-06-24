@@ -36,11 +36,6 @@ jacocoTestReport {
     }
 }
 
-if (project != project.rootProject || project.hasProperty('remoteBuild')) {
-
-    compileJava.mustRunAfter(":common-util:build")
-}
-
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
 
