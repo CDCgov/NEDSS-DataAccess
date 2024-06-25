@@ -1,5 +1,6 @@
 FROM amazoncorretto:17 as builder
 #Copy sources
+COPY data-reporting-service/common-util /usr/src/data-reporting-service/common-util
 COPY data-reporting-service/ldfdata-service /usr/src/data-reporting-service/ldfdata-service
 COPY gradle /usr/src/data-reporting-service/gradle
 COPY gradlew /usr/src/data-reporting-service/gradlew
