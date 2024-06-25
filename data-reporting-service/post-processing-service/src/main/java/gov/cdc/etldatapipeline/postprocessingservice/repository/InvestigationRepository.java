@@ -11,4 +11,7 @@ import org.springframework.stereotype.Repository;
 public interface InvestigationRepository extends JpaRepository<InvestigationStoredProc, Long> {
     @Procedure("sp_nrt_investigation_postprocessing")
     void executeStoredProcForPublicHealthCaseIds(@Param("publicHealthCaseUids") String publicHealthCaseUids);
+
+    @Procedure("sp_f_page_case_postprocessing")
+    void executeStoredProcForFPageCase(@Param("publicHealthCaseUids") String publicHealthCaseUids);
 }
