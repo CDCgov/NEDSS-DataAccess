@@ -4,12 +4,13 @@ COPY data-reporting-service/common-util /usr/src/data-reporting-service/common-u
 COPY data-reporting-service/person-service /usr/src/data-reporting-service/person-service
 COPY gradle /usr/src/data-reporting-service/gradle
 COPY gradlew /usr/src/data-reporting-service/gradlew
+COPY settings.gradle /usr/src/data-reporting-service/settings.gradle
 
 #cd to person-service
-WORKDIR /usr/src/data-reporting-service/person-service
+WORKDIR /usr/src/data-reporting-service/
 
 #Build person service along with any required libraries
-RUN ./gradlew buildNeeded -x test --no-daemon
+RUN ./gradlew :person-service:buildNeeded -x test --no-daemon
 FROM amazoncorretto:17
 COPY --from=builder /usr/src/data-reporting-service/person-service/build/libs/person-service*.jar person-service.jar
 
