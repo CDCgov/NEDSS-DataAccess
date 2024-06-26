@@ -62,9 +62,7 @@ public class ProcessInvestigationDataUtil {
 
             if(investigationNotificationsJsonArray != null && investigationNotificationsJsonArray.isArray()) {
                 for(JsonNode node : investigationNotificationsJsonArray) {
-                    Long actUid = node.get("source_act_uid").asLong();
                     Long notificationUid = node.get("notification_uid").asLong();
-                    investigationNotificationsKey.setSourceActUid(actUid);
                     investigationNotificationsKey.setNotificationUid(notificationUid);
 
                     InvestigationNotifications tempInvestigationNotificationsObject = objectMapper.treeToValue(node, InvestigationNotifications.class);

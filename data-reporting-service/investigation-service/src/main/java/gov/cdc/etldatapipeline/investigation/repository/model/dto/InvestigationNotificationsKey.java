@@ -13,7 +13,4 @@ public class InvestigationNotificationsKey {
     @NonNull
     @JsonProperty("notification_uid")
     private Long notificationUid;
-
-    @NonNull
-    private Long sourceActUid;
 }
