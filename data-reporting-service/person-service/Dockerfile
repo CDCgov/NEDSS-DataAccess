@@ -1,10 +1,6 @@
 FROM amazoncorretto:17 as builder
 #Copy sources
-COPY data-reporting-service/common-util /usr/src/data-reporting-service/common-util
-COPY data-reporting-service/person-service /usr/src/data-reporting-service/person-service
-COPY gradle /usr/src/data-reporting-service/gradle
-COPY gradlew /usr/src/data-reporting-service/gradlew
-COPY settings.gradle /usr/src/data-reporting-service/settings.gradle
+COPY data-reporting-service /usr/src/data-reporting-service
 
 #cd to person-service
 WORKDIR /usr/src/data-reporting-service/

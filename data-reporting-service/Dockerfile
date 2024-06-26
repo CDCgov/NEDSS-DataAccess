@@ -1,11 +1,7 @@
 FROM amazoncorretto:17 as builder
-#Copy project config
-COPY gradle /usr/src/etldatapipeline/gradle
-COPY gradlew /usr/src/etldatapipeline/gradlew
-COPY build.gradle /usr/src/etldatapipeline/build.gradle
-COPY settings.gradle /usr/src/etldatapipeline/settings.gradle
+
 #Copy sources
-COPY . /usr/src/etldatapipeline/data-reporting-service
+COPY data-reporting-service /usr/src/data-reporting-service
 #COPY . /usr/src/etldatapipeline
 WORKDIR /usr/src/etldatapipeline/data-reporting-service
 #Build ETL service along with any required libraries
