@@ -1,15 +1,12 @@
 FROM amazoncorretto:17 as builder
-
 #Copy sources
-COPY data-reporting-service/organization-service /usr/src/data-reporting-service/organization-service
-COPY gradle /usr/src/data-reporting-service/gradle
-COPY gradlew /usr/src/data-reporting-service/gradlew
+COPY data-reporting-service /usr/src/data-reporting-service
 
-#COPY . /usr/src/etldatapipeline
-WORKDIR /usr/src/data-reporting-service/organization-service
+#cd to data-reporting-service
+WORKDIR /usr/src/data-reporting-service/
 
 #Build organization service along with any required libraries
-RUN ./gradlew buildNeeded -x test --no-daemon
+RUN ./gradlew :organization-service:buildNeeded -x test --no-daemon
 FROM amazoncorretto:17
 COPY --from=builder /usr/src/data-reporting-service/organization-service/build/libs/organization-service*.jar organization-service.jar
 
