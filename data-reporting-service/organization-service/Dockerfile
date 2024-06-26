@@ -7,7 +7,7 @@ COPY data-reporting-service /usr/src/data-reporting-service
 WORKDIR /usr/src/data-reporting-service/organization-service
 
 #Build organization service along with any required libraries
-RUN ./gradlew buildNeeded -x test --no-daemon
+RUN ./gradlew :organization-service:buildNeeded -x test --no-daemon
 FROM amazoncorretto:17
 COPY --from=builder /usr/src/data-reporting-service/organization-service/build/libs/organization-service*.jar organization-service.jar
 
