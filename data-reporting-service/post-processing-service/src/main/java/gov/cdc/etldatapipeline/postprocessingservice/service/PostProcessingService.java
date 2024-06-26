@@ -73,6 +73,7 @@ public class PostProcessingService {
                     processTopic(keyTopic, ids, investigationRepository::executeStoredProcForPublicHealthCaseIds, "investigation","sp_nrt_investigation_postprocessing");
                     ids.forEach(id -> {
                         if (idVals.containsKey(id)) {
+                            logger.info("Investigation block debug: id val process");
                             processId(id, idVals.get(id), pageBuilderRepository::executeStoredProcForPageBuilder, "case answers","sp_page_builder_postprocessing");
                         }
                     });
@@ -104,11 +105,12 @@ public class PostProcessingService {
             }
             if(topic.contains("investigation")) {
                 final Long phcUid = id = jsonNode.get("payload").get("public_health_case_uid").asLong();
+                logger.info("Investigation block debug: id val create");
                 Optional.ofNullable(jsonNode.get("payload").get("rdb_table_name_list"))
                         .ifPresent(node -> idVals.put(phcUid, node.asText()));
             }
             if(topic.contains("notifications")) {
-                id = jsonNode.get("payload").get("notification_uid").asLong();
+                id = jsonNode.get("payload").get("source_act_uid").asLong();
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
