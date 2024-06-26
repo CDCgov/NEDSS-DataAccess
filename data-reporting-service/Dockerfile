@@ -2,7 +2,7 @@ FROM amazoncorretto:17 as builder
 
 #Copy sources
 COPY data-reporting-service /usr/src/data-reporting-service
-#COPY . /usr/src/etldatapipeline
+#Set the Working Directory
 WORKDIR /usr/src/etldatapipeline/data-reporting-service
 #Build ETL service along with any required libraries
 RUN ./gradlew buildNeeded -x test --no-daemon

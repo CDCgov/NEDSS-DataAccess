@@ -6,7 +6,7 @@ COPY post-processing-service /usr/src/data-reporting-service/post-processing-ser
 COPY gradle /usr/src/data-reporting-service/gradle
 COPY gradlew /usr/src/data-reporting-service/gradlew
 
-#cd to post-processing-service
+#Set the Working Directory
 WORKDIR /usr/src/data-reporting-service/post-processing-service
 
 #Build post-processing service along with any required libraries

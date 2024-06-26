@@ -6,7 +6,7 @@ COPY organization-service /usr/src/data-reporting-service/organization-service
 COPY gradle /usr/src/data-reporting-service/gradle
 COPY gradlew /usr/src/data-reporting-service/gradlew
 
-#COPY . /usr/src/etldatapipeline
+#Set the Working Directory
 WORKDIR /usr/src/data-reporting-service/organization-service
 
 #Build organization service along with any required libraries

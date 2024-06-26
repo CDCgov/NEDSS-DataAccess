@@ -6,7 +6,7 @@ COPY gradle /usr/src/data-reporting-service/gradle
 COPY gradlew /usr/src/data-reporting-service/gradlew
 COPY settings.gradle /usr/src/data-reporting-service/settings.gradle
 
-#cd to person-service
+#Set the Working Directory
 WORKDIR /usr/src/data-reporting-service/
 
 #Build person service along with any required libraries

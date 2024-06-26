@@ -3,7 +3,7 @@ FROM amazoncorretto:17 as builder
 #Copy sources
 COPY data-reporting-service /usr/src/data-reporting-service
 
-#cd to data-reporting-service
+#Set the Working Directory
 WORKDIR /usr/src/data-reporting-service/
 
 #Build post-processing service along with any required libraries
