@@ -1,4 +1,4 @@
-CREATE OR ALTER PROCEDURE [dbo].[sp_f_page_case_postprocessing]
+CREATE OR ALTER  PROCEDURE [dbo].[sp_f_page_case_postprocessing]
     @phc_ids nvarchar(max),
     @debug bit = 'false'
 as
@@ -10,7 +10,9 @@ BEGIN
     DECLARE @batch_start_time datetime2(7) = null ;
     DECLARE @batch_end_time datetime2(7) = null ;
     DECLARE @batch_id BIGINT;
-    set @batch_id = cast((format(getdate(),'yyyyMMddHHmmss')) as bigint)
+    set @batch_id = cast((format(getdate(),'yyyyMMddHHmmss')) as bigint);
+    print @batch_id;
+
 
     BEGIN TRY
 
@@ -228,37 +230,41 @@ BEGIN
         SET @Proc_Step_Name = ' Generating DIMENSION_KEYS_PAGECASEID';
 
         IF OBJECT_ID('#DIMENSION_KEYS_PAGECASEID', 'U') IS NOT NULL
-            drop table #DIMENSION_KEYS_PAGECASEID;
+            drop table #DIMENSION_KEYS_PAGECASEID
+            ;
 
-        select L_INV_ADMINISTRATIVE_INC.PAGE_CASE_UID as PAGE_CASE_UID
-        into #DIMENSION_KEYS_PAGECASEID
-        from  dbo.L_INV_ADMINISTRATIVE_INC  union
-        select L_INV_CLINICAL_INC.PAGE_CASE_UID 	 from  dbo.L_INV_CLINICAL_INC  union
-        select L_INV_COMPLICATION_INC.PAGE_CASE_UID 	 from  dbo.L_INV_COMPLICATION_INC  union
-        select L_INV_CONTACT_INC.PAGE_CASE_UID 	 from  dbo.L_INV_CONTACT_INC  union
-        select L_INV_DEATH_INC.PAGE_CASE_UID 	 from  dbo.L_INV_DEATH_INC  union
-        select L_INV_EPIDEMIOLOGY_INC.PAGE_CASE_UID 	 from  dbo.L_INV_EPIDEMIOLOGY_INC  union
-        select L_INV_HIV_INC.PAGE_CASE_UID 	 from  dbo.L_INV_HIV_INC  union
-        select L_INV_ISOLATE_TRACKING_INC.PAGE_CASE_UID 	 from  dbo.L_INV_ISOLATE_TRACKING_INC  union
-        select L_INV_LAB_FINDING_INC.PAGE_CASE_UID 	 from  dbo.L_INV_LAB_FINDING_INC  union
-        select L_INV_MEDICAL_HISTORY_INC.PAGE_CASE_UID 	 from  dbo.L_INV_MEDICAL_HISTORY_INC  union
-        select L_INV_MOTHER_INC.PAGE_CASE_UID 	 from  dbo.L_INV_MOTHER_INC  union
-        select L_INV_OTHER_INC.PAGE_CASE_UID 	 from  dbo.L_INV_OTHER_INC  union
-        select L_INV_PATIENT_OBS_INC.PAGE_CASE_UID 	 from  dbo.L_INV_PATIENT_OBS_INC  union
-        select L_INV_PREGNANCY_BIRTH_INC.PAGE_CASE_UID 	 from  dbo.L_INV_PREGNANCY_BIRTH_INC  union
-        select L_INV_RESIDENCY_INC.PAGE_CASE_UID 	 from  dbo.L_INV_RESIDENCY_INC  union
-        select L_INV_RISK_FACTOR_INC.PAGE_CASE_UID 	 from  dbo.L_INV_RISK_FACTOR_INC  union
-        select L_INV_SOCIAL_HISTORY_INC.PAGE_CASE_UID 	 from  dbo.L_INV_SOCIAL_HISTORY_INC  union
-        select L_INV_SYMPTOM_INC.PAGE_CASE_UID 	 from  dbo.L_INV_SYMPTOM_INC  union
-        select L_INV_TRAVEL_INC.PAGE_CASE_UID 	 from  dbo.L_INV_TRAVEL_INC  union
-        select L_INV_TREATMENT_INC.PAGE_CASE_UID 	 from  dbo.L_INV_TREATMENT_INC  union
-        select L_INV_UNDER_CONDITION_INC.PAGE_CASE_UID 	 from  dbo.L_INV_UNDER_CONDITION_INC  union
-        select L_INV_VACCINATION_INC.PAGE_CASE_UID 	 from  dbo.L_INV_VACCINATION_INC union
+        SELECT L_INV_ADMINISTRATIVE_INC.PAGE_CASE_UID as PAGE_CASE_UID
+        INTO #DIMENSION_KEYS_PAGECASEID
+        FROM  dbo.L_INV_ADMINISTRATIVE_INC  union
+        SELECT L_INV_CLINICAL_INC.PAGE_CASE_UID 	 from  dbo.L_INV_CLINICAL_INC  union
+        SELECT L_INV_COMPLICATION_INC.PAGE_CASE_UID 	 from  dbo.L_INV_COMPLICATION_INC  union
+        SELECT L_INV_CONTACT_INC.PAGE_CASE_UID 	 from  dbo.L_INV_CONTACT_INC  union
+        SELECT L_INV_DEATH_INC.PAGE_CASE_UID 	 from  dbo.L_INV_DEATH_INC  union
+        SELECT L_INV_EPIDEMIOLOGY_INC.PAGE_CASE_UID 	 from  dbo.L_INV_EPIDEMIOLOGY_INC  union
+        SELECT L_INV_HIV_INC.PAGE_CASE_UID 	 from  dbo.L_INV_HIV_INC  union
+        SELECT L_INV_ISOLATE_TRACKING_INC.PAGE_CASE_UID 	 from  dbo.L_INV_ISOLATE_TRACKING_INC  union
+        SELECT L_INV_LAB_FINDING_INC.PAGE_CASE_UID 	 from  dbo.L_INV_LAB_FINDING_INC  union
+        SELECT L_INV_MEDICAL_HISTORY_INC.PAGE_CASE_UID 	 from  dbo.L_INV_MEDICAL_HISTORY_INC  union
+        SELECT L_INV_MOTHER_INC.PAGE_CASE_UID 	 from  dbo.L_INV_MOTHER_INC  union
+        SELECT L_INV_OTHER_INC.PAGE_CASE_UID 	 from  dbo.L_INV_OTHER_INC  union
+        SELECT L_INV_PATIENT_OBS_INC.PAGE_CASE_UID 	 from  dbo.L_INV_PATIENT_OBS_INC  union
+        SELECT L_INV_PREGNANCY_BIRTH_INC.PAGE_CASE_UID 	 from  dbo.L_INV_PREGNANCY_BIRTH_INC  union
+        SELECT L_INV_RESIDENCY_INC.PAGE_CASE_UID 	 from  dbo.L_INV_RESIDENCY_INC  union
+        SELECT L_INV_RISK_FACTOR_INC.PAGE_CASE_UID 	 from  dbo.L_INV_RISK_FACTOR_INC  union
+        SELECT L_INV_SOCIAL_HISTORY_INC.PAGE_CASE_UID 	 from  dbo.L_INV_SOCIAL_HISTORY_INC  union
+        SELECT L_INV_SYMPTOM_INC.PAGE_CASE_UID 	 from  dbo.L_INV_SYMPTOM_INC  union
+        SELECT L_INV_TRAVEL_INC.PAGE_CASE_UID 	 from  dbo.L_INV_TRAVEL_INC  union
+        SELECT L_INV_TREATMENT_INC.PAGE_CASE_UID 	 from  dbo.L_INV_TREATMENT_INC  union
+        SELECT L_INV_UNDER_CONDITION_INC.PAGE_CASE_UID 	 from  dbo.L_INV_UNDER_CONDITION_INC  union
+        SELECT L_INV_VACCINATION_INC.PAGE_CASE_UID 	 from  dbo.L_INV_VACCINATION_INC union
         SELECT L_INVESTIGATION_REPEAT_INC.PAGE_CASE_UID	 from  [dbo].[L_INVESTIGATION_REPEAT_INC] union
         SELECT L_INV_PLACE_REPEAT.PAGE_CASE_UID	 from  [dbo].[L_INV_PLACE_REPEAT]
         ;
 
-        if @debug  = 'true' select * from #DIMENSION_KEYS_PAGECASEID;
+        if @debug  = 'true'
+            select * from #DIMENSION_KEYS_PAGECASEID
+            where page_case_uid IN (SELECT value FROM STRING_SPLIT(@phc_ids, ','));
+
         SELECT @RowCount_no = @@ROWCOUNT;
 
         INSERT INTO [dbo].[job_flow_log]
@@ -276,7 +282,8 @@ BEGIN
             drop table #DIMENSIONAL_KEYS
             ;
 
-        SELECT  DIMC.page_case_uid,
+        /**Updated to handle cases when there are no page builder investigation updates.*/
+        SELECT  phc.page_case_uid,
                 COALESCE(L_INV_ADMINISTRATIVE_INC.D_INV_ADMINISTRATIVE_KEY , 1) AS 	D_INV_ADMINISTRATIVE_KEY ,
                 COALESCE(L_INV_CLINICAL_INC.D_INV_CLINICAL_KEY , 1) AS 	D_INV_CLINICAL_KEY ,
                 COALESCE(L_INV_COMPLICATION_INC.D_INV_COMPLICATION_KEY , 1) AS 	D_INV_COMPLICATION_KEY ,
@@ -301,9 +308,9 @@ BEGIN
                 COALESCE(L_INV_VACCINATION_INC.D_INV_VACCINATION_KEY , 1) AS 	D_INV_VACCINATION_KEY ,
                 COALESCE(L_INVESTIGATION_REPEAT_INC.D_INVESTIGATION_REPEAT_KEY , 1 ) AS	D_INVESTIGATION_REPEAT_KEY,
                 COALESCE(L_INV_PLACE_REPEAT.D_INV_PLACE_REPEAT_KEY , 1 ) AS	D_INV_PLACE_REPEAT_KEY
-
         INTO #DIMENSIONAL_KEYS
-        FROM #DIMENSION_KEYS_PAGECASEID DIMC
+        FROM #PHC_UIDS phc
+        LEFT OUTER JOIN  #DIMENSION_KEYS_PAGECASEID DIMC ON DIMC.PAGE_CASE_UID = phc.PAGE_CASE_UID
         LEFT OUTER JOIN   dbo.L_INV_ADMINISTRATIVE_INC ON  L_INV_ADMINISTRATIVE_INC.PAGE_CASE_UID  =  dimc.page_case_uid
         LEFT OUTER JOIN   dbo.L_INV_CLINICAL_INC ON  L_INV_CLINICAL_INC.PAGE_CASE_UID  =  dimc.page_case_uid
         LEFT OUTER JOIN   dbo.L_INV_COMPLICATION_INC ON  L_INV_COMPLICATION_INC.PAGE_CASE_UID  =  dimc.page_case_uid
@@ -328,7 +335,7 @@ BEGIN
         LEFT OUTER JOIN   dbo.L_INV_VACCINATION_INC ON  L_INV_VACCINATION_INC.PAGE_CASE_UID  =  dimc.page_case_uid
         LEFT OUTER JOIN   dbo.L_INVESTIGATION_REPEAT_INC ON  L_INVESTIGATION_REPEAT_INC.PAGE_CASE_UID =  dimc.page_case_uid
         LEFT OUTER JOIN   dbo.L_INV_PLACE_REPEAT ON  L_INV_PLACE_REPEAT.PAGE_CASE_UID =  dimc.page_case_uid
-        WHERE  L_INV_ADMINISTRATIVE_INC.PAGE_CASE_UID IN (SELECT PAGE_CASE_UID FROM #PHC_UIDS WHERE CASE_MANAGEMENT_UID IS NULL)
+        WHERE phc.CASE_MANAGEMENT_UID IS NULL;
         ;
 
         if @debug  = 'true' select * from #DIMENSIONAL_KEYS;
@@ -337,7 +344,7 @@ BEGIN
 
         INSERT INTO [dbo].[job_flow_log]
         (batch_id,[Dataflow_Name],[package_Name] ,[Status_Type],[step_number],[step_name],[row_count])
-        VALUES(@batch_id,'F_PAGE_CASE','F_PAGE_CASE','START',@Proc_Step_no,@Proc_Step_Name,@RowCount_no);
+        VALUES (@batch_id,'F_PAGE_CASE','F_PAGE_CASE','START',@Proc_Step_no,@Proc_Step_Name,@RowCount_no);
 
         COMMIT TRANSACTION;
 
@@ -347,9 +354,7 @@ BEGIN
         SET @Proc_Step_Name = ' Generating F_PAGE_CASE_TEMP_INC';
 
         IF OBJECT_ID('#F_PAGE_CASE_TEMP_INC', 'U') IS NOT NULL
-            drop table #F_PAGE_CASE_TEMP_INC
-            ;
-
+            drop table #F_PAGE_CASE_TEMP_INC;
 
         --DROP TABLE dbo.F_PAGE_CASE;
 
@@ -371,8 +376,8 @@ BEGIN
             DATE2.DATE_KEY AS LAST_CHG_DATE_KEY
 
         INTO #F_PAGE_CASE_TEMP_INC
-        FROM  #DIMENSIONAL_KEYS as DIM_KEYS
-        INNER JOIN #ENTITY_KEYSTORE_INC AS KEYSTORE ON DIM_KEYS.PAGE_CASE_UID = KEYSTORE.PAGE_CASE_UID
+        FROM #ENTITY_KEYSTORE_INC AS KEYSTORE
+        INNER JOIN #DIMENSIONAL_KEYS as DIM_KEYS ON DIM_KEYS.PAGE_CASE_UID = KEYSTORE.PAGE_CASE_UID
         LEFT OUTER JOIN dbo.RDB_DATE DATE1 ON cast(DATE1.DATE_MM_DD_YYYY as date)= cast(KEYSTORE.ADD_TIME as date)
         LEFT OUTER JOIN dbo.RDB_DATE DATE2 ON cast(DATE2.DATE_MM_DD_YYYY as date )=cast(KEYSTORE.LAST_CHG_TIME as date)
         ;
@@ -394,7 +399,7 @@ BEGIN
         SELECT @RowCount_no = @@ROWCOUNT;
 
         INSERT INTO [dbo].[job_flow_log]
-        (batch_id,[Dataflow_Name],[package_Name] ,[Status_Type],[step_number],[step_name],[row_count])
+            (batch_id,[Dataflow_Name],[package_Name] ,[Status_Type],[step_number],[step_name],[row_count])
         VALUES(@batch_id,'F_PAGE_CASE','F_PAGE_CASE','START',@Proc_Step_no,@Proc_Step_Name,@RowCount_no);
 
         COMMIT TRANSACTION;
@@ -406,39 +411,39 @@ BEGIN
 
         -- DROP COLUMN PAGE_CASE_UID;
         ALTER TABLE  #F_PAGE_CASE_TEMP_INC DROP COLUMN PAGE_CASE_UID ;
+        if @debug  = 'true' select * from #F_PAGE_CASE_TEMP_INC;
 
         --??PROC SORT DATA=F_PAGE_CASE NODUPKEY; BY PATIENT_KEY; RUN;
 
         IF OBJECT_ID('dbo.F_PAGE_CASE', 'U') IS NOT NULL
-            BEGIN
-                --drop table dbo.F_PAGE_CASE;
-                DELETE fpagecase FROM dbo.F_PAGE_CASE fpagecase
-                JOIN #F_PAGE_CASE_TEMP_INC fpagecaseinc ON fpagecase.investigation_key=fpagecaseinc.investigation_key;
+        BEGIN
+            --drop table dbo.F_PAGE_CASE;
+            DELETE fpagecase FROM dbo.F_PAGE_CASE fpagecase
+            JOIN #F_PAGE_CASE_TEMP_INC fpagecaseinc ON fpagecase.investigation_key=fpagecaseinc.investigation_key;
 
-                INSERT INTO dbo.F_PAGE_CASE SELECT * FROM #F_PAGE_CASE_TEMP_INC;
-            END;
+            INSERT INTO dbo.F_PAGE_CASE SELECT * FROM #F_PAGE_CASE_TEMP_INC;
+        END;
 
 
         IF OBJECT_ID('dbo.F_PAGE_CASE', 'U') IS NULL
-            BEGIN
-                SELECT *
-                into [dbo].F_PAGE_CASE
-                FROM
-                    (
-                        SELECT *,
-                               ROW_NUMBER () OVER (PARTITION BY PATIENT_KEY order by PATIENT_KEY) rowid
-                        FROM #F_PAGE_CASE_TEMP_INC
-                    ) AS Der WHERE rowid=1;
+        BEGIN
+            SELECT *
+            into [dbo].F_PAGE_CASE
+            FROM
+                (
+                SELECT *,
+                    ROW_NUMBER () OVER (PARTITION BY PATIENT_KEY order by PATIENT_KEY) rowid
+                FROM #F_PAGE_CASE_TEMP_INC
+                ) AS Der WHERE rowid=1;
 
-                ALTER TABLE  dbo.F_PAGE_CASE DROP COLUMN rowid ;
-            END;
+            ALTER TABLE dbo.F_PAGE_CASE DROP COLUMN rowid ;
+        END;
         /**
         This should cover any issue with defect https://nbscentral.sramanaged.com/redmine/issues/12555
         ETL Error in Dynamic Datamarts Process - Problem Record(s) Causing Million+ Rows in Dynamic Datamart (Total Should Be a Few Thousand)
         */
 
-        DELETE FROM [DBO].F_PAGE_CASE
-        WHERE INVESTIGATION_KEY IN (
+        DELETE FROM [DBO].F_PAGE_CASE WHERE INVESTIGATION_KEY IN (
             SELECT INVESTIGATION_KEY FROM dbo.F_PAGE_CASE
             GROUP BY INVESTIGATION_KEY HAVING COUNT(INVESTIGATION_KEY)>1) AND PATIENT_KEY =1
 

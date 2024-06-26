@@ -109,7 +109,7 @@ public class PostProcessingService {
                         .ifPresent(node -> idVals.put(phcUid, node.asText()));
             }
             if(topic.contains("notifications")) {
-                id = jsonNode.get("payload").get("source_act_uid").asLong();
+                id = jsonNode.get("payload").get("notification_uid").asLong();
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
