@@ -3,8 +3,8 @@ FROM amazoncorretto:17 as builder
 #Copy sources
 COPY data-reporting-service /usr/src/data-reporting-service
 
-#cd to post-processing-service
-WORKDIR /usr/src/data-reporting-service/post-processing-service
+#cd to data-reporting-service
+WORKDIR /usr/src/data-reporting-service/
 
 #Build post-processing service along with any required libraries
 RUN ./gradlew :post-processing-service:buildNeeded -x test --no-daemon

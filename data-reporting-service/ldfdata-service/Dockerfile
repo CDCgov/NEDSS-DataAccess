@@ -2,8 +2,8 @@ FROM amazoncorretto:17 as builder
 #Copy sources
 COPY data-reporting-service /usr/src/data-reporting-service
 
-#cd to ldfdata-service
-WORKDIR /usr/src/data-reporting-service/ldfdata-service
+#cd to data-reporting-service
+WORKDIR /usr/src/data-reporting-service/
 
 #Build ldfdata service along with any required libraries
 RUN ./gradlew :ldfdata-service:buildNeeded  -x test --no-daemon

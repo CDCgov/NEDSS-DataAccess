@@ -68,8 +68,8 @@ services:
 
   person-reporting-service:
     build:
-      context: ./person-service
-      dockerfile: ./docker-compose.Dockerfile
+      context: .
+      dockerfile: ./person-service/docker-compose.Dockerfile
     ports:
       - 8091:8091
     depends_on:
@@ -78,14 +78,14 @@ services:
     env_file:
       - etldatapipeline.env
     environment:
-      SPRING_KAFKA_BOOTSTRAPSERVERS: broker:29092
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: broker:29092
     networks:
       - etldatapipeline
 
   organization-reporting-service:
     build:
-      context: ./organization-service
-      dockerfile: ./docker-compose.Dockerfile
+      context: .
+      dockerfile: ./organization-service/docker-compose.Dockerfile
     ports:
       - 8092:8092
     depends_on:
@@ -94,14 +94,14 @@ services:
     env_file:
       - etldatapipeline.env
     environment:
-      SPRING_KAFKA_BOOTSTRAPSERVERS: broker:29092
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: broker:29092
     networks:
       - etldatapipeline
 
   investigation-reporting-service:
     build:
-      context: ./investigation-service
-      dockerfile: ./docker-compose.Dockerfile
+      context: .
+      dockerfile: ./investigation-service/docker-compose.Dockerfile
     ports:
       - 8093:8093
     depends_on:
@@ -110,14 +110,14 @@ services:
     env_file:
       - etldatapipeline.env
     environment:
-      SPRING_KAFKA_BOOTSTRAPSERVERS: broker:29092
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: broker:29092
     networks:
       - etldatapipeline
 
   observation-reporting-service:
     build:
-      context: ./observation-service
-      dockerfile: ./docker-compose.Dockerfile
+      context: .
+      dockerfile: ./observation-service/docker-compose.Dockerfile
     ports:
       - 8094:8094
     depends_on:
@@ -126,14 +126,14 @@ services:
     env_file:
       - etldatapipeline.env
     environment:
-      SPRING_KAFKA_BOOTSTRAPSERVERS: broker:29092
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: broker:29092
     networks:
       - etldatapipeline
 
   post-processing-reporting-service:
     build:
-      context: ./post-processing-service
-      dockerfile: ./docker-compose.Dockerfile
+      context: .
+      dockerfile: ./post-processing-service/docker-compose.Dockerfile
     ports:
       - 8095:8095
     depends_on:
@@ -142,7 +142,23 @@ services:
     env_file:
       - etldatapipeline.env
     environment:
-      SPRING_KAFKA_BOOTSTRAPSERVERS: broker:29092
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: broker:29092
+    networks:
+      - etldatapipeline
+
+  ldfdata-reporting-service:
+    build:
+      context: .
+      dockerfile: ./ldfdata-service/docker-compose.Dockerfile
+    ports:
+      - 8096:8096
+    depends_on:
+      - broker
+    container_name: ldfdata-service-reporting-service
+    env_file:
+      - etldatapipeline.env
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: broker:29092
     networks:
       - etldatapipeline
 

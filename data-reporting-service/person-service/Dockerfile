@@ -2,7 +2,7 @@ FROM amazoncorretto:17 as builder
 #Copy sources
 COPY data-reporting-service /usr/src/data-reporting-service
 
-#cd to person-service
+#cd to data-reporting-service
 WORKDIR /usr/src/data-reporting-service/
 
 #Build person service along with any required libraries

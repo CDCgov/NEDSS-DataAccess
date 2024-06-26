@@ -2,8 +2,8 @@ FROM amazoncorretto:17 as builder
 #Copy sources
 COPY data-reporting-service /usr/src/data-reporting-service
 
-#cd to observation-service
-WORKDIR /usr/src/data-reporting-service/observation-service
+#cd to data-reporting-service
+WORKDIR /usr/src/data-reporting-service/
 
 #Build observation service along with any required libraries
 RUN ./gradlew :observation-service:buildNeeded -x test --no-daemon
