@@ -11,8 +11,8 @@ import lombok.NonNull;
 public class InvestigationNotificationsKey {
 
     @NonNull
-    @JsonProperty("public_health_case_uid")
-    private Long publicHealthCaseUid;
+    @JsonProperty("notification_uid")
+    private Long notificationUid;
 
     @NonNull
     private Long sourceActUid;
