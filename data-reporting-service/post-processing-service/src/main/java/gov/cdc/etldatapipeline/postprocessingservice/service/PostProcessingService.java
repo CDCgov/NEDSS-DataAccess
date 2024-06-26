@@ -74,6 +74,7 @@ public class PostProcessingService {
                     ids.forEach(id -> {
                         if (idVals.containsKey(id)) {
                             processId(id, idVals.get(id), pageBuilderRepository::executeStoredProcForPageBuilder, "case answers","sp_page_builder_postprocessing");
+                            idVals.remove(id);
                         }
                     });
                 }
@@ -103,9 +104,11 @@ public class PostProcessingService {
                 id = jsonNode.get("payload").get("organization_uid").asLong();
             }
             if(topic.contains("investigation")) {
-                final Long phcUid = id = jsonNode.get("payload").get("public_health_case_uid").asLong();
-                Optional.ofNullable(jsonNode.get("payload").get("rdb_table_name_list"))
-                        .ifPresent(node -> idVals.put(phcUid, node.asText()));
+                id = jsonNode.get("payload").get("public_health_case_uid").asLong();
+                JsonNode tblNode = jsonNode.get("payload").get("rdb_table_name_list");
+                if (!tblNode.isNull()) {
+                    idVals.put(id, tblNode.asText());
+                }
             }
             if(topic.contains("notifications")) {
                 id = jsonNode.get("payload").get("notification_uid").asLong();

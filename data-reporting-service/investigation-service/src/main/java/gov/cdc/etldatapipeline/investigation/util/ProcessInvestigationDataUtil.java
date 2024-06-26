@@ -277,7 +277,9 @@ public class ProcessInvestigationDataUtil {
 
                 String rdbTblNms = String.join(",", investigationCaseAnswerList.stream()
                                 .map(InvestigationCaseAnswer::getRdbTableNm).collect(Collectors.toSet()));
-                investigationTransformed.setRdbTableNameList(rdbTblNms);
+                if (!rdbTblNms.isEmpty()) {
+                    investigationTransformed.setRdbTableNameList(rdbTblNms);
+                }
             }
             else {
                 logger.info("InvestigationCaseAnswerJsonArray array is null.");

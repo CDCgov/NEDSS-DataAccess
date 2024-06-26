@@ -88,7 +88,7 @@ public class InvestigationService {
 
                 // Calling sp_public_health_case_fact_datamart_event
                 logger.info("Executing stored proc with ids: {} to populate PHС fact datamart", publicHealthCaseUid);
-                investigationRepository.populatePhcFact(publicHealthCaseUid);
+                //investigationRepository.populatePhcFact(publicHealthCaseUid);
                 logger.info("Stored proc executed");
 
                 logger.debug(topicDebugLog, publicHealthCaseUid, investigationTopic);
@@ -97,6 +97,7 @@ public class InvestigationService {
                     InvestigationReporting reportingModel = modelMapper.map(investigationData.get(), InvestigationReporting.class);
                     InvestigationTransformed investigationTransformed = processDataUtil.transformInvestigationData(investigationData.get());
                     buildReportingModelForTransformedData(reportingModel, investigationTransformed);
+                    investigationKey.setRdbTableNameList(investigationTransformed.getRdbTableNameList());
                     pushKeyValuePairToKafka(investigationKey, reportingModel, investigationTopicReporting);
                     return objectMapper.writeValueAsString(investigationData.get());
                 }
