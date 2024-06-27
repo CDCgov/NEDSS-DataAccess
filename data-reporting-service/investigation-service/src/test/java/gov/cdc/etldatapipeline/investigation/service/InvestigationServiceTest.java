@@ -74,9 +74,10 @@ class InvestigationServiceTest {
         final var investigationService = getInvestigationService(inputTopicName, outputTopicName);
         investigationService.processMessage(payload, inputTopicName);
 
+        final InvestigationReporting reportingModel = constructInvestigationReporting(investigation.getPublicHealthCaseUid());
         InvestigationKey investigationKey = new InvestigationKey();
         investigationKey.setPublicHealthCaseUid(investigation.getPublicHealthCaseUid());
-        final InvestigationReporting reportingModel = constructInvestigationReporting(investigation.getPublicHealthCaseUid());
+        investigationKey.setRdbTableNameList(reportingModel.getRdbTableNameList());
 
         String expectedKey = jsonGenerator.generateStringJson(investigationKey);
         String expectedValue = jsonGenerator.generateStringJson(reportingModel);
