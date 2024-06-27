@@ -147,10 +147,11 @@ public class PostProcessingServiceTest {
 
         String expectedPublicHealthCaseIdsString = "123";
         verify(investigationRepositoryMock).executeStoredProcForPublicHealthCaseIds(expectedPublicHealthCaseIdsString);
+        verify(investigationRepositoryMock).executeStoredProcForFPageCase(expectedPublicHealthCaseIdsString);
         assertTrue(postProcessingServiceMock.idCache.containsKey(topic));
 
         List<ILoggingEvent> logs = listAppender.list;
-        assertEquals(3, logs.size());
+        assertEquals(5, logs.size());
         assertTrue(logs.get(2).getMessage().contains(PostProcessingService.SP_EXECUTION_COMPLETED));
     }
 
@@ -205,9 +206,10 @@ public class PostProcessingServiceTest {
         assertTrue(postProcessingServiceMock.idVals.containsKey(expectedPublicHealthCaseId));
         assertTrue(postProcessingServiceMock.idVals.containsValue(expectedRdbTableNames));
 
+        String expectedMsgInv = "Processing the investigation message topic: " + topic + ". Calling stored proc: sp_nrt_investigation_postprocessing('123')";
         List<ILoggingEvent> logs = listAppender.list;
-        assertEquals(5, logs.size());
-        assertTrue(logs.get(4).getMessage().contains(PostProcessingService.SP_EXECUTION_COMPLETED));
+        assertEquals(7, logs.size());
+        assertTrue(logs.get(6).getMessage().contains(PostProcessingService.SP_EXECUTION_COMPLETED));
     }
 
     @Test

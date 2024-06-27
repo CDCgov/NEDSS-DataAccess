@@ -76,6 +76,7 @@ public class PostProcessingService {
                             processId(id, idVals.get(id), pageBuilderRepository::executeStoredProcForPageBuilder, "case answers","sp_page_builder_postprocessing");
                         }
                     });
+                    processTopic(keyTopic, ids, investigationRepository::executeStoredProcForFPageCase, "investigation","sp_f_page_case_postprocessing");
                 }
                 if(keyTopic.contains("notifications")) {
                     processTopic(keyTopic, ids, notificationRepository::executeStoredProcForNotificationIds, "notifications", "sp_nrt_notification_postprocessing");
