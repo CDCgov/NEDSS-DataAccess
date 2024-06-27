@@ -36,6 +36,7 @@ public class PostProcessingService {
     private final NotificationRepository notificationRepository;
     private final PageBuilderRepository pageBuilderRepository;
 
+    static final String PAYLOAD = "payload";
     static final String SP_EXECUTION_COMPLETED = "Stored proc execution completed.";
 
     @KafkaListener(topics = {
@@ -96,23 +97,24 @@ public class PostProcessingService {
             JsonNode jsonNode = objectMapper.readTree(messageKey);
             logger.info("Got this key payload: {} from the topic: {}", messageKey, topic);
             if(topic.contains("patient")) {
-                id = jsonNode.get("payload").get("patient_uid").asLong();
+                id = jsonNode.get(PAYLOAD).get("patient_uid").asLong();
+
             }
             if(topic.contains("provider")) {
-                id = jsonNode.get("payload").get("provider_uid").asLong();
+                id = jsonNode.get(PAYLOAD).get("provider_uid").asLong();
             }
             if(topic.contains("organization")) {
-                id = jsonNode.get("payload").get("organization_uid").asLong();
+                id = jsonNode.get(PAYLOAD).get("organization_uid").asLong();
             }
             if(topic.contains("investigation")) {
-                id = jsonNode.get("payload").get("public_health_case_uid").asLong();
-                JsonNode tblNode = jsonNode.get("payload").get("rdb_table_name_list");
+                id = jsonNode.get(PAYLOAD).get("public_health_case_uid").asLong();
+                JsonNode tblNode = jsonNode.get(PAYLOAD).get("rdb_table_name_list");
                 if (tblNode != null && !tblNode.isNull()) {
                     idVals.put(id, tblNode.asText());
                 }
             }
             if(topic.contains("notifications")) {
-                id = jsonNode.get("payload").get("notification_uid").asLong();
+                id = jsonNode.get(PAYLOAD).get("notification_uid").asLong();
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

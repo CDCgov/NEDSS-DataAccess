@@ -87,6 +87,7 @@ class InvestigationServiceTest {
         assertEquals(expectedKey, keyCaptor.getValue());
         assertEquals(expectedValue, messageCaptor.getValue());
         assertTrue(keyCaptor.getValue().contains(String.valueOf(investigationKey.getPublicHealthCaseUid())));
+        assertTrue(keyCaptor.getValue().contains(String.valueOf(investigationKey.getRdbTableNameList())));
     }
 
     private InvestigationService getInvestigationService(String inputTopicName, String outputTopicName) {

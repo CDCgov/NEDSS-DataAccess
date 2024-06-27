@@ -16,6 +16,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -130,10 +131,18 @@ public class InvestigationDataProcessingTests {
         investigation.setInvestigationNotifications(readFileData(FILE_PREFIX + "InvestigationNotifications.json"));
         transformer.investigationNotificationsOutputTopicName = NOTIFICATIONS_TOPIC;
 
+        InvestigationNotificationsKey notificationsKey = new InvestigationNotificationsKey();
+        notificationsKey.setNotificationUid(263748597L);
+
         InvestigationNotifications notifications = new InvestigationNotifications();
         notifications.setPublicHealthCaseUid(investigationUid);
         notifications.setSourceActUid(263748597L);
+        notifications.setNotificationUid(263748597L);
         notifications.setLocalPatientUid(75395128L);
+        notifications.setSourceClassCd("NOTF");
+        notifications.setTargetClassCd("CASE");
+        notifications.setNotifStatus("APPROVED");
+        notifications.setNotifAddUserId(96325874L);
         notifications.setConditionCd("11065");
 
         transformer.transformInvestigationData(investigation);
@@ -143,11 +152,17 @@ public class InvestigationDataProcessingTests {
         Function<InvestigationNotifications, List<String>> nDetailsFn = (n) -> Arrays.asList(
                 String.valueOf(n.getPublicHealthCaseUid()),
                 String.valueOf(n.getSourceActUid()),
+                String.valueOf(n.getNotificationUid()),
                 String.valueOf(n.getLocalPatientUid()),
+                n.getSourceClassCd(),
+                n.getTargetClassCd(),
+                n.getNotifStatus(),
+                String.valueOf(n.getNotifAddUserId()),
                 n.getConditionCd());
 
         String actualCombined = String.join(" ",messageCaptor.getAllValues());
 
+        assertTrue(containsWords.apply(keyCaptor.getValue(), Collections.singletonList(String.valueOf(notificationsKey.getNotificationUid()))));
         assertTrue(containsWords.apply(actualCombined, nDetailsFn.apply(notifications)));
     }
 
