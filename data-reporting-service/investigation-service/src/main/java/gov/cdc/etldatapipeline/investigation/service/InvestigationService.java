@@ -97,6 +97,7 @@ public class InvestigationService {
                     InvestigationReporting reportingModel = modelMapper.map(investigationData.get(), InvestigationReporting.class);
                     InvestigationTransformed investigationTransformed = processDataUtil.transformInvestigationData(investigationData.get());
                     buildReportingModelForTransformedData(reportingModel, investigationTransformed);
+                    investigationKey.setRdbTableNameList(investigationTransformed.getRdbTableNameList());
                     pushKeyValuePairToKafka(investigationKey, reportingModel, investigationTopicReporting);
                     return objectMapper.writeValueAsString(investigationData.get());
                 }
