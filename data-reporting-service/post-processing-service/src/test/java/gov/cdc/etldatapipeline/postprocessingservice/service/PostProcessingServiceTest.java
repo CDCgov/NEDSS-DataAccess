@@ -15,9 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -197,14 +195,16 @@ public class PostProcessingServiceTest {
         String key = "{\"payload\":{\"public_health_case_uid\":123, \"rdb_table_name_list\":\"D_INV_CLINICAL,D_INV_ADMINISTRATIVE\"}}";
         String topic = "dummy_investigation";
 
-        postProcessingServiceMock.postProcessMessage(key, topic);
-        postProcessingServiceMock.processCachedIds();
-
         Long expectedPublicHealthCaseId = 123L;
         String expectedRdbTableNames = "D_INV_CLINICAL,D_INV_ADMINISTRATIVE";
-        verify(pageBuilderRepositoryMock).executeStoredProcForPageBuilder(expectedPublicHealthCaseId, expectedRdbTableNames);
+
+        postProcessingServiceMock.postProcessMessage(key, topic);
         assertTrue(postProcessingServiceMock.idVals.containsKey(expectedPublicHealthCaseId));
         assertTrue(postProcessingServiceMock.idVals.containsValue(expectedRdbTableNames));
+
+        postProcessingServiceMock.processCachedIds();
+        assertFalse(postProcessingServiceMock.idVals.containsKey(expectedPublicHealthCaseId));
+        verify(pageBuilderRepositoryMock).executeStoredProcForPageBuilder(expectedPublicHealthCaseId, expectedRdbTableNames);
 
         String expectedMsgInv = "Processing the investigation message topic: " + topic + ". Calling stored proc: sp_nrt_investigation_postprocessing('123')";
         List<ILoggingEvent> logs = listAppender.list;

@@ -107,7 +107,7 @@ public class PostProcessingService {
             if(topic.contains("investigation")) {
                 id = jsonNode.get("payload").get("public_health_case_uid").asLong();
                 JsonNode tblNode = jsonNode.get("payload").get("rdb_table_name_list");
-                if (!tblNode.isNull()) {
+                if (tblNode != null && !tblNode.isNull()) {
                     idVals.put(id, tblNode.asText());
                 }
             }
