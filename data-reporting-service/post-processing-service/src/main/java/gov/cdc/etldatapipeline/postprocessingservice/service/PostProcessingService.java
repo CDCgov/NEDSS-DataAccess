@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import gov.cdc.etldatapipeline.postprocessingservice.repository.*;
+import gov.cdc.etldatapipeline.postprocessingservice.repository.model.InvestigationResult;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,7 +39,12 @@ public class PostProcessingService {
     private final PageBuilderRepository pageBuilderRepository;
 
     static final String PAYLOAD = "payload";
-    static final String SP_EXECUTION_COMPLETED = "Stored proc execution completed.";
+    static final String INVESTIGATION = "investigation";
+    static final String NOTIFICATIONS = "notifications";
+    static final String PATIENT = "patient";
+    static final String ORGANIZATION = "organization";
+    static final String PROVIDER = "provider";
+    static final String SP_EXECUTION_COMPLETED = "Stored proc execution completed";
 
     @KafkaListener(topics = {
             "${spring.kafka.topic.investigation}",
@@ -61,27 +68,28 @@ public class PostProcessingService {
                 String keyTopic = entry.getKey();
                 List<Long> ids = entry.getValue();
                 idCache.put(keyTopic, new ArrayList<>());
-                if(keyTopic.contains("organization")) {
-                    processTopic(keyTopic, ids, organizationRepository::executeStoredProcForOrganizationIds, "organization", "sp_nrt_organization_postprocessing");
+                if(keyTopic.contains(ORGANIZATION)) {
+                    processTopic(keyTopic, ids, organizationRepository::executeStoredProcForOrganizationIds, ORGANIZATION, "sp_nrt_organization_postprocessing");
                 }
-                if(keyTopic.contains("provider")) {
-                    processTopic(keyTopic, ids, providerRepository::executeStoredProcForProviderIds, "provider", "sp_nrt_provider_postprocessing");
+                if(keyTopic.contains(PROVIDER)) {
+                    processTopic(keyTopic, ids, providerRepository::executeStoredProcForProviderIds, PROVIDER, "sp_nrt_provider_postprocessing");
                 }
-                if(keyTopic.contains("patient")) {
-                    processTopic(keyTopic, ids, patientRepository::executeStoredProcForPatientIds, "patient", "sp_nrt_patient_postprocessing");
+                if(keyTopic.contains(PATIENT)) {
+                    processTopic(keyTopic, ids, patientRepository::executeStoredProcForPatientIds, PATIENT, "sp_nrt_patient_postprocessing");
                 }
-                if(keyTopic.contains("investigation")) {
-                    processTopic(keyTopic, ids, investigationRepository::executeStoredProcForPublicHealthCaseIds, "investigation","sp_nrt_investigation_postprocessing");
+                if(keyTopic.contains(INVESTIGATION)) {
+                    //List<InvestigationResult> res =
+                    processTopic(keyTopic, ids, investigationRepository::executeStoredProcForPublicHealthCaseIds, INVESTIGATION,"sp_nrt_investigation_postprocessing");
                     ids.forEach(id -> {
                         if (idVals.containsKey(id)) {
                             processId(id, idVals.get(id), pageBuilderRepository::executeStoredProcForPageBuilder, "case answers","sp_page_builder_postprocessing");
                             idVals.remove(id);
                         }
                     });
-                    processTopic(keyTopic, ids, investigationRepository::executeStoredProcForFPageCase, "investigation","sp_f_page_case_postprocessing");
+                    processTopic(keyTopic, ids, investigationRepository::executeStoredProcForFPageCase, INVESTIGATION,"sp_f_page_case_postprocessing");
                 }
-                if(keyTopic.contains("notifications")) {
-                    processTopic(keyTopic, ids, notificationRepository::executeStoredProcForNotificationIds, "notifications", "sp_nrt_notification_postprocessing");
+                if(keyTopic.contains(NOTIFICATIONS)) {
+                    processTopic(keyTopic, ids, notificationRepository::executeStoredProcForNotificationIds, NOTIFICATIONS, "sp_nrt_notification_postprocessing");
                 }
             }
             else {
@@ -96,24 +104,24 @@ public class PostProcessingService {
             ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
             JsonNode jsonNode = objectMapper.readTree(messageKey);
             logger.info("Got this key payload: {} from the topic: {}", messageKey, topic);
-            if(topic.contains("patient")) {
+            if(topic.contains(PATIENT)) {
                 id = jsonNode.get(PAYLOAD).get("patient_uid").asLong();
 
             }
-            if(topic.contains("provider")) {
+            if(topic.contains(PROVIDER)) {
                 id = jsonNode.get(PAYLOAD).get("provider_uid").asLong();
             }
-            if(topic.contains("organization")) {
+            if(topic.contains(ORGANIZATION)) {
                 id = jsonNode.get(PAYLOAD).get("organization_uid").asLong();
             }
-            if(topic.contains("investigation")) {
+            if(topic.contains(INVESTIGATION)) {
                 id = jsonNode.get(PAYLOAD).get("public_health_case_uid").asLong();
                 JsonNode tblNode = jsonNode.get(PAYLOAD).get("rdb_table_name_list");
                 if (tblNode != null && !tblNode.isNull()) {
                     idVals.put(id, tblNode.asText());
                 }
             }
-            if(topic.contains("notifications")) {
+            if(topic.contains(NOTIFICATIONS)) {
                 id = jsonNode.get(PAYLOAD).get("notification_uid").asLong();
             }
         } catch (Exception e) {
@@ -123,17 +131,27 @@ public class PostProcessingService {
     }
 
     private void processTopic(String keyTopic, List<Long> ids, Consumer<String> repositoryMethod, String entity, String proc) {
-        if(keyTopic.contains(entity)) {
-            String idsString = ids.stream().map(String::valueOf).collect(Collectors.joining(","));
-            logger.info("Processing the {} message topic: {}. Calling stored proc: {}('{}')", entity, keyTopic, proc, idsString);
-            repositoryMethod.accept(idsString);
-            logger.info(SP_EXECUTION_COMPLETED);
-        }
+        String idsString = prepareAndLog(keyTopic, ids, entity, proc);
+        repositoryMethod.accept(idsString);
+        logger.info(SP_EXECUTION_COMPLETED);
+    }
+
+    private <T> List<T> processTopic(String keyTopic, List<Long> ids, Function<String, List<T>> repositoryMethod, String entity, String proc) {
+        String idsString = prepareAndLog(keyTopic, ids, entity, proc);
+        List<T> result = repositoryMethod.apply(idsString);
+        logger.info(SP_EXECUTION_COMPLETED);
+        return result;
+    }
+
+    private String prepareAndLog(String keyTopic, List<Long> ids, String entity, String proc) {
+        String idsString = ids.stream().map(String::valueOf).collect(Collectors.joining(","));
+        logger.info("Processing the {} message topic: {}. Calling stored proc: {}('{}')", entity, keyTopic, proc, idsString);
+        return idsString;
     }
 
     private void processId(Long id, String vals,BiConsumer<Long, String> repositoryMethod, String entity, String proc) {
-            logger.info("Processing PHC ID for {}. Calling stored proc: {}({}, '{}')", entity, proc, id, vals);
-            repositoryMethod.accept(id, vals);
-            logger.info(SP_EXECUTION_COMPLETED);
+        logger.info("Processing PHC ID for {}. Calling stored proc: {}({}, '{}')", entity, proc, id, vals);
+        repositoryMethod.accept(id, vals);
+        logger.info(SP_EXECUTION_COMPLETED);
     }
 }
