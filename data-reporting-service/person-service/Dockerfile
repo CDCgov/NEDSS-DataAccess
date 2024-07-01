@@ -1,14 +1,12 @@
 FROM amazoncorretto:17 as builder
 #Copy sources
-COPY data-reporting-service/person-service /usr/src/data-reporting-service/person-service
-COPY gradle /usr/src/data-reporting-service/gradle
-COPY gradlew /usr/src/data-reporting-service/gradlew
+COPY data-reporting-service /usr/src/data-reporting-service
 
-#cd to person-service
-WORKDIR /usr/src/data-reporting-service/person-service
+#cd to data-reporting-service
+WORKDIR /usr/src/data-reporting-service/
 
 #Build person service along with any required libraries
-RUN ./gradlew buildNeeded -x test --no-daemon
+RUN ./gradlew :person-service:buildNeeded -x test --no-daemon
 FROM amazoncorretto:17
 COPY --from=builder /usr/src/data-reporting-service/person-service/build/libs/person-service*.jar person-service.jar
 

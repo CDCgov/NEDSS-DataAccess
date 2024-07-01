@@ -1,15 +1,13 @@
 # Build the post processing service docker image
 FROM amazoncorretto:17 as builder
 #Copy sources
-COPY data-reporting-service/post-processing-service /usr/src/data-reporting-service/post-processing-service
-COPY gradle /usr/src/data-reporting-service/gradle
-COPY gradlew /usr/src/data-reporting-service/gradlew
+COPY data-reporting-service /usr/src/data-reporting-service
 
-#cd to post-processing-service
-WORKDIR /usr/src/data-reporting-service/post-processing-service
+#Set the Working Directory
+WORKDIR /usr/src/data-reporting-service/
 
 #Build post-processing service along with any required libraries
-RUN ./gradlew buildNeeded -x test --no-daemon
+RUN ./gradlew :post-processing-service:buildNeeded -x test --no-daemon
 FROM amazoncorretto:17
 COPY --from=builder /usr/src/data-reporting-service/post-processing-service/build/libs/post-processing-service*.jar post-processing-service.jar
 

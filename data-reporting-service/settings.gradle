@@ -9,3 +9,7 @@ include 'organization-service'
 include 'investigation-service'
 
 include 'observation-service'
+
+include 'post-processing-service'
+
+include 'ldfdata-service'
