@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.cdc.etldatapipeline.organization.model.dto.org.OrganizationSp;
 import gov.cdc.etldatapipeline.organization.model.dto.orgdetails.*;
-import gov.cdc.etldatapipeline.organization.utils.UtilHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class OrganizationDataProcessTests {
     private final ObjectMapper objectMapper = new ObjectMapper();
-    UtilHelper utilHelper = UtilHelper.getInstance();
     OrganizationSp orgSp;
 
     @BeforeEach
@@ -22,8 +20,8 @@ public class OrganizationDataProcessTests {
     }
 
     @Test
-    public void OrganizationNameProcessTest() {
-        Name[] name = utilHelper.deserializePayload(orgSp.getOrganizationName(), Name[].class);
+    public void OrganizationNameProcessTest() throws JsonProcessingException {
+        Name[] name = objectMapper.readValue(orgSp.getOrganizationName(), Name[].class);
         Name expected = Name.builder()
                 .onOrgUid(10036000L)
                 .organizationName("Autauga County Health Department")
@@ -33,8 +31,8 @@ public class OrganizationDataProcessTests {
     }
 
     @Test
-    public void OrganizationAddressProcessTest() {
-        Address[] addr = utilHelper.deserializePayload(orgSp.getOrganizationAddress(), Address[].class);
+    public void OrganizationAddressProcessTest() throws JsonProcessingException {
+        Address[] addr = objectMapper.readValue(orgSp.getOrganizationAddress(), Address[].class);
         Address expected = Address.builder()
                 .addrElpCd("O")
                 .addrElpUseCd("WP")
@@ -55,8 +53,8 @@ public class OrganizationDataProcessTests {
     }
 
     @Test
-    public void OrganizationPhoneProcessTest() {
-        Phone[] phn = utilHelper.deserializePayload(orgSp.getOrganizationTelephone(), Phone[].class);
+    public void OrganizationPhoneProcessTest() throws JsonProcessingException {
+        Phone[] phn = objectMapper.readValue(orgSp.getOrganizationTelephone(), Phone[].class);
         Phone expected = Phone.builder()
                 .phTlUid(10615102L)
                 .phElpCd("PH")
@@ -72,8 +70,8 @@ public class OrganizationDataProcessTests {
     }
 
     @Test
-    public void OrganizationEntityProcessTest() {
-        Entity[] ets = utilHelper.deserializePayload(orgSp.getOrganizationEntityId(), Entity[].class);
+    public void OrganizationEntityProcessTest() throws JsonProcessingException {
+        Entity[] ets = objectMapper.readValue(orgSp.getOrganizationEntityId(), Entity[].class);
         Entity expected = Entity.builder()
                 .entityUid(10036000L)
                 .typeCd("FI")
@@ -88,8 +86,8 @@ public class OrganizationDataProcessTests {
     }
 
     @Test
-    public void OrganizationFaxProcessTest() {
-        Fax[] fax = utilHelper.deserializePayload(orgSp.getOrganizationFax(), Fax[].class);
+    public void OrganizationFaxProcessTest() throws JsonProcessingException {
+        Fax[] fax = objectMapper.readValue(orgSp.getOrganizationFax(), Fax[].class);
         Fax expected = Fax.builder()
                 .faxTlUid(1002L)
                 .faxElpCd("fax-cd-1002")
