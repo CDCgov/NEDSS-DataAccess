@@ -74,7 +74,7 @@ public class OrganizationService {
             JsonNode jsonNode = objectMapper.readTree(message);
             JsonNode payloadNode = jsonNode.get("payload").path("after");
             if (payloadNode != null && payloadNode.has("organization_uid")) {
-                String organizationUid = payloadNode.get("observation_uid").asText();
+                String organizationUid = payloadNode.get("organization_uid").asText();
                 log.info("Received OrganizationUid: {} from topic: {}", organizationUid, topic);
                 Set<OrganizationSp> organizations = orgRepository.computeAllOrganizations(organizationUid);
 
