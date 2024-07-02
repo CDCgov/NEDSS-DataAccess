@@ -1,44 +1,66 @@
 CREATE OR ALTER PROCEDURE dbo.sp_observation_event @obs_id_list nvarchar(max)
-AS 
+AS
 BEGIN
-	
+
 BEGIN TRY
+
+	DECLARE @batch_id BIGINT;
+	SET @batch_id = cast((format(getdate(),'yyMMddHHmmss')) as bigint)
+	INSERT INTO [rdb].[dbo].[job_flow_log] (
+		batch_id
+		,[Dataflow_Name]
+		,[package_Name]
+		,[Status_Type]
+		,[step_number]
+		,[step_name]
+		,[row_count]
+		)
+	VALUES (
+		@batch_id
+		,'Observation Pre-Processing Event'
+		,'NBS_ODSE.sp_observation_event'
+		,'START'
+		,0
+		,LEFT('Pre ID-' + @obs_id_list,199)
+		,0
+		);
+
 SELECT
-  act.act_uid,
-  act.class_cd,
-  act.mood_cd,
-  results.*
+    act.act_uid,
+    act.class_cd,
+    act.mood_cd,
+    results.*
 FROM
-  (
-    SELECT
-      o.observation_uid,o.obs_domain_cd_st_1 ,
-      o.cd_desc_txt,
-      o.record_status_cd,
-      o.program_jurisdiction_oid,
-      o.prog_area_cd,
-      o.jurisdiction_cd,
-      o.pregnant_ind_cd,
-      o.local_id local_id,
-      o.activity_to_time,
-      o.effective_from_time,
-      o.rpt_to_state_time,
-      o.electronic_ind,
-      o.version_ctrl_nbr,
-      o.add_user_id,
-      case when o.add_user_id > 0 then (select * from dbo.fn_get_user_name(o.add_user_id))
-  	  end as add_user_name,
-      o.last_chg_user_id ,
-      case when o.last_chg_user_id > 0 then (select * from dbo.fn_get_user_name(o.last_chg_user_id))
-  	  end as last_chg_user_name,
-      o.add_time add_time,
-      o.last_chg_time last_chg_time,      
-      nesteddata.person_participations,
-      nesteddata.organization_participations,
-      nesteddata.material_participations,
-      nesteddata.followup_observations,
-      nesteddata.act_ids
-    FROM
-      Observation o WITH (NOLOCK) OUTER apply (
+    (
+        SELECT
+            o.observation_uid,o.obs_domain_cd_st_1 ,
+            o.cd_desc_txt,
+            o.record_status_cd,
+            o.program_jurisdiction_oid,
+            o.prog_area_cd,
+            o.jurisdiction_cd,
+            o.pregnant_ind_cd,
+            o.local_id local_id,
+            o.activity_to_time,
+            o.effective_from_time,
+            o.rpt_to_state_time,
+            o.electronic_ind,
+            o.version_ctrl_nbr,
+            o.add_user_id,
+            case when o.add_user_id > 0 then (select * from dbo.fn_get_user_name(o.add_user_id))
+                end as add_user_name,
+            o.last_chg_user_id ,
+            case when o.last_chg_user_id > 0 then (select * from dbo.fn_get_user_name(o.last_chg_user_id))
+                end as last_chg_user_name,
+            o.add_time add_time,
+            o.last_chg_time last_chg_time,
+            nesteddata.person_participations,
+            nesteddata.organization_participations,
+            nesteddata.material_participations,
+            nesteddata.followup_observations,
+            nesteddata.act_ids
+        FROM
+            Observation o WITH (NOLOCK) OUTER apply (
         SELECT
           *
         FROM
@@ -166,21 +188,58 @@ FROM
               ) AS act_ids
           ) AS act_ids
       ) AS nesteddata
-    WHERE
-     o.observation_uid in (SELECT value FROM STRING_SPLIT(@obs_id_list, ','))
-  ) as results
-  JOIN act WITH (NOLOCK) ON results.observation_uid = act.act_uid;
- 
+        WHERE
+            o.observation_uid in (SELECT value FROM STRING_SPLIT(@obs_id_list, ','))
+    ) as results
+        JOIN act WITH (NOLOCK) ON results.observation_uid = act.act_uid;
+
+INSERT INTO [rdb].[dbo].[job_flow_log] (
+                                         batch_id
+    ,[Dataflow_Name]
+    ,[package_Name]
+    ,[Status_Type]
+    ,[step_number]
+    ,[step_name]
+    ,[row_count]
+)
+VALUES (
+    @batch_id
+        ,'Observation Pre-Processing Event'
+        ,'NBS_ODSE.sp_observation_event'
+        ,'COMPLETE'
+        ,0
+        ,LEFT('Pre ID-' + @obs_id_list,199)
+        ,0
+    );
+
 END TRY
 
 BEGIN CATCH
-     
-     IF @@TRANCOUNT > 0   ROLLBACK TRANSACTION;
-  
-    	DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE(); 
 
-      	return @ErrorMessage;
+IF @@TRANCOUNT > 0   ROLLBACK TRANSACTION;
+
+    	DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
+INSERT INTO [rdb].[dbo].[job_flow_log] (
+                                         batch_id
+    ,[Dataflow_Name]
+    ,[package_Name]
+    ,[Status_Type]
+    ,[step_number]
+    ,[step_name]
+    ,[row_count]
+)
+VALUES (
+    @batch_id
+        ,'Observation Pre-Processing Event'
+        ,'NBS_ODSE.sp_observation_event'
+        ,'ERROR: ' + @ErrorMessage
+        ,0
+        ,LEFT('Pre ID-' + @obs_id_list,199)
+        ,0
+    );
+
+return @ErrorMessage;
 
 END CATCH
-	
+
 END;
