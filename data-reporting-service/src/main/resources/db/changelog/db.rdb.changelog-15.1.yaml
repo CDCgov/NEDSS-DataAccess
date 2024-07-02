@@ -210,6 +210,13 @@ databaseChangeLog:
             path: src/main/resources/db/rdb/029-sp_page_builder_postprocessing-001.sql
             splitStatements: false
   - changeSet:
+      id: 30
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/030-sp_f_page_case_postprocessing-001.sql
+            splitStatements: false
+  - changeSet:
       id: 31
       author: liquibase
       changes:
