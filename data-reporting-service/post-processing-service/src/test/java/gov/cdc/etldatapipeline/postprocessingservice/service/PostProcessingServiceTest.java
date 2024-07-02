@@ -7,6 +7,8 @@ import gov.cdc.etldatapipeline.postprocessingservice.repository.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -54,6 +56,19 @@ class PostProcessingServiceTest {
         logger.detachAppender(listAppender);
     }
 
+    @ParameterizedTest
+    @CsvSource({
+            "dummy_patient, '{\"payload\":{\"patient_uid\":123}}', 123",
+            "dummy_provider, '{\"payload\":{\"provider_uid\":123}}', 123",
+            "dummy_organization, '{\"payload\":{\"organization_uid\":123}}', 123",
+            "dummy_investigation, '{\"payload\":{\"public_health_case_uid\":123}}', 123",
+            "dummy_notifications, '{\"payload\":{\"notification_uid\":123}}', 123"
+    })
+    void testExtractIdFromMessage(String topic, String messageKey, Long expectedId) {
+        Long extractedId = postProcessingServiceMock.extractIdFromMessage(topic, messageKey, messageKey);
+        assertEquals(expectedId, extractedId);
+    }
+
     @Test
     void testPostProcessPatientMessage() {
         String topic = "dummy_patient";
@@ -69,16 +84,6 @@ class PostProcessingServiceTest {
         List<ILoggingEvent> logs = listAppender.list;
         assertEquals(3, logs.size());
         assertTrue(logs.get(2).getMessage().contains(PostProcessingService.SP_EXECUTION_COMPLETED));
-    }
-
-    @Test
-    void testExtractIdFromPatientMessage() {
-        String topic = "dummy_patient";
-        String messageKey = "{\"payload\":{\"patient_uid\":123}}";
-        Long expectedId = 123L;
-        Long extractedId = postProcessingServiceMock.extractIdFromMessage(topic, messageKey, messageKey);
-
-        assertEquals(expectedId, extractedId);
     }
 
     @Test
@@ -99,16 +104,6 @@ class PostProcessingServiceTest {
     }
 
     @Test
-    void testExtractIdFromProviderMessage() {
-        String topic = "dummy_provider";
-        String messageKey = "{\"payload\":{\"provider_uid\":123}}";
-        Long expectedId = 123L;
-        Long extractedId = postProcessingServiceMock.extractIdFromMessage(topic, messageKey, messageKey);
-
-        assertEquals(expectedId, extractedId);
-    }
-
-    @Test
     void testPostProcessOrganizationMessage() {
         String topic = "dummy_organization";
         String key = "{\"payload\":{\"organization_uid\":123}}";
@@ -123,16 +118,6 @@ class PostProcessingServiceTest {
         List<ILoggingEvent> logs = listAppender.list;
         assertEquals(3, logs.size());
         assertTrue(logs.get(2).getMessage().contains(PostProcessingService.SP_EXECUTION_COMPLETED));
-    }
-
-    @Test
-    void testExtractIdFromOrganizationMessage() {
-        String topic = "dummy_organization";
-        String messageKey = "{\"payload\":{\"organization_uid\":123}}";
-        Long expectedId = 123L;
-        Long extractedId = postProcessingServiceMock.extractIdFromMessage(topic, messageKey, messageKey);
-
-        assertEquals(expectedId, extractedId);
     }
 
     @Test
@@ -154,16 +139,6 @@ class PostProcessingServiceTest {
     }
 
     @Test
-    void testExtractIdFromInvestigationMessage() {
-        String topic = "dummy_investigation";
-        String messageKey = "{\"payload\":{\"public_health_case_uid\":123}}";
-        Long expectedId = 123L;
-        Long extractedId = postProcessingServiceMock.extractIdFromMessage(topic, messageKey, messageKey);
-
-        assertEquals(expectedId, extractedId);
-    }
-
-    @Test
     void testPostProcessNotificationMessage() {
         String topic = "dummy_notifications";
         String key = "{\"payload\":{\"notification_uid\":123}}";
@@ -178,16 +153,6 @@ class PostProcessingServiceTest {
         List<ILoggingEvent> logs = listAppender.list;
         assertEquals(3, logs.size());
         assertTrue(logs.get(2).getMessage().contains(PostProcessingService.SP_EXECUTION_COMPLETED));
-    }
-
-    @Test
-    void testExtractIdFromNotificationMessage() {
-        String topic = "dummy_notifications";
-        String messageKey = "{\"payload\":{\"notification_uid\":123}}";
-        Long expectedId = 123L;
-        Long extractedId = postProcessingServiceMock.extractIdFromMessage(topic, messageKey, messageKey);
-
-        assertEquals(expectedId, extractedId);
     }
 
     @Test
