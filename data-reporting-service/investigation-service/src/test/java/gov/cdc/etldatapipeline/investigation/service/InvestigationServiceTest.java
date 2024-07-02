@@ -20,7 +20,6 @@ import java.util.Optional;
 import static gov.cdc.etldatapipeline.commonutil.TestUtils.readFileData;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 class InvestigationServiceTest {
@@ -53,7 +52,7 @@ class InvestigationServiceTest {
     }
 
     @Test
-    public void testProcessMessage() {
+    void testProcessMessage() {
         String investigationTopic = "Investigation";
         String investigationTopicOutput = "InvestigationOutput";
 
@@ -61,11 +60,11 @@ class InvestigationServiceTest {
         String payload = "{\"payload\": {\"after\": {\"public_health_case_uid\": \"" + investigationUid + "\"}}}";
 
         final Investigation investigation = constructInvestigation(investigationUid);
-        when(investigationRepository.computeInvestigations(eq(String.valueOf(investigationUid)))).thenReturn(Optional.of(investigation));
+        when(investigationRepository.computeInvestigations(String.valueOf(investigationUid))).thenReturn(Optional.of(investigation));
 
         validateData(investigationTopic, investigationTopicOutput, payload, investigation);
 
-        verify(investigationRepository).computeInvestigations(eq(String.valueOf(investigationUid)));
+        verify(investigationRepository).computeInvestigations(String.valueOf(investigationUid));
     }
 
     private void validateData(String inputTopicName, String outputTopicName,
@@ -74,10 +73,9 @@ class InvestigationServiceTest {
         final var investigationService = getInvestigationService(inputTopicName, outputTopicName);
         investigationService.processMessage(payload, inputTopicName);
 
-        final InvestigationReporting reportingModel = constructInvestigationReporting(investigation.getPublicHealthCaseUid());
         InvestigationKey investigationKey = new InvestigationKey();
         investigationKey.setPublicHealthCaseUid(investigation.getPublicHealthCaseUid());
-        investigationKey.setRdbTableNameList(reportingModel.getRdbTableNameList());
+        final InvestigationReporting reportingModel = constructInvestigationReporting(investigation.getPublicHealthCaseUid());
 
         String expectedKey = jsonGenerator.generateStringJson(investigationKey);
         String expectedValue = jsonGenerator.generateStringJson(reportingModel);
@@ -87,7 +85,6 @@ class InvestigationServiceTest {
         assertEquals(expectedKey, keyCaptor.getValue());
         assertEquals(expectedValue, messageCaptor.getValue());
         assertTrue(keyCaptor.getValue().contains(String.valueOf(investigationKey.getPublicHealthCaseUid())));
-        assertTrue(keyCaptor.getValue().contains(String.valueOf(investigationKey.getRdbTableNameList())));
     }
 
     private InvestigationService getInvestigationService(String inputTopicName, String outputTopicName) {
