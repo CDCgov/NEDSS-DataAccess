@@ -1,0 +1,28 @@
+{
+  "name": "nbs-cdc-debezium-connector-04-24-24",
+  "config": {
+    "snapshot.mode": "schema_only",
+    "connector.class": "io.debezium.connector.sqlserver.SqlServerConnector",
+    "database.hostname": "",
+    "database.port": "1433",
+    "database.user": "nbs_ods",
+    "database.password": "ods",
+    "database.dbname": "nbs_odse",
+    "database.server.name": "SQLAzure",
+    "tasks.max": "1",
+    "decimal.handling.mode": "string",
+    "table.include.list": "Sales.Orders,Warehouse.StockItems",
+    "include.schema.changes": true,
+    "topic.prefix": "cdc",
+    "topic.creation.default.partitions":"10",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable":true,
+    "snapshot.lock.timeout.ms": "2400000",
+    "transform": "dropPrefix",
+    "transforms.dropPrefix.regex": "cdc\\.NBS_ODSE\\.dbo\\.(.+)",
+    "transforms.dropPrefix.replacement": "nbs_$1",
+    "tombstones.on.delete": false,
+    "database.history": "io.debezium.relational.history.MemoryDatabaseHistory"
+  }
+}
