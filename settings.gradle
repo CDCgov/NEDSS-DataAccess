@@ -1,3 +1,17 @@
 rootProject.name = 'data-access-service'
 
 include 'data-reporting-service'
+
+include 'common-util'
+
+include 'person-service'
+
+include 'organization-service'
+
+include 'investigation-service'
+
+include 'observation-service'
+
+include 'post-processing-service'
+
+include 'ldfdata-service'
