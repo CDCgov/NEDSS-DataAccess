@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="PersonServiceApplication_RDS" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <envs>
+      <env name="DA_LOG_PATH" value="logs" />
+      <env name="DB_ODSE" value="nbs_odse" />
+      <env name="DB_PASSWORD" value="" />
+      <env name="DB_URL" value="cdc-nbs-legacy-rds-mssql.czya31goozkz.us-east-1.rds.amazonaws.com" />
+      <env name="DB_USERNAME" value="" />
+    </envs>
+    <module name="data-access-service.person-service.main" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="gov.cdc.etldatapipeline.person.PersonServiceApplication" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

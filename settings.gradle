@@ -15,3 +15,5 @@ include 'observation-service'
 include 'post-processing-service'
 
 include 'ldfdata-service'
+
+include 'status-service'
