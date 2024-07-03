@@ -6,8 +6,7 @@ on:
       - master
       - rel-**
 #       Uncomment the following line only to test the build deploy from private branches.
-      - CNDIT-*
-      - dead-letter-topic-bug-fix
+#      - CNDIT-*
     paths-ignore:
       - "docker-compose.yml"
       - "**.md"
