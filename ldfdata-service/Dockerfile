@@ -15,7 +15,7 @@ WORKDIR /usr/src/
 #Build person service along with any required libraries
 RUN ./gradlew :ldfdata-service:buildNeeded -x test --no-daemon
 FROM amazoncorretto:17
-COPY --from=builder /usr/src/ldfdata-service/build/libs/ldfdata-service*.jar investigation-service.jar
+COPY --from=builder /usr/src/ldfdata-service/build/libs/ldfdata-service*.jar ldfdata-service.jar
 
 # Run jar
 ENTRYPOINT ["java", "-jar", "ldfdata-service.jar"]

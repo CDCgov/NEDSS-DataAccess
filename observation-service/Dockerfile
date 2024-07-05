@@ -15,7 +15,7 @@ WORKDIR /usr/src/
 #Build person service along with any required libraries
 RUN ./gradlew :observation-service:buildNeeded -x test --no-daemon
 FROM amazoncorretto:17
-COPY --from=builder /usr/src/observation-service/build/libs/observation-service*.jar investigation-service.jar
+COPY --from=builder /usr/src/observation-service/build/libs/observation-service*.jar observation-service.jar
 
 # Run jar
 ENTRYPOINT ["java", "-jar", "observation-service.jar"]
