@@ -4,13 +4,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import gov.cdc.etldatapipeline.postprocessingservice.repository.*;
-import gov.cdc.etldatapipeline.postprocessingservice.repository.model.InvestigationResult;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -53,9 +53,11 @@ public class PostProcessingService {
             "${spring.kafka.topic.provider}",
             "${spring.kafka.topic.notification}"
     })
-    public void postProcessMessage(@Header(KafkaHeaders.RECEIVED_KEY) String key,
-                                   @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
-        Long id = extractIdFromMessage(key, topic);
+    public void postProcessMessage(
+            @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
+            @Header(KafkaHeaders.RECEIVED_KEY) String key,
+            @Payload String payload) {
+        Long id = extractIdFromMessage(topic, key, payload);
         if (id != null) {
             idCache.computeIfAbsent(topic, k -> new CopyOnWriteArrayList<>()).add(id);
         }
@@ -98,31 +100,32 @@ public class PostProcessingService {
         }
     }
 
-    Long extractIdFromMessage(String messageKey, String topic) {
+    Long extractIdFromMessage(String topic, String messageKey, String payload) {
         Long id = null;
         try {
             ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-            JsonNode jsonNode = objectMapper.readTree(messageKey);
+            JsonNode keyNode = objectMapper.readTree(messageKey);
+            JsonNode payloadNode = objectMapper.readTree(payload);
             logger.info("Got this key payload: {} from the topic: {}", messageKey, topic);
             if(topic.contains(PATIENT)) {
-                id = jsonNode.get(PAYLOAD).get("patient_uid").asLong();
+                id = keyNode.get(PAYLOAD).get("patient_uid").asLong();
 
             }
             if(topic.contains(PROVIDER)) {
-                id = jsonNode.get(PAYLOAD).get("provider_uid").asLong();
+                id = keyNode.get(PAYLOAD).get("provider_uid").asLong();
             }
             if(topic.contains(ORGANIZATION)) {
-                id = jsonNode.get(PAYLOAD).get("organization_uid").asLong();
+                id = keyNode.get(PAYLOAD).get("organization_uid").asLong();
             }
             if(topic.contains(INVESTIGATION)) {
-                id = jsonNode.get(PAYLOAD).get("public_health_case_uid").asLong();
-                JsonNode tblNode = jsonNode.get(PAYLOAD).get("rdb_table_name_list");
+                id = keyNode.get(PAYLOAD).get("public_health_case_uid").asLong();
+                JsonNode tblNode = payloadNode.get(PAYLOAD).get("rdb_table_name_list");
                 if (tblNode != null && !tblNode.isNull()) {
                     idVals.put(id, tblNode.asText());
                 }
             }
             if(topic.contains(NOTIFICATIONS)) {
-                id = jsonNode.get(PAYLOAD).get("notification_uid").asLong();
+                id = keyNode.get(PAYLOAD).get("notification_uid").asLong();
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

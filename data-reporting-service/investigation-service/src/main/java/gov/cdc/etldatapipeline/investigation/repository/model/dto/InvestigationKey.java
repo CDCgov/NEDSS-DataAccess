@@ -11,7 +11,4 @@ public class InvestigationKey {
     @NonNull
     @JsonProperty("public_health_case_uid")
     private Long publicHealthCaseUid;
-
-    @JsonProperty("rdb_table_name_list")
-    private String rdbTableNameList;
 }
