@@ -11,7 +11,7 @@ BEGIN TRY
 		declare @batch_id bigint;
 		declare @create_dttm datetime2(7) = current_timestamp ;
 		declare @update_dttm datetime2(7) = current_timestamp ;
-		declare @dataflow_name varchar(200) = 'Organization Post-Processing';
+		declare @dataflow_name varchar(200) = 'Organization POST-Processing';
 		declare @package_name varchar(200) = 'sp_nrt_organization_postprocessing';
 
 		set @batch_id = cast((format(getdate(),'yyMMddHHmmss')) as bigint);
@@ -37,11 +37,11 @@ VALUES (
         ,'START'
         ,0
         ,'SP_Start'
-        ,LEFT('ID List-' + @id_list,500)
+        ,LEFT(@id_list,500)
         ,0
     );
 
-SET @proc_step_name='Create ORGANIZATION Temp table';
+SET @proc_step_name='Create ORGANIZATION Temp table for -'+ LEFT(@id_list,165);
 		SET @proc_step_no = 1;
 
         /* Temp organization table creation*/
@@ -83,7 +83,8 @@ where nrt.organization_uid in (SELECT value FROM STRING_SPLIT(@id_list, ','));
 
 /* Logging */
 set @rowcount=@@rowcount
-	   INSERT INTO [dbo].[job_flow_log] (
+	   INSERT INTO [dbo].[job_flow_log]
+	   		(
 				batch_id
 				,[Dataflow_Name]
 				,[package_Name]
@@ -91,6 +92,7 @@ set @rowcount=@@rowcount
 				,[step_number]
 				,[step_name]
 				,[row_count]
+				,[msg_description1]
 				)
 		VALUES (
 				@batch_id
@@ -100,6 +102,7 @@ set @rowcount=@@rowcount
 				,@proc_step_no
 				,@proc_step_name
 				,@rowcount
+				,LEFT(@id_list,500)
 				);
 
 
@@ -145,7 +148,8 @@ set	[ORGANIZATION_KEY]             = org.ORGANIZATION_KEY,
 
         /* Logging */
         set @rowcount=@@rowcount
-        INSERT INTO [dbo].[job_flow_log] (
+        INSERT INTO [dbo].[job_flow_log]
+        (
 			batch_id
 			,[Dataflow_Name]
 			,[package_Name]
@@ -153,6 +157,7 @@ set	[ORGANIZATION_KEY]             = org.ORGANIZATION_KEY,
 			,[step_number]
 			,[step_name]
 			,[row_count]
+			,[msg_description1]
 			)
 		VALUES (
 			@batch_id
@@ -162,6 +167,7 @@ set	[ORGANIZATION_KEY]             = org.ORGANIZATION_KEY,
 			,@proc_step_no
 			,@proc_step_name
 			,@rowcount
+			,LEFT(@id_list,500)
 			);
 
 		SET @proc_step_name='Insert into D_ORAGANIZATION Dimension';
@@ -268,7 +274,7 @@ VALUES
         ,@Proc_Step_no
         , 'Step -' +CAST(@Proc_Step_no AS VARCHAR(3))+' -' +CAST(ERROR_MESSAGE() AS VARCHAR(500))
         ,0
-        ,LEFT('ID List-' + @id_list,500)
+        ,LEFT(@id_list,500)
     );
 
 return ERROR_MESSAGE();
@@ -284,6 +290,7 @@ set @rowcount=@@rowcount
 			,[step_number]
 			,[step_name]
 			,[row_count]
+			,[msg_description1]
 			)
 		VALUES (
 			@batch_id
@@ -293,6 +300,7 @@ set @rowcount=@@rowcount
 			,@proc_step_no
 			,@proc_step_name
 			,@rowcount
+			,LEFT(@id_list,500)
 			);
 
 select 'Success';
@@ -325,7 +333,7 @@ VALUES (
         ,@proc_step_no
         ,@proc_step_name
         ,0
-        ,LEFT('ID List-' + @id_list,500)
+        ,LEFT(@id_list,500)
     );
 
 END TRY
@@ -360,7 +368,7 @@ VALUES
         ,@Proc_Step_no
         , 'Step -' +CAST(@Proc_Step_no AS VARCHAR(3))+' -' +CAST(@ErrorMessage AS VARCHAR(500))
         ,0
-        ,LEFT('ID List-' + @id_list,500)
+        ,LEFT(@id_list,500)
     );
 
 return @ErrorMessage;

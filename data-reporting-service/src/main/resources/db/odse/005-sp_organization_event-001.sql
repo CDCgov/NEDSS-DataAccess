@@ -1,27 +1,30 @@
 CREATE OR ALTER PROCEDURE dbo.sp_organization_event @org_id_list nvarchar(max)
 AS
 Begin
-		DECLARE @batch_id BIGINT;
 
 BEGIN TRY
-SET @batch_id = cast((format(getdate(),'yyMMddHHmmss')) as bigint);
-INSERT INTO [rdb].[dbo].[job_flow_log] (
-                                         batch_id
+ 	DECLARE @batch_id BIGINT;
+ 	SET @batch_id = cast((format(getdate(),'yyMMddHHmmss')) as bigint);
+INSERT INTO [rdb].[dbo].[job_flow_log]
+(
+      batch_id
     ,[Dataflow_Name]
     ,[package_Name]
     ,[Status_Type]
     ,[step_number]
     ,[step_name]
     ,[row_count]
+    ,[Msg_Description1]
 )
 VALUES (
     @batch_id
-        ,'Organization Pre-Processing Event'
+        ,'Organization PRE-Processing Event'
         ,'NBS_ODSE.sp_organization_event'
         ,'START'
         ,0
         ,LEFT('Pre ID-' + @org_id_list,199)
         ,0
+        ,LEFT(@org_id_list,199)
     );
 
 SELECT o.organization_uid,
@@ -120,7 +123,7 @@ FROM NBS_ODSE.dbo.Organization o WITH (NOLOCK)
                                        FOR json path, INCLUDE_NULL_VALUES) AS fax) AS fax,
                               -- Entity id
                               (SELECT (SELECT ei.entity_uid,
-                                              ei.type_cd          AS [type_cd],
+                      ei.type_cd          AS [type_cd],
                                               ei.record_status_cd AS [record_status_cd],
                                               STRING_ESCAPE(
                                                       REPLACE(REPLACE(ei.root_extension_txt, '-', ''), ' ', ''),
@@ -138,23 +141,26 @@ FROM NBS_ODSE.dbo.Organization o WITH (NOLOCK)
              LEFT JOIN nbs_srte.dbo.NAICS_INDUSTRY_CODE naics ON (NAICS.CODE = o.STANDARD_INDUSTRY_CLASS_CD)
 WHERE o.organization_uid in (SELECT value FROM STRING_SPLIT(@org_id_list, ','))
 
-INSERT INTO [rdb].[dbo].[job_flow_log] (
-                                         batch_id
+INSERT INTO [rdb].[dbo].[job_flow_log]
+(
+      batch_id
     ,[Dataflow_Name]
     ,[package_Name]
     ,[Status_Type]
     ,[step_number]
     ,[step_name]
     ,[row_count]
+    ,[Msg_Description1]
 )
 VALUES (
     @batch_id
-        ,'Organization Pre-Processing Event'
+        ,'Organization PRE-Processing Event'
         ,'NBS_ODSE.sp_organization_event'
         ,'COMPLETE'
         ,0
         ,LEFT('Pre ID-' + @org_id_list,199)
         ,0
+        ,LEFT(@org_id_list,199)
     );
 
 end try
@@ -173,15 +179,17 @@ INSERT INTO [rdb].[dbo].[job_flow_log] (
     ,[step_number]
     ,[step_name]
     ,[row_count]
+    ,[Msg_Description1]
 )
 VALUES (
     @batch_id
-        ,'Organization Pre-Processing Event'
+        ,'Organization PRE-Processing Event'
         ,'NBS_ODSE.sp_organization_event'
         ,'ERROR: ' + @ErrorMessage
         ,0
         ,LEFT('Pre ID-' + @org_id_list,199)
         ,0
+        ,LEFT(@org_id_list,199)
     );
 return @ErrorMessage;
 

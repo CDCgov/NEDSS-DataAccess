@@ -11,13 +11,14 @@ BEGIN TRY
 	declare @batch_id bigint;
 	declare @create_dttm datetime2(7) = current_timestamp ;
 	declare @update_dttm datetime2(7) = current_timestamp ;
-	declare @dataflow_name varchar(200) = 'Investigation Post-Processing';
+	declare @dataflow_name varchar(200) = 'Investigation POST-Processing';
 	declare @package_name varchar(200) = 'sp_nrt_investigation_postprocessing';
 
 	set @batch_id = cast((format(getdate(),'yyMMddHHmmss')) as bigint);
 
-INSERT INTO [dbo].[job_flow_log] (
-                                   batch_id
+INSERT INTO [dbo].[job_flow_log]
+(
+      batch_id
     ,[create_dttm]
     ,[update_dttm]
     ,[Dataflow_Name]
@@ -37,11 +38,11 @@ VALUES (
         ,'START'
         ,0
         ,'SP_Start'
-        ,LEFT('ID List-' + @id_list,500)
+        ,LEFT(@id_list,500)
         ,0
     );
 
-SET @proc_step_name='Create INVESTIGATION Temp table';
+SET @proc_step_name='Create INVESTIGATION Temp table -'+ LEFT(@id_list,160);
 	SET @proc_step_no = 1;
 
 	/* Temp investigation table creation*/
@@ -129,7 +130,8 @@ where
 
 /* Logging */
 set @rowcount=@@rowcount
-	INSERT INTO [dbo].[job_flow_log] (
+	INSERT INTO [dbo].[job_flow_log]
+		(
 			batch_id
 			,[Dataflow_Name]
 			,[package_Name]
@@ -137,6 +139,7 @@ set @rowcount=@@rowcount
 			,[step_number]
 			,[step_name]
 			,[row_count]
+			,[msg_description1]
 			)
 		VALUES (
 			@batch_id
@@ -146,6 +149,7 @@ set @rowcount=@@rowcount
 			,@proc_step_no
 			,@proc_step_name
 			,@rowcount
+			,LEFT(@id_list,500)
 			);
 
 	/* Investigation Update Operation */
@@ -229,7 +233,8 @@ from #temp_inv_table inv
 
 /* Logging */
 set @rowcount=@@rowcount
-	INSERT INTO [dbo].[job_flow_log] (
+	INSERT INTO [dbo].[job_flow_log]
+			(
 			batch_id
 			,[Dataflow_Name]
 			,[package_Name]
@@ -237,6 +242,7 @@ set @rowcount=@@rowcount
 			,[step_number]
 			,[step_name]
 			,[row_count]
+			,[msg_description1]
 			)
 		VALUES (
 			@batch_id
@@ -246,6 +252,7 @@ set @rowcount=@@rowcount
 			,@proc_step_no
 			,@proc_step_name
 			,@rowcount
+			,LEFT(@id_list,500)
 			);
 
 
@@ -404,7 +411,8 @@ where inv.investigation_key is null;
 
 /* Logging */
 set @rowcount=@@rowcount
-		INSERT INTO [dbo].[job_flow_log] (
+		INSERT INTO [dbo].[job_flow_log]
+		(
 			batch_id
 			,[Dataflow_Name]
 			,[package_Name]
@@ -412,6 +420,7 @@ set @rowcount=@@rowcount
 			,[step_number]
 			,[step_name]
 			,[row_count]
+			,[msg_description1]
 			)
 		VALUES (
 			@batch_id
@@ -421,6 +430,7 @@ set @rowcount=@@rowcount
 			,@proc_step_no
 			,@proc_step_name
 			,@rowcount
+			,LEFT(@id_list,500)
 			);
 
 
@@ -461,7 +471,8 @@ set cmg.CONFIRMATION_DT = cmt.CONFIRMATION_DT
 
 /*Logging*/
 set @rowcount=@@rowcount
-		INSERT INTO [dbo].[job_flow_log] (
+		INSERT INTO [dbo].[job_flow_log]
+			(
 			batch_id
 			,[Dataflow_Name]
 			,[package_Name]
@@ -469,6 +480,7 @@ set @rowcount=@@rowcount
 			,[step_number]
 			,[step_name]
 			,[row_count]
+			,[msg_description1]
 			)
 		VALUES (
 			@batch_id
@@ -478,6 +490,7 @@ set @rowcount=@@rowcount
 			,@proc_step_no
 			,@proc_step_name
 			,@rowcount
+			,LEFT(@id_list,500)
 			);
 
 
@@ -493,30 +506,28 @@ insert into dbo.nrt_confirmation_method_key(confirmation_method_cd)
 select distinct confirmation_method_cd
 from #temp_cm_table cmt
 where CONFIRMATION_METHOD_KEY is null
-  and cmt.confirmation_method_cd not in (select confirmation_method_cd from dbo.confirmation_method)
-  --order by INVESTIGATION_KEY;
+  and cmt.confirmation_method_cd not in (select confirmation_method_cd from dbo.confirmation_method);
 
-
-    /* Insert confirmation_method */
-    Insert into dbo.confirmation_method(CONFIRMATION_METHOD_KEY,confirmation_method_cd,CONFIRMATION_METHOD_DESC)
+/* Insert confirmation_method */
+Insert into dbo.confirmation_method(CONFIRMATION_METHOD_KEY,confirmation_method_cd,CONFIRMATION_METHOD_DESC)
 Select distinct cmk.D_CONFIRMATION_METHOD_KEY, cmt.confirmation_method_cd, cmt.CONFIRMATION_METHOD_DESC_TXT
 from #temp_cm_table cmt
          join dbo.nrt_confirmation_method_key cmk on cmk.confirmation_method_cd = cmt.confirmation_method_cd
 where cmt.CONFIRMATION_METHOD_KEY is  null
-  and cmt.confirmation_method_cd not in (select confirmation_method_cd from dbo.confirmation_method)
+  and cmt.confirmation_method_cd not in (select confirmation_method_cd from dbo.confirmation_method);
 
 
-    insert into dbo.CONFIRMATION_METHOD_GROUP ([INVESTIGATION_KEY],	[CONFIRMATION_METHOD_KEY],[CONFIRMATION_DT])
+insert into dbo.CONFIRMATION_METHOD_GROUP ([INVESTIGATION_KEY],	[CONFIRMATION_METHOD_KEY],[CONFIRMATION_DT])
 select cmt.INVESTIGATION_KEY,	cmt.CONFIRMATION_METHOD_KEY, cmt.CONFIRMATION_DT
 from #temp_cm_table cmt
          left outer join dbo.confirmation_method cm on cmt.confirmation_method_cd = cm.confirmation_method_cd
          left outer join dbo.confirmation_method_group cmg on cmt.investigation_key = cmg.investigation_key
 where cmg.investigation_key is null and cmg.confirmation_method_key is null;
 
-
 /* Logging */
 set @rowcount=@@rowcount
-		INSERT INTO [dbo].[job_flow_log] (
+		INSERT INTO [dbo].[job_flow_log]
+			(
 			batch_id
 			,[Dataflow_Name]
 			,[package_Name]
@@ -524,6 +535,7 @@ set @rowcount=@@rowcount
 			,[step_number]
 			,[step_name]
 			,[row_count]
+			,[msg_description1]
 			)
 		VALUES (
 			@batch_id
@@ -533,8 +545,8 @@ set @rowcount=@@rowcount
 			,@proc_step_no
 			,@proc_step_name
 			,@rowcount
+			,LEFT(@id_list,500)
 			);
-
 
 
 COMMIT TRANSACTION;
@@ -542,8 +554,9 @@ COMMIT TRANSACTION;
 SET @proc_step_name='Get Topic for Datamart';
 	SET @proc_step_no = 5;
 
-INSERT INTO [dbo].[job_flow_log] (
-                                   batch_id
+INSERT INTO [dbo].[job_flow_log]
+(
+      batch_id
     ,[create_dttm]
     ,[update_dttm]
     ,[Dataflow_Name]
@@ -564,11 +577,11 @@ VALUES (
         ,@proc_step_no
         ,@proc_step_name
         ,0
-        ,LEFT('ID List-' + @id_list,500)
+        ,LEFT(@id_list,500)
     );
 
 
-SELECT nrt.public_health_case_uid AS case_uid,
+SELECT nrt.public_health_case_uid AS public_health_case_uid,
        nrt.patient_id AS patient_uid,
        COALESCE(inv.INVESTIGATION_KEY, 1) AS investigation_key,
        COALESCE(pat.PATIENT_KEY, 1) AS patient_key,
@@ -592,8 +605,9 @@ IF @@TRANCOUNT > 0   ROLLBACK TRANSACTION;
     	DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
 
       /* Logging */
-INSERT INTO [dbo].[job_flow_log] (
-                                   batch_id
+INSERT INTO [dbo].[job_flow_log]
+(
+      batch_id
     ,[create_dttm]
     ,[update_dttm]
     ,[Dataflow_Name]
@@ -615,7 +629,7 @@ VALUES
         ,@Proc_Step_no
         , 'Step -' +CAST(@Proc_Step_no AS VARCHAR(3))+' -' +CAST(@ErrorMessage AS VARCHAR(500))
         ,0
-        ,LEFT('ID List-' + @id_list,500)
+        ,LEFT(@id_list,500)
     );
 
 

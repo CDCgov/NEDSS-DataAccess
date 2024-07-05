@@ -295,7 +295,7 @@ public class Investigation {
     @Column(name = "nac_last_chg_time")
     private String nacLastChgTime;
 
-    @Column(name = "nacAddTime")
+    @Column(name = "nac_add_time")
     private String nacAddTime;
 
     @Column(name = "person_as_reporter_uid")

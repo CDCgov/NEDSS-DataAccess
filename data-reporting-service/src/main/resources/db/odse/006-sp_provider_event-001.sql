@@ -1,28 +1,32 @@
 CREATE OR ALTER PROCEDURE dbo.sp_provider_event @user_id_list nvarchar(max)
 AS
 BEGIN
-		DECLARE @batch_id BIGINT;
 
 BEGIN TRY
-SELECT @batch_id = cast((format(getdate(),'yyMMddHHmmss')) as bigint)
 
-    INSERT INTO [rdb].[dbo].[job_flow_log] (
-                                             batch_id
+ 	DECLARE @batch_id BIGINT;
+	SET @batch_id = cast((format(getdate(),'yyMMddHHmmss')) as bigint);
+
+INSERT INTO [rdb].[dbo].[job_flow_log]
+(
+      batch_id
     ,[Dataflow_Name]
     ,[package_Name]
     ,[Status_Type]
     ,[step_number]
     ,[step_name]
     ,[row_count]
+    ,[Msg_Description1]
 )
 VALUES (
     @batch_id
-        ,'Provider Pre-Processing Event'
+        ,'Provider PRE-Processing Event'
         ,'NBS_ODSE.sp_provider_event'
         ,'START'
         ,0
         ,LEFT('Pre ID-' + @user_id_list,199)
         ,0
+        ,LEFT(@user_id_list,199)
     );
 
 SELECT p.person_uid,
@@ -81,7 +85,7 @@ FROM nbs_odse.dbo.Person p WITH (NOLOCK)
                                                                 ON elp.locator_uid = pl.postal_locator_uid
                                                 LEFT OUTER JOIN nbs_srte.dbo.State_code sc with (NOLOCK) ON sc.state_cd = pl.state_cd
                                                 LEFT OUTER JOIN nbs_srte.dbo.State_county_code_value scc with (NOLOCK)
-                                                                ON scc.code = pl.cnty_cd
+                                   ON scc.code = pl.cnty_cd
                LEFT OUTER JOIN nbs_srte.dbo.Country_code cc with (nolock) ON cc.CODE = pl.cntry_cd
                                        WHERE elp.entity_uid = p.person_uid
                                          AND elp.class_cd = 'PST'
@@ -125,7 +129,7 @@ FROM nbs_odse.dbo.Person p WITH (NOLOCK)
                                               pn.nm_use_cd,
                                               --Target length check
                                               pn.nm_suffix                                         nmSuffix,
-                                              case
+          case
      when (pn.nm_suffix is not null or pn.nm_suffix != '')
                                                       then (select * from dbo.fn_get_value_by_cd_ques(pn.nm_suffix, 'DEM107'))
                                                   end            as                                name_suffix,
@@ -163,15 +167,17 @@ INSERT INTO [rdb].[dbo].[job_flow_log] (
     ,[step_number]
     ,[step_name]
     ,[row_count]
+    ,[Msg_Description1]
 )
 VALUES (
     @batch_id
-        ,'Provider Pre-Processing Event'
+        ,'Provider PRE-Processing Event'
         ,'NBS_ODSE.sp_provider_event'
         ,'COMPLETE'
         ,0
         ,LEFT('Pre ID-' + @user_id_list,199)
         ,0
+        ,LEFT(@user_id_list,199)
     );
 
 END TRY
@@ -190,15 +196,17 @@ INSERT INTO [rdb].[dbo].[job_flow_log] (
     ,[step_number]
     ,[step_name]
     ,[row_count]
+    ,[Msg_Description1]
 )
 VALUES (
     @batch_id
-        ,'Provider Pre-Processing Event'
+        ,'Provider PRE-Processing Event'
         ,'NBS_ODSE.sp_provider_event'
         ,'ERROR: ' + @ErrorMessage
         ,0
         ,LEFT('Pre ID-' + @user_id_list,199)
         ,0
+        ,LEFT(@user_id_list,199)
     );
 return @ErrorMessage;
 

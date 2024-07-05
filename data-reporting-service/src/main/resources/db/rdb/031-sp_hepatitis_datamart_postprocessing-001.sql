@@ -645,7 +645,7 @@ END;
 
 
 
-			IF EXISTS(SELECT 1 FROM sys.columns   WHERE Name = N'EPI_OutbreakUnidentified'   AND Object_ID = Object_ID(N'#TMP_D_INV_EPIDEMIOLOGY'))
+			IF EXISTS(SELECT 1 FROM sys.columns   WHERE Name = N'EPI_OutbreakUnidentified'  AND Object_ID = Object_ID(N'#TMP_D_INV_EPIDEMIOLOGY'))
 BEGIN
 			    SET @sql = N'update #TMP_D_INV_EPIDEMIOLOGY set OBRK_UNIDENTIFIED_IND = RTRIM(LTRIM(EPI_OutbreakUnidentified));'
 			    execute sp_executesql  @sql

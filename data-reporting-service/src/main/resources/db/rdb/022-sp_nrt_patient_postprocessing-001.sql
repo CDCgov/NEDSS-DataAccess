@@ -11,13 +11,14 @@ BEGIN TRY
 	declare @batch_id bigint;
 	declare @create_dttm datetime2(7) = current_timestamp ;
 	declare @update_dttm datetime2(7) = current_timestamp ;
-	declare @dataflow_name varchar(200) = 'Patient Post-Processing';
+	declare @dataflow_name varchar(200) = 'Patient POST-Processing';
 	declare @package_name varchar(200) = 'sp_nrt_patient_postprocessing';
 
 	set @batch_id = cast((format(getdate(),'yyMMddHHmmss')) as bigint);
 
-INSERT INTO [dbo].[job_flow_log] (
-                                   batch_id
+INSERT INTO [dbo].[job_flow_log]
+(
+      batch_id
     ,[create_dttm]
     ,[update_dttm]
     ,[Dataflow_Name]
@@ -37,11 +38,11 @@ VALUES (
         ,'START'
         ,0
         ,'SP_Start'
-        ,LEFT('ID List-' + @id_list,500)
+        ,LEFT(@id_list,500)
         ,0
     );
 
-SET @proc_step_name='Create PATIENT Temp tables';
+SET @proc_step_name='Create PATIENT Temp tables for -'+ LEFT(@id_list,165);
 	SET @proc_step_no = 1;
 
 	/* Temp patient table creation*/
@@ -158,6 +159,7 @@ set @rowcount=@@rowcount
 			,[step_number]
 			,[step_name]
 			,[row_count]
+			,[msg_description1]
 			)
 		VALUES (
 			@batch_id
@@ -167,6 +169,7 @@ set @rowcount=@@rowcount
 			,@proc_step_no
 			,@proc_step_name
 			,@rowcount
+			,LEFT(@id_list,500)
 			);
 
    	SET @proc_step_name='Update D_PATIENT Dimension';
@@ -270,6 +273,7 @@ set @rowcount=@@rowcount
 				,[step_number]
 				,[step_name]
 				,[row_count]
+				,[msg_description1]
 				)
 			VALUES (
 				@batch_id
@@ -279,6 +283,7 @@ set @rowcount=@@rowcount
 				,@proc_step_no
 				,@proc_step_name
 				,@rowcount
+				,LEFT(@id_list,500)
 				);
 
 	SET @proc_step_name='Insert into D_PATIENT Dimension';
@@ -470,6 +475,7 @@ set @rowcount=@@rowcount
 			,[step_number]
 			,[step_name]
 			,[row_count]
+			,[msg_description1]
 			)
 		VALUES (
 			@batch_id
@@ -479,6 +485,7 @@ set @rowcount=@@rowcount
 			,@proc_step_no
 			,@proc_step_name
 			,@rowcount
+			,LEFT(@id_list,500)
 			);
 
 select 'Success';
@@ -510,7 +517,7 @@ VALUES (
         ,@proc_step_no
         ,@proc_step_name
         ,0
-        ,LEFT('ID List-' + @id_list,500)
+        ,LEFT(@id_list,500)
     );
 
 END TRY
@@ -518,7 +525,6 @@ END TRY
 BEGIN CATCH
 
 IF @@TRANCOUNT > 0   ROLLBACK TRANSACTION;
-
 
     	DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
 
@@ -546,7 +552,7 @@ VALUES
         ,@Proc_Step_no
         , 'Step -' +CAST(@Proc_Step_no AS VARCHAR(3))+' -' +CAST(@ErrorMessage AS VARCHAR(500))
         ,0
-        ,LEFT('ID List-' + @id_list,500)
+        ,LEFT(@id_list,500)
     );
 
 return @ErrorMessage;

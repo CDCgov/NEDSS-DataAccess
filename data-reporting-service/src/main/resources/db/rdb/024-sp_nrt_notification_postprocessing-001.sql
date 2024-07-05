@@ -1,4 +1,4 @@
-CREATE OR ALTER  PROCEDURE [dbo].[sp_nrt_notification_postprocessing] @notification_id_list nvarchar(max), @debug bit = 'false'
+CREATE OR ALTER PROCEDURE [dbo].[sp_nrt_notification_postprocessing] @notification_id_list nvarchar(max), @debug bit = 'false'
 AS
 BEGIN
 
@@ -11,37 +11,38 @@ BEGIN TRY
 		declare @batch_id bigint;
 		declare @create_dttm datetime2(7) = current_timestamp ;
 		declare @update_dttm datetime2(7) = current_timestamp ;
-		declare @dataflow_name varchar(200) = 'Notification Post-Processing';
+		declare @dataflow_name varchar(200) = 'Notification POST-Processing';
 		declare @package_name varchar(200) = 'sp_nrt_notification_postprocessing';
 
 		set @batch_id = cast((format(getdate(),'yyMMddHHmmss')) as bigint);
 
-INSERT INTO [dbo].[job_flow_log] (
-                                   batch_id
-    ,[create_dttm]
-    ,[update_dttm]
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[msg_description1]
-    ,[row_count]
-)
-VALUES (
-    @batch_id
-        ,@create_dttm
-        ,@update_dttm
-        ,@dataflow_name
-        ,@package_name
-        ,'START'
-        ,0
-        ,'SP_Start'
-        ,LEFT('ID List-' + @notification_id_list,500)
-        ,0
-    );
+    INSERT INTO [dbo].[job_flow_log]
+        (
+        batch_id
+        ,[create_dttm]
+        ,[update_dttm]
+        ,[Dataflow_Name]
+        ,[package_Name]
+        ,[Status_Type]
+        ,[step_number]
+        ,[step_name]
+        ,[msg_description1]
+        ,[row_count]
+    )
+    VALUES (
+        @batch_id
+            ,@create_dttm
+            ,@update_dttm
+            ,@dataflow_name
+            ,@package_name
+            ,'START'
+            ,0
+            ,'SP_Start'
+            ,LEFT(@notification_id_list,500)
+            ,0
+        );
 
-SET @proc_step_name='Create NOTIFICATION and NOTIFICATION_EVENT Temp tables';
+SET @proc_step_name='Create NOTIFICATION and NOTIFICATION_EVENT Temp tables-'+ LEFT(@notification_id_list,105);
 		SET @proc_step_no = 1;
 
         /* Temp notification table creation */
@@ -81,7 +82,8 @@ WHERE nrt.notification_uid in (SELECT value FROM STRING_SPLIT(@notification_id_l
 
 /* Logging */
 set @rowcount=@@rowcount
-		INSERT INTO [dbo].[job_flow_log] (
+		INSERT INTO [dbo].[job_flow_log]
+			(
 				batch_id
 				,[Dataflow_Name]
 				,[package_Name]
@@ -89,6 +91,7 @@ set @rowcount=@@rowcount
 				,[step_number]
 				,[step_name]
 				,[row_count]
+				,[msg_description1]
 				)
 			VALUES (
 				@batch_id
@@ -98,6 +101,7 @@ set @rowcount=@@rowcount
 				,@proc_step_no
 				,@proc_step_name
 				,@rowcount
+				,LEFT(@notification_id_list,500)
 				);
 
 BEGIN TRANSACTION;
@@ -117,14 +121,16 @@ SET NOTIFICATION_STATUS = ntf.NOTIFICATION_STATUS
 
     /* Logging */
     set @rowcount=@@rowcount
-INSERT INTO [dbo].[job_flow_log] (
-                                   batch_id
+INSERT INTO [dbo].[job_flow_log]
+(
+      batch_id
     ,[Dataflow_Name]
     ,[package_Name]
     ,[Status_Type]
     ,[step_number]
     ,[step_name]
     ,[row_count]
+    ,[msg_description1]
 )
 VALUES (
     @batch_id
@@ -134,6 +140,7 @@ VALUES (
         ,@proc_step_no
         ,@proc_step_name
         ,@rowcount
+        ,LEFT(@notification_id_list,500)
     );
 
 SET @proc_step_name='Update NOTIFICATION_EVENT Dimension';
@@ -154,14 +161,16 @@ SET PATIENT_KEY = ntfe.PATIENT_KEY
 
     /* Logging */
     set @rowcount=@@rowcount
-INSERT INTO [dbo].[job_flow_log] (
-                                   batch_id
+INSERT INTO [dbo].[job_flow_log]
+(
+      batch_id
     ,[Dataflow_Name]
     ,[package_Name]
     ,[Status_Type]
     ,[step_number]
     ,[step_name]
     ,[row_count]
+    ,[msg_description1]
 )
 VALUES (
     @batch_id
@@ -171,6 +180,7 @@ VALUES (
         ,@proc_step_no
         ,@proc_step_name
         ,@rowcount
+        ,LEFT(@notification_id_list,500)
     );
 
 SET @proc_step_name='Insert into NOTIFICATION Dimension';
@@ -202,7 +212,8 @@ WHERE ntf.NOTIFICATION_KEY IS NULL;
 
 /* Logging */
 set @rowcount=@@rowcount
-	    INSERT INTO [dbo].[job_flow_log] (
+	    INSERT INTO [dbo].[job_flow_log]
+	    (
 			batch_id
 			,[Dataflow_Name]
 			,[package_Name]
@@ -210,6 +221,7 @@ set @rowcount=@@rowcount
 			,[step_number]
 			,[step_name]
 			,[row_count]
+			,[msg_description1]
 			)
 		VALUES (
 			@batch_id
@@ -219,6 +231,7 @@ set @rowcount=@@rowcount
 			,@proc_step_no
 			,@proc_step_name
 			,@rowcount
+			,LEFT(@notification_id_list,500)
 			);
 
 		SET @proc_step_name='Insert into NOTIFICATION_EVENT Dimension';
@@ -248,14 +261,16 @@ WHERE ntfe.NOTIFICATION_KEY IS NULL
 
     /* Logging */
     set @rowcount=@@rowcount
-INSERT INTO [dbo].[job_flow_log] (
-                                   batch_id
+INSERT INTO [dbo].[job_flow_log]
+(
+      batch_id
     ,[Dataflow_Name]
     ,[package_Name]
     ,[Status_Type]
     ,[step_number]
     ,[step_name]
     ,[row_count]
+    ,[msg_description1]
 )
 VALUES (
     @batch_id
@@ -265,6 +280,7 @@ VALUES (
         ,@proc_step_no
         ,@proc_step_name
         ,@rowcount
+        ,LEFT(@notification_id_list,500)
     );
 
 
@@ -274,8 +290,9 @@ COMMIT TRANSACTION;
 SET @proc_step_name='SP_COMPLETE';
 	SET @proc_step_no = 6;
 
-INSERT INTO [dbo].[job_flow_log] (
-                                   batch_id
+INSERT INTO [dbo].[job_flow_log]
+(
+      batch_id
     ,[create_dttm]
     ,[update_dttm]
     ,[Dataflow_Name]
@@ -296,7 +313,7 @@ VALUES (
         ,@proc_step_no
         ,@proc_step_name
         ,0
-        ,LEFT('ID List-' + @notification_id_list,500)
+        ,LEFT(@notification_id_list,500)
     );
 
 select 'Success';
@@ -310,8 +327,9 @@ IF @@TRANCOUNT > 0   ROLLBACK TRANSACTION;
         DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
 
         /* Logging */
-INSERT INTO [dbo].[job_flow_log] (
-                                   batch_id
+INSERT INTO [dbo].[job_flow_log]
+(
+      batch_id
     ,[create_dttm]
     ,[update_dttm]
     ,[Dataflow_Name]
@@ -333,7 +351,7 @@ VALUES
         ,@Proc_Step_no
         , 'Step -' +CAST(@Proc_Step_no AS VARCHAR(3))+' -' +CAST(@ErrorMessage AS VARCHAR(500))
         ,0
-        ,LEFT('ID List-' + @notification_id_list,500)
+        ,LEFT(@notification_id_list,500)
     );
 
 

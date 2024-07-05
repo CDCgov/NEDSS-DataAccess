@@ -2,29 +2,32 @@ CREATE OR ALTER PROCEDURE dbo.sp_patient_event @user_id_list nvarchar(max)
 AS
 BEGIN
 
-	DECLARE @batch_id BIGINT;
-
 BEGIN TRY
 
-SET @batch_id = cast((format(getdate(),'yyMMddHHmmss')) as bigint)
-	INSERT INTO [rdb].[dbo].[job_flow_log] (
-		batch_id
-		,[Dataflow_Name]
-		,[package_Name]
-		,[Status_Type]
-		,[step_number]
-		,[step_name]
-		,[row_count]
-		)
-	VALUES (
-		@batch_id
-		,'Patient Pre-Processing Event'
-		,'NBS_ODSE.sp_patient_event'
-		,'START'
-		,0
-		,LEFT('Pre ID-' + @user_id_list,199)
-		,0
-		);
+	DECLARE @batch_id BIGINT;
+	SET @batch_id = cast((format(getdate(),'yyMMddHHmmss')) as bigint);
+
+INSERT INTO [rdb].[dbo].[job_flow_log]
+(
+      batch_id
+    ,[Dataflow_Name]
+    ,[package_Name]
+    ,[Status_Type]
+    ,[step_number]
+    ,[step_name]
+    ,[row_count]
+    ,[Msg_Description1]
+)
+VALUES (
+    @batch_id
+        ,'Patient PRE-Processing Event'
+        ,'NBS_ODSE.sp_patient_event'
+        ,'START'
+        ,0
+        ,LEFT('Pre ID-' + @user_id_list,199)
+        ,0
+        ,LEFT(@user_id_list,199)
+    );
 
 create table #temp_race_table
 (
@@ -231,7 +234,7 @@ FROM nbs_odse.dbo.Person p WITH (NOLOCK)
                                                 LEFT OUTER JOIN nbs_srte.dbo.State_county_code_value scc with (NOLOCK)
                                                                 ON scc.code = pl.cnty_cd
                                                 LEFT OUTER JOIN nbs_srte.dbo.Country_code cc with (nolock) ON cc.code = pl.cntry_cd
-                                       WHERE elp.entity_uid = p.person_uid
+                       WHERE elp.entity_uid = p.person_uid
                                          AND elp.class_cd = 'PST'
                                          AND elp.status_cd = 'A'
                                        FOR json path, INCLUDE_NULL_VALUES) AS address) AS address,
@@ -337,23 +340,26 @@ WHERE p.person_uid in (SELECT value FROM STRING_SPLIT(@user_id_list, ','))
   AND p.cd = 'PAT'
 
 
-INSERT INTO [rdb].[dbo].[job_flow_log] (
-                                         batch_id
+INSERT INTO [rdb].[dbo].[job_flow_log]
+(
+      batch_id
     ,[Dataflow_Name]
     ,[package_Name]
     ,[Status_Type]
     ,[step_number]
     ,[step_name]
     ,[row_count]
+    ,[Msg_Description1]
 )
 VALUES (
     @batch_id
-        ,'Patient Pre-Processing Event'
+        ,'Patient PRE-Processing Event'
         ,'NBS_ODSE.sp_patient_event'
         ,'COMPLETE'
         ,0
         ,LEFT('Pre ID-' + @user_id_list,199)
         ,0
+        ,LEFT(@user_id_list,199)
     );
 
 end try
@@ -364,23 +370,26 @@ BEGIN CATCH
 IF @@TRANCOUNT > 0   ROLLBACK TRANSACTION;
 
     	DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
-INSERT INTO [rdb].[dbo].[job_flow_log] (
-                                         batch_id
+INSERT INTO [rdb].[dbo].[job_flow_log]
+(
+      batch_id
     ,[Dataflow_Name]
     ,[package_Name]
     ,[Status_Type]
     ,[step_number]
     ,[step_name]
     ,[row_count]
+    ,[Msg_Description1]
 )
 VALUES (
     @batch_id
-        ,'Patient Pre-Processing Event'
+        ,'Patient PRE-Processing Event'
         ,'NBS_ODSE.sp_patient_event'
         ,'ERROR: ' + @ErrorMessage
         ,0
         ,LEFT('Pre ID-' + @user_id_list,199)
         ,0
+        ,LEFT(@user_id_list,199)
     );
 return @ErrorMessage;
 
