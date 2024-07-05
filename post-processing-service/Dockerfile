@@ -1,4 +1,10 @@
 FROM amazoncorretto:17 as builder
+
+#Copy project config
+COPY gradle /usr/src/gradle
+COPY gradlew /usr/src/gradlew
+COPY settings.gradle /usr/src/settings.gradle
+
 #Copy sources
 COPY post-processing-service /usr/src/post-processing-service
 
