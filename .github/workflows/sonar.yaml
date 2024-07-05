@@ -10,7 +10,12 @@ on:
         required: true
   pull_request:
     paths:
-      - "data-reporting-service/**"
+      - "investigation-service/**"
+      - "ldfdata-service/**"
+      - "person-service/**"
+      - "post-processing-service/**"
+      - "observation-service/**"
+      - "organization-service/**"
       - ".github/workflows/sonar.yaml"
       - "build.gradle"
       - "settings.gradle"
