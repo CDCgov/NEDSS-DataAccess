@@ -10,7 +10,12 @@ on:
         required: true
   pull_request:
     paths:
-      - "data-reporting-service/**"
+      - "investigation-service/**"
+      - "ldfdata-service/**"
+      - "person-service/**"
+      - "post-processing-service/**"
+      - "observation-service/**"
+      - "organization-service/**"
       - ".github/workflows/sonar.yaml"
       - "build.gradle"
       - "settings.gradle"
@@ -50,7 +55,7 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle
 
       - name: Build and analyze
-        working-directory: ./data-reporting-service
+        working-directory: ./
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
