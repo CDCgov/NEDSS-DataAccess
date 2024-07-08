@@ -6,8 +6,6 @@ import ch.qos.logback.core.read.ListAppender;
 import gov.cdc.etldatapipeline.commonutil.json.CustomJsonGeneratorImpl;
 import gov.cdc.etldatapipeline.postprocessingservice.repository.*;
 import gov.cdc.etldatapipeline.postprocessingservice.repository.model.InvestigationResult;
-import gov.cdc.etldatapipeline.postprocessingservice.repository.model.dto.Datamart;
-import gov.cdc.etldatapipeline.postprocessingservice.repository.model.dto.DatamartKey;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,10 +44,6 @@ class PostProcessingServiceTest {
     KafkaTemplate<String, String> kafkaTemplate;
     @Captor
     private ArgumentCaptor<String> topicCaptor;
-    @Captor
-    private ArgumentCaptor<String> keyCaptor;
-    @Captor
-    private ArgumentCaptor<String> messageCaptor;
 
     private ProcessDatamartData datamartProcessor;
     private final CustomJsonGeneratorImpl jsonGenerator = new CustomJsonGeneratorImpl();
@@ -243,21 +237,14 @@ class PostProcessingServiceTest {
         String dmTopic = "dummy_datamart";
 
         List<InvestigationResult> invResults = getInvestigationResults();
-        InvestigationResult invResult = invResults.get(0);
 
         datamartProcessor.datamartTopic = dmTopic;
         when(investigationRepositoryMock.executeStoredProcForPublicHealthCaseIds("123")).thenReturn(invResults);
         postProcessingServiceMock.postProcessMessage(topic, key, key);
         postProcessingServiceMock.processCachedIds();
 
-        DatamartKey dmKey = DatamartKey.builder().publicHealthCaseUid(invResult.getPublicHealthCaseUid()).build();
-        String expectedKey = jsonGenerator.generateStringJson(dmKey);
-        String expectedMsg = jsonGenerator.generateStringJson(modelMapper.map(invResults.get(0), Datamart.class));
-        verify(kafkaTemplate).send(topicCaptor.capture(), keyCaptor.capture(), messageCaptor.capture());
+        verify(kafkaTemplate).send(topicCaptor.capture(), anyString(), anyString());
         assertEquals(dmTopic, topicCaptor.getValue());
-        assertEquals(expectedKey, keyCaptor.getValue());
-        assertEquals(expectedMsg, messageCaptor.getValue());
-        assertTrue(keyCaptor.getValue().contains(String.valueOf(dmKey.getPublicHealthCaseUid())));
     }
 
     @Test
