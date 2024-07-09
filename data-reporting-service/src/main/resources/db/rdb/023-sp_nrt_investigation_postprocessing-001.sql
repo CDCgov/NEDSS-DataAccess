@@ -1,4 +1,4 @@
-CREATE OR ALTER PROCEDURE [dbo].[sp_nrt_investigation_postprocessing] @id_list nvarchar(max), @debug bit = 'false'
+CREATE OR ALTER PROCEDURE dbo.sp_nrt_investigation_postprocessing @id_list nvarchar(max), @debug bit = 'false'
 AS
 BEGIN
 
@@ -176,7 +176,8 @@ set [INVESTIGATION_KEY] = inv.INVESTIGATION_KEY,
     [INV_RPT_DT] = inv.INV_RPT_DT,
     [INV_START_DT] = inv.INV_START_DT,
     [RPT_SRC_CD_DESC] = inv.RPT_SRC_CD_DESC,
-    [EARLIEST_RPT_TO_CNTY_DT] = inv.EARLIEST_RPT_TO_STATE_DT,
+    [EARLIEST_RPT_TO_CNTY_DT] = inv.EARLIEST_RPT_TO_CNTY_DT,
+    [EARLIEST_RPT_TO_STATE_DT] = inv.EARLIEST_RPT_TO_STATE_DT,
     [CASE_RPT_MMWR_WK] = inv.CASE_RPT_MMWR_WK,
     [CASE_RPT_MMWR_YR] = inv.CASE_RPT_MMWR_YR,
     [DISEASE_IMPORTED_IND] = inv.DISEASE_IMPORTED_IND,
@@ -286,6 +287,7 @@ insert into dbo.INVESTIGATION
     [INV_START_DT],
     [RPT_SRC_CD_DESC],
     [EARLIEST_RPT_TO_CNTY_DT],
+    [EARLIEST_RPT_TO_STATE_DT],
     [CASE_RPT_MMWR_WK],
     [CASE_RPT_MMWR_YR],
     [DISEASE_IMPORTED_IND],
@@ -356,6 +358,7 @@ select
     inv.INV_RPT_DT,
     inv.INV_START_DT,
     inv.RPT_SRC_CD_DESC,
+    inv.EARLIEST_RPT_TO_CNTY_DT,
     inv.EARLIEST_RPT_TO_STATE_DT,
     inv.CASE_RPT_MMWR_WK,
     inv.CASE_RPT_MMWR_YR,
@@ -441,7 +444,7 @@ set @rowcount=@@rowcount
 		SET @proc_step_name='Update CONFIRMATION_METHOD and CONFIRMATION_METHOD_GROUP';
 		SET @proc_step_no = 3;
 
-		/*Temp Confimation Method Table*/
+		/*Temp Confirmation Method Table*/
 select distinct
     nrt.PUBLIC_HEALTH_CASE_UID,
     i.INVESTIGATION_KEY,
