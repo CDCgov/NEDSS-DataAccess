@@ -79,7 +79,7 @@ CREATE TABLE dbo.nrt_investigation (
     curr_process_state            varchar(100)                                    NULL,
     inv_priority_cd               varchar(100)                                    NULL,
     coinfection_id                varchar(100)                                    NULL,
-    legacy_case_id                bigint                                          NULL,
+    legacy_case_id                varchar(100)                                    NULL,
     curr_process_state_cd         varchar(20)                                     NULL,
     investigation_status_cd       varchar(20)                                     NULL,
     notification_local_id         varchar(50)                                     NULL,
