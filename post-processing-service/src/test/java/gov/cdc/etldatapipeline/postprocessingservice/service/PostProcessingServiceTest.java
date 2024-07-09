@@ -3,7 +3,6 @@ package gov.cdc.etldatapipeline.postprocessingservice.service;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import gov.cdc.etldatapipeline.commonutil.json.CustomJsonGeneratorImpl;
 import gov.cdc.etldatapipeline.postprocessingservice.repository.*;
 import gov.cdc.etldatapipeline.postprocessingservice.repository.model.InvestigationResult;
 import org.junit.jupiter.api.AfterEach;
@@ -12,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.*;
-import org.modelmapper.ModelMapper;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 
@@ -46,8 +44,6 @@ class PostProcessingServiceTest {
     private ArgumentCaptor<String> topicCaptor;
 
     private ProcessDatamartData datamartProcessor;
-    private final CustomJsonGeneratorImpl jsonGenerator = new CustomJsonGeneratorImpl();
-    private final ModelMapper modelMapper = new ModelMapper();
 
     private final ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
 
@@ -236,7 +232,7 @@ class PostProcessingServiceTest {
         String key = "{\"payload\":{\"public_health_case_uid\":123}}";
         String dmTopic = "dummy_datamart";
 
-        List<InvestigationResult> invResults = getInvestigationResults();
+        List<InvestigationResult> invResults = getInvestigationResults(123L, 200L);
 
         datamartProcessor.datamartTopic = dmTopic;
         when(investigationRepositoryMock.executeStoredProcForPublicHealthCaseIds("123")).thenReturn(invResults);
@@ -245,6 +241,23 @@ class PostProcessingServiceTest {
 
         verify(kafkaTemplate).send(topicCaptor.capture(), anyString(), anyString());
         assertEquals(dmTopic, topicCaptor.getValue());
+    }
+
+    @Test
+    void testProduceDatamartTopicWithNoPatient() {
+        String topic = "dummy_investigation";
+        String key = "{\"payload\":{\"public_health_case_uid\":123}}";
+        String dmTopic = "dummy_datamart";
+
+        // patientKey=1L for no patient data in D_PATIENT
+        List<InvestigationResult> invResults = getInvestigationResults(123L, 1L);
+
+        datamartProcessor.datamartTopic = dmTopic;
+        when(investigationRepositoryMock.executeStoredProcForPublicHealthCaseIds("123")).thenReturn(invResults);
+        postProcessingServiceMock.postProcessMessage(topic, key, key);
+        postProcessingServiceMock.processCachedIds();
+
+        verify(kafkaTemplate, never()).send(anyString(), anyString(), anyString());
     }
 
     @Test
@@ -280,13 +293,21 @@ class PostProcessingServiceTest {
         assertThrows(RuntimeException.class, () -> postProcessingServiceMock.extractIdFromMessage(invalidTopic, invalidKey, invalidKey));
     }
 
-    private List<InvestigationResult> getInvestigationResults() {
+    @Test
+    void testPostProcessDatamartException() {
+        String topic = "dummy_datamart";
+        String invalidMsg = "invalid_msg";
+
+        assertThrows(RuntimeException.class, () -> postProcessingServiceMock.postProcessDatamart(topic, invalidMsg));
+    }
+
+    private List<InvestigationResult> getInvestigationResults(Long phcUid, Long patientKey) {
         List<InvestigationResult> investigationResults = new ArrayList<>();
         InvestigationResult investigationResult = new InvestigationResult();
-        investigationResult.setPublicHealthCaseUid(123L);
+        investigationResult.setPublicHealthCaseUid(phcUid);
         investigationResult.setInvestigationKey(100L);
         investigationResult.setPatientUid(456L);
-        investigationResult.setPatientKey(200L);
+        investigationResult.setPatientKey(patientKey);
         investigationResult.setConditionCd("10110");
         investigationResult.setDatamart("Hepatitis_Datamart");
         investigationResult.setStoredProcedure("sp_hepatitis_datamart_postprocessing");

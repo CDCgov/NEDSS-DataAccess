@@ -81,6 +81,11 @@ class DatamartProcessingTest {
     }
 
     @Test
+    void testDatamartProcessException() {
+        assertThrows(RuntimeException.class, () -> datamartProcessor.process(null));
+    }
+
+    @Test
     void testDataMartDeserialization() throws Exception {
         String dmJson = readFileData(FILE_PREFIX + "Datamart.json");
         JsonNode dmNode = objectMapper.readTree(dmJson);

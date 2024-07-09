@@ -7,7 +7,7 @@ spring:
       patient: nrt_patient
       provider: nrt_provider
       notification: nrt_notifications
-      datamart: nrt_datamart
+      datamart: nbs_Datamart
     consumer:
       maxPollIntervalMs: 30000
       maxConcurrency: 5

@@ -29,6 +29,8 @@ public class ProcessDatamartData {
     public void process(List<InvestigationResult> data) {
         try {
             for (InvestigationResult invResult : data) {
+                if (invResult.getPatientKey().equals(1L)) continue; // skipping now for unprocessed patients
+
                 Datamart dmart = modelMapper.map(invResult, Datamart.class);
                 String jsonKey = jsonGenerator.generateStringJson(DatamartKey.builder().publicHealthCaseUid(invResult.getPublicHealthCaseUid()).build());
                 String jsonMessage = jsonGenerator.generateStringJson(dmart);
@@ -37,6 +39,7 @@ public class ProcessDatamartData {
             }
         } catch (Exception e) {
             logger.error("Error processing Datamart JSON array from investigation result data: {}", e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 }

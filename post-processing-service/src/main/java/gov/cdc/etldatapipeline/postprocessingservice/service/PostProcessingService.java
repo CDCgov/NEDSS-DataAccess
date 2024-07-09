@@ -138,7 +138,7 @@ public class PostProcessingService {
 
                     logger.info("Processing the {} message topic. Calling stored proc: {}('{}','{}')", dmType, "sp_hepatitis_datamart_postprocessing", cases, patients);
                     investigationRepository.executeStoredProcForHepDatamart(cases, patients);
-                    comleteLog();
+                    completeLog();
                 }
             }
             else {
@@ -181,13 +181,13 @@ public class PostProcessingService {
     private void processTopic(String keyTopic, List<Long> ids, Consumer<String> repositoryMethod, String entity, String proc) {
         String idsString = prepareAndLog(keyTopic, ids, entity, proc);
         repositoryMethod.accept(idsString);
-        comleteLog();
+        completeLog();
     }
 
     private <T> List<T> processTopic(String keyTopic, List<Long> ids, Function<String, List<T>> repositoryMethod, String entity, String proc) {
         String idsString = prepareAndLog(keyTopic, ids, entity, proc);
         List<T> result = repositoryMethod.apply(idsString);
-        comleteLog();
+        completeLog();
         return result;
     }
 
@@ -200,10 +200,10 @@ public class PostProcessingService {
     private void processId(Long id, String vals,BiConsumer<Long, String> repositoryMethod, String entity, String proc) {
         logger.info("Processing PHC ID for {}. Calling stored proc: {}({}, '{}')", entity, proc, id, vals);
         repositoryMethod.accept(id, vals);
-        comleteLog();
+        completeLog();
     }
 
-    private void comleteLog() {
+    private void completeLog() {
         logger.info(SP_EXECUTION_COMPLETED);
     }
 }
