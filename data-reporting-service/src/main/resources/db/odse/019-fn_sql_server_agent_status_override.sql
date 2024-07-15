@@ -1,6 +1,6 @@
 -- This function needs to be created in Azure since the Sql Server agent is not exposed
 -- Debezium deployment in Azure AKS need to override this function in the helm chart
-CREATE FUNCTION dbo.IsSqlAgentRunning() RETURNS BIT AS
+CREATE OR ALTER FUNCTION dbo.IsSqlAgentRunning() RETURNS BIT AS
 BEGIN
     DECLARE @IsRunning BIT = 0;
 
