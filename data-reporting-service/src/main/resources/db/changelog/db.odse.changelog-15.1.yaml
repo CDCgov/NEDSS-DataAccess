@@ -132,11 +132,3 @@ databaseChangeLog:
         - sqlFile:
             path: src/main/resources/db/odse/018-sp_public_health_case_fact_datamart_event-001.sql
             splitStatements: false
-
-  - changeSet:
-      id: 19
-      author: liquibase
-      changes:
-        - sqlFile:
-            path: src/main/resources/db/odse/019-fn_sql_server_agent_status_override.sql
-            splitStatements: false
