@@ -19,7 +19,7 @@ jobs:
     with:
       microservice_name: person-reporting-service
       dockerfile_relative_path: -f ./person-service/Dockerfile .
-      environment_classifier: SNAPSHOT
+      environment_classifier: SANDBOX
       java_version: "17"
     secrets:
       CDC_NBS_SANDBOX_SHARED_SERVICES_ACCOUNTID: ${{secrets.CDC_NBS_SANDBOX_SHARED_SERVICES_ACCOUNTID}}
@@ -35,7 +35,7 @@ jobs:
     with:
       microservice_name: organization-reporting-service
       dockerfile_relative_path: -f ./organization-service/Dockerfile .
-      environment_classifier: SNAPSHOT
+      environment_classifier: SANDBOX
       java_version: "17"
     secrets:
       CDC_NBS_SANDBOX_SHARED_SERVICES_ACCOUNTID: ${{secrets.CDC_NBS_SANDBOX_SHARED_SERVICES_ACCOUNTID}}
@@ -51,7 +51,7 @@ jobs:
     with:
       microservice_name: investigation-reporting-service
       dockerfile_relative_path: -f ./investigation-service/Dockerfile .
-      environment_classifier: SNAPSHOT
+      environment_classifier: SANDBOX
       java_version: "17"
     secrets:
       CDC_NBS_SANDBOX_SHARED_SERVICES_ACCOUNTID: ${{secrets.CDC_NBS_SANDBOX_SHARED_SERVICES_ACCOUNTID}}
@@ -67,7 +67,7 @@ jobs:
     with:
       microservice_name: post-processing-reporting-service
       dockerfile_relative_path: -f ./post-processing-service/Dockerfile .
-      environment_classifier: SNAPSHOT
+      environment_classifier: SANDBOX
       java_version: "17"
     secrets:
       CDC_NBS_SANDBOX_SHARED_SERVICES_ACCOUNTID: ${{secrets.CDC_NBS_SANDBOX_SHARED_SERVICES_ACCOUNTID}}
@@ -83,7 +83,7 @@ jobs:
     with:
       microservice_name: observation-reporting-service
       dockerfile_relative_path: -f ./observation-service/Dockerfile .
-      environment_classifier: SNAPSHOT
+      environment_classifier: SANDBOX
       java_version: "17"
     secrets:
       CDC_NBS_SANDBOX_SHARED_SERVICES_ACCOUNTID: ${{secrets.CDC_NBS_SANDBOX_SHARED_SERVICES_ACCOUNTID}}
@@ -99,7 +99,7 @@ jobs:
     with:
       microservice_name: ldfdata-reporting-service
       dockerfile_relative_path: -f ./ldfdata-service/Dockerfile .
-      environment_classifier: SNAPSHOT
+      environment_classifier: SANDBOX
       java_version: "17"
     secrets:
       CDC_NBS_SANDBOX_SHARED_SERVICES_ACCOUNTID: ${{secrets.CDC_NBS_SANDBOX_SHARED_SERVICES_ACCOUNTID}}
