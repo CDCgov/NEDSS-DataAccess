@@ -1,5 +1,7 @@
--- This function needs to be created in Azure since the Sql Server agent is not exposed
--- Debezium deployment in Azure AKS need to override this function in the helm chart
+-- This function needs to be created in master since the Sql Server agent is not exposed
+-- We need to override this function in the helm chart distributed properties
+USE MASTER
+
 CREATE OR ALTER FUNCTION dbo.IsSqlAgentRunning() RETURNS BIT AS
 BEGIN
     DECLARE @IsRunning BIT = 0;
@@ -15,3 +17,5 @@ BEGIN
 
     RETURN @IsRunning;
 END;
+
+GRANT VIEW SERVER STATE TO nbs_ods;
