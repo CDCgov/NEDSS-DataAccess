@@ -1,4 +1,4 @@
-USE RDB;
+USE RDB_MODERN;
 IF NOT EXISTS (SELECT 1 FROM sysobjects WHERE name = 'nrt_page_case_answer' and xtype = 'U')
 CREATE TABLE dbo.nrt_page_case_answer
 (

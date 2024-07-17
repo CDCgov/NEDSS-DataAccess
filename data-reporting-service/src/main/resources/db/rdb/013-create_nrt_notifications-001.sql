@@ -1,4 +1,4 @@
-USE RDB;
+USE RDB_MODERN;
 IF NOT EXISTS (SELECT 1 FROM sysobjects WHERE name = 'nrt_notifications' and xtype = 'U')
 CREATE TABLE dbo.nrt_notifications (
     source_act_uid           bigint                                          NOT NULL,

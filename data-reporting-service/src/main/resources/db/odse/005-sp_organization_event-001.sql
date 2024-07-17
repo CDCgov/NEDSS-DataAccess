@@ -1,34 +1,60 @@
 CREATE OR ALTER PROCEDURE dbo.sp_organization_event @org_id_list nvarchar(max)
 AS
-BEGIN
-    SELECT o.organization_uid,
-           o.description,
-           o.cd,
-           o.electronic_ind,
-           o.record_status_cd,
-           o.record_status_time,
-           o.status_cd,
-           o.status_time,
-           o.local_id,
-           o.version_ctrl_nbr,
-           o.edx_ind,
-           naics.code_short_desc_txt as 'stand_ind_class',
-           o.add_user_id,
-           case
-               when o.add_user_id > 0 then (select * from dbo.fn_get_user_name(o.add_user_id))
-               end                   as add_user_name,
-           o.last_chg_user_id,
-           case
-               when o.last_chg_user_id > 0 then (select * from dbo.fn_get_user_name(o.last_chg_user_id))
-               end                   as last_chg_user_name,
-           o.add_time,
-           o.last_chg_time,
-           nested.name               AS 'organization_name',
-           nested.address            AS 'organization_address',
-           nested.phone              AS 'organization_telephone',
-           nested.fax                AS 'organization_fax',
-           nested.entity_id          AS 'organization_entity_id'
-    FROM NBS_ODSE.dbo.Organization o WITH (NOLOCK)
+Begin
+
+BEGIN TRY
+ 	DECLARE @batch_id BIGINT;
+ 	SET @batch_id = cast((format(getdate(),'yyMMddHHmmss')) as bigint);
+INSERT INTO [rdb_modern].[dbo].[job_flow_log]
+(
+      batch_id
+    ,[Dataflow_Name]
+    ,[package_Name]
+    ,[Status_Type]
+    ,[step_number]
+    ,[step_name]
+    ,[row_count]
+    ,[Msg_Description1]
+)
+VALUES (
+    @batch_id
+        ,'Organization PRE-Processing Event'
+        ,'NBS_ODSE.sp_organization_event'
+        ,'START'
+        ,0
+        ,LEFT('Pre ID-' + @org_id_list,199)
+        ,0
+        ,LEFT(@org_id_list,199)
+    );
+
+SELECT o.organization_uid,
+       o.description,
+       o.cd,
+       o.electronic_ind,
+       o.record_status_cd,
+       o.record_status_time,
+       o.status_cd,
+       o.status_time,
+       o.local_id,
+       o.version_ctrl_nbr,
+       o.edx_ind,
+       naics.code_short_desc_txt as 'stand_ind_class',
+        o.add_user_id,
+       case
+           when o.add_user_id > 0 then (select * from dbo.fn_get_user_name(o.add_user_id))
+           end                   as add_user_name,
+       o.last_chg_user_id,
+       case
+           when o.last_chg_user_id > 0 then (select * from dbo.fn_get_user_name(o.last_chg_user_id))
+           end                   as last_chg_user_name,
+       o.add_time,
+       o.last_chg_time,
+       nested.name               AS 'organization_name',
+        nested.address            AS 'organization_address',
+        nested.phone              AS 'organization_telephone',
+        nested.fax                AS 'organization_fax',
+        nested.entity_id          AS 'organization_entity_id'
+FROM NBS_ODSE.dbo.Organization o WITH (NOLOCK)
              OUTER apply (SELECT *
                           FROM
                               -- address
@@ -53,11 +79,11 @@ BEGIN
                                                                 on elp.locator_uid = pl.postal_locator_uid
                                                 left outer join nbs_srte.dbo.state_code sc with (nolock) on sc.state_cd = pl.state_cd
                                                 left outer join nbs_srte.dbo.state_county_code_value scc with (nolock)
-                                                                on scc.code = pl.cnty_cd
+                                                              on scc.code = pl.cnty_cd
                                                 left outer join nbs_srte.dbo.country_code cc with (nolock) on cc.code = pl.cntry_cd
                                                 left outer join nbs_srte.dbo.state_county_code_value ccv with (nolock)
                                                                 on ccv.code = pl.cnty_cd
-                                       WHERE elp.entity_uid = o.organization_uid
+               WHERE elp.entity_uid = o.organization_uid
                                          AND elp.class_cd = 'PST'
                                          AND elp.use_cd = 'WP'
                                          AND elp.cd = 'O'
@@ -97,13 +123,13 @@ BEGIN
                                        FOR json path, INCLUDE_NULL_VALUES) AS fax) AS fax,
                               -- Entity id
                               (SELECT (SELECT ei.entity_uid,
-                                              ei.type_cd          AS [type_cd],
-                                              ei.record_status_cd AS [record_status_cd],
+                      ei.type_cd          AS [type_cd],
+                                 ei.record_status_cd AS [record_status_cd],
                                               STRING_ESCAPE(
                                                       REPLACE(REPLACE(ei.root_extension_txt, '-', ''), ' ', ''),
                                                       'json')     AS [root_extension_txt],
                                               ei.entity_id_seq,
-                                              ei.assigning_authority_cd,
+                                           ei.assigning_authority_cd,
                                               case
                                                   when (ei.type_cd = 'FI' and ei.assigning_authority_cd is not null)
                                                       then (select *
@@ -113,5 +139,60 @@ BEGIN
                                        WHERE ei.entity_uid = o.organization_uid
                                        FOR json path, INCLUDE_NULL_VALUES) AS entity_id) AS entity_id) AS nested
              LEFT JOIN nbs_srte.dbo.NAICS_INDUSTRY_CODE naics ON (NAICS.CODE = o.STANDARD_INDUSTRY_CLASS_CD)
-    WHERE o.organization_uid in (SELECT value FROM STRING_SPLIT(@org_id_list, ','))
-END;
+WHERE o.organization_uid in (SELECT value FROM STRING_SPLIT(@org_id_list, ','))
+
+INSERT INTO [rdb_modern].[dbo].[job_flow_log]
+(
+      batch_id
+    ,[Dataflow_Name]
+    ,[package_Name]
+    ,[Status_Type]
+    ,[step_number]
+    ,[step_name]
+    ,[row_count]
+    ,[Msg_Description1]
+)
+VALUES (
+    @batch_id
+        ,'Organization PRE-Processing Event'
+        ,'NBS_ODSE.sp_organization_event'
+        ,'COMPLETE'
+        ,0
+        ,LEFT('Pre ID-' + @org_id_list,199)
+        ,0
+        ,LEFT(@org_id_list,199)
+    );
+
+end try
+
+BEGIN CATCH
+
+
+IF @@TRANCOUNT > 0   ROLLBACK TRANSACTION;
+
+    	DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
+INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
+                                                batch_id
+    ,[Dataflow_Name]
+    ,[package_Name]
+    ,[Status_Type]
+    ,[step_number]
+    ,[step_name]
+    ,[row_count]
+    ,[Msg_Description1]
+)
+VALUES (
+    @batch_id
+        ,'Organization PRE-Processing Event'
+        ,'NBS_ODSE.sp_organization_event'
+        ,'ERROR: ' + @ErrorMessage
+        ,0
+        ,LEFT('Pre ID-' + @org_id_list,199)
+        ,0
+        ,LEFT(@org_id_list,199)
+    );
+return @ErrorMessage;
+
+END CATCH
+
+end;

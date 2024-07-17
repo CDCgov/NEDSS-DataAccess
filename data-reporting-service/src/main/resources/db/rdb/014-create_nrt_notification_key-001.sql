@@ -1,4 +1,4 @@
-USE RDB;
+USE RDB_MODERN;
 drop table if exists dbo.nrt_notification_key;
 
 CREATE TABLE dbo.nrt_notification_key (

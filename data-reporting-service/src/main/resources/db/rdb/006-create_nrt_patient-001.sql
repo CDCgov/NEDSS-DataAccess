@@ -1,4 +1,4 @@
-use rdb;
+use RDB_MODERN;
 IF NOT EXISTS (SELECT 1 FROM sysobjects WHERE name = 'nrt_patient' and xtype = 'U')
 create table dbo.nrt_patient
 (

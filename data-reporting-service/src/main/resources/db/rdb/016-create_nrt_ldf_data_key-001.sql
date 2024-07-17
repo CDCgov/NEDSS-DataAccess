@@ -1,4 +1,4 @@
-use rdb;
+use RDB_MODERN;
 drop table if exists dbo.nrt_ldf_data_key;
 	
 CREATE TABLE dbo.nrt_ldf_data_key(
