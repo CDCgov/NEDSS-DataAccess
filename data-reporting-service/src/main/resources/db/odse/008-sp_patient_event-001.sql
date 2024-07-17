@@ -5,29 +5,25 @@ BEGIN
     BEGIN TRY
 
         DECLARE @batch_id BIGINT;
-        SET @batch_id = cast((format(getdate(),'yyMMddHHmmss')) as bigint);
+        SET @batch_id = cast((format(getdate(), 'yyMMddHHmmss')) as bigint);
 
         INSERT INTO [rdb_modern].[dbo].[job_flow_log]
-        (
-          batch_id
+        (batch_id
         ,[Dataflow_Name]
         ,[package_Name]
         ,[Status_Type]
         ,[step_number]
         ,[step_name]
         ,[row_count]
-        ,[Msg_Description1]
-        )
-        VALUES (
-                 @batch_id
+        ,[Msg_Description1])
+        VALUES (@batch_id
                ,'Patient PRE-Processing Event'
                ,'NBS_ODSE.sp_patient_event'
                ,'START'
                ,0
-               ,LEFT('Pre ID-' + @user_id_list,199)
+               ,LEFT('Pre ID-' + @user_id_list, 199)
                ,0
-               ,LEFT(@user_id_list,199)
-               );
+               ,LEFT(@user_id_list, 199));
 
         create table #temp_race_table
             (
@@ -221,6 +217,7 @@ BEGIN
                                                   pl.cntry_cd                                                            AS [cntryCd],
                                                   sc.code_desc_txt                                                       AS [state_desc],
                                                   scc.code_desc_txt                                                      AS [county],
+                                                  pl.census_tract                                                        AS [census_tract],
                                                   pl.within_city_limits_ind,
                                                   case
                                                       when elp.use_cd = 'H'
@@ -236,14 +233,14 @@ BEGIN
                                                     LEFT OUTER JOIN nbs_srte.dbo.Country_code cc with (nolock) ON cc.code = pl.cntry_cd
                                            WHERE elp.entity_uid = p.person_uid
                                              AND elp.class_cd = 'PST'
-                                             AND elp.status_cd = 'A'
+                                             AND elp.RECORD_STATUS_CD = 'ACTIVE'
                                            FOR json path, INCLUDE_NULL_VALUES) AS address) AS address,
                                   -- person phone
-                                  (SELECT (SELECT tl.tele_locator_uid                                  AS [ph_tl_uid],
-                                                  elp.cd                     AS [ph_elp_cd],
-                                                  elp.use_cd                  AS [ph_elp_use_cd],
-                                                  REPLACE(tl.phone_nbr_txt, ' ', '')                    AS [telephoneNbr],
-                                                  tl.extension_txt                                     AS [extensionTxt]
+                                  (SELECT (SELECT tl.tele_locator_uid                AS [ph_tl_uid],
+                                                  elp.cd                             AS [ph_elp_cd],
+                                                  elp.use_cd                         AS [ph_elp_use_cd],
+                                                  REPLACE(tl.phone_nbr_txt, ' ', '') AS [telephoneNbr],
+                                                  tl.extension_txt                   AS [extensionTxt]
                                            FROM nbs_odse.dbo.Entity_locator_participation elp WITH (NOLOCK)
                                                     JOIN nbs_odse.dbo.Tele_locator tl WITH (NOLOCK)
                                                          ON elp.locator_uid = tl.tele_locator_uid
@@ -337,60 +334,51 @@ BEGIN
                                            WHERE ei.entity_uid = p.person_uid
                                            FOR json path, INCLUDE_NULL_VALUES) AS entity_id) AS entity_id) AS nested
         WHERE p.person_uid in (SELECT value FROM STRING_SPLIT(@user_id_list, ','))
-          AND p.cd = 'PAT'
+          AND p.cd = 'PAT';
 
 
         INSERT INTO [rdb_modern].[dbo].[job_flow_log]
-        (
-          batch_id
+        (batch_id
         ,[Dataflow_Name]
         ,[package_Name]
         ,[Status_Type]
         ,[step_number]
         ,[step_name]
         ,[row_count]
-        ,[Msg_Description1]
-        )
-        VALUES (
-                 @batch_id
+        ,[Msg_Description1])
+        VALUES (@batch_id
                ,'Patient PRE-Processing Event'
                ,'NBS_ODSE.sp_patient_event'
                ,'COMPLETE'
                ,0
-               ,LEFT('Pre ID-' + @user_id_list,199)
+               ,LEFT('Pre ID-' + @user_id_list, 199)
                ,0
-               ,LEFT(@user_id_list,199)
-               );
+               ,LEFT(@user_id_list, 199));
 
     end try
-
     BEGIN CATCH
 
 
-        IF @@TRANCOUNT > 0   ROLLBACK TRANSACTION;
+        IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
 
         DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
         INSERT INTO [rdb_modern].[dbo].[job_flow_log]
-        (
-          batch_id
+        (batch_id
         ,[Dataflow_Name]
         ,[package_Name]
         ,[Status_Type]
         ,[step_number]
         ,[step_name]
         ,[row_count]
-        ,[Msg_Description1]
-        )
-        VALUES (
-                 @batch_id
+        ,[Msg_Description1])
+        VALUES (@batch_id
                ,'Patient PRE-Processing Event'
                ,'NBS_ODSE.sp_patient_event'
                ,'ERROR: ' + @ErrorMessage
                ,0
-               ,LEFT('Pre ID-' + @user_id_list,199)
+               ,LEFT('Pre ID-' + @user_id_list, 199)
                ,0
-               ,LEFT(@user_id_list,199)
-               );
+               ,LEFT(@user_id_list, 199));
         return @ErrorMessage;
 
     END CATCH
