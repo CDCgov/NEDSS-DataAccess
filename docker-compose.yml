@@ -51,8 +51,8 @@ services:
 
   data-reporting-service:
     build:
-      context: data-reporting-service
-      dockerfile: data-reporting-service/Dockerfile
+      context: .
+      dockerfile: ./liquibase-service/Dockerfile
       args:
         DB_USERNAME: $DB_USERNAME
         DB_PASSWORD: $DB_PASSWORD
@@ -60,9 +60,9 @@ services:
         DB_ODSE: $DB_ODSE
     ports:
       - 8090:8090
-    container_name: data-reporting-service
+    container_name: liquibase-service
     env_file:
-      - data-reporting-service/etldatapipeline.env
+      - liquibase-service/etldatapipeline.env
     networks:
       - etldatapipeline
 

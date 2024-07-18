@@ -1,6 +1,6 @@
 rootProject.name = 'data-access-service'
 
-include 'data-reporting-service'
+include 'liquibase-service'
 
 include 'common-util'
 
