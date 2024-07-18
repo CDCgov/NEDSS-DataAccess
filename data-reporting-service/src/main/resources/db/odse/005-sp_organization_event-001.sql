@@ -28,17 +28,17 @@ VALUES (
     );
 
 SELECT o.organization_uid,
-       o.description,
+       LTRIM(RTRIM(SUBSTRING(o.description,1,1000))) as description,
        o.cd,
-       o.electronic_ind,
-       o.record_status_cd,
+       LTRIM(RTRIM(SUBSTRING(o.electronic_ind,1,1))) as electronic_ind,
+       LTRIM(RTRIM(SUBSTRING(dbo.fn_get_record_status(o.record_status_cd),1,20))) as record_status_cd,
        o.record_status_time,
        o.status_cd,
        o.status_time,
-       o.local_id,
+       LTRIM(RTRIM(o.local_id)) as local_id,
        o.version_ctrl_nbr,
        o.edx_ind,
-       naics.code_short_desc_txt as 'stand_ind_class',
+       LTRIM(RTRIM(naics.code_short_desc_txt)) as 'stand_ind_class',
         o.add_user_id,
        case
            when o.add_user_id > 0 then (select * from dbo.fn_get_user_name(o.add_user_id))
@@ -123,13 +123,13 @@ FROM NBS_ODSE.dbo.Organization o WITH (NOLOCK)
                                        FOR json path, INCLUDE_NULL_VALUES) AS fax) AS fax,
                               -- Entity id
                               (SELECT (SELECT ei.entity_uid,
-                      ei.type_cd          AS [type_cd],
-                                 ei.record_status_cd AS [record_status_cd],
+                      						  ei.type_cd          AS [type_cd],
+                                 			  ei.record_status_cd AS [record_status_cd],
                                               STRING_ESCAPE(
                                                       REPLACE(REPLACE(ei.root_extension_txt, '-', ''), ' ', ''),
                                                       'json')     AS [root_extension_txt],
                                               ei.entity_id_seq,
-                                           ei.assigning_authority_cd,
+                                           	  ei.assigning_authority_cd,
                                               case
                                                   when (ei.type_cd = 'FI' and ei.assigning_authority_cd is not null)
                                                       then (select *
@@ -172,7 +172,7 @@ IF @@TRANCOUNT > 0   ROLLBACK TRANSACTION;
 
     	DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
 INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
+    batch_id
     ,[Dataflow_Name]
     ,[package_Name]
     ,[Status_Type]
