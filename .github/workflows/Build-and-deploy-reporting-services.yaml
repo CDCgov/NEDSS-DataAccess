@@ -6,7 +6,7 @@ on:
       - master
       - rel-**
 #       Uncomment the following line only to test the build deploy from private branches.
-#      - CNDIT-*
+      - CNDIT-*
     paths-ignore:
       - "docker-compose.yml"
       - "**.md"
@@ -110,7 +110,7 @@ jobs:
 
 
   # liquibase-microservice
-  call-build-liquibase-service-microservice-container-workflow:
+  call-build-liquibase-microservice-container-workflow:
     name: Build Liquibase Service Container
     uses: CDCgov/NEDSS-Workflows/.github/workflows/Build-gradle-microservice-container.yaml@main
     with:
