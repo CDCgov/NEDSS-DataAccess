@@ -138,17 +138,10 @@ databaseChangeLog:
       author: liquibase
       changes:
         - sqlFile:
-            path: 019-fn_sql_server_agent_status_override-001.sql
+            path: 020-v_inv_form_code_data-001.sql
             splitStatements: false
   - changeSet:
       id: 20
-      author: liquibase
-      changes:
-        - sqlFile:
-            path: 019-v_inv_form_code_data-001.sql
-            splitStatements: false
-  - changeSet:
-      id: 21
       author: liquibase
       changes:
         - sqlFile:
