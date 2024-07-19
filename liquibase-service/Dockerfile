@@ -11,9 +11,9 @@ RUN wget "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -O "awscliv2
 
 #Copy sources
 COPY liquibase-service/src/main/resources/db/changelog /liquibase/changelog
-COPY liquibase-service/src/main/resources/db/master /liquibase/changelog/src/main/resources/db/master/
-COPY liquibase-service/src/main/resources/db/odse /liquibase/changelog/src/main/resources/db/odse
-COPY liquibase-service/src/main/resources/db/rdb /liquibase/changelog/src/main/resources/db/rdb
+COPY liquibase-service/src/main/resources/db/master /liquibase/changelog
+COPY liquibase-service/src/main/resources/db/odse /liquibase/changelog
+COPY liquibase-service/src/main/resources/db/rdb /liquibase/changelog
 
 #Set the Working Directory
 WORKDIR /liquibase/changelog
