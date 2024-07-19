@@ -10,7 +10,7 @@ export DB_USERNAME=sa
 export DB_PASSWORD=fake.fake.fake.1234
 export DB_URL=localhost 
 export DB_ODSE=NBS_ODSE
-export DB_RDB=RDB
+export DB_RDB=RDB_MODERN
 ```
 
 ### Liquibase script execution
