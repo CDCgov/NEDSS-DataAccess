@@ -1,4 +1,4 @@
-USE RDB;
+USE RDB_MODERN;
 IF NOT EXISTS (SELECT 1 FROM sysobjects WHERE name = 'nrt_investigation_observation' and xtype = 'U')
 CREATE TABLE dbo.nrt_investigation_observation (
     public_health_case_uid bigint                                          NULL,

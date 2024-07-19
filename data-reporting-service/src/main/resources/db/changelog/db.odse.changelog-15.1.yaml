@@ -138,5 +138,19 @@ databaseChangeLog:
       author: liquibase
       changes:
         - sqlFile:
-            path: src/main/resources/db/odse/019-fn_sql_server_agent_status_override.sql
+            path: src/main/resources/db/odse/019-fn_sql_server_agent_status_override-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 20
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/odse/020-v_inv_form_code_data-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 21
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/odse/021-fn_get_record_status-001.sql
             splitStatements: false

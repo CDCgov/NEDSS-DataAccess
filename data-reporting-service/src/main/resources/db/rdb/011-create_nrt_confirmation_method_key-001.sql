@@ -1,4 +1,4 @@
-use rdb;
+use RDB_MODERN;
 drop table if exists dbo.nrt_confirmation_method_key;
 
 CREATE TABLE dbo.nrt_confirmation_method_key (

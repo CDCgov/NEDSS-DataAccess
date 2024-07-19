@@ -1,4 +1,4 @@
-USE RDB;
+USE RDB_MODERN;
 IF NOT EXISTS (SELECT 1 FROM sysobjects WHERE name = 'nrt_batch_log' and xtype = 'U')
 CREATE TABLE dbo.nrt_batch_log(
     batch_id          bigint IDENTITY(1,1) NOT NULL PRIMARY KEY,

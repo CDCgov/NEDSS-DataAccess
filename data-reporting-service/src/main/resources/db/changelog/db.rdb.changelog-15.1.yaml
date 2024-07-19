@@ -216,3 +216,24 @@ databaseChangeLog:
         - sqlFile:
             path: src/main/resources/db/rdb/030-sp_f_page_case_postprocessing-001.sql
             splitStatements: false
+  - changeSet:
+      id: 31
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/031-sp_hepatitis_datamart_postprocessing-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 32
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/032-create_nrt_datamart_metadata-001.sql
+            splitStatements: false
+  - changeSet:
+      id: 33
+      author: liquibase
+      changes:
+        - sqlFile:
+            path: src/main/resources/db/rdb/033-sp_get_date_dim-001.sql
+            splitStatements: false
