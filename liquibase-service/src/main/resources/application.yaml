@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: liquibase-service
+  datasource:
+    password: ${DB_PASSWORD:-fake.fake.fake.1234}
+    username: ${DB_USERNAME:-sa}
+    url: ${DB_URL:localhost}
+    odse: ${DB_ODSE:NBS_ODSE}
+    rdb: ${DB_RDB:RDB}
+logging:
+  #  Only one config can be active at a time
+  config: classpath:logback-config.xml
+  file:
+    name: DataReportingService.log
+    path: ${DA_LOG_PATH:logs}
+server:
+  port: '8090'
