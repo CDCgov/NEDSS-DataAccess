@@ -110,7 +110,7 @@ jobs:
 
 
   # liquibase-microservice
-  call-build-liquibase-microservice-container-workflow:
+  call-build-liquibase-service-microservice-container-workflow:
     name: Build Liquibase Service Container
     uses: CDCgov/NEDSS-Workflows/.github/workflows/Build-gradle-microservice-container.yaml@main
     with:
@@ -125,6 +125,7 @@ jobs:
       GIT_USER_NAME: ${{secrets.GIT_USER_NAME}}
       HELM_TOKEN: ${{secrets.HELM_TOKEN}}
 
+ # Helm Update Liquibase service
   call-update-helm-for-liquibase-microservice:
     needs: call-build-liquibase-microservice-container-workflow
     uses: CDCgov/NEDSS-Workflows/.github/workflows/Update-helm-charts.yaml@main
