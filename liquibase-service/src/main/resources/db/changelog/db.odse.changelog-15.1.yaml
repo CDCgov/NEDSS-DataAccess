@@ -138,7 +138,7 @@ databaseChangeLog:
       author: liquibase
       changes:
         - sqlFile:
-            path: 020-v_inv_form_code_data-001.sql
+            path: 019-v_inv_form_code_data-001.sql
             splitStatements: false
   - changeSet:
       id: 20
