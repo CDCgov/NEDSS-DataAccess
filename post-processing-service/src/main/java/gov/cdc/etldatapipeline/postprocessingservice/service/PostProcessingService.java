@@ -160,7 +160,6 @@ public class PostProcessingService {
                         }
                         break;
                     case NOTIFICATIONS:
-                        logger.info("Notifications processed along with the Investigations");
 //                        processTopic(keyTopic, entity, ids,
 //                        notificationRepository::executeStoredProcForNotificationIds);
                         break;
