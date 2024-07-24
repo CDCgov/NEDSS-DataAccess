@@ -1,2650 +1,645 @@
-CREATE OR ALTER PROCEDURE dbo.sp_public_health_case_fact_datamart_event @phc_id_list nvarchar(max)
+CREATE OR ALTER PROCEDURE [dbo].[sp_investigation_event] @phc_id_list nvarchar(max)
 AS
 BEGIN
-	DECLARE @RowCount_no INT;
-	DECLARE @Proc_Step_no FLOAT = 0;
-	DECLARE @Proc_Step_Name VARCHAR(200) = '';
-	DECLARE @batch_id BIGINT;
-	DECLARE @batch_start_time DATETIME2(7) = NULL;
-	DECLARE @batch_end_time DATETIME2(7) = NULL;
-	DECLARE @type_code VARCHAR(200) = 'PHCMartETL';
-	DECLARE @type_description VARCHAR(200) = 'PHCMartETL Process';
-	DECLARE @return_value INT = 0;
 
-BEGIN TRY
+        BEGIN TRY
+
+        /*NBS case answer section
+         * TODO: Bring in null rows*/
+        DECLARE @batch_id BIGINT;
+        SET @batch_id = cast((format(getdate(),'yyMMddHHmmss')) as bigint);
+        INSERT INTO [rdb_modern].[dbo].[job_flow_log]
+        (      batch_id
+            , [Dataflow_Name]
+            , [package_Name]
+            , [Status_Type]
+            , [step_number]
+            , [step_name]
+            , [row_count]
+            , [Msg_Description1])
+        VALUES (
+            @batch_id
+                , 'Investigation PRE-Processing Event'
+                , 'NBS_ODSE.sp_investigation_event'
+                , 'START'
+                , 0
+                , LEFT ('Pre ID-' + @phc_id_list, 199)
+                , 0
+                , LEFT (@phc_id_list, 199)
+            );
+
+
+        SELECT *
+        into
+            #temp_page_case_answer_table
+        FROM (SELECT *,
+                     ROW_NUMBER() OVER (PARTITION BY NBS_QUESTION_UID
+            order by
+                NBS_QUESTION_UID,
+                other_value_ind_cd desc) rowid
+              FROM (SELECT distinct nbs_case_answer_uid,
+                                    nuim.nbs_ui_metadata_uid,
+                                    nrdbm.nbs_rdb_metadata_uid,
+                                    nrdbm.rdb_table_nm,
+                                    nrdbm.rdb_column_nm,
+                                    nuim.code_set_group_id,
+                                    cast(replace(answer_txt, char(13)+ char(10), ' ') as varchar(2000)) as answer_txt,
+                                    pa.act_uid,
+                                    pa.record_status_cd,
+                                    nuim.nbs_question_uid,
+                                    nuim.investigation_form_cd,
+                                    nuim.unit_value,
+                                    nuim.question_identifier,
+                                    pa.answer_group_seq_nbr,
+                                    nuim.data_location,
+                                    question_label,
+                                    other_value_ind_cd,
+                                    unit_type_cd,
+                                    mask,
+                                    nuim.block_nm,
+                                    question_group_seq_nbr,
+                                    data_type,
+                                    pa.last_chg_time
+                    from nbs_odse.dbo.nbs_rdb_metadata nrdbm with (nolock)
+                inner join nbs_odse.dbo.nbs_ui_metadata nuim
+                    with (nolock)
+                    on
+                        nrdbm.nbs_ui_metadata_uid = nuim.nbs_ui_metadata_uid
+                        left outer join nbs_odse.dbo.nbs_case_answer pa
+                    with (nolock)
+                    on
+                        nuim.nbs_question_uid = pa.nbs_question_uid
+                        inner join nbs_srte.dbo.code_value_general cvg
+                    with (nolock)
+                    on
+                        cvg.code = nuim.data_type
+                    where
+                        cvg.code_set_nm = 'NBS_DATA_TYPE'
+                      and
+                        act_uid in (
+                        SELECT
+                        value
+                        FROM
+                        STRING_SPLIT(@phc_id_list
+                        , ','))) as answer_table) as answer_table
+        where rowid = 1;
+
+        /*Complete Investigation section*/
+        SELECT results.public_health_case_uid,
+               results.program_jurisdiction_oid as program_jurisdiction_oid,
+               jc.code                          as jurisdiction_code,
+               jc.code_desc_txt                 as jurisdiction_nm,
+               act.mood_cd,
+               act.class_cd,
+               results.case_type_cd,
+               results.case_class_cd,
+               results.inv_case_status,
+               results.outbreak_name,
+               results.cd,
+               results.cd_desc_txt,
+               results.prog_area_cd,
+               results.jurisdiction_cd,
+               results.pregnant_ind_cd,
+               results.pregnant_ind,
+               results.local_id                    local_id,
+               results.rpt_form_cmplt_time,
+               results.activity_to_time,
+               results.activity_from_time,
+               results.add_user_id,
+               case
+                   when results.add_user_id > 0 then (select * from dbo.fn_get_user_name(results.add_user_id))
+                   end                          as add_user_name,
+               results.add_time,
+               results.last_chg_user_id,
+               case
+                   when results.last_chg_user_id > 0 then (select * from dbo.fn_get_user_name(results.last_chg_user_id))
+                   end                          as last_chg_user_name,
+               results.last_chg_time,
+               results.curr_process_state_cd,
+               results.curr_process_state,
+               results.investigation_status_cd,
+               results.investigation_status,
+               case
+                   when (results.record_status_cd is not null or results.record_status_cd != '')
+                       then dbo.fn_get_record_status(results.record_status_cd)
+                   end                          as record_status_cd,
+               results.shared_ind,
+               results.txt,
+               results.effective_from_time,
+               results.effective_to_time,
+               results.rpt_source_cd,
+               results.rpt_src_cd_desc,
+               results.rpt_to_county_time,
+               results.rpt_to_state_time,
+               results.mmwr_week,
+               results.mmwr_year,
+               results.disease_imported_cd,
+               results.disease_imported_ind,
+               results.imported_country_cd,
+               results.imported_state_cd,
+               results.imported_county_cd,
+               results.imported_from_country,
+               sc.state_nm                         imported_from_state,
+               sccv.code_desc_txt                  imported_from_county,
+               results.imported_city_desc_txt,
+               results.diagnosis_time,
+               results.hospitalized_admin_time,
+               results.hospitalized_discharge_time,
+               results.hospitalized_duration_amt,
+               results.outbreak_ind,
+               results.outbreak_ind_val,
+               results.hospitalized_ind_cd,
+               results.hospitalized_ind,
+               results.transmission_mode_cd,
+               results.transmission_mode,
+               results.outcome_cd,
+               results.die_frm_this_illness_ind,
+               results.day_care_ind_cd,
+               results.day_care_ind,
+               results.food_handler_ind_cd,
+               results.food_handler_ind,
+               results.deceased_time,
+               results.pat_age_at_onset,
+               results.pat_age_at_onset_unit_cd,
+               results.pat_age_at_onset_unit,
+               results.detection_method_cd,
+               results.priority_cd,
+               results.contact_inv_status_cd,
+               cvg.code_desc_txt                   detection_method_desc_txt,
+               cvg1.code_short_desc_txt            contact_inv_priority,
+               cvg2.code_short_desc_txt            contact_inv_status,
+               results.investigator_assigned_time,
+               results.effective_duration_amt,
+               results.effective_duration_unit_cd,
+               results.illness_duration_unit,
+               results.infectious_from_date,
+               results.infectious_to_date,
+               results.referral_basis_cd,
+               results.referral_basis,
+               results.inv_priority_cd,
+               results.coinfection_id,
+               results.contact_inv_txt,
+               pac.prog_area_desc_txt              program_area_description,
+               notification.local_id               notification_local_id,
+               notification.add_time               notification_add_time,
+               notification.record_status_cd       notification_record_status_cd,
+               notification.last_chg_time          notification_last_chg_time,
+               cm.case_management_uid,
+               investigation_act_entity.nac_page_case_uid,
+               investigation_act_entity.nac_last_chg_time,
+               investigation_act_entity.nac_add_time,
+               investigation_act_entity.person_as_reporter_uid,
+               investigation_act_entity.hospital_uid,
+               investigation_act_entity.ordering_facility_uid,
+               results.act_ids,
+               results.observation_notification_ids,
+               results.person_participations,
+               results.organization_participations,
+               results.investigation_confirmation_method,
+               results.investigation_case_answer,
+               results.investigation_notifications
+        --con.investigation_form_cd,
+        -- ,results.investigation_act_entity
+        -- ,results.ldf_public_health_case
+        -- into dbo.Investigation_Dim_Event
+        FROM (SELECT phc.public_health_case_uid,
+                     phc.program_jurisdiction_oid program_jurisdiction_oid,
+                     phc.case_type_cd,
+                     phc.case_class_cd,
+                     case
+                         when (phc.case_class_cd is not null or phc.case_class_cd != '') then (select *
+                                                                                               from dbo.fn_get_value_by_cd_codeset(phc.case_class_cd, 'INV163'))
+                         end as                   inv_case_status,
+                     phc.outbreak_name,
+                     phc.cd,
+                     phc.cd_desc_txt              cd_desc_txt,
+                     phc.prog_area_cd             prog_area_cd,
+                     phc.jurisdiction_cd          jurisdiction_cd,
+                     phc.pregnant_ind_cd          pregnant_ind_cd,
+                     case
+                         when (phc.pregnant_ind_cd is not null or phc.pregnant_ind_cd != '') then (select *
+                                                                                                   from dbo.fn_get_value_by_cd_codeset(phc.pregnant_ind_cd, 'INV178'))
+                         end as                   pregnant_ind,
+                     phc.local_id                 local_id,
+                     phc.rpt_form_cmplt_time      rpt_form_cmplt_time,
+                     phc.activity_to_time         activity_to_time,
+                     phc.add_time                 add_time,
+                     phc.activity_from_time       activity_from_time,
+                     phc.last_chg_time,
+                     phc.add_user_id              add_user_id,
+                     phc.last_chg_user_id         last_chg_user_id,
+                     phc.curr_process_state_cd    curr_process_state_cd,
+                     case
+                         when (phc.curr_process_state_cd is not null or phc.curr_process_state_cd != '') then (select *
+                                                                                                               from dbo.fn_get_value_by_cvg(
+                                                                                                                       phc.curr_process_state_cd,
+                                                                                                                       'CM_PROCESS_STAGE'))
+                         end as                   curr_process_state,
+                     phc.investigation_status_cd,
+                     case
+                         when (phc.investigation_status_cd is not null or phc.investigation_status_cd != '') then (select *
+                                                                                                                   from dbo.fn_get_value_by_cd_codeset(
+                                                                                                                           phc.investigation_status_cd,
+                                                                                                                           'INV109'))
+                         end as                   investigation_status,
+                     phc.record_status_cd,
+                     phc.shared_ind,
+                     phc.txt,
+                     phc.effective_from_time,
+                     phc.effective_to_time,
+                     phc.rpt_source_cd,
+                     case
+                         when (phc.rpt_source_cd is not null or phc.rpt_source_cd != '') then (select *
+                                                                                               from dbo.fn_get_value_by_cd_codeset(phc.rpt_source_cd, 'INV112'))
+                         end as                   rpt_src_cd_desc,
+                     phc.rpt_to_county_time,
+                     phc.rpt_to_state_time,
+                     phc.mmwr_week,
+                     phc.mmwr_year,
+                     phc.disease_imported_cd,
+                     case
+                         when (phc.disease_imported_cd is not null or phc.disease_imported_cd != '') then (select *
+                                                                                                           from dbo.fn_get_value_by_cd_codeset(phc.disease_imported_cd, 'INV152'))
+                         end as                   disease_imported_ind,
+                     phc.imported_city_desc_txt,
+                     phc.imported_country_cd,
+                     case
+                         when (phc.imported_country_cd is not null or phc.imported_country_cd != '') then (select *
+                                                                                                           from dbo.fn_get_value_by_cd_codeset(phc.imported_country_cd, 'INV153'))
+                         end as                   imported_from_country,
+                     phc.imported_state_cd,
+                     phc.imported_county_cd,
+                     phc.diagnosis_time,
+                     phc.hospitalized_admin_time,
+                     phc.hospitalized_discharge_time,
+                     phc.hospitalized_duration_amt,
+                     phc.outbreak_ind,
+                     case
+                         when (phc.outbreak_ind is not null or phc.outbreak_ind != '') then (select *
+                                                                                             from dbo.fn_get_value_by_cd_codeset(phc.outbreak_ind, 'INV150'))
+                         end as                   outbreak_ind_val,
+                     phc.hospitalized_ind_cd,
+                     case
+                         when (phc.hospitalized_ind_cd is not null or phc.hospitalized_ind_cd != '') then (select *
+                                                                                                           from dbo.fn_get_value_by_cd_codeset(phc.hospitalized_ind_cd, 'INV128'))
+                         end as                   hospitalized_ind,
+                     phc.transmission_mode_cd,
+                     case
+                         when (phc.transmission_mode_cd is not null or phc.transmission_mode_cd != '') then (select *
+                                                                                                             from dbo.fn_get_value_by_cd_codeset(phc.transmission_mode_cd, 'INV157'))
+                         end as                   transmission_mode,
+                     phc.outcome_cd,
+                     case
+                         when (phc.outcome_cd != '') then (select *
+                                                           from dbo.fn_get_value_by_cd_codeset(phc.outcome_cd, 'INV145'))
+                         end as                   die_frm_this_illness_ind,
+                     phc.day_care_ind_cd,
+                     case
+                         when (phc.day_care_ind_cd is not null or phc.day_care_ind_cd != '') then (select *
+                                                                                                   from dbo.fn_get_value_by_cd_codeset(phc.day_care_ind_cd, 'INV148'))
+                         end as                   day_care_ind,
+                     phc.food_handler_ind_cd,
+                     case
+                         when (phc.food_handler_ind_cd is not null or phc.food_handler_ind_cd != '') then (select *
+                                                                                                           from dbo.fn_get_value_by_cd_codeset(phc.food_handler_ind_cd, 'INV149'))
+                         end as                   food_handler_ind,
+                     phc.deceased_time,
+                     phc.pat_age_at_onset,
+                     phc.pat_age_at_onset_unit_cd,
+                     case
+                         when (phc.pat_age_at_onset_unit_cd is not null or phc.pat_age_at_onset_unit_cd != '') then (select *
+                                                                                                                     from dbo.fn_get_value_by_cd_codeset(
+                                                                                                                             phc.pat_age_at_onset_unit_cd,
+                                                                                                                             'INV144'))
+                         end as                   pat_age_at_onset_unit,
+                     phc.detection_method_cd,
+                     phc.priority_cd,
+                     phc.investigator_assigned_time,
+                     phc.effective_duration_amt,
+                     phc.effective_duration_unit_cd,
+                     case
+                         when (phc.effective_duration_unit_cd is not null or phc.effective_duration_unit_cd != '')
+                             then (select * from dbo.fn_get_value_by_cd_codeset(phc.effective_duration_unit_cd, 'INV144'))
+                         end as                   illness_duration_unit,
+                     phc.infectious_from_date,
+                     phc.infectious_to_date,
+                     phc.referral_basis_cd,
+                     case
+                         when (phc.referral_basis_cd is not null or phc.referral_basis_cd != '') then (select *
+                                                                                                       from dbo.fn_get_value_by_cvg(phc.referral_basis_cd, 'REFERRAL_BASIS'))
+                         end as                   referral_basis,
+                     phc.inv_priority_cd,
+                     phc.contact_inv_status_cd,
+                     phc.coinfection_id,
+                     phc.contact_inv_txt,
+                     nesteddata.act_ids,
+                     nesteddata.observation_notification_ids,
+                     nesteddata.person_participations,
+                     nesteddata.organization_participations,
+                     nesteddata.investigation_confirmation_method,
+                     nesteddata.investigation_case_answer
+                      ,
+                     nesteddata.investigation_notifications
+              --,nesteddata.ldf_public_health_case
+              FROM
+                  --public health case
+                  public_health_case phc WITH (NOLOCK)
+               OUTER apply (
+                SELECT
+                  *
+                FROM
+                  (
+                    -- persons associated with public_health_case
+                    SELECT
+                      (
+                        SELECT
+                          p.act_uid AS [act_uid],
+                          p.type_cd AS [type_cd],
+                          p.subject_entity_uid AS [entity_id],
+                          p.subject_class_cd AS [subject_class_cd],
+                          p.record_status_cd AS [participation_record_status],
+                          p.last_chg_time AS [participation_last_change_time],
+                          STRING_ESCAPE(person.first_nm, 'json') AS [first_name],
+                          STRING_ESCAPE(person.last_nm, 'json') AS [last_name],
+                          person.local_id AS [local_id],
+                          person.birth_time AS [birth_time],
+                          person.curr_sex_cd AS [curr_sex_cd],
+                          person.cd AS [person_cd],
+                          person.person_parent_uid AS [person_parent_uid],
+                          person.record_status_cd AS [person_record_status],
+                          person.last_chg_time AS [person_last_chg_time]
+                      FROM
+                        participation p
+                          WITH (NOLOCK)
+                          JOIN person ON person.person_uid = (
+                        select
+                              person.person_parent_uid
+                            from
+                              person WITH (NOLOCK)
+                            where
+                              person.person_uid = p.subject_entity_uid
+                          )
+                        WHERE
+              p.act_uid = phc.public_health_case_uid FOR json path,INCLUDE_NULL_VALUES
+                      ) AS person_participations
+                  ) AS person_participations,
+                  (
+              SELECT
+                    (
+                        SELECT
+                          p.act_uid AS [act_uid],
+                          p.type_cd AS [type_cd],
+                          p.subject_entity_uid AS [entity_id],
+                          p.subject_class_cd AS [subject_class_cd],
+                          p.record_status_cd AS [record_status],
+                          p.last_chg_time AS [participation_last_change_time],
+                          STRING_ESCAPE(org.display_nm, 'json') AS [name],
+                          org.last_chg_time AS [org_last_change_time]
+                        FROM
+                          participation p
+                          WITH (NOLOCK)
+                          JOIN organization org WITH (NOLOCK) ON org.organization_uid = p.subject_entity_uid
+                        WHERE
+                          p.act_uid = phc.public_health_case_uid FOR json path,INCLUDE_NULL_VALUES
+                      ) AS organization_participations
+                  ) AS organization_participations
+                  -- act_ids associated with public health case
+                  ,(
+                    SELECT
+            (
+                        SELECT
+                        act.source_act_uid ,
+                        act.target_Act_uid as public_health_case_uid,
+                        act.source_class_cd,
+                        act.target_class_cd,
+                        act.type_cd as act_type_cd,
+                        act.status_cd,
+                        act.add_time act_add_time,
+                        act.add_user_id act_add_user_id,
+                        case when act.add_user_id > 0 then (select * from dbo.fn_get_user_name(act.add_user_id))
+                        end as add_user_name,
+                        act.last_chg_user_id act_last_chg_user_id,
+                        case when act.last_chg_user_id > 0 then (select * from dbo.fn_get_user_name(act.last_chg_user_id))
+                        end as last_chg_user_name,
+                        act.last_chg_time as act_last_chg_time
+                        FROM
+                          act_id WITH (NOLOCK)
+                          join act_relationship act WITH (NOLOCK) on act_id.act_uid = act.target_act_uid
+                        WHERE
+                          act.target_act_uid = phc.public_health_case_uid FOR json path,INCLUDE_NULL_VALUES
+                      ) AS observation_notification_ids
+                ) AS observation_notification_ids
+               -- act_ids associated with public health case
+                      ,(
+                        SELECT
+                          (
+                            SELECT
+                              act_id.act_uid AS [id],
+                              act_id_seq AS [act_id_seq],
+                              act_id.record_status_cd AS [record_status],
+                              act_id.root_extension_txt AS [root_extension_txt],
+                              act_id.type_cd AS [type_cd],
+                              act_id.type_desc_txt AS [type_desc_txt],
+                              act_id.add_time act_id_add_time,
+                              act_id.add_user_id act_id_add_user_id,
+                              act_id.last_chg_user_id act_id_last_chg_user_id,
+                              act_id.last_chg_time AS [act_id_last_change_time]
+                            FROM
+                              act_id WITH (NOLOCK)
+                            WHERE
+                              act_uid = phc.public_health_case_uid FOR json path,INCLUDE_NULL_VALUES
+                  ) AS act_ids
+                      ) AS act_ids,
+                  -- get assocaited confirmation method
+        (
+                    SELECT
+                      (
+                       select cm.public_health_case_uid,
+                        cm.confirmation_method_cd,
+                        cvg.CODE_SHORT_DESC_TXT as confirmation_method_desc_txt,
+                        cm.confirmation_method_time,
+                        phc1.last_chg_time as phc_last_chg_time
+                        from dbo.Confirmation_method cm
+                            join nbs_srte.dbo.Code_value_general cvg WITH (NOLOCK) on cvg.code = cm.confirmation_method_cd and cvg.code_set_nm='PHC_CONF_M'
+                            join dbo.Public_health_case phc1 WITH (NOLOCK) on cm.public_health_case_uid = phc1.public_health_case_uid
+                        WHERE
+                          cm.public_health_case_uid = phc.public_health_case_uid  FOR json path,INCLUDE_NULL_VALUES
+                      ) AS investigation_confirmation_method
+                  ) AS investigation_confirmation_method,
+                  -- NBS case answer associated with phc
+                  (
+                    SELECT
+                      (
+                       select
+                        nbs_case_answer_uid,
+                        nca.nbs_ui_metadata_uid,
+                        nca.nbs_rdb_metadata_uid,
+                        nca.rdb_table_nm,
+                        nca.rdb_column_nm,
+                        nca.code_set_group_id,
+                        nca.answer_txt,
+                        nca.act_uid,
+                        nca.record_status_cd,
+                        nca.nbs_question_uid,
+                        nca.investigation_form_cd,
+                        nca.unit_value,
+                        nca.question_identifier,
+                        nca.data_location,
+                        nca.answer_group_seq_nbr,
+                        nca.question_label,
+                        nca.other_value_ind_cd,
+                        nca.unit_type_cd,
+                        nca.mask,
+                        nca.block_nm,
+                        nca.question_group_seq_nbr,
+                        nca.data_type,
+                        nca.last_chg_time
+                        from #temp_page_case_answer_table nca WITH (NOLOCK)
+                        WHERE
+                          nca.act_uid = phc.public_health_case_uid
+                          --AND nca.last_chg_time = phc.last_chg_time
+                          FOR json path,INCLUDE_NULL_VALUES
+                      ) AS investigation_case_answer
+                  ) AS investigation_case_answer
+
+                  -- investigation notification columns
+                  ,(
+                    SELECT
+                      (
+                       SELECT
+                    act.source_act_uid ,
+                        act.target_act_uid as public_health_case_uid,
+                        act.source_class_cd,
+                        act.target_class_cd,
+                        act.type_cd as act_type_cd,
+                        act.status_cd,
+                        notif.notification_uid,
+                        notif.prog_area_cd,
+                        notif.program_jurisdiction_oid,
+                        notif.jurisdiction_cd,
+                        notif.record_status_time,
+                        notif.status_time,
+                        notif.rpt_sent_time,
+                        notif.record_status_cd as 'notif_status',
+                        notif.local_id as 'notif_local_id',
+                        notif.txt as 'notif_comments',
+                        notif.add_time as 'notif_add_time',
+                        notif.add_user_id as 'notif_add_user_id',
+                        case when notif.add_user_id > 0 then (select * from dbo.fn_get_user_name(notif.add_user_id))
+                        end as 'notif_add_user_name',
+                        notif.last_chg_user_id as 'notif_last_chg_user_id',
+                        case when notif.last_chg_user_id > 0 then (select * from dbo.fn_get_user_name(notif.last_chg_user_id))
+                        end as 'notif_last_chg_user_name',
+                        notif.last_chg_time as 'notif_last_chg_time',
+                        per.local_id as 'local_patient_id',
+                        per.person_uid as 'local_patient_uid',
+                        phc.cd as 'condition_cd',
+                        phc.cd_desc_txt as 'condition_desc'
+                        FROM
+                          act_relationship act WITH (NOLOCK)
+                          join notification notif WITH (NOLOCK) on  act.source_act_uid = notif.notification_uid
+                          join nbs_odse.dbo.participation part with (nolock) ON part.type_cd='SubjOfPHC' AND part.act_uid=act.target_act_uid
+                          join nbs_odse.dbo.person per with (nolock) ON per.cd='PAT' AND per.person_uid = part.subject_entity_uid
+                        WHERE
+                          act.target_act_uid = phc.public_health_case_uid
+                          AND notif.cd not in ('EXP_NOTF', 'SHARE_NOTF', 'EXP_NOTF_PHDC','SHARE_NOTF_PHDC')
+                         AND act.source_class_cd = 'NOTF'
+                          AND act.target_class_cd = 'CASE' FOR json path,INCLUDE_NULL_VALUES
+                      ) AS investigation_notifications
+                  ) AS investigation_notifications
+
+                  /*
+                   -- ldf_phc associated with phc
+                  ,(
+                    SELECT
+                      (
+                       select * from nbs_odse..v_ldf_phc ldf
+                         WHERE ldf.public_health_case_uid = phc.public_health_case_uid
+                       Order By ldf.public_health_case_uid, ldf.display_order_nbr
+                                FOR json path,INCLUDE_NULL_VALUES
+                      ) AS ldf_public_health_case
+                  ) AS ldf_public_health_case
+                  */
+
+              ) as nestedData
+              WHERE
+                  phc.public_health_case_uid in (SELECT value FROM STRING_SPLIT(@phc_id_list
+                  , ','))) AS results
+                 LEFT JOIN notification WITH (NOLOCK) ON results.public_health_case_uid = notification.notification_uid
+                 LEFT JOIN nbs_srte.dbo.jurisdiction_code jc WITH (NOLOCK) ON results.jurisdiction_cd = jc.code
+                 LEFT JOIN act WITH (NOLOCK) ON act.act_uid = results.public_health_case_uid
+                 LEFT JOIN nbs_srte.dbo.program_area_code pac WITH (NOLOCK) on results.prog_area_cd = pac.prog_area_cd
+                 LEFT JOIN nbs_srte.dbo.state_code sc WITH (NOLOCK) ON results.imported_state_cd = sc.state_cd
+                 LEFT JOIN nbs_srte.dbo.state_county_code_value sccv WITH (NOLOCK) ON results.imported_county_cd = sccv.code
+                 LEFT JOIN nbs_srte.dbo.code_value_general cvg WITH (NOLOCK)
+                    ON results.detection_method_cd = cvg.code and cvg.code_set_nm = 'PHC_DET_MT'
+                        LEFT JOIN nbs_srte.dbo.code_value_general cvg1 WITH (NOLOCK)
+                    on results.priority_cd = cvg1.code and cvg1.code_set_nm = 'NBS_PRIORITY'
+                        LEFT JOIN nbs_srte.dbo.code_value_general cvg2 WITH (NOLOCK)
+                    on results.contact_inv_status_cd = cvg2.code and cvg2.code_set_nm = 'PHC_IN_STS'
+                 LEFT OUTER JOIN nbs_odse.dbo.case_management cm WITH (NOLOCK) on results.public_health_case_uid = cm.public_health_case_uid
+                 LEFT JOIN
+                        (SELECT DISTINCT act_uid       AS                                                  nac_page_case_uid,
+                        last_chg_time AS                                                  nac_last_chg_time,
+                        add_time      as                                                  nac_add_time,
+                        MAX(CASE WHEN type_cd = 'PerAsReporterOfPHC' THEN entity_uid END) person_as_reporter_uid,
+                        MAX(CASE WHEN type_cd = 'HospOfADT' THEN entity_uid END)          hospital_uid,
+                        MAX(CASE WHEN type_cd = 'OrgAsClinicOfPHC' THEN entity_uid END)   ordering_facility_uid
+                        FROM nbs_act_entity nac WITH (NOLOCK)
+                        GROUP BY act_uid, last_chg_time, add_time) AS investigation_act_entity
+                        ON investigation_act_entity.nac_page_case_uid = results.public_health_case_uid
+                    --LEFT JOIN nbs_srte.dbo.condition_code con on results.cd = con.condition_cd
+                    ;
+
+        -- select * from dbo.Investigation_Dim_Event;
+
+        INSERT INTO [rdb_modern].[dbo].[job_flow_log]
+        (      batch_id
+            , [Dataflow_Name]
+            , [package_Name]
+            , [Status_Type]
+            , [step_number]
+            , [step_name]
+            , [row_count]
+            , [Msg_Description1])
+        VALUES (
+            @batch_id
+                , 'Investigation PRE-Processing Event'
+                , 'NBS_ODSE.sp_investigation_event'
+                , 'COMPLETE'
+                , 0
+                , LEFT ('Pre ID-' + @phc_id_list, 199)
+                , 0
+                , LEFT (@phc_id_list, 199)
+            );
 
-
-		--EXEC @return_value = [rdb_modern].[dbo].[sp_nbs_batch_start] @type_code 	,@type_description;
-
-		-- SELECT 'Return Value TEST ' = @return_value;
-SELECT @batch_id = cast((format(getdate(),'yyMMddHHmmss')) as bigint);
-
--- SET @batch_end_time = getdate();
-
-
-PRINT CAST(@batch_id AS VARCHAR(max));
-
-
-BEGIN TRANSACTION;
-
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @batch_id
-        ,'PCHMartETL'
-        ,'NBS_ODSE.PublicHealthCaseFact'
-        ,'Start Process'
-        ,0
-        ,@phc_id_list
-        ,0
-    );
-
-
-SET @Proc_Step_no = @Proc_Step_no + 1;
-		SET @Proc_Step_Name = 'Generating TEMP_INV_FORM_CODE_DATA' ;
-
-		IF OBJECT_ID('#TEMP_INV_FORM_CODE_DATA') IS NOT NULL
-DROP TABLE #TEMP_INV_FORM_CODE_DATA;
-
--- The below SQL is now a view - nbs_odse.dbo.v_inv_form_code_data
-/*SELECT DISTINCT DATA_LOCATION
-    ,CODESET.CODE_SET_GROUP_ID
-    ,CODESET.CODE_SET_NM
-    ,NBS_UI_METADATA.INVESTIGATION_FORM_CD
-    ,CODE_VALUE_GENERAL.CODE
-    ,CODE_VALUE_GENERAL.CODE_SHORT_DESC_TXT
-INTO #TEMP_INV_FORM_CODE_DATA
-FROM NBS_ODSE.DBO.NBS_UI_METADATA WITH (NOLOCK)
-INNER JOIN NBS_SRTE.DBO.CODESET WITH (NOLOCK) ON NBS_UI_METADATA.CODE_SET_GROUP_ID = CODESET.CODE_SET_GROUP_ID
-INNER JOIN NBS_SRTE.DBO.CONDITION_CODE WITH (NOLOCK) ON CONDITION_CODE.INVESTIGATION_FORM_CD = NBS_UI_METADATA.INVESTIGATION_FORM_CD
-INNER JOIN NBS_SRTE.DBO.CODE_VALUE_GENERAL WITH (NOLOCK) ON CODE_VALUE_GENERAL.CODE_SET_NM = CODESET.CODE_SET_NM
-WHERE  question_identifier in (
-        'DEM218', 'DEM114', 'INV163',  'INV161',  'DEM126',  'DEM113', 'DEM127', 'INV159', 'INV152', 'DEM155', 'NOT112', 'INV109',  'INV107', 'DEM140',  'DEM116_B', 'DEM139', 'INV145', 'INV150', 'INV151', 'NPP063', 'INV144', 'DEM142', 'INV108',  'DEM152', 'DEM238', 'INV187', 'INV112', 'INV174', 'INV107', 'INV2002')
-        AND CODESET.CODE_SET_GROUP_ID IS NOT NULL
-ORDER BY NBS_UI_METADATA.DATA_LOCATION */
-
--- use the view and order by data_location
-Select DATA_LOCATION
-     ,CODE_SET_GROUP_ID
-     ,CODE_SET_NM
-     ,INVESTIGATION_FORM_CD
-     ,CODE
-     ,CODE_SHORT_DESC_TXT
-INTO #TEMP_INV_FORM_CODE_DATA
-from nbs_odse.dbo.v_inv_form_code_data
-ORDER BY DATA_LOCATION;
-
-
-SELECT @ROWCOUNT_NO = @@ROWCOUNT;
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @Batch_id
-        ,'PCHMartETL'
-        ,'NBS_ODSE.PublicHealthCaseFact'
-        ,'COMPLETED'
-        ,@PROC_STEP_NO
-        ,@PROC_STEP_NAME
-        ,@ROWCOUNT_NO
-    );
-
-COMMIT TRANSACTION;
-BEGIN TRANSACTION;
-				SET @Proc_Step_no = @Proc_Step_no + 1;
-		SET @Proc_Step_Name = 'Generating DBO.TEMP_UPDATE_NEW_PATIENT';
-
-
-	IF OBJECT_ID('#TEMP_UPDATE_NEW_PATIENT') IS NOT NULL
-DROP TABLE #TEMP_UPDATE_NEW_PATIENT;
-
-SELECT  Public_health_case.PUBLIC_HEALTH_CASE_UID
-     ,PER.PERSON_UID
-     ,PER.PERSON_PARENT_UID
-     ,PER.LOCAL_ID AS PERSON_LOCAL_ID
-     ,PER.AGE_CATEGORY_CD
-     ,PER.AGE_REPORTED
-     ,PER.AGE_REPORTED_TIME
-     ,PER.AGE_REPORTED_UNIT_CD
-     ,PER.BIRTH_TIME
-     ,PER.BIRTH_TIME_CALC
-     ,PER.CD AS PERSON_CD
-     ,PER.CD_DESC_TXT AS PERSON_CODE_DESC
-     ,PER.CURR_SEX_CD
-     ,PER.DECEASED_IND_CD
-     ,PER.DECEASED_TIME
-     ,PER.ETHNIC_GROUP_IND
-     ,PER.MARITAL_STATUS_CD
-     ,MPR.MULTIPLE_BIRTH_IND
-     ,MPR.OCCUPATION_CD
-     ,MPR.PRIM_LANG_CD
-     ,MPR.ADULTS_IN_HOUSE_NBR
-     ,MPR.BIRTH_GENDER_CD
-     ,MPR.BIRTH_ORDER_NBR
-     ,MPR.CHILDREN_IN_HOUSE_NBR
-     ,MPR.EDUCATION_LEVEL_CD
-     ,MPR.LAST_CHG_TIME AS MPR_LAST_CHG_TIME
-     ,NOTIFICATION.LAST_CHG_TIME AS NOTIF_LAST_CHG_TIME
-INTO #TEMP_UPDATE_NEW_PATIENT
-FROM NBS_ODSE.DBO.PERSON PER WITH (NOLOCK)
-		INNER JOIN NBS_ODSE.DBO.PARTICIPATION PAR WITH (NOLOCK) ON PER.PERSON_UID = PAR.SUBJECT_ENTITY_UID
-    INNER JOIN NBS_ODSE.DBO.Public_health_case Public_health_case WITH (NOLOCK) ON PAR.act_uid = Public_health_case.public_health_case_uid
-    INNER JOIN NBS_ODSE.DBO.PERSON MPR WITH (NOLOCK) ON PER.PERSON_PARENT_UID = MPR.PERSON_UID
-    LEFT JOIN NBS_ODSE.DBO.ACT_RELATIONSHIP  WITH (NOLOCK) ON ACT_RELATIONSHIP.TARGET_ACT_UID=PUBLIC_HEALTH_CASE.PUBLIC_HEALTH_CASE_UID
-    LEFT JOIN NBS_ODSE.DBO.NOTIFICATION   WITH (NOLOCK) ON NOTIFICATION.NOTIFICATION_UID=ACT_RELATIONSHIP.SOURCE_ACT_UID
-    AND NOTIFICATION.CD='NOTF'
-WHERE PAR.TYPE_CD = 'SUBJOFPHC'
-  and  Public_health_case.public_health_case_uid in (select value from string_split(@phc_id_list, ','))
-
-SELECT @ROWCOUNT_NO = @@ROWCOUNT;
-
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @Batch_id
-        ,'PCHMartETL'
-        ,'NBS_ODSE.PublicHealthCaseFact'
-        ,'COMPLETED'
-        ,@PROC_STEP_NO
-        ,@PROC_STEP_NAME
-        ,@ROWCOUNT_NO
-    );
-COMMIT TRANSACTION;
--------------------PHCSUBJECT
-BEGIN TRANSACTION;
-
-		SET @Proc_Step_no = @Proc_Step_no + 1;
-		SET @Proc_Step_Name = 'Generating TEMP_PHCPATIENTINFO';
-
-		IF OBJECT_ID('#TEMP_PHCPATIENTINFO') IS NOT NULL
-DROP TABLE #TEMP_PHCPATIENTINFO;
-
-SELECT
-    PER.*
-     ,(COALESCE(LTRIM(RTRIM(PNM.LAST_NM)), '') + ', ' + COALESCE(LTRIM(RTRIM(PNM.FIRST_NM)), '')) AS PATIENTNAME
-     ,case when LTRIM(RTRIM(PST.STATE_CD)) = '' then null else LTRIM(RTRIM(PST.STATE_CD)) end STATE_CD
-     ,SRT1.code_short_desc_txt AS STATE
-     ,case when LTRIM(RTRIM(PST.CNTY_CD)) = '' then null else LTRIM(RTRIM(PST.CNTY_CD)) end CNTY_CD
-     ,SRT3.code_desc_txt AS COUNTY
-     ,PAR.AWARENESS_CD
-     ,PAR.AWARENESS_DESC_TXT
-     ,PAR.TYPE_CD AS PAR_TYPE_CD
-     ,CVG.CODE_SHORT_DESC_TXT AS EDUCATION_LEVEL_DESC_TXT
-     ,RTRIM(LTRIM(A.CODE_SHORT_DESC_TXT)) AS ETHNIC_GROUP_IND_DESC
-     ,CVG2.CODE_SHORT_DESC_TXT AS MARITAL_STATUS_DESC_TXT
-     ,LNG.CODE_SHORT_DESC_TXT AS PRIM_LANG_DESC_TXT
-     ,ELP.FROM_TIME AS ELP_FROM_TIME
-     ,ELP.TO_TIME AS ELP_TO_TIME
-     ,ELP.CLASS_CD AS ELP_CLASS_CD
-     ,ELP.USE_CD AS ELP_USE_CD
-     ,ELP.AS_OF_DATE AS SUB_ADDR_AS_OF_DATE
-     ,PST.POSTAL_LOCATOR_UID
-     ,PST.CENSUS_BLOCK_CD
-     ,PST.CENSUS_MINOR_CIVIL_DIVISION_CD
-     ,PST.CENSUS_TRACK_CD
-     ,PST.CITY_CD
-     ,case when LTRIM(RTRIM(PST.CITY_DESC_TXT)) = '' then null else LTRIM(RTRIM(PST.CITY_DESC_TXT)) end CITY_DESC_TXT
-     ,case when LTRIM(RTRIM(PST.CNTRY_CD)) = '' then null else LTRIM(RTRIM(PST.CNTRY_CD)) end CNTRY_CD
-     ,CNTRY_DESC.CODE_SHORT_DESC_TXT AS CNTRY_DESC_TXT
-     ,PST.REGION_DISTRICT_CD
-     ,PST.MSA_CONGRESS_DISTRICT_CD
-     ,case when LTRIM(RTRIM(PST.ZIP_CD)) = '' then null else LTRIM(RTRIM(PST.ZIP_CD)) end ZIP_CD
-     ,PST.RECORD_STATUS_TIME AS PST_RECORD_STATUS_TIME
-     ,PST.RECORD_STATUS_CD AS PST_RECORD_STATUS_CD
-     ,case when LTRIM(RTRIM(PST.STREET_ADDR1)) = '' then null else LTRIM(RTRIM(PST.STREET_ADDR1)) end STREET_ADDR1
-     ,case when LTRIM(RTRIM(PST.STREET_ADDR2)) = '' then null else LTRIM(RTRIM(PST.STREET_ADDR2)) end STREET_ADDR2
-     ,PAR.ACT_UID
-     ,CONDITION_CODE.INVESTIGATION_FORM_CD
-     ,AGE_UNIT.CODE_SHORT_DESC_TXT AS AGE_REPORTED_UNIT_DESC_TXT
-     ,BIRTH_GENDER.CODE_SHORT_DESC_TXT AS BIRTH_GENDER_DESC_TXT
-     ,CURR_SEX.CODE_SHORT_DESC_TXT AS CURR_SEX_DESC_TXT
-     ,OCCUPATION.CODE_SHORT_DESC_TXT AS OCCUPATION_DESC_TXT
-     ,RN = ROW_NUMBER() OVER (
-				PARTITION BY PER.PERSON_UID ORDER BY PER.PERSON_UID
-				)
-			, CASE WHEN (CONDITION_CODE.investigation_form_cd NOT LIKE 'PG_%' or CONDITION_CODE.investigation_form_cd  is null) then 1 else 0 end as FLAG1 ---added this as part of optimization (very imp)
-INTO #TEMP_PHCPATIENTINFO
-FROM #TEMP_UPDATE_NEW_PATIENT PER WITH (NOLOCK)
-		INNER JOIN NBS_ODSE.DBO.PARTICIPATION PAR WITH (NOLOCK) ON PER.PERSON_UID = PAR.SUBJECT_ENTITY_UID
-    INNER JOIN NBS_ODSE.DBO.Public_health_case Public_health_case WITH (NOLOCK) ON PAR.act_uid = Public_health_case.public_health_case_uid
-    INNER JOIN NBS_srte.DBO.Condition_code Condition_code WITH (NOLOCK) ON Condition_code.condition_cd = Public_health_case.cd
-    LEFT OUTER JOIN NBS_ODSE.DBO.ENTITY_LOCATOR_PARTICIPATION ELP WITH (NOLOCK) ON ELP.ENTITY_UID = PER.PERSON_UID
-    AND ELP.USE_CD = 'H'
-    AND ELP.CLASS_CD = 'PST'
-    AND ELP.RECORD_STATUS_CD = 'ACTIVE'
-    LEFT OUTER JOIN NBS_ODSE.DBO.POSTAL_LOCATOR PST WITH (NOLOCK) ON ELP.LOCATOR_UID = PST.POSTAL_LOCATOR_UID
-    AND PST.RECORD_STATUS_CD = 'ACTIVE'
-    LEFT OUTER JOIN NBS_SRTE.DBO.Code_value_general CNTRY_DESC ON CNTRY_DESC.code=PST.cntry_cd
-    AND CNTRY_DESC.CODE=PST.CNTRY_CD
-    AND CNTRY_DESC.CODE_SET_NM='PSL_CNTRY'
-    LEFT OUTER JOIN NBS_SRTE.DBO.V_state_code SRT1 WITH (NOLOCK) ON PST.STATE_CD = SRT1.CODE
-    LEFT OUTER JOIN NBS_SRTE.DBO.state_county_code_value SRT3 WITH (NOLOCK) ON PST.CNTY_CD = SRT3.CODE
-    LEFT OUTER JOIN #TEMP_INV_FORM_CODE_DATA A ON A.CODE=PER.ETHNIC_GROUP_IND
-    AND  A.investigation_form_cd = Condition_code.investigation_form_cd
-    AND A.DATA_LOCATION LIKE '%.ETHNIC_GROUP_IND'
-    LEFT OUTER JOIN NBS_ODSE.DBO.PERSON_NAME PNM WITH (NOLOCK) ON PER.PERSON_UID = PNM.PERSON_UID
-    AND PNM.NM_USE_CD = 'L'
-    AND PNM.RECORD_STATUS_CD = 'ACTIVE'
-
-    LEFT OUTER JOIN #TEMP_INV_FORM_CODE_DATA AGE_UNIT WITH (NOLOCK) ON PER.age_reported_unit_cd = AGE_UNIT.CODE
-    AND  AGE_UNIT.investigation_form_cd = Condition_code.investigation_form_cd
-    AND AGE_UNIT.DATA_LOCATION LIKE 'Person.age_reported_unit_cd'
-    LEFT OUTER JOIN #TEMP_INV_FORM_CODE_DATA BIRTH_GENDER WITH (NOLOCK) ON PER.birth_gender_cd = BIRTH_GENDER.CODE
-    AND  BIRTH_GENDER.investigation_form_cd = Condition_code.investigation_form_cd
-    AND BIRTH_GENDER.DATA_LOCATION LIKE 'Person.birth_gender_cd'
-    LEFT OUTER JOIN #TEMP_INV_FORM_CODE_DATA CURR_SEX WITH (NOLOCK) ON PER.curr_sex_cd = CURR_SEX.CODE
-    AND  CURR_SEX.investigation_form_cd = Condition_code.investigation_form_cd
-    AND CURR_SEX.DATA_LOCATION LIKE 'Person.curr_sex_cd'
-    LEFT OUTER JOIN NBS_SRTE.DBO.NAICS_INDUSTRY_CODE OCCUPATION WITH (NOLOCK) ON PER.occupation_cd = OCCUPATION.CODE
-    LEFT OUTER JOIN NBS_SRTE.DBO.CODE_VALUE_GENERAL CVG WITH (NOLOCK) ON PER.education_level_cd = CVG.CODE
-    AND CVG.CODE_SET_NM = 'P_EDUC_LVL'
-    LEFT OUTER JOIN #TEMP_INV_FORM_CODE_DATA CVG2 WITH (NOLOCK) ON PER.MARITAL_STATUS_CD = CVG2.CODE
-    AND  CVG2.investigation_form_cd = Condition_code.investigation_form_cd
-    AND CVG2.DATA_LOCATION = 'PERSON.MARITAL_STATUS_CD'
-    LEFT OUTER JOIN NBS_SRTE.DBO.LANGUAGE_CODE LNG WITH (NOLOCK) ON PER.PRIM_LANG_CD = LNG.CODE
-where Public_health_case.public_health_case_uid in (select value from string_split(@phc_id_list, ','))
-ORDER BY PAR.ACT_UID
-
-SELECT @ROWCOUNT_NO = @@ROWCOUNT;
-
-DELETE
-FROM #TEMP_PHCPATIENTINFO
-WHERE RN > 1
-
-
-    PRINT '1. starttime' + LEFT(CONVERT(VARCHAR, @batch_start_time, 120), 10)
-		PRINT '1. endtime' + LEFT(CONVERT(VARCHAR, @batch_end_time, 120), 10)
-
-
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @Batch_id
-        ,'PCHMartETL'
-        ,'NBS_ODSE.PublicHealthCaseFact'
-        ,'COMPLETED'
-        ,@PROC_STEP_NO
-        ,@PROC_STEP_NAME
-        ,@ROWCOUNT_NO
-    );
-
-COMMIT TRANSACTION;
-
-BEGIN TRANSACTION;
-
-UPDATE #TEMP_PHCPATIENTINFO
-SET ETHNIC_GROUP_IND_DESC = CODE_VALUE_GENERAL.CODE_SHORT_DESC_TXT
-    FROM #TEMP_PHCPATIENTINFO
-		INNER JOIN NBS_SRTE.DBO.CODE_VALUE_GENERAL WITH (NOLOCK) ON #TEMP_PHCPATIENTINFO.ETHNIC_GROUP_IND = CODE_VALUE_GENERAL.CODE
-    AND CODE_SET_NM = 'P_ETHN_GRP'
-    AND #TEMP_PHCPATIENTINFO.FLAG1 =1; ---added this optimization
-
-
-UPDATE #TEMP_PHCPATIENTINFO
-SET MARITAL_STATUS_DESC_TXT = CODE_VALUE_GENERAL.CODE_SHORT_DESC_TXT
-    FROM #TEMP_PHCPATIENTINFO
-		INNER JOIN NBS_SRTE.DBO.CODE_VALUE_GENERAL WITH (NOLOCK) ON #TEMP_PHCPATIENTINFO.MARITAL_STATUS_CD = CODE_VALUE_GENERAL.CODE
-    AND CODE_SET_NM = 'P_MARITAL'
-    AND #TEMP_PHCPATIENTINFO.FLAG1 =1; ---added this optimization
-
-
-UPDATE #TEMP_PHCPATIENTINFO
-SET BIRTH_GENDER_DESC_TXT = CODE_VALUE_GENERAL.CODE_SHORT_DESC_TXT
-    FROM #TEMP_PHCPATIENTINFO
-		INNER JOIN NBS_SRTE.DBO.CODE_VALUE_GENERAL WITH (NOLOCK) ON #TEMP_PHCPATIENTINFO.birth_gender_cd = CODE_VALUE_GENERAL.CODE
-    AND CODE_SET_NM = 'SEX'
-    AND BIRTH_GENDER_DESC_TXT IS NULL
-    AND birth_gender_cd IS NOT NULL
-
-
-UPDATE #TEMP_PHCPATIENTINFO
-SET AGE_REPORTED_UNIT_DESC_TXT = CODE_VALUE_GENERAL.CODE_SHORT_DESC_TXT
-    FROM #TEMP_PHCPATIENTINFO
-		INNER JOIN NBS_SRTE.DBO.CODE_VALUE_GENERAL WITH (NOLOCK) ON #TEMP_PHCPATIENTINFO.age_reported_unit_cd = CODE_VALUE_GENERAL.CODE
-    AND CODE_SET_NM = 'AGE_UNIT'
-    AND #TEMP_PHCPATIENTINFO.FLAG1 =1; ---added this optimization
-
-
-UPDATE #TEMP_PHCPATIENTINFO
-SET CURR_SEX_DESC_TXT = CODE_VALUE_GENERAL.CODE_SHORT_DESC_TXT
-    FROM #TEMP_PHCPATIENTINFO
-		INNER JOIN NBS_SRTE.DBO.CODE_VALUE_GENERAL WITH (NOLOCK) ON #TEMP_PHCPATIENTINFO.curr_sex_cd = CODE_VALUE_GENERAL.CODE
-    AND CODE_SET_NM = 'SEX'
-    AND #TEMP_PHCPATIENTINFO.FLAG1 =1; ---added this optimization
-
-
-COMMIT TRANSACTION;
-BEGIN TRANSACTION;
-
-		SET @Proc_Step_no = @Proc_Step_no + 1;
-		SET @Proc_Step_Name = 'Generating TEMP_PHCINFO_INIT';
-		IF OBJECT_ID('#TEMP_PHCINFO_INIT') IS NOT NULL
-DROP TABLE #TEMP_PHCINFO_INIT;
-
-SELECT OBSERVATION2.CD, t.PUBLIC_HEALTH_CASE_UID,OBS_VALUE_DATE.FROM_TIME
-INTO #TEMP_PHCINFO_INIT
-FROM #TEMP_PHCPATIENTINFO t WITH (NOLOCK)
-			INNER JOIN NBS_ODSE.DBO.ACT_RELATIONSHIP WITH (NOLOCK) ON ACT_RELATIONSHIP.TARGET_ACT_UID=t.PUBLIC_HEALTH_CASE_UID
-    INNER JOIN NBS_ODSE.DBO.ACT_RELATIONSHIP ACT_RELATIONSHIP2 WITH (NOLOCK) ON ACT_RELATIONSHIP2.TARGET_ACT_UID=ACT_RELATIONSHIP.SOURCE_ACT_UID
-    LEFT JOIN NBS_ODSE.DBO.OBSERVATION OBSERVATION2 WITH (NOLOCK) ON OBSERVATION2.OBSERVATION_UID =ACT_RELATIONSHIP2.SOURCE_ACT_UID
-    LEFT JOIN NBS_ODSE.DBO.OBS_VALUE_DATE  WITH (NOLOCK) ON OBSERVATION2.OBSERVATION_UID =OBS_VALUE_DATE.OBSERVATION_UID
-WHERE OBSERVATION2.CD IN ('INV132', 'INV133') AND ACT_RELATIONSHIP.TYPE_CD ='PHCInvForm';
-
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @Batch_id
-        ,'PCHMartETL'
-        ,'NBS_ODSE.PublicHealthCaseFact'
-        ,'COMPLETED'
-        ,@PROC_STEP_NO
-        ,@PROC_STEP_NAME
-        ,@ROWCOUNT_NO
-    );
-COMMIT TRANSACTION;
-
-BEGIN TRANSACTION;
-
-		SET @Proc_Step_no = @Proc_Step_no + 1;
-		SET @Proc_Step_Name = 'Generating TEMP_PHCINFO_LEGACY_HOSP';
-		IF OBJECT_ID('#TEMP_PHCINFO_LEGACY_HOSP') IS NOT NULL
-DROP TABLE #TEMP_PHCINFO_LEGACY_HOSP;
-
-SELECT OBSERVATION2.CD, t.PUBLIC_HEALTH_CASE_UID,OBS_VALUE_CODED.CODE
-INTO #TEMP_PHCINFO_LEGACY_HOSP
-FROM #TEMP_PHCPATIENTINFO t WITH (NOLOCK)
-			INNER JOIN NBS_ODSE.DBO.ACT_RELATIONSHIP WITH (NOLOCK) ON ACT_RELATIONSHIP.TARGET_ACT_UID=t.PUBLIC_HEALTH_CASE_UID
-    INNER JOIN NBS_ODSE.DBO.ACT_RELATIONSHIP ACT_RELATIONSHIP2 WITH (NOLOCK) ON ACT_RELATIONSHIP2.TARGET_ACT_UID=ACT_RELATIONSHIP.SOURCE_ACT_UID
-    INNER JOIN NBS_ODSE.DBO.OBSERVATION AS OBSERVATION2  WITH (NOLOCK) ON ACT_RELATIONSHIP2.SOURCE_ACT_UID =OBSERVATION2.OBSERVATION_UID
-    INNER JOIN NBS_ODSE.DBO.OBS_VALUE_CODED  WITH (NOLOCK) ON ACT_RELATIONSHIP2.SOURCE_ACT_UID =OBS_VALUE_CODED.OBSERVATION_UID
-WHERE OBSERVATION2.CD IN ('INV128') AND ACT_RELATIONSHIP.TYPE_CD ='PHCInvForm';
-
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @Batch_id
-        ,'PCHMartETL'
-        ,'NBS_ODSE.PublicHealthCaseFact'
-        ,'COMPLETED'
-        ,@PROC_STEP_NO
-        ,@PROC_STEP_NAME
-        ,@ROWCOUNT_NO
-    );
-COMMIT TRANSACTION;
-
-BEGIN TRANSACTION;
-
-		SET @Proc_Step_no = @Proc_Step_no + 1;
-		SET @Proc_Step_Name = 'Generating TEMP_PHCINFO1';
-
-		IF OBJECT_ID('#TEMP_PHCINFO1') IS NOT NULL
-DROP TABLE #TEMP_PHCINFO1;
-
-SELECT PHC.PUBLIC_HEALTH_CASE_UID
-     ,PHC.CASE_TYPE_CD
-     ,PHC.DIAGNOSIS_TIME AS DIAGNOSIS_DATE
-     ,PHC.CD AS PHC_CODE
-     ,PHC.CD_DESC_TXT AS PHC_CODE_DESC
-     ,ISNULL(PHC.CASE_CLASS_CD, '') CASE_CLASS_CD
-     ,PHC.CD_SYSTEM_CD
-     ,PHC.CD_SYSTEM_DESC_TXT
-     ,PHC.CONFIDENTIALITY_CD
-     ,PHC.CONFIDENTIALITY_DESC_TXT
-     ,case when ltrim(rtrim(PHC.DETECTION_METHOD_CD)) = '' then null else ltrim(rtrim(PHC.DETECTION_METHOD_CD)) end detection_method_cd
-     ,
-    /*PHC.DETECTION_METHOD_DESC_TXT,*/
-    case when ltrim(rtrim(PHC.DISEASE_IMPORTED_CD)) = '' then null else ltrim(rtrim(PHC.DISEASE_IMPORTED_CD)) end DISEASE_IMPORTED_CD
-     ,
-    /*PHC.DISEASE_IMPORTED_DESC_TXT,*/
-    PHC.GROUP_CASE_CNT
-     ,PHC.INVESTIGATION_STATUS_CD
-     ,PHC.JURISDICTION_CD
-     ,JURISDICTION_CODE.CODE_DESC_TXT AS JURISDICTION
-     ,case when SUBSTRING(ltrim(rtrim(PHC.MMWR_WEEK)), 1, 4) = '' then null else SUBSTRING(ltrim(rtrim(PHC.MMWR_WEEK)), 1, 4) end MMWR_WEEK
-     ,case when SUBSTRING(ltrim(rtrim(PHC.MMWR_YEAR)), 1, 4) = '' then null else SUBSTRING(ltrim(rtrim(PHC.MMWR_YEAR)), 1, 4) end MMWR_YEAR
-     ,case when ltrim(rtrim(PHC.OUTBREAK_IND)) = '' then null else ltrim(rtrim(PHC.OUTBREAK_IND)) end OUTBREAK_IND
-     ,case when ltrim(rtrim(PHC.OUTBREAK_FROM_TIME)) = '' then null else ltrim(rtrim(PHC.OUTBREAK_FROM_TIME)) end OUTBREAK_FROM_TIME
-     ,case when ltrim(rtrim(PHC.OUTBREAK_TO_TIME)) = '' then null else ltrim(rtrim(PHC.OUTBREAK_TO_TIME)) end OUTBREAK_TO_TIME
-     ,case when ltrim(rtrim(PHC.OUTBREAK_NAME)) = '' then null else ltrim(rtrim(PHC.OUTBREAK_NAME)) end OUTBREAK_NAME
-     ,case when ltrim(rtrim(PHC.OUTCOME_CD)) = '' then null else ltrim(rtrim(PHC.OUTCOME_CD)) end OUTCOME_CD
-     ,case when SUBSTRING(ltrim(rtrim(PHC.PAT_AGE_AT_ONSET)), 1, 4) = '' then null else SUBSTRING(ltrim(rtrim(PHC.PAT_AGE_AT_ONSET)), 1, 4) end PAT_AGE_AT_ONSET
-     ,case when ltrim(rtrim(PHC.PAT_AGE_AT_ONSET_UNIT_CD)) = '' then null else ltrim(rtrim(PHC.PAT_AGE_AT_ONSET_UNIT_CD)) end PAT_AGE_AT_ONSET_UNIT_CD
-     ,PHC.PROG_AREA_CD
-     ,PHC.RECORD_STATUS_CD
-     ,PHC.RPT_CNTY_CD
-     ,PHC.RPT_FORM_CMPLT_TIME
-     ,case when ltrim(rtrim(PHC.RPT_SOURCE_CD)) = '' then null else ltrim(rtrim(PHC.RPT_SOURCE_CD)) end RPT_SOURCE_CD
-     ,
-    /*PHC.RPT_SOURCE_CD_DESC_TXT*/
-    PHC.RPT_TO_COUNTY_TIME
-     ,PHC.RPT_TO_STATE_TIME
-     ,PHC.STATUS_CD
-     ,PHC.EFFECTIVE_FROM_TIME AS ONSETDATE
-     ,PHC.ACTIVITY_FROM_TIME AS INVESTIGATIONSTARTDATE
-     ,PHC.ADD_TIME AS PHC_ADD_TIME
-     ,PHC.PROGRAM_JURISDICTION_OID
-     ,PHC.SHARED_IND
-     ,PHC.IMPORTED_COUNTRY_CD AS IMPORTED_COUNTRY_CODE
-     ,PHC.IMPORTED_STATE_CD AS IMPORTED_STATE_CODE
-     ,PHC.IMPORTED_COUNTY_CD AS IMPORTED_COUNTY_CODE
-     ,PHC.INVESTIGATOR_ASSIGNED_TIME AS INVESTIGATOR_ASSIGN_DATE
-     ,PHC.HOSPITALIZED_ADMIN_TIME AS HSPTL_ADMISSION_DT
-     ,PHC.HOSPITALIZED_DISCHARGE_TIME AS HSPTL_DISCHARGE_DT
-     ,PHC.HOSPITALIZED_DURATION_AMT
-     ,PHC.IMPORTED_CITY_DESC_TXT
-     ,PHC.DECEASED_TIME AS INVESTIGATION_DEATH_DATE
-     ,PHC.LOCAL_ID AS LOCAL_ID
-     ,PHC.LAST_CHG_TIME AS LASTUPDATE
-     ,case when ltrim(rtrim(PHC.TXT)) = '' then null else ltrim(rtrim(PHC.TXT)) end PHCTXT
-     ,FOOD_HANDLER_IND_CD
-     ,case when ltrim(rtrim(hospitalized_ind_cd)) = '' then null else ltrim(rtrim(hospitalized_ind_cd)) end HOSPITALIZED_IND
-     ,DAY_CARE_IND_CD
-     ,PREGNANT_IND_CD
-     ,CONDITION_CODE.INVESTIGATION_FORM_CD
-     ,TEMP_PHCINFO_INITA.FROM_TIME AS LEGACY_HSPTL_ADMISSION_DT
-     ,TEMP_PHCINFO_INITb.FROM_TIME AS LEGACY_HSPTL_DISCHARGE_DT
-     ,NOTIF_LAST_CHG_TIME
-     ,t.CODE AS LEGACY_HOSP_IND
-INTO #TEMP_PHCINFO1
-FROM NBS_ODSE.DBO.PUBLIC_HEALTH_CASE PHC WITH (NOLOCK)
-		INNER JOIN #TEMP_PHCPATIENTINFO t1 ON PHC.PUBLIC_HEALTH_CASE_UID = t1.ACT_UID
-    LEFT OUTER JOIN NBS_SRTE.DBO.JURISDICTION_CODE WITH (NOLOCK) ON JURISDICTION_CODE.CODE = PHC.jurisdiction_cd
-    INNER JOIN NBS_SRTE.DBO.Condition_code ON PHC.CD=Condition_code.condition_cd
-    LEFT OUTER JOIN #TEMP_PHCINFO_INIT TEMP_PHCINFO_INITA ON  PHC.PUBLIC_HEALTH_CASE_UID = TEMP_PHCINFO_INITA.PUBLIC_HEALTH_CASE_UID
-    AND TEMP_PHCINFO_INITA.CD='INV132'
-    LEFT OUTER JOIN #TEMP_PHCINFO_INIT TEMP_PHCINFO_INITB ON  PHC.PUBLIC_HEALTH_CASE_UID = TEMP_PHCINFO_INITB.PUBLIC_HEALTH_CASE_UID
-    AND TEMP_PHCINFO_INITB.CD='INV133'
-    LEFT OUTER JOIN #TEMP_PHCINFO_LEGACY_HOSP t  ON  PHC.PUBLIC_HEALTH_CASE_UID = t.PUBLIC_HEALTH_CASE_UID
-    AND t.CD='INV128'
-where PHC.public_health_case_uid in (select value from string_split(@phc_id_list, ','))
-
-SELECT @ROWCOUNT_NO = @@ROWCOUNT;
-
-PRINT @ROWCOUNT_NO;
-
-UPDATE #TEMP_PHCINFO1
-SET HSPTL_ADMISSION_DT = LEGACY_HSPTL_ADMISSION_DT
-WHERE LEGACY_HSPTL_ADMISSION_DT IS NOT NULL;
-
-UPDATE #TEMP_PHCINFO1
-SET HOSPITALIZED_IND = LEGACY_HOSP_IND
-WHERE LEGACY_HOSP_IND IS NOT NULL;
-
-UPDATE #TEMP_PHCINFO1
-SET HSPTL_DISCHARGE_DT = LEGACY_HSPTL_DISCHARGE_DT
-WHERE LEGACY_HSPTL_DISCHARGE_DT IS NOT NULL;
-
-
-ALTER TABLE #TEMP_PHCINFO1 DROP column LEGACY_HSPTL_DISCHARGE_DT, LEGACY_HSPTL_ADMISSION_DT;
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @Batch_id
-        ,'PCHMartETL'
-        ,'NBS_ODSE.PublicHealthCaseFact'
-        ,'COMPLETED'
-        ,@PROC_STEP_NO
-        ,@PROC_STEP_NAME
-        ,@ROWCOUNT_NO
-    );
-
-COMMIT TRANSACTION;
-BEGIN TRANSACTION;
-
-		SET @Proc_Step_no = @Proc_Step_no + 1;
-		SET @Proc_Step_Name = 'Remove Updated records';
-
-DELETE
-FROM NBS_ODSE.DBO.SubjectRaceInfo
-WHERE public_health_case_uid IN (
-    SELECT public_health_case_uid
-    FROM #TEMP_PHCINFO1
-);
-
-DELETE
-FROM NBS_ODSE.DBO.PublicHealthCaseFact
-WHERE public_health_case_uid IN (
-    SELECT public_health_case_uid
-    FROM #TEMP_PHCINFO1
-);
-
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @Batch_id
-        ,'PCHMartETL'
-        ,'NBS_ODSE.PublicHealthCaseFact'
-        ,'COMPLETED'
-        ,@PROC_STEP_NO
-        ,@PROC_STEP_NAME
-        ,@ROWCOUNT_NO
-    );
-
-COMMIT TRANSACTION;
-
-BEGIN TRANSACTION;
-
-		SET @Proc_Step_no = @Proc_Step_no + 1;
-		SET @Proc_Step_Name = 'Generating TEMP_PHCINFO2';
-
-		IF OBJECT_ID('#TEMP_PHCINFO2') IS NOT NULL
-DROP TABLE #TEMP_PHCINFO2;
-
-SELECT A.*
-     ,NBS_CASE_ANSWER.ANSWER_TXT AS THERAPY_DATE
-INTO #TEMP_PHCINFO2
-FROM #TEMP_PHCINFO1 A WITH (NOLOCK)
-		LEFT OUTER JOIN NBS_ODSE.DBO.NBS_CASE_ANSWER WITH (NOLOCK) ON A.PUBLIC_HEALTH_CASE_UID = NBS_CASE_ANSWER.ACT_UID
-    AND NBS_CASE_ANSWER.NBS_QUESTION_UID IN (
-    SELECT NBS_QUESTION_UID
-    FROM NBS_ODSE.DBO.NBS_QUESTION WITH (NOLOCK)
-    WHERE QUESTION_IDENTIFIER = 'TUB170'
-    );
-
-SELECT @ROWCOUNT_NO = @@ROWCOUNT;
-
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @Batch_id
-        ,'PCHMartETL'
-        ,'NBS_ODSE.PublicHealthCaseFact'
-        ,'COMPLETED'
-        ,@Proc_Step_no
-        ,@Proc_Step_Name
-        ,@ROWCOUNT_NO
-    );
-
-COMMIT TRANSACTION;
-
-BEGIN TRANSACTION;
-
-		SET @Proc_Step_no = @Proc_Step_no + 1;
-		SET @Proc_Step_Name = 'Generating TEMP_PHCINFO3';
-
-		IF OBJECT_ID('#TEMP_PHCINFO3') IS NOT NULL
-DROP TABLE #TEMP_PHCINFO3;
-
-SELECT A.*
-     ,case when ltrim(rtrim(AID.ROOT_EXTENSION_TXT)) = '' then null else ltrim(rtrim(AID.ROOT_EXTENSION_TXT)) end  AS STATE_CASE_ID
-INTO #TEMP_PHCINFO3
-FROM #TEMP_PHCINFO2 A WITH (NOLOCK)
-		LEFT OUTER JOIN NBS_ODSE.DBO.ACT_ID AID WITH (NOLOCK) ON A.PUBLIC_HEALTH_CASE_UID = AID.ACT_UID
-    AND ACT_ID_SEQ = 1
-WHERE A.RECORD_STATUS_CD <> 'LOG_DEL'
-ORDER BY A.PUBLIC_HEALTH_CASE_UID;
-
-SELECT @ROWCOUNT_NO = @@ROWCOUNT;
-
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @Batch_id
-        ,'PCHMartETL'
-        ,'NBS_ODSE.PublicHealthCaseFact'
-        ,'COMPLETED'
-        ,@PROC_STEP_NO
-        ,@PROC_STEP_NAME
-        ,@ROWCOUNT_NO
-    );
-
-COMMIT TRANSACTION;
-
-BEGIN TRANSACTION;
-
-		SET @Proc_Step_no = @Proc_Step_no + 1;
-		SET @Proc_Step_Name = 'Update TEMP_PHCINFO3';
-
-		/*UPDATE #TEMP_PHCINFO3
-		SET STATE_CASE_ID = NULL
-		WHERE STATE_CASE_ID = LTRIM(RTRIM(''));*/
-
-SELECT @ROWCOUNT_NO = @@ROWCOUNT;
-
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @Batch_id
-        ,'PCHMartETL'
-        ,'NBS_ODSE.PublicHealthCaseFact'
-        ,'COMPLETED'
-        ,@PROC_STEP_NO
-        ,@PROC_STEP_NAME
-        ,@ROWCOUNT_NO
-    );
-
-COMMIT TRANSACTION;
-
-
-
-BEGIN TRANSACTION;
-
-		SET @Proc_Step_no = @Proc_Step_no + 1;
-		SET @Proc_Step_Name = 'Generating TEMP_PHCINFO';
-
-		IF OBJECT_ID('#TEMP_PHCINFO') IS NOT NULL
-DROP TABLE #TEMP_PHCINFO;
-
-SELECT PUBLIC_HEALTH_CASE_UID
-     ,CASE_TYPE_CD
-     ,DIAGNOSIS_DATE
-     ,PHC_CODE
-     ,case when PHC_CODE_DESC = null then A.condition_short_nm  else PHC_CODE_DESC end as PHC_CODE_DESC
-     ,CASE_CLASS_CD
-     ,CD_SYSTEM_CD
-     ,THERAPY_DATE
-     ,STATE_CASE_ID
-     ,CD_SYSTEM_DESC_TXT
-     ,CONFIDENTIALITY_CD
-     ,CONFIDENTIALITY_DESC_TXT
-     ,DETECTION_METHOD_CD
-     ,DISEASE_IMPORTED_CD
-     ,GROUP_CASE_CNT
-     ,INVESTIGATION_STATUS_CD
-     ,JURISDICTION
-     ,JURISDICTION_CD
-     ,MMWR_WEEK
-     ,MMWR_YEAR
-     ,OUTBREAK_IND
-     ,OUTBREAK_FROM_TIME
-     ,OUTBREAK_TO_TIME
-     ,OUTBREAK_NAME
-     ,OUTCOME_CD
-     ,PAT_AGE_AT_ONSET
-     ,PAT_AGE_AT_ONSET_UNIT_CD
-     ,t3.PROG_AREA_CD
-     ,RECORD_STATUS_CD
-     ,RPT_CNTY_CD
-     ,RPT_FORM_CMPLT_TIME
-     ,RPT_SOURCE_CD
-     ,RPT_TO_COUNTY_TIME
-     ,RPT_TO_STATE_TIME
-     ,t3.STATUS_CD
-     ,ONSETDATE
-     ,INVESTIGATIONSTARTDATE
-     ,PHC_ADD_TIME
-     ,PROGRAM_JURISDICTION_OID
-     ,SHARED_IND
-     ,IMPORTED_COUNTRY_CODE
-     ,IMPORTED_STATE_CODE
-     ,IMPORTED_COUNTY_CODE
-     ,INVESTIGATOR_ASSIGN_DATE
-     ,HSPTL_ADMISSION_DT
-     ,HSPTL_DISCHARGE_DT
-     ,HOSPITALIZED_DURATION_AMT
-     ,IMPORTED_CITY_DESC_TXT
-     ,INVESTIGATION_DEATH_DATE
-     ,LOCAL_ID
-     ,HOSPITALIZED_IND
-     ,DAY_CARE_IND_CD AS CASE_DAY_CARE_IND_CD
-     ,PREGNANT_IND_CD
-     ,LASTUPDATE
-     ,case when ltrim(rtrim(PHCTXT))='' then null else ltrim(rtrim(PHCTXT)) end as PHCTXT
-     ,A.CONDITION_CD
-     ,A.investigation_form_cd
-     ,A.condition_short_nm AS PHC_CODE_SHORT_DESC
-     ,B.CODE_SHORT_DESC_TXT AS DISEASE_IMPORTED_DESC_TXT
-     ,C.CODE_SHORT_DESC_TXT AS DETECTION_METHOD_DESC_TXT
-     ,D.CODE_SHORT_DESC_TXT AS RPT_SOURCE_DESC_TXT
-     ,E.CODE_SHORT_DESC_TXT AS HOSPITALIZED
-     ,F.CODE_SHORT_DESC_TXT AS PREGNANT
-     ,G.CODE_SHORT_DESC_TXT AS DAY_CARE_IND_CD
-     ,H.CODE_SHORT_DESC_TXT AS FOOD_HANDLER_IND_CD
-     ,I.CODE_SHORT_DESC_TXT AS IMPORTED_COUNTRY_CD
-     ,J.CODE_SHORT_DESC_TXT AS IMPORTED_COUNTY_CD
-     ,K.CODE_SHORT_DESC_TXT AS IMPORTED_STATE_CD
-     ,L.CODE_SHORT_DESC_TXT AS CASE_CLASS_DESC_TXT
-     ,M.CODE_SHORT_DESC_TXT AS investigation_status_desc_txt
-     ,N.CODE_SHORT_DESC_TXT AS outcome_desc_txt
-     ,O.CODE_SHORT_DESC_TXT AS pat_age_at_onset_unit_desc_txt
-     ,P.prog_area_desc_txt AS prog_area_desc_txt
-     ,Q.CODE_SHORT_DESC_TXT AS rpt_cnty_desc_txt
-     ,R.CODE_SHORT_DESC_TXT AS outbreak_name_desc
-     ,NOTIF_LAST_CHG_TIME
-     , CASE WHEN (A.investigation_form_cd NOT LIKE 'PG_%' or A.investigation_form_cd is null) then 1 else 0 end as FLAG2  /* Optimization (very imp) */
-INTO #TEMP_PHCINFO
-FROM #TEMP_PHCINFO3 t3
-         LEFT OUTER JOIN NBS_SRTE.DBO.CONDITION_CODE A WITH (NOLOCK) ON A.CONDITION_CD = t3.PHC_CODE
-    LEFT OUTER JOIN #TEMP_INV_FORM_CODE_DATA B WITH (NOLOCK) ON t3.DISEASE_IMPORTED_CD = B.CODE
-    AND t3.investigation_form_cd = B.investigation_form_cd
-    AND B.DATA_LOCATION LIKE '%.DISEASE_IMPORTED_CD'
-    LEFT OUTER JOIN #TEMP_INV_FORM_CODE_DATA C WITH (NOLOCK) ON t3.DETECTION_METHOD_CD = C.CODE
-    AND t3.investigation_form_cd = C.investigation_form_cd
-    AND C.DATA_LOCATION LIKE '%.DETECTION_METHOD_CD'
-    LEFT OUTER JOIN #TEMP_INV_FORM_CODE_DATA D WITH (NOLOCK) ON t3.RPT_SOURCE_CD = D.CODE
-    AND t3.investigation_form_cd = D.investigation_form_cd
-    AND D.DATA_LOCATION LIKE '%.RPT_SOURCE_CD'
-    LEFT OUTER JOIN #TEMP_INV_FORM_CODE_DATA E WITH (NOLOCK) ON t3.HOSPITALIZED_IND = E.CODE
-    AND t3.investigation_form_cd = E.investigation_form_cd
-    AND E.DATA_LOCATION LIKE '%.HOSPITALIZED_IND_CD'
-    LEFT OUTER JOIN #TEMP_INV_FORM_CODE_DATA F WITH (NOLOCK) ON t3.PREGNANT_IND_CD = F.CODE
-    AND t3.investigation_form_cd = F.investigation_form_cd
-    AND F.DATA_LOCATION LIKE '%.PREGNANT_IND_CD'
-    LEFT OUTER JOIN #TEMP_INV_FORM_CODE_DATA G WITH (NOLOCK) ON t3.DAY_CARE_IND_CD = G.CODE
-    AND t3.investigation_form_cd = G.investigation_form_cd
-    AND G.DATA_LOCATION LIKE '%.DAY_CARE_IND_CD'
-    LEFT OUTER JOIN #TEMP_INV_FORM_CODE_DATA H WITH (NOLOCK) ON t3.FOOD_HANDLER_IND_CD = H.CODE
-    AND t3.investigation_form_cd = H.investigation_form_cd
-    AND H.DATA_LOCATION LIKE '%.FOOD_HANDLER_IND_CD'
-    LEFT OUTER JOIN #TEMP_INV_FORM_CODE_DATA I WITH (NOLOCK) ON t3.IMPORTED_COUNTRY_CODE = I.CODE
-    AND t3.investigation_form_cd = I.investigation_form_cd
-    AND I.DATA_LOCATION LIKE '%.IMPORTED_COUNTRY_CD'
-    LEFT OUTER JOIN #TEMP_INV_FORM_CODE_DATA J WITH (NOLOCK) ON t3.IMPORTED_COUNTY_CODE = J.CODE
-    AND t3.investigation_form_cd = J.investigation_form_cd
-    AND J.DATA_LOCATION LIKE '%.IMPORTED_COUNTY_CD'
-    LEFT OUTER JOIN #TEMP_INV_FORM_CODE_DATA K WITH (NOLOCK) ON t3.IMPORTED_STATE_CODE = K.CODE
-    AND t3.INVESTIGATION_FORM_CD = K.INVESTIGATION_FORM_CD
-    AND K.DATA_LOCATION LIKE '%.IMPORTED_STATE_CD'
-    LEFT OUTER JOIN NBS_SRTE.DBO.CODE_VALUE_GENERAL L WITH (NOLOCK) ON t3.CASE_CLASS_CD = L.CODE
-    AND L.CODE_SET_NM = 'PHC_CLASS'
-    LEFT OUTER JOIN NBS_SRTE.DBO.CODE_VALUE_GENERAL M WITH (NOLOCK) ON t3.INVESTIGATION_STATUS_CD = M.CODE
-    AND M.CODE_SET_NM = 'PHC_IN_STS'
-    LEFT OUTER JOIN NBS_SRTE.DBO.CODE_VALUE_GENERAL N WITH (NOLOCK) ON t3.OUTCOME_CD = N.CODE
-    AND N.CODE_SET_NM = 'YNU'
-    LEFT OUTER JOIN NBS_SRTE.DBO.CODE_VALUE_GENERAL O WITH (NOLOCK) ON t3.PAT_AGE_AT_ONSET_UNIT_CD = O.CODE
-    AND O.CODE_SET_NM = 'AGE_UNIT'
-    LEFT OUTER JOIN NBS_SRTE.DBO.PROGRAM_AREA_CODE P WITH (NOLOCK) ON t3.PROG_AREA_CD = P.PROG_AREA_CD
-    AND P.CODE_SET_NM = 'S_PROGRA_C'
-    LEFT OUTER JOIN NBS_SRTE.DBO.V_STATE_COUNTY_CODE_VALUE Q WITH (NOLOCK) ON t3.RPT_CNTY_CD = Q.CODE
-    AND Q.CODE_SET_NM = 'COUNTY_CCD'
-    LEFT OUTER JOIN NBS_SRTE.DBO.CODE_VALUE_GENERAL R WITH (NOLOCK) ON t3.OUTBREAK_NAME = R.CODE
-    AND R.CODE_SET_NM = 'OUTBREAK_NM'
-
-
-SELECT @ROWCOUNT_NO = @@ROWCOUNT;
-
-
-UPDATE t
-SET DISEASE_IMPORTED_DESC_TXT = CODE_VALUE_GENERAL.CODE_SHORT_DESC_TXT
-    FROM #TEMP_PHCINFO t
-		INNER JOIN NBS_SRTE.DBO.CODE_VALUE_GENERAL WITH (NOLOCK) ON t.DISEASE_IMPORTED_CD = CODE_VALUE_GENERAL.CODE
-    AND CODE_SET_NM = 'PHC_IMPRT'
-    AND FLAG2=1; /* Optimization */
-
-UPDATE t
-SET DETECTION_METHOD_DESC_TXT = CODE_VALUE_GENERAL.CODE_SHORT_DESC_TXT
-    FROM #TEMP_PHCINFO t
-		INNER JOIN NBS_SRTE.DBO.CODE_VALUE_GENERAL WITH (NOLOCK) ON t.detection_method_cd = CODE_VALUE_GENERAL.CODE
-    AND CODE_SET_NM = 'PHC_DET_MT'
-    AND FLAG2=1; /* Optimization */
-
-UPDATE t
-SET RPT_SOURCE_DESC_TXT = CODE_VALUE_GENERAL.CODE_SHORT_DESC_TXT
-    FROM #TEMP_PHCINFO t
-		INNER JOIN NBS_SRTE.DBO.CODE_VALUE_GENERAL WITH (NOLOCK) ON t.rpt_source_cd = CODE_VALUE_GENERAL.CODE
-    AND CODE_SET_NM = 'PHC_RPT_SRC_T'
-    AND FLAG2=1; /* Optimization */
-
-UPDATE t
-SET HOSPITALIZED = CODE_VALUE_GENERAL.CODE_SHORT_DESC_TXT
-    FROM #TEMP_PHCINFO t
-		INNER JOIN NBS_SRTE.DBO.CODE_VALUE_GENERAL WITH (NOLOCK) ON t.HOSPITALIZED_IND = CODE_VALUE_GENERAL.CODE
-    AND CODE_SET_NM = 'YNU'
-    AND FLAG2=1; /* Optimization */
-
-UPDATE t
-SET PREGNANT = CODE_VALUE_GENERAL.CODE_SHORT_DESC_TXT
-    FROM #TEMP_PHCINFO t
-		INNER JOIN NBS_SRTE.DBO.CODE_VALUE_GENERAL WITH (NOLOCK) ON t.pregnant_ind_cd = CODE_VALUE_GENERAL.CODE
-    AND CODE_SET_NM = 'YNU'
-    AND FLAG2=1; /* Optimization */
-
-UPDATE t
-SET DAY_CARE_IND_CD = CODE_VALUE_GENERAL.CODE_SHORT_DESC_TXT
-    FROM #TEMP_PHCINFO t
-		INNER JOIN NBS_SRTE.DBO.CODE_VALUE_GENERAL WITH (NOLOCK) ON t.CASE_DAY_CARE_IND_CD = CODE_VALUE_GENERAL.CODE
-    AND CODE_SET_NM = 'YNU'
-    AND FLAG2=1; /* Optimization */
-
-UPDATE t
-SET FOOD_HANDLER_IND_CD = CODE_VALUE_GENERAL.CODE_SHORT_DESC_TXT
-    FROM #TEMP_PHCINFO t
-		INNER JOIN NBS_SRTE.DBO.CODE_VALUE_GENERAL WITH (NOLOCK) ON t.FOOD_HANDLER_IND_CD = CODE_VALUE_GENERAL.CODE
-    AND CODE_SET_NM = 'YNU'
-    AND FLAG2=1; /* Optimization */
-
-UPDATE t
-SET DISEASE_IMPORTED_DESC_TXT = CODE_VALUE_GENERAL.CODE_SHORT_DESC_TXT
-    FROM #TEMP_PHCINFO t
-		INNER JOIN NBS_SRTE.DBO.CODE_VALUE_GENERAL WITH (NOLOCK) ON t.DISEASE_IMPORTED_CD = CODE_VALUE_GENERAL.CODE
-    AND CODE_SET_NM = 'PHC_IMPRT'
-    AND FLAG2=1; /* Optimization */
-
-UPDATE t
-SET IMPORTED_COUNTRY_CD = CODE_VALUE_GENERAL.CODE_SHORT_DESC_TXT
-    FROM #TEMP_PHCINFO t
-		INNER JOIN NBS_SRTE.DBO.CODE_VALUE_GENERAL WITH (NOLOCK) ON t.IMPORTED_COUNTRY_CODE = CODE_VALUE_GENERAL.CODE
-    AND CODE_SET_NM = 'PSL_CNTRY'
-    AND FLAG2=1; /* Optimization */
-
-UPDATE t
-SET IMPORTED_STATE_CD = CODE_VALUE_GENERAL.CODE_SHORT_DESC_TXT
-    FROM #TEMP_PHCINFO t
-		INNER JOIN NBS_SRTE.DBO.CODE_VALUE_GENERAL WITH (NOLOCK) ON t.IMPORTED_STATE_CD = CODE_VALUE_GENERAL.CODE
-    AND CODE_SET_NM = 'STATE_CCD'
-    AND FLAG2=1; /* Optimization */
-
-UPDATE t
-SET IMPORTED_STATE_CD = CODE_VALUE_GENERAL.CODE_SHORT_DESC_TXT
-    FROM #TEMP_PHCINFO t
-		INNER JOIN NBS_SRTE.DBO.CODE_VALUE_GENERAL WITH (NOLOCK) ON t.IMPORTED_STATE_CD = CODE_VALUE_GENERAL.CODE
-    AND CODE_SET_NM = 'YNU'
-    AND FLAG2=1; /* Optimization */
-
-
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @Batch_id
-        ,'PCHMartETL'
-        ,'NBS_ODSE.PublicHealthCaseFact'
-        ,'COMPLETED'
-        ,@PROC_STEP_NO
-        ,@PROC_STEP_NAME
-        ,@ROWCOUNT_NO
-    );
-
-COMMIT TRANSACTION;
-
-BEGIN TRANSACTION;
-
-		SET @Proc_Step_no = @Proc_Step_no + 1;
-		SET @Proc_Step_Name = 'Cleanup process';
-
-
-
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @Batch_id
-        ,'PCHMartETL'
-        ,'NBS_ODSE.PublicHealthCaseFact'
-        ,'COMPLETED'
-        ,@Proc_Step_no
-        ,@Proc_Step_Name
-        ,0
-    );
-
-COMMIT TRANSACTION;
-
-BEGIN TRANSACTION;
-
-		SET @Proc_Step_no = @Proc_Step_no + 1;
-		SET @Proc_Step_Name = 'Generating TEMP_PHCSUBJECT';
-
-		IF OBJECT_ID('#TEMP_PHCSUBJECT') IS NOT NULL
-DROP TABLE #TEMP_PHCSUBJECT;
-
-SELECT --PUBLIC_HEALTH_CASE_UID,
-    CASE_TYPE_CD
-     ,DIAGNOSIS_DATE
-     ,PHC_CODE
-     ,PHC_CODE_DESC
-     ,CASE_CLASS_CD
-     ,CD_SYSTEM_CD
-     ,THERAPY_DATE
-     ,STATE_CASE_ID
-     ,CD_SYSTEM_DESC_TXT
-     ,CONFIDENTIALITY_CD
-     ,CONFIDENTIALITY_DESC_TXT
-     ,DETECTION_METHOD_CD
-     ,HSPTL_ADMISSION_DT
-     ,HSPTL_DISCHARGE_DT
-     ,DISEASE_IMPORTED_CD
-     ,GROUP_CASE_CNT
-     ,INVESTIGATION_STATUS_CD
-     ,JURISDICTION
-     ,JURISDICTION_CD
-     ,MMWR_WEEK
-     ,MMWR_YEAR
-     ,OUTBREAK_IND
-     ,OUTBREAK_FROM_TIME
-     ,OUTBREAK_TO_TIME
-     ,OUTBREAK_NAME
-     ,OUTCOME_CD
-     ,PAT_AGE_AT_ONSET
-     ,PAT_AGE_AT_ONSET_UNIT_CD
-     ,PROG_AREA_CD
-     ,RECORD_STATUS_CD
-     ,RPT_CNTY_CD
-     ,RPT_FORM_CMPLT_TIME
-     ,RPT_SOURCE_CD
-     ,RPT_TO_COUNTY_TIME
-     ,RPT_TO_STATE_TIME
-     ,STATUS_CD
-     ,ONSETDATE
-     ,INVESTIGATIONSTARTDATE
-     ,PHC_ADD_TIME
-     ,PROGRAM_JURISDICTION_OID
-     ,SHARED_IND
-     ,IMPORTED_COUNTRY_CODE
-     ,IMPORTED_STATE_CODE
-     ,IMPORTED_COUNTY_CODE
-     ,INVESTIGATOR_ASSIGN_DATE
-     ,HOSPITALIZED_DURATION_AMT
-     ,IMPORTED_CITY_DESC_TXT
-     ,INVESTIGATION_DEATH_DATE
-     ,LOCAL_ID
-     ,HOSPITALIZED_IND
-     ,PREGNANT_IND_CD
-     ,PHC_CODE_SHORT_DESC
-     ,DISEASE_IMPORTED_DESC_TXT
-     ,DETECTION_METHOD_DESC_TXT
-     ,RPT_SOURCE_DESC_TXT
-     ,HOSPITALIZED
-     ,PREGNANT
-     ,RPT_CNTY_DESC_TXT
-     ,DAY_CARE_IND_CD
-     ,FOOD_HANDLER_IND_CD
-     ,IMPORTED_COUNTRY_CD
-     ,IMPORTED_COUNTY_CD
-     ,IMPORTED_STATE_CD
-     ,CASE_CLASS_DESC_TXT
-     ,INVESTIGATION_STATUS_DESC_TXT
-     ,OUTCOME_DESC_TXT
-     ,PAT_AGE_AT_ONSET_UNIT_DESC_TXT
-     ,OUTBREAK_NAME_DESC
-     ,LASTUPDATE
-     ,PHCTXT
-     ,PROG_AREA_DESC_TXT
-     ,t.*
-INTO #TEMP_PHCSUBJECT
-FROM #TEMP_PHCINFO t1 WITH (NOLOCK)
-		INNER JOIN #TEMP_PHCPATIENTINFO t WITH (NOLOCK) ON t1.PUBLIC_HEALTH_CASE_UID = t.PUBLIC_HEALTH_CASE_UID
-
-SELECT @ROWCOUNT_NO = @@ROWCOUNT;
-
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @Batch_id
-        ,'PCHMartETL'
-        ,'NBS_ODSE.PublicHealthCaseFact'
-        ,'COMPLETED'
-        ,@PROC_STEP_NO
-        ,@PROC_STEP_NAME
-        ,@ROWCOUNT_NO
-    );
-
-COMMIT TRANSACTION;
-
------------------------------------------SMMARY
-----TODO NEEDS TO CHECK MERGE LOGIC
-BEGIN TRANSACTION;
-
-		SET @Proc_Step_no = @Proc_Step_no + 1;
-		SET @Proc_Step_Name = 'Generating TEMP_SUMMARYUID';
-
-		IF OBJECT_ID('#TEMP_SUMMARYUID') IS NOT NULL
-DROP TABLE #TEMP_SUMMARYUID;
-
-SELECT PHC.PUBLIC_HEALTH_CASE_UID
-     ,SRT1.PARENT_IS_CD AS STATE_CD
-     ,SRT2.CODE_DESC_TXT AS STATE
-     ,PHC.RPT_CNTY_CD AS CNTY_CD
-     ,SRT1.CODE_DESC_TXT AS COUNTY
-INTO #TEMP_SUMMARYUID
-FROM NBS_ODSE.DBO.PUBLIC_HEALTH_CASE PHC WITH (NOLOCK)
-		LEFT OUTER JOIN NBS_SRTE.DBO.STATE_COUNTY_CODE_VALUE SRT1 WITH (NOLOCK) ON PHC.RPT_CNTY_CD = SRT1.CODE
-    LEFT OUTER JOIN NBS_SRTE.DBO.STATE_CODE SRT2 WITH (NOLOCK) ON SRT1.PARENT_IS_CD = SRT2.STATE_CD
-    LEFT JOIN NBS_ODSE.DBO.ACT_RELATIONSHIP ARN WITH (NOLOCK) ON ARN.TARGET_ACT_UID=PHC.PUBLIC_HEALTH_CASE_UID
-    LEFT JOIN NBS_ODSE.DBO.NOTIFICATION WITH (NOLOCK) ON NOTIFICATION.NOTIFICATION_UID=ARN.SOURCE_ACT_UID
-    AND NOTIFICATION.CD='NOTF'
-WHERE CASE_TYPE_CD IS NOT NULL
-  AND CASE_TYPE_CD = 'S'
-  and  PHC.public_health_case_uid in (select value from string_split(@phc_id_list, ','))
-
-
-ORDER BY PUBLIC_HEALTH_CASE_UID;
-
-SELECT @ROWCOUNT_NO = @@ROWCOUNT;
-
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @Batch_id
-        ,'PCHMartETL'
-        ,'NBS_ODSE.PublicHealthCaseFact'
-        ,'COMPLETED'
-        ,@PROC_STEP_NO
-        ,@PROC_STEP_NAME
-        ,@ROWCOUNT_NO
-    );
-
-COMMIT TRANSACTION;
-
-BEGIN TRANSACTION;
-
-		SET @Proc_Step_no = @Proc_Step_no + 1;
-		SET @Proc_Step_Name = 'Generating TEMP_CASECNT';
-
-		IF OBJECT_ID('#TEMP_CASECNT') IS NOT NULL
-DROP TABLE #TEMP_CASECNT;
-
-SELECT AR2.TARGET_ACT_UID AS PUBLIC_HEALTH_CASE_UID
-     ,AR2.SOURCE_ACT_UID AS SUM_REPORT_FORM_UID
-     ,AR1.TARGET_ACT_UID AS AR1_SUM_REPORT_FORM_UID
-     ,
-    /*--SUMMARY_REPORT_FORM OBS_UID*/
-    AR1.SOURCE_ACT_UID AS AR1_SUM107_UID
-     ,
-    /*--SUM107 OBS_UID*/
-    OB1.OBSERVATION_UID AS OB1_SUM107_UID
-     ,OB1.CD AS OB1_CD
-     ,OB2.OBSERVATION_UID AS OB2_SUM_REPORT_FORM_UID
-     ,OB2.CD AS OB2_CD
-     ,OVN.NUMERIC_VALUE_1 AS GROUP_CASE_CNT
-     ,AR1.TYPE_CD AS AR1_TYPE_CD
-     ,AR1.SOURCE_CLASS_CD AS AR1_SOURCE_CLASS_CD
-     ,AR1.TARGET_CLASS_CD AS AR1_TARGET_CLASS_CD
-     ,AR2.TYPE_CD AS AR2_TYPE_CD
-     ,AR2.SOURCE_CLASS_CD AS AR2_SOURCE_CLASS_CD
-     ,AR2.TARGET_CLASS_CD AS AR2_TARGET_CLASS_CD
-INTO #TEMP_CASECNT
-FROM NBS_ODSE.DBO.ACT_RELATIONSHIP AS AR1 WITH (NOLOCK)
-			,NBS_ODSE.DBO.OBSERVATION AS OB1 WITH (NOLOCK)
-        ,NBS_ODSE.DBO.OBSERVATION AS OB2 WITH (NOLOCK)
-        ,NBS_ODSE.DBO.OBS_VALUE_NUMERIC AS OVN WITH (NOLOCK)
-        ,NBS_ODSE.DBO.ACT_RELATIONSHIP AS AR2 WITH (NOLOCK)
-WHERE AR1.SOURCE_ACT_UID = OB1.OBSERVATION_UID
-  AND AR1.TARGET_ACT_UID = OB2.OBSERVATION_UID
-  AND AR1.TYPE_CD = 'SUMMARYFRMQ'
-  AND OB1.CD = 'SUM107'
-  AND OB2.CD = 'SUMMARY_REPORT_FORM'
-  AND OB1.OBSERVATION_UID = OVN.OBSERVATION_UID
-  AND OB2.OBSERVATION_UID = AR2.SOURCE_ACT_UID
-  AND AR2.TYPE_CD = 'SUMMARYFORM'
-  and  AR2.TARGET_ACT_UID in (select value from string_split(@phc_id_list, ','))
-
-
-
-ORDER BY PUBLIC_HEALTH_CASE_UID;
-
-SELECT @ROWCOUNT_NO = @@ROWCOUNT;
-
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @Batch_id
-        ,'PCHMartETL'
-        ,'NBS_ODSE.PublicHealthCaseFact'
-        ,'COMPLETED'
-        ,@PROC_STEP_NO
-        ,@PROC_STEP_NAME
-        ,@ROWCOUNT_NO
-    );
-
-COMMIT TRANSACTION;
-
----TODO PENDING CODE LOGIC
------------------------NOTIFICATION
-BEGIN TRANSACTION;
-		SET @Proc_Step_no = @Proc_Step_no + 1;
-		SET @Proc_Step_Name = 'Generating TEMP_SAS_LATEST_NOT';
-
-		IF OBJECT_ID('#TEMP_SAS_LATEST_NOT') IS NOT NULL
-DROP TABLE #TEMP_SAS_LATEST_NOT;
-
-SELECT TARGET_ACT_UID AS PUBLIC_HEALTH_CASE_UID
-     ,ar.SOURCE_ACT_UID
-     ,SOURCE_CLASS_CD
-     ,NF.RECORD_STATUS_CD AS NOTIFCURRENTSTATE
-     , NF.txt
-     ,NF.local_id AS NOTIFICATION_LOCAL_ID
-INTO #TEMP_SAS_LATEST_NOT
-FROM NBS_ODSE.DBO.ACT_RELATIONSHIP AR WITH (NOLOCK)
-			,NBS_ODSE.DBO.NOTIFICATION NF WITH (NOLOCK)
-WHERE AR.SOURCE_ACT_UID = NF.NOTIFICATION_UID
-  AND SOURCE_CLASS_CD = 'NOTF'
-  AND TARGET_CLASS_CD = 'CASE'
-  AND (
-    NF.RECORD_STATUS_CD = 'COMPLETED'
-   OR NF.RECORD_STATUS_CD = 'PEND_APPR'
-   OR NF.RECORD_STATUS_CD = 'APPROVED'
-    )
-  AND  AR.TARGET_ACT_UID IN (SELECT PUBLIC_HEALTH_CASE_UID  FROM #TEMP_PHCSUBJECT WITH (NOLOCK))
-
-
-    COMMIT TRANSACTION;
-BEGIN TRANSACTION;
-		SET @Proc_Step_no = @Proc_Step_no + 1;
-		SET @Proc_Step_Name = 'Generating TEMP_SAS_NOTIFICATION';
-
-		IF OBJECT_ID('#TEMP_SAS_NOTIFICATION') IS NOT NULL
-DROP TABLE #TEMP_SAS_NOTIFICATION;
-
-SELECT DISTINCT TARGET_ACT_UID AS PUBLIC_HEALTH_CASE_UID
-              ,TARGET_CLASS_CD
-              ,SOURCE_ACT_UID
-              ,SOURCE_CLASS_CD
-              ,NF.VERSION_CTRL_NBR
-              ,NF.ADD_TIME
-              ,NF.ADD_USER_ID
-              ,NF.RPT_SENT_TIME
-              ,NF.RECORD_STATUS_CD
-              ,NF.RECORD_STATUS_TIME
-              ,NF.LAST_CHG_TIME
-              ,NF.LAST_CHG_USER_ID
-              ,'Y' AS HIST_IND
-              , NF.txt
-              ,CAST(NULL AS INT) AS NOTIFSENTCOUNT
-              ,CAST(NULL AS INT) AS NOTIFREJECTEDCOUNT
-              ,CAST(NULL AS INT) AS NOTIFCREATEDCOUNT
-              ,CAST(NULL AS INT) AS X1
-              ,CAST(NULL AS INT) AS X2
-              ,CAST(NULL AS DATETIME) AS FIRSTNOTIFICATIONSENDDATE
-              ,CAST(NULL AS DATETIME) AS NOTIFICATIONDATE
-INTO #TEMP_SAS_NOTIFICATION
-FROM NBS_ODSE.DBO.ACT_RELATIONSHIP AR WITH (NOLOCK)
-			 INNER JOIN NBS_ODSE.DBO.NOTIFICATION_HIST NF WITH (NOLOCK) ON AR.SOURCE_ACT_UID = NF.NOTIFICATION_UID
-WHERE
-    SOURCE_CLASS_CD = 'NOTF'
-  AND TARGET_CLASS_CD = 'CASE'
-  AND NF.CD='NOTF'
-  AND (
-    NF.RECORD_STATUS_CD = 'COMPLETED'
-   OR NF.RECORD_STATUS_CD = 'MSG_FAIL'
-   OR NF.RECORD_STATUS_CD = 'REJECTED'
-   OR NF.RECORD_STATUS_CD = 'PEND_APPR'
-   OR NF.RECORD_STATUS_CD = 'APPROVED'
-    )
-  and AR.TARGET_ACT_UID IN (SELECT PUBLIC_HEALTH_CASE_UID FROM #TEMP_PHCSUBJECT WITH (NOLOCK))
-
-
-UNION
-
-SELECT TARGET_ACT_UID
-     ,TARGET_CLASS_CD
-     ,SOURCE_ACT_UID
-     ,SOURCE_CLASS_CD
-     ,NF.VERSION_CTRL_NBR
-     ,NF.ADD_TIME
-     ,NF.ADD_USER_ID
-     ,NF.RPT_SENT_TIME
-     ,NF.RECORD_STATUS_CD
-     ,NF.RECORD_STATUS_TIME
-     ,NF.LAST_CHG_TIME
-     ,NF.LAST_CHG_USER_ID
-     ,'N' AS HIST_IND
-     , NULL AS TXT
-     ,CAST(NULL AS INT) AS NOTIFSENTCOUNT
-     ,CAST(NULL AS INT) AS NOTIFREJECTEDCOUNT
-     ,CAST(NULL AS INT) AS NOTIFCREATEDCOUNT
-     ,CAST(NULL AS INT) AS X1
-     ,CAST(NULL AS INT) AS X2
-     ,CAST(NULL AS DATETIME) AS FIRSTNOTIFICATIONSENDDATE
-     ,CAST(NULL AS DATETIME) AS NOTIFICATIONDATE
-FROM NBS_ODSE.DBO.ACT_RELATIONSHIP AR WITH (NOLOCK)
-			,NBS_ODSE.DBO.NOTIFICATION NF WITH (NOLOCK)
-WHERE AR.SOURCE_ACT_UID = NF.NOTIFICATION_UID
-  AND SOURCE_CLASS_CD = 'NOTF'
-  AND TARGET_CLASS_CD = 'CASE'
-  AND NF.CD='NOTF'
-  AND (
-    NF.RECORD_STATUS_CD = 'COMPLETED'
-   OR NF.RECORD_STATUS_CD = 'MSG_FAIL'
-   OR NF.RECORD_STATUS_CD = 'REJECTED'
-   OR NF.RECORD_STATUS_CD = 'PEND_APPR'
-   OR NF.RECORD_STATUS_CD = 'APPROVED'
-    )
-  and AR.TARGET_ACT_UID IN (SELECT PUBLIC_HEALTH_CASE_UID FROM #TEMP_PHCSUBJECT WITH (NOLOCK))
-
-ORDER BY TARGET_ACT_UID
-        ,LAST_CHG_TIME;
-
-SELECT @ROWCOUNT_NO = @@ROWCOUNT;
-
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @Batch_id
-        ,'PCHMartETL'
-        ,'NBS_ODSE.PublicHealthCaseFact'
-        ,'COMPLETED'
-        ,@PROC_STEP_NO
-        ,@PROC_STEP_NAME
-        ,@ROWCOUNT_NO
-    );
-
-COMMIT TRANSACTION;
-
-BEGIN TRANSACTION;
-
-		SET @Proc_Step_no = @Proc_Step_no + 1;
-		SET @Proc_Step_Name = 'Generating TEMP_PHCFACT';
-
-		IF OBJECT_ID('#TEMP_PHCFACT') IS NOT NULL
-DROP TABLE #TEMP_PHCFACT;
-
-SELECT t.*
-     ,TARGET_CLASS_CD
-     ,tn.SOURCE_ACT_UID
-     ,tn.SOURCE_CLASS_CD
-     ,VERSION_CTRL_NBR
-     ,ADD_TIME
-     ,ADD_USER_ID
-     ,RPT_SENT_TIME
-     ,RECORD_STATUS_CD
-     ,RECORD_STATUS_TIME
-     ,LAST_CHG_TIME
-     ,LAST_CHG_USER_ID
-     ,HIST_IND
-     ,NOTIFSENTCOUNT
-     ,NOTIFCREATEDCOUNT
-     ,FIRSTNOTIFICATIONSENDDATE
-     ,NOTIFICATIONDATE
-INTO #TEMP_PHCFACT
-FROM #TEMP_CASECNT t WITH (NOLOCK)
-		LEFT JOIN #TEMP_SAS_NOTIFICATION tn WITH (NOLOCK) ON tn.PUBLIC_HEALTH_CASE_UID = t.PUBLIC_HEALTH_CASE_UID;
-
-SELECT @ROWCOUNT_NO = @@ROWCOUNT;
-
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @Batch_id
-        ,'PCHMartETL'
-        ,'NBS_ODSE.PublicHealthCaseFact'
-        ,'COMPLETED'
-        ,@PROC_STEP_NO
-        ,@PROC_STEP_NAME
-        ,@ROWCOUNT_NO
-    );
-
-COMMIT TRANSACTION;
-
-BEGIN TRANSACTION;
-
-		SET @Proc_Step_no = @Proc_Step_no + 1;
-		SET @Proc_Step_Name = 'Generating TEMP_MIN_MAX_NOTIFICATION';
-
-IF OBJECT_ID('#TEMP_MIN_MAX_NOTIFICATION') IS NOT NULL
-DROP TABLE #TEMP_MIN_MAX_NOTIFICATION;
-
-SELECT DISTINCT MIN(CASE
-    WHEN VERSION_CTRL_NBR = 1
-        THEN RECORD_STATUS_CD
-    END) AS FIRSTNOTIFICATIONSTATUS
-              ,
-
-    SUM(CASE
-        WHEN RECORD_STATUS_CD = 'REJECTED'
-            THEN 1
-        ELSE 0
-        END) NOTIFREJECTEDCOUNT
-              ,SUM(CASE
-    WHEN RECORD_STATUS_CD = 'APPROVED'
-        OR RECORD_STATUS_CD = 'PEND_APPR'
-        THEN 1
-    WHEN RECORD_STATUS_CD = 'REJECTED'
-        THEN -1
-    ELSE 0
-    END) NOTIFCREATEDCOUNT
-              ,SUM(CASE
-    WHEN RECORD_STATUS_CD = 'COMPLETED'
-        THEN 1
-    ELSE 0
-    END) NOTIFSENTCOUNT
-              ,MIN(CASE
-    WHEN RECORD_STATUS_CD = 'COMPLETED'
-        THEN RPT_SENT_TIME
-    END) AS FIRSTNOTIFICATIONSENDDATE
-              ,
-    SUM(CASE
-        WHEN RECORD_STATUS_CD = 'PEND_APPR'
-            THEN 1
-        ELSE 0
-        END) NOTIFCREATEDPENDINGSCOUNT
-              ,MAX(CASE
-    WHEN RECORD_STATUS_CD = 'APPROVED'
-        OR RECORD_STATUS_CD = 'PEND_APPR'
-        THEN LAST_CHG_TIME
-    END) AS LASTNOTIFICATIONDATE
-              ,
-              --DONE?
-    MAX(CASE
-        WHEN RECORD_STATUS_CD = 'COMPLETED'
-            THEN RPT_SENT_TIME
-        END) AS LASTNOTIFICATIONSENDDATE
-              ,
-              --DONE?
-    MIN(ADD_TIME) AS FIRSTNOTIFICATIONDATE
-              ,
-              --DONE
-    MIN(ADD_USER_ID) AS FIRSTNOTIFICATIONSUBMITTEDBY
-              ,
-              --DONE
-    MIN(ADD_USER_ID) AS LASTNOTIFICATIONSUBMITTEDBY
-              --DONE
-              --MIN(CASE WHEN RECORD_STATUS_CD='COMPLETED' THEN  LAST_CHG_USER_ID END) AS FIRSTNOTIFICATIONSUBMITTEDBY,
-              ,MIN(CASE
-    WHEN RECORD_STATUS_CD = 'COMPLETED'
-        AND RPT_SENT_TIME IS NOT NULL
-        THEN RPT_SENT_TIME
-    END) AS NOTIFICATIONDATE
-              ,PUBLIC_HEALTH_CASE_UID
-INTO #TEMP_MIN_MAX_NOTIFICATION
-FROM #TEMP_SAS_NOTIFICATION WITH (NOLOCK)
-GROUP BY PUBLIC_HEALTH_CASE_UID;
-
-UPDATE #TEMP_MIN_MAX_NOTIFICATION set NOTIFCREATEDCOUNT = NOTIFCREATEDCOUNT-1 where NOTIFCREATEDPENDINGSCOUNT>0 and NOTIFCREATEDCOUNT>0;
-UPDATE #TEMP_MIN_MAX_NOTIFICATION set NOTIFCREATEDCOUNT = 1 where NOTIFCREATEDPENDINGSCOUNT>0 and NOTIFCREATEDCOUNT=0 and NOTIFREJECTEDCOUNT=0;
-
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @Batch_id
-        ,'PCHMartETL'
-        ,'NBS_ODSE.PublicHealthCaseFact'
-        ,'COMPLETED'
-        ,@Proc_Step_no
-        ,@Proc_Step_Name
-        ,0
-    );
-
-COMMIT TRANSACTION;
-
-BEGIN TRANSACTION;
-
-		SET @Proc_Step_no = @Proc_Step_no + 1;
-		SET @Proc_Step_Name = 'Generating TEMP_SUB_CASE_NOTIF';
-
-		IF OBJECT_ID('#TEMP_SUB_CASE_NOTIF') IS NOT NULL
-DROP TABLE #TEMP_SUB_CASE_NOTIF;
-
-SELECT DISTINCT ts.*
-              ,NOTIFCREATEDCOUNT
-              ,NOTIFSENTCOUNT
-              ,NOTIFICATIONDATE
-              ,FIRSTNOTIFICATIONSTATUS
-              ,FIRSTNOTIFICATIONSENDDATE
-              ,LASTNOTIFICATIONDATE
-              ,LASTNOTIFICATIONSENDDATE
-              ,FIRSTNOTIFICATIONDATE
-              ,FIRSTNOTIFICATIONSUBMITTEDBY
-              ,LASTNOTIFICATIONSUBMITTEDBY
-              ,t.TXT AS NOTITXT
-              ,t.NOTIFICATION_LOCAL_ID
-              ,t.NOTIFCURRENTSTATE
-              ,ROWN = ROW_NUMBER() OVER (
-				PARTITION BY ts.PUBLIC_HEALTH_CASE_UID ORDER BY ts.PUBLIC_HEALTH_CASE_UID
-				)
-INTO #TEMP_SUB_CASE_NOTIF
-FROM #TEMP_PHCSUBJECT ts WITH (NOLOCK)
-		LEFT JOIN #TEMP_MIN_MAX_NOTIFICATION tn WITH (NOLOCK) ON tn.PUBLIC_HEALTH_CASE_UID = ts.PUBLIC_HEALTH_CASE_UID
-    LEFT JOIN #TEMP_SAS_LATEST_NOT  t WITH (NOLOCK) ON t.PUBLIC_HEALTH_CASE_UID = ts.PUBLIC_HEALTH_CASE_UID;
-
-SELECT @ROWCOUNT_NO = @@ROWCOUNT;
-
-DELETE
-FROM #TEMP_SUB_CASE_NOTIF
-WHERE ROWN > 1
-      --IF OBJECT_ID ('TEMP_PHCFACT') IS NOT NULL DROP TABLE TEMP_PHCFACT;
-      --IF OBJECT_ID ('TEMP_MIN_MAX_NOTIFICATION') IS NOT NULL DROP TABLE TEMP_MIN_MAX_NOTIFICATION;
-    INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                    batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @Batch_id
-        ,'PCHMartETL'
-        ,'NBS_ODSE.PublicHealthCaseFact'
-        ,'COMPLETED'
-        ,@PROC_STEP_NO
-        ,@PROC_STEP_NAME
-        ,@ROWCOUNT_NO
-    );
-
-COMMIT TRANSACTION;
-
-BEGIN TRANSACTION;
-
-		SET @Proc_Step_no = @Proc_Step_no + 1;
-		SET @Proc_Step_Name = 'Generating TEMP_CONFIRM';
-
-		IF OBJECT_ID('#TEMP_CONFIRM') IS NOT NULL
-DROP TABLE #TEMP_CONFIRM;
-
-SELECT CONFIRMATION_METHOD.PUBLIC_HEALTH_CASE_UID
-     ,A.CONFIRMATION_METHOD_TIME
-     ,CONFIRMATION_METHOD_CD
-     ,tc.CODE_SHORT_DESC_TXT AS CONFIRMATION_METHOD_DESC_TXT
-     ,tc.investigation_form_cd
-INTO #TEMP_CONFIRM
-FROM (
-         SELECT CONFIRMATION_METHOD.PUBLIC_HEALTH_CASE_UID
-              ,MAX(CONFIRMATION_METHOD_TIME) AS CONFIRMATION_METHOD_TIME
-         FROM NBS_ODSE.DBO.CONFIRMATION_METHOD WITH (NOLOCK)
-         GROUP BY CONFIRMATION_METHOD.PUBLIC_HEALTH_CASE_UID
-     ) A
-         INNER JOIN #TEMP_PHCINFO t WITH (NOLOCK) ON t.PUBLIC_HEALTH_CASE_UID = A.PUBLIC_HEALTH_CASE_UID
-    INNER JOIN NBS_ODSE.DBO.CONFIRMATION_METHOD WITH (NOLOCK) ON A.PUBLIC_HEALTH_CASE_UID = CONFIRMATION_METHOD.PUBLIC_HEALTH_CASE_UID
-    LEFT OUTER JOIN #TEMP_INV_FORM_CODE_DATA  tc WITH (NOLOCK) ON CONFIRMATION_METHOD.CONFIRMATION_METHOD_CD = tc.CODE
-    AND  tc.investigation_form_cd = t.investigation_form_cd
-    AND tc.CODE_SET_NM= 'PHC_CONF_M'
-GROUP BY CONFIRMATION_METHOD.PUBLIC_HEALTH_CASE_UID
-        ,CONFIRMATION_METHOD_CD
-        ,A.CONFIRMATION_METHOD_TIME
-        ,CONFIRMATION_METHOD_DESC_TXT
-        ,tc.CODE_SHORT_DESC_TXT
-        ,tc.investigation_form_cd;
-
-SELECT @ROWCOUNT_NO = @@ROWCOUNT;
-
-
-UPDATE t
-SET CONFIRMATION_METHOD_DESC_TXT = CODE_VALUE_GENERAL.CODE_SHORT_DESC_TXT
-    FROM #TEMP_CONFIRM t
-		INNER JOIN NBS_SRTE.DBO.CODE_VALUE_GENERAL WITH (NOLOCK) ON t.CONFIRMATION_METHOD_CD = CODE_VALUE_GENERAL.CODE
-    AND CODE_SET_NM= 'PHC_CONF_M'
-where t.INVESTIGATION_FORM_CD NOT LIKE 'PG_%' or INVESTIGATION_FORM_CD is null
-
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @Batch_id
-        ,'PCHMartETL'
-        ,'NBS_ODSE.PublicHealthCaseFact'
-        ,'COMPLETED'
-        ,@PROC_STEP_NO
-        ,@PROC_STEP_NAME
-        ,@ROWCOUNT_NO
-    );
-
-COMMIT TRANSACTION;
-
-BEGIN TRANSACTION;
-
-		SET @Proc_Step_no = @Proc_Step_no + 1;
-		SET @Proc_Step_Name = 'Generating TEMP_CONFIRM_CONCAT';
-
-		IF OBJECT_ID('#TEMP_CONFIRM_CONCAT') IS NOT NULL
-DROP TABLE #TEMP_CONFIRM_CONCAT;
-
-SELECT DISTINCT PUBLIC_HEALTH_CASE_UID
-              ,CONFIRMATION_METHOD_TIME = (
-    SELECT TOP 1 CONFIRMATION_METHOD_TIME
-    FROM #TEMP_CONFIRM WITH (NOLOCK)
-WHERE PUBLIC_HEALTH_CASE_UID = T.PUBLIC_HEALTH_CASE_UID
-    )
-    ,CONFIRMATION_METHOD_DESC_TXT = STUFF((
-    SELECT ', ' + CONFIRMATION_METHOD_DESC_TXT
-    FROM #TEMP_CONFIRM WITH (NOLOCK)
-    WHERE PUBLIC_HEALTH_CASE_UID = T.PUBLIC_HEALTH_CASE_UID
-    FOR XML PATH('')
-    ), 1, 1, '')
-    ,CONFIRMATION_METHOD_CD = STUFF((
-    SELECT ', ' + CONFIRMATION_METHOD_CD
-    FROM #TEMP_CONFIRM WITH (NOLOCK)
-    WHERE PUBLIC_HEALTH_CASE_UID = T.PUBLIC_HEALTH_CASE_UID
-    FOR XML PATH('')
-    ), 1, 1, '')
-INTO #TEMP_CONFIRM_CONCAT
-FROM #TEMP_CONFIRM AS T;
-
-SELECT @ROWCOUNT_NO = @@ROWCOUNT;
-
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @Batch_id
-        ,'PCHMartETL'
-        ,'NBS_ODSE.PublicHealthCaseFact'
-        ,'COMPLETED'
-        ,@PROC_STEP_NO
-        ,@PROC_STEP_NAME
-        ,@ROWCOUNT_NO
-    );
-
-COMMIT TRANSACTION;
-
-BEGIN TRANSACTION;
-
-		SET @Proc_Step_no = @Proc_Step_no + 1;
-		SET @Proc_Step_Name = 'Generating TEMP_SUB_CASE_CONF_NOTIF';
-
-		IF OBJECT_ID('#TEMP_SUB_CASE_CONF_NOTIF') IS NOT NULL
-DROP TABLE #TEMP_SUB_CASE_CONF_NOTIF;
-
-SELECT t.*
-     ,CONFIRMATION_METHOD_TIME
-     ,CONFIRMATION_METHOD_CD
-     ,CONFIRMATION_METHOD_DESC_TXT
-INTO #TEMP_SUB_CASE_CONF_NOTIF
-FROM #TEMP_SUB_CASE_NOTIF t WITH (NOLOCK)
-		LEFT OUTER JOIN #TEMP_CONFIRM_CONCAT tc WITH (NOLOCK) ON t.PUBLIC_HEALTH_CASE_UID = tc.PUBLIC_HEALTH_CASE_UID;
-
-SELECT @ROWCOUNT_NO = @@ROWCOUNT;
-
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @Batch_id
-        ,'PCHMartETL'
-        ,'NBS_ODSE.PublicHealthCaseFact'
-        ,'COMPLETED'
-        ,@PROC_STEP_NO
-        ,@PROC_STEP_NAME
-        ,@ROWCOUNT_NO
-    );
-
-COMMIT TRANSACTION;
-
-----------------------PHCREPORTER
-BEGIN TRANSACTION;
-
-		SET @Proc_Step_no = @Proc_Step_no + 1;
-		SET @Proc_Step_Name = 'Generating TEMP_PHCREPORTER';
-
-		IF OBJECT_ID('#TEMP_PHCREPORTER') IS NOT NULL
-DROP TABLE #TEMP_PHCREPORTER;
-
-SELECT PAR.ACT_UID
-     ,PNM.PERSON_UID AS ENTITY_UID
-     ,TYPE_CD
-     ,TEL.PHONE_NBR_TXT
-     ,PAR.FROM_TIME
-     ,isnull(RTRIM(LTRIM(PNM.LAST_NM)), '') + ', ' + isnull(PNM.FIRST_NM, '') AS NAME
-INTO #TEMP_PHCREPORTER
-FROM NBS_ODSE.DBO.PARTICIPATION AS PAR WITH (NOLOCK)
-		INNER JOIN #TEMP_PHCINFO t on t.public_health_CASE_UID  =PAR.ACT_UID
-    INNER JOIN NBS_ODSE.DBO.PERSON  AS P WITH (NOLOCK) ON P.PERSON_UID = PAR.SUBJECT_ENTITY_UID
-    LEFT JOIN NBS_ODSE.DBO.PERSON_NAME AS PNM WITH (NOLOCK) ON PNM.PERSON_UID = PAR.SUBJECT_ENTITY_UID
-    AND PNM.NM_USE_CD = 'L'
-    AND PNM.RECORD_STATUS_CD = 'ACTIVE'
-    LEFT JOIN NBS_ODSE.DBO.ENTITY_LOCATOR_PARTICIPATION AS ELP WITH (NOLOCK) ON ELP.ENTITY_UID = PAR.SUBJECT_ENTITY_UID
-    AND ELP.CLASS_CD = 'TELE'
-    AND ELP.USE_CD = 'WP' /*WORK PLACE*/
-    AND ELP.CD = 'PH' /*PHONE*/
-    AND ELP.RECORD_STATUS_CD = 'ACTIVE'
-    LEFT JOIN NBS_ODSE.DBO.TELE_LOCATOR AS TEL WITH (NOLOCK) ON ELP.LOCATOR_UID = TEL.TELE_LOCATOR_UID
-/*AND (TEL.RECORD_STATUS_CD IS NOT NULL AND TEL.RECORD_STATUS_CD ='ACTIVE')*/
-WHERE (
-    PAR.TYPE_CD IN (
-    'OrgAsReporterOfPHC'
-    ,'InvestgrOfPHC'
-    ,'PerAsReporterOfPHC'
-    ,'PhysicianOfPHC'
-    )
-    )
-UNION
-
-SELECT PAR2.ACT_UID
-     ,ORG.ORGANIZATION_UID AS ENTITY_UID
-     ,TYPE_CD
-     ,' ' AS PHONE_NBR_TXT
-     ,PAR2.FROM_TIME
-     ,ORG.NM_TXT AS NAME
-FROM NBS_ODSE.DBO.PARTICIPATION AS PAR2 WITH (NOLOCK)
-			INNER JOIN #TEMP_PHCINFO t on t.public_health_CASE_UID  =PAR2.ACT_UID
-    INNER JOIN NBS_ODSE.DBO.ORGANIZATION_NAME AS ORG WITH (NOLOCK) ON ORG.ORGANIZATION_UID =  PAR2.SUBJECT_ENTITY_UID
-    INNER JOIN NBS_ODSE.DBO.ORGANIZATION WITH (NOLOCK) ON ORGANIZATION.ORGANIZATION_UID = ORG.ORGANIZATION_UID
-WHERE  PAR2.RECORD_STATUS_CD = 'ACTIVE'
-  AND PAR2.TYPE_CD = 'OrgAsReporterOfPHC'
-  AND LTRIM(RTRIM(NM_TXT)) <> ''
-ORDER BY ACT_UID
-        ,TYPE_CD;
-
-IF OBJECT_ID('#TEMP_ENTITY') IS NOT NULL
-DROP TABLE #TEMP_ENTITY;
-
-SELECT ACT_UID
-     ,PROVIDERNAME = MAX(CASE
-    WHEN TYPE_CD = 'PhysicianOfPHC'
-        THEN NAME
-    END)
-     ,PROVIDERPHONE = MAX(CASE
-    WHEN TYPE_CD = 'PhysicianOfPHC'
-        THEN PHONE_NBR_TXT
-    END)
-     ,REPORTERNAME = MAX(CASE
-    WHEN TYPE_CD = 'PerAsReporterOfPHC'
-        THEN NAME
-    END)
-     ,REPORTERPHONE = MAX(CASE
-    WHEN TYPE_CD = 'PerAsReporterOfPHC'
-        THEN PHONE_NBR_TXT
-    END)
-     ,INVESTIGATORNAME = MAX(CASE
-    WHEN TYPE_CD = 'InvestgrOfPHC'
-        THEN NAME
-    END)
-     ,INVESTIGATORPHONE = MAX(CASE
-    WHEN TYPE_CD = 'InvestgrOfPHC'
-        THEN PHONE_NBR_TXT
-    END)
-     ,INVESTIGATORASSIGNEDDATE = MAX(CASE
-    WHEN TYPE_CD = 'InvestgrOfPHC'
-        THEN FROM_TIME
-    END)
-     ,ORGANIZATIONNAME = MAX(CASE
-    WHEN TYPE_CD = 'OrgAsReporterOfPHC'
-        THEN NAME
-    END)
-INTO #TEMP_ENTITY
-FROM #TEMP_PHCREPORTER WITH (NOLOCK)
-GROUP BY ACT_UID
-
-SELECT @ROWCOUNT_NO = @@ROWCOUNT;
-
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @Batch_id
-        ,'PCHMartETL'
-        ,'NBS_ODSE.PublicHealthCaseFact'
-        ,'COMPLETED'
-        ,@PROC_STEP_NO
-        ,@PROC_STEP_NAME
-        ,@ROWCOUNT_NO
-    );
-
-COMMIT TRANSACTION;
-
-BEGIN TRANSACTION;
-
-		SET @Proc_Step_no = @Proc_Step_no + 1;
-		SET @Proc_Step_Name = 'Generating TEMP_CASE_ENTITY';
-
-		IF OBJECT_ID('#TEMP_CASE_ENTITY') IS NOT NULL
-DROP TABLE #TEMP_CASE_ENTITY;
-
-SELECT tn.*
-     ,te.PROVIDERNAME
-     ,te.PROVIDERPHONE
-     ,te.REPORTERNAME
-     ,te.REPORTERPHONE
-     ,te.INVESTIGATORNAME
-     ,te.INVESTIGATORPHONE
-     ,te.INVESTIGATORASSIGNEDDATE
-     ,te.ORGANIZATIONNAME
-INTO #TEMP_CASE_ENTITY
-FROM #TEMP_SUB_CASE_CONF_NOTIF tn WITH (NOLOCK)
-		LEFT OUTER JOIN #TEMP_ENTITY te WITH (NOLOCK) ON tn.PUBLIC_HEALTH_CASE_UID = te.ACT_UID;
-
-SELECT @ROWCOUNT_NO = @@ROWCOUNT;
-
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @Batch_id
-        ,'PCHMartETL'
-        ,'NBS_ODSE.PublicHealthCaseFact'
-        ,'COMPLETED'
-        ,@PROC_STEP_NO
-        ,@PROC_STEP_NAME
-        ,@ROWCOUNT_NO
-    );
-
-COMMIT TRANSACTION;
-
--------------------------PHCPERSONRACE
-BEGIN TRANSACTION;
-
-		SET @Proc_Step_no = @Proc_Step_no + 1;
-		SET @Proc_Step_Name = 'Generating TEMP_PHCPERSONRACE';
-
-		IF OBJECT_ID('#TEMP_PHCPERSONRACE') IS NOT NULL
-DROP TABLE #TEMP_PHCPERSONRACE;
-
-SELECT DISTINCT PER.PERSON_UID
-              ,PER.RACE_CATEGORY_CD
-              ,CODE_SHORT_DESC_TXT AS RACE_DESC_TXT
-INTO #TEMP_PHCPERSONRACE
-FROM NBS_ODSE.DBO.PERSON_RACE AS PER WITH (NOLOCK)
-			,NBS_SRTE.DBO.RACE_CODE AS RAC WITH (NOLOCK)
-        ,#TEMP_UPDATE_NEW_PATIENT t WITH (NOLOCK)
-WHERE PER.RACE_CD = PER.RACE_CATEGORY_CD /*CONCATENATE ONLY CATEGORY CD AND DESC*/
-  AND t.PERSON_UID=PER.PERSON_UID
-  AND PER.RACE_CD = RAC.CODE
-  AND RAC.PARENT_IS_CD = 'ROOT'
-  AND RAC.CODE_SET_NM = 'P_RACE_CAT'
-UNION
-
-SELECT DISTINCT PER.PERSON_UID
-              ,PER.RACE_CATEGORY_CD
-              ,CODE_SHORT_DESC_TXT AS RACE_DESC_TXT
---INTO TEMP_RACE1
-FROM NBS_ODSE.DBO.PERSON_RACE AS PER WITH (NOLOCK)
-			,NBS_SRTE.DBO.RACE_CODE AS RAC WITH (NOLOCK)
-        ,#TEMP_UPDATE_NEW_PATIENT t WITH (NOLOCK)
-WHERE PER.RACE_CD = 'ROOT'
-  AND t.PERSON_UID=PER.PERSON_UID
-  AND PER.RACE_CATEGORY_CD = RAC.CODE
-
-    IF OBJECT_ID('#TEMP_PHCPERSONRACE_CONCAT') IS NOT NULL
-DROP TABLE #TEMP_PHCPERSONRACE_CONCAT;
-
-SELECT DISTINCT PERSON_UID
-              ,RACE_CONCATENATED_DESC_TXT = STUFF((
-    SELECT ', ' + RACE_DESC_TXT
-    FROM #TEMP_PHCPERSONRACE WITH (NOLOCK)
-    WHERE PERSON_UID = T.PERSON_UID
-    FOR XML PATH('')
-    ), 1, 1, '')
-              ,RACE_CONCATENATED_TXT = STUFF((
-    SELECT ', ' + RACE_CATEGORY_CD
-    FROM #TEMP_PHCPERSONRACE WITH (NOLOCK)
-    WHERE PERSON_UID = T.PERSON_UID
-    FOR XML PATH('')
-    ), 1, 1, '')
-INTO #TEMP_PHCPERSONRACE_CONCAT
-FROM #TEMP_PHCPERSONRACE AS T;
-
-SELECT @ROWCOUNT_NO = @@ROWCOUNT;
-
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @Batch_id
-        ,'PCHMartETL'
-        ,'NBS_ODSE.PublicHealthCaseFact'
-        ,'COMPLETED'
-        ,@PROC_STEP_NO
-        ,@PROC_STEP_NAME
-        ,@ROWCOUNT_NO
-    );
-
-COMMIT TRANSACTION;
-
-BEGIN TRANSACTION;
-
-		SET @Proc_Step_no = @Proc_Step_no + 1;
-		SET @Proc_Step_Name = 'Generating TEMP_PHC_FACT';
-
-		IF OBJECT_ID('#TEMP_PHC_FACT') IS NOT NULL
-DROP TABLE #TEMP_PHC_FACT;
-
-SELECT te.*
-     ,RACE_CONCATENATED_DESC_TXT
-     ,RACE_CONCATENATED_TXT
-     ,cast(null  as varchar(20)) EVENT_TYPE
-     ,cast(null as datetime)  EVENT_DATE
-     ,cast(null as datetime)  REPORT_DATE
-     ,cast(null as datetime)  MART_RECORD_CREATION_TIME
-INTO #TEMP_PHC_FACT
-FROM #TEMP_CASE_ENTITY te
-         LEFT OUTER JOIN #TEMP_PHCPERSONRACE_CONCAT tc WITH (NOLOCK) ON te.PERSON_UID = tc.PERSON_UID;
-
-----------------------
--- Moved this column above SQL
--- ALTER TABLE #TEMP_PHC_FACT ADD EVENT_TYPE VARCHAR(20);
-
--- ALTER TABLE #TEMP_PHC_FACT ADD EVENT_DATE DATETIME;
-
--- ALTER TABLE #TEMP_PHC_FACT ADD REPORT_DATE DATETIME;
-
--- ALTER TABLE #TEMP_PHC_FACT ADD MART_RECORD_CREATION_TIME DATETIME;
-
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @Batch_id
-        ,'PCHMartETL'
-        ,'NBS_ODSE.PublicHealthCaseFact'
-        ,'COMPLETED'
-        ,@Proc_Step_no
-        ,@Proc_Step_Name
-        ,0
-    );
-
-COMMIT TRANSACTION;
-
-BEGIN TRANSACTION;
-
-		SET @Proc_Step_no = @Proc_Step_no + 1;
-		SET @Proc_Step_Name = 'Updating TEMP_PHC_FACT';
-
-UPDATE #TEMP_PHC_FACT
-SET EVENT_TYPE = (
-    CASE
-        WHEN ONSETDATE IS NOT NULL
-            THEN 'O'
-        WHEN ONSETDATE IS NULL
-            AND DIAGNOSIS_DATE IS NOT NULL
-            THEN 'D'
-        WHEN ONSETDATE IS NULL
-            AND DIAGNOSIS_DATE IS NULL
-            AND RPT_TO_COUNTY_TIME IS NOT NULL
-            THEN 'C'
-        WHEN ONSETDATE IS NULL
-            AND DIAGNOSIS_DATE IS NULL
-            AND RPT_TO_COUNTY_TIME IS NULL
-            AND RPT_TO_STATE_TIME IS NOT NULL
-            THEN 'S'
-        WHEN PHC_CODE IN ('10220')
-            AND THERAPY_DATE IS NOT NULL
-            THEN 'RVCT_DTS'
-        WHEN PHC_CODE IN ('10220')
-            AND THERAPY_DATE IS NULL
-            AND RPT_FORM_CMPLT_TIME IS NOT NULL
-            THEN 'RVCT_DR'
-        ELSE 'P'
-        END
-    )
-  ,EVENT_DATE = (
-    CASE
-        WHEN ONSETDATE IS NOT NULL
-            THEN ONSETDATE
-        WHEN ONSETDATE IS NULL
-            AND DIAGNOSIS_DATE IS NOT NULL
-            THEN DIAGNOSIS_DATE
-        WHEN ONSETDATE IS NULL
-            AND DIAGNOSIS_DATE IS NULL
-            AND RPT_TO_COUNTY_TIME IS NOT NULL
-            THEN RPT_TO_COUNTY_TIME
-        WHEN ONSETDATE IS NULL
-            AND DIAGNOSIS_DATE IS NULL
-            AND RPT_TO_COUNTY_TIME IS NULL
-            AND RPT_TO_STATE_TIME IS NOT NULL
-            THEN RPT_TO_STATE_TIME
-        WHEN PHC_CODE IN ('10220')
-            AND THERAPY_DATE IS NOT NULL
-            THEN THERAPY_DATE
-        WHEN PHC_CODE IN ('10220')
-            AND THERAPY_DATE IS NULL
-            AND RPT_FORM_CMPLT_TIME IS NOT NULL
-            THEN RPT_FORM_CMPLT_TIME
-        ELSE PHC_ADD_TIME
-        END
-    )
-  ,REPORT_DATE = (
-    CASE
-        WHEN RPT_TO_COUNTY_TIME is not null
-            THEN RPT_TO_COUNTY_TIME
-        WHEN RPT_TO_STATE_TIME IS NOT NULL AND RPT_TO_COUNTY_TIME IS NULL
-            THEN RPT_TO_STATE_TIME
-        ELSE PHC_ADD_TIME
-        END
-    )
-  ,DECEASED_TIME = (
-    CASE
-        WHEN PHC_CODE IN (
-                          '10220'
-            ,'10030'
-            )
-            THEN INVESTIGATION_DEATH_DATE
-        ELSE DECEASED_TIME
-        END
-    )
-  ,INVESTIGATORASSIGNEDDATE = (
-    CASE
-        WHEN PHC_CODE IN (
-                          '10220'
-            ,'10030'
-            )
-            THEN INVESTIGATOR_ASSIGN_DATE
-        ELSE INVESTIGATORASSIGNEDDATE
-        END
-    )
-  ,MART_RECORD_CREATION_TIME = getDate();;
-
-SELECT @ROWCOUNT_NO = @@ROWCOUNT;
-
--- the below 4 update's are already covered in the above sql
--- so commenting the below 4 sql
--- UPDATE #TEMP_PHC_FACT SET EVENT_DATE = THERAPY_DATE WHERE PHC_CODE ='10220' and THERAPY_DATE is not null ;
--- UPDATE #TEMP_PHC_FACT SET EVENT_DATE = rpt_form_cmplt_time WHERE PHC_CODE ='10220' and THERAPY_DATE is null and rpt_form_cmplt_time is not null;
--- UPDATE #TEMP_PHC_FACT SET EVENT_TYPE = 'RVCT_DTS' WHERE PHC_CODE ='10220' and THERAPY_DATE is not null ;
--- UPDATE #TEMP_PHC_FACT SET EVENT_TYPE = 'RVCT_DR' WHERE PHC_CODE ='10220' and THERAPY_DATE is null and rpt_form_cmplt_time is not null;
-
--- below sql are now in the corresponding select clause
--- UPDATE #TEMP_PHC_FACT SET State_cd = NULL WHERE State_cd = LTRIM(RTRIM(''));
--- UPDATE #TEMP_PHC_FACT SET phctxt = NULL WHERE phctxt = LTRIM(RTRIM(''));
--- UPDATE #TEMP_PHC_FACT SET cntry_cd = NULL WHERE cntry_cd = LTRIM(RTRIM(''));
-
-
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @Batch_id
-        ,'PCHMartETL'
-        ,'NBS_ODSE.PublicHealthCaseFact'
-        ,'COMPLETED'
-        ,@PROC_STEP_NO
-        ,@PROC_STEP_NAME
-        ,@ROWCOUNT_NO
-    );
-
-COMMIT TRANSACTION;
-
-BEGIN TRANSACTION;
-
-		SET @Proc_Step_no = @Proc_Step_no + 1;
-		SET @Proc_Step_Name = 'Cleanup temp tables';
-/*
-		IF OBJECT_ID('#TEMP_UPDATE_NEW_PATIENT') IS NOT NULL
-			DROP TABLE #TEMP_UPDATE_NEW_PATIENT;
-
-		IF OBJECT_ID('#TEMP_PHCINFO1') IS NOT NULL
-			DROP TABLE #TEMP_PHCINFO1;
-
-		IF OBJECT_ID('#TEMP_PHCINFO2') IS NOT NULL
-			DROP TABLE #TEMP_PHCINFO2;
-
-		IF OBJECT_ID('#TEMP_PHCINFO3') IS NOT NULL
-			DROP TABLE #TEMP_PHCINFO3;
-
-		IF OBJECT_ID('#TEMP_INV_FORM_CODE_DATA') IS NOT NULL
-			DROP TABLE #TEMP_INV_FORM_CODE_DATA;
-
-		IF OBJECT_ID('#TEMP_PHCPATIENTINFO') IS NOT NULL
-			DROP TABLE #TEMP_PHCPATIENTINFO;
-
-		IF OBJECT_ID('#TEMP_PHCSUBJECT') IS NOT NULL
-			DROP TABLE #TEMP_PHCSUBJECT;
-
-		IF OBJECT_ID('#TEMP_PHCINFO') IS NOT NULL
-			DROP TABLE #TEMP_PHCINFO;
-
-		IF OBJECT_ID('#TEMP_SUMMARYUID') IS NOT NULL
-			DROP TABLE #TEMP_SUMMARYUID;
-
-		IF OBJECT_ID('#TEMP_CASECNT') IS NOT NULL
-			DROP TABLE #TEMP_CASECNT;
-		IF OBJECT_ID('#TEMP_SAS_LATEST_NOT') IS NOT NULL
-			DROP TABLE #TEMP_SAS_LATEST_NOT;
-
-		IF OBJECT_ID('#TEMP_SAS_NOTIFICATION') IS NOT NULL
-			DROP TABLE #TEMP_SAS_NOTIFICATION;
-
-		IF OBJECT_ID('#TEMP_CASECNT') IS NOT NULL
-			DROP TABLE #TEMP_CASECNT;
-
-		IF OBJECT_ID('#TEMP_MIN_MAX_NOTIFICATION') IS NOT NULL
-			DROP TABLE #TEMP_MIN_MAX_NOTIFICATION;
-
-		IF OBJECT_ID('#TEMP_PHCFACT') IS NOT NULL
-			DROP TABLE #TEMP_PHCFACT;
-
-		IF OBJECT_ID('#TEMP_SUB_CASE_NOTIF') IS NOT NULL
-			DROP TABLE #TEMP_SUB_CASE_NOTIF;
-
-		IF OBJECT_ID('#TEMP_CONFIRM') IS NOT NULL
-			DROP TABLE #TEMP_CONFIRM;
-
-		IF OBJECT_ID('#TEMP_PHCREPORTER') IS NOT NULL
-			DROP TABLE #TEMP_PHCREPORTER;
-
-		IF OBJECT_ID('#TEMP_ENTITY') IS NOT NULL
-			DROP TABLE #TEMP_ENTITY;
-
-		IF OBJECT_ID('#TEMP_CASE_ENTITY') IS NOT NULL
-			DROP TABLE #TEMP_CASE_ENTITY;
-
-		IF OBJECT_ID('#TEMP_PHCPERSONRACE') IS NOT NULL
-			DROP TABLE #TEMP_PHCPERSONRACE;
-
-		IF OBJECT_ID('#TEMP_PHCPERSONRACE_CONCAT') IS NOT NULL
-			DROP TABLE #TEMP_PHCPERSONRACE_CONCAT;
-*/
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @Batch_id
-        ,'PCHMartETL'
-        ,'NBS_ODSE.PublicHealthCaseFact'
-        ,'STEP-AVOIDED'
-        ,@Proc_Step_no
-        ,@Proc_Step_Name
-        ,0
-    );
-
-COMMIT TRANSACTION;
-
-BEGIN TRANSACTION;
-
-		SET @Proc_Step_no = @Proc_Step_no + 1;
-		SET @Proc_Step_Name = 'Updating PublicHealthCaseFact';
-
-INSERT INTO NBS_ODSE.DBO.PUBLICHEALTHCASEFACT (
-                                                PUBLIC_HEALTH_CASE_UID
-                                              ,ADULTS_IN_HOUSE_NBR
-                                              ,HSPTL_ADMISSION_DT
-                                              ,HSPTL_DISCHARGE_DT
-                                              ,AGE_CATEGORY_CD
-                                              ,AGE_REPORTED_TIME
-                                              ,AGE_REPORTED_UNIT_CD
-                                              ,AGE_REPORTED
-                                              ,AWARENESS_CD
-                                              ,AWARENESS_DESC_TXT
-                                              ,BIRTH_GENDER_CD
-                                              ,BIRTH_ORDER_NBR
-                                              ,BIRTH_TIME
-                                              ,BIRTH_TIME_CALC
-                                              ,
-    --,BIRTH_TIME_STD
-                                                CASE_CLASS_CD
-                                              ,CASE_TYPE_CD
-                                              ,CD_SYSTEM_CD
-                                              ,CD_SYSTEM_DESC_TXT
-                                              ,CENSUS_BLOCK_CD
-                                              ,CENSUS_MINOR_CIVIL_DIVISION_CD
-                                              ,CENSUS_TRACK_CD
-                                              ,
-    --,CNTY_CODE_DESC_TXT
-                                                CHILDREN_IN_HOUSE_NBR
-                                              ,CITY_CD
-                                              ,CITY_DESC_TXT
-                                              ,CONFIDENTIALITY_CD
-                                              ,CONFIDENTIALITY_DESC_TXT
-                                              ,CONFIRMATION_METHOD_CD
-                                              ,CONFIRMATION_METHOD_TIME
-                                              ,COUNTY
-                                              ,CNTRY_CD
-                                              ,CNTY_CD
-                                              ,CURR_SEX_CD
-                                              ,DECEASED_IND_CD
-                                              ,DECEASED_TIME
-                                              ,DETECTION_METHOD_CD
-                                              ,DETECTION_METHOD_DESC_TXT
-                                              ,DIAGNOSIS_DATE
-                                              ,DISEASE_IMPORTED_CD
-                                              ,DISEASE_IMPORTED_DESC_TXT
-                                              ,EDUCATION_LEVEL_CD
-                                              ,ELP_CLASS_CD
-                                              ,ELP_FROM_TIME
-                                              ,ELP_TO_TIME
-                                              ,ETHNIC_GROUP_IND
-                                              ,ETHNIC_GROUP_IND_DESC
-                                              ,EVENT_DATE
-                                              ,EVENT_TYPE
-                                              ,EDUCATION_LEVEL_DESC_TXT
-                                              ,FIRSTNOTIFICATIONSENDDATE
-                                              ,FIRSTNOTIFICATIONDATE
-                                              ,FIRSTNOTIFICATIONSTATUS
-                                              ,FIRSTNOTIFICATIONSUBMITTEDBY
-                                              ,
-    --,GEOLATITUDE
-    --,GEOLONGITUDE
-                                                GROUP_CASE_CNT
-                                              ,INVESTIGATION_STATUS_CD
-                                              ,INVESTIGATORASSIGNEDDATE
-                                              ,INVESTIGATORNAME
-                                              ,INVESTIGATORPHONE
-                                              ,JURISDICTION_CD
-                                              ,LASTNOTIFICATIONDATE
-                                              ,LASTNOTIFICATIONSENDDATE
-                                              ,LASTNOTIFICATIONSUBMITTEDBY
-                                              ,MARITAL_STATUS_CD
-                                              ,MARITAL_STATUS_DESC_TXT
-                                              ,
-    --,MART_RECORD_CREATION_DATE
-                                                MART_RECORD_CREATION_TIME
-                                              ,MMWR_WEEK
-                                              ,MMWR_YEAR
-                                              ,MSA_CONGRESS_DISTRICT_CD
-                                              ,MULTIPLE_BIRTH_IND
-                                              ,NOTIFCREATEDCOUNT
-                                              ,NOTIFICATIONDATE
-                                              ,NOTIFSENTCOUNT
-                                              ,OCCUPATION_CD
-                                              ,ONSETDATE
-                                              ,ORGANIZATIONNAME
-                                              ,OUTCOME_CD
-                                              ,OUTBREAK_FROM_TIME
-                                              ,OUTBREAK_IND
-                                              ,OUTBREAK_NAME
-                                              ,OUTBREAK_TO_TIME
-                                              ,PAR_TYPE_CD
-                                              ,PAT_AGE_AT_ONSET
-                                              ,PAT_AGE_AT_ONSET_UNIT_CD
-                                              ,POSTAL_LOCATOR_UID
-                                              ,PERSON_CD
-                                              ,PERSON_CODE_DESC
-                                              ,PERSON_UID
-                                              ,PHC_ADD_TIME
-                                              ,PHC_CODE
-                                              ,PHC_CODE_DESC
-                                              ,PHC_CODE_SHORT_DESC
-                                              ,PRIM_LANG_CD
-                                              ,PRIM_LANG_DESC_TXT
-                                              ,PROG_AREA_CD
-                                              ,PROVIDERPHONE
-                                              ,PROVIDERNAME
-                                              ,PST_RECORD_STATUS_TIME
-                                              ,PST_RECORD_STATUS_CD
-                                              ,RACE_CONCATENATED_TXT
-                                              ,RACE_CONCATENATED_DESC_TXT
-                                              ,REGION_DISTRICT_CD
-                                              ,RECORD_STATUS_CD
-                                              ,REPORTERNAME
-                                              ,REPORTERPHONE
-                                              ,RPT_CNTY_CD
-                                              ,RPT_FORM_CMPLT_TIME
-                                              ,RPT_SOURCE_CD
-                                              ,RPT_SOURCE_DESC_TXT
-                                              ,RPT_TO_COUNTY_TIME
-                                              ,RPT_TO_STATE_TIME
-                                              ,SHARED_IND
-                                              ,STATE
-                                              ,STATE_CD
-                                              ,
-    --,STATE_CODE_SHORT_DESC_TXT
-                                                STATUS_CD
-                                              ,STREET_ADDR1
-                                              ,STREET_ADDR2
-                                              ,ELP_USE_CD
-                                              ,ZIP_CD
-                                              ,PATIENTNAME
-                                              ,JURISDICTION
-                                              ,INVESTIGATIONSTARTDATE
-                                              ,PROGRAM_JURISDICTION_OID
-                                              ,REPORT_DATE
-                                              ,PERSON_PARENT_UID
-                                              ,PERSON_LOCAL_ID
-                                              ,SUB_ADDR_AS_OF_DATE
-                                              ,STATE_CASE_ID
-                                              ,LOCAL_ID
-                                              ,AGE_REPORTED_UNIT_DESC_TXT
-                                              ,BIRTH_GENDER_DESC_TXT
-                                              ,CASE_CLASS_DESC_TXT
-                                              ,CNTRY_DESC_TXT
-                                              ,CURR_SEX_DESC_TXT
-                                              ,INVESTIGATION_STATUS_DESC_TXT
-                                              ,OCCUPATION_DESC_TXT
-                                              ,OUTCOME_DESC_TXT
-                                              ,PAT_AGE_AT_ONSET_UNIT_DESC_TXT
-                                              ,PROG_AREA_DESC_TXT
-                                              ,RPT_CNTY_DESC_TXT
-                                              ,OUTBREAK_NAME_DESC
-                                              ,CONFIRMATION_METHOD_DESC_TXT
-                                              ,LASTUPDATE
-                                              ,PHCTXT
-                                              ,NOTITXT
-                                              ,NOTIFICATION_LOCAL_ID
-                                              ,NOTIFCURRENTSTATE
-                                              ,HOSPITALIZED_IND
-) (
-    SELECT PUBLIC_HEALTH_CASE_UID
-         ,ADULTS_IN_HOUSE_NBR
-         ,HSPTL_ADMISSION_DT
-         ,HSPTL_DISCHARGE_DT
-         ,AGE_CATEGORY_CD
-         ,AGE_REPORTED_TIME
-         ,AGE_REPORTED_UNIT_CD
-         ,CONVERT(NUMERIC, substring(RTRIM(LTRIM(AGE_REPORTED)), 1, 3))
-         ,AWARENESS_CD
-         ,AWARENESS_DESC_TXT
-         ,BIRTH_GENDER_CD
-         ,BIRTH_ORDER_NBR
-         ,BIRTH_TIME
-         ,BIRTH_TIME_CALC
-         ,
-         --,BIRTH_TIME_STD
-        CASE_CLASS_CD
-         ,CASE_TYPE_CD
-         ,CD_SYSTEM_CD
-         ,CD_SYSTEM_DESC_TXT
-         ,CENSUS_BLOCK_CD
-         ,CENSUS_MINOR_CIVIL_DIVISION_CD
-         ,CENSUS_TRACK_CD
-         ,
-         --,CNTY_CODE_DESC_TXT
-        CHILDREN_IN_HOUSE_NBR
-         ,CITY_CD
-         ,CITY_DESC_TXT
-         ,CONFIDENTIALITY_CD
-         ,CONFIDENTIALITY_DESC_TXT
-         ,substring(RTRIM(LTRIM(CONFIRMATION_METHOD_CD)), 1, 300)
-         ,CONFIRMATION_METHOD_TIME
-         ,COUNTY
-         ,CNTRY_CD
-         ,CNTY_CD
-         ,CURR_SEX_CD
-         ,DECEASED_IND_CD
-         ,DECEASED_TIME
-         ,DETECTION_METHOD_CD
-         ,DETECTION_METHOD_DESC_TXT
-         ,DIAGNOSIS_DATE
-         ,DISEASE_IMPORTED_CD
-         ,DISEASE_IMPORTED_DESC_TXT
-         ,EDUCATION_LEVEL_CD
-         ,ELP_CLASS_CD
-         ,ELP_FROM_TIME
-         ,ELP_TO_TIME
-         ,ETHNIC_GROUP_IND
-         ,RTRIM(LTRIM(substring(ETHNIC_GROUP_IND_DESC, 1, 50)))
-         ,EVENT_DATE
-         ,substring(EVENT_TYPE, 1, 10)
-         ,EDUCATION_LEVEL_DESC_TXT
-         ,FIRSTNOTIFICATIONSENDDATE
-         ,FIRSTNOTIFICATIONDATE
-         ,FIRSTNOTIFICATIONSTATUS
-         ,FIRSTNOTIFICATIONSUBMITTEDBY
-         ,
-         --,GEOLATITUDE
-         --,GEOLONGITUDE
-        GROUP_CASE_CNT
-         ,INVESTIGATION_STATUS_CD
-         ,INVESTIGATORASSIGNEDDATE
-         ,INVESTIGATORNAME
-         ,INVESTIGATORPHONE
-         ,JURISDICTION_CD
-         ,LASTNOTIFICATIONDATE
-         ,LASTNOTIFICATIONSENDDATE
-         ,LASTNOTIFICATIONSUBMITTEDBY
-         ,MARITAL_STATUS_CD
-         ,MARITAL_STATUS_DESC_TXT
-         ,
-         --,MART_RECORD_CREATION_DATE
-        MART_RECORD_CREATION_TIME
-         ,MMWR_WEEK
-         ,MMWR_YEAR
-         ,MSA_CONGRESS_DISTRICT_CD
-         ,MULTIPLE_BIRTH_IND
-         ,NOTIFCREATEDCOUNT
-         ,NOTIFICATIONDATE
-         ,NOTIFSENTCOUNT
-         ,OCCUPATION_CD
-         ,ONSETDATE
-         ,ORGANIZATIONNAME
-         ,OUTCOME_CD
-         ,OUTBREAK_FROM_TIME
-         ,OUTBREAK_IND
-         ,OUTBREAK_NAME
-         ,OUTBREAK_TO_TIME
-         ,PAR_TYPE_CD
-         ,PAT_AGE_AT_ONSET
-         ,PAT_AGE_AT_ONSET_UNIT_CD
-         ,POSTAL_LOCATOR_UID
-         ,PERSON_CD
-         ,PERSON_CODE_DESC
-         ,PERSON_UID
-         ,PHC_ADD_TIME
-         ,PHC_CODE
-         ,PHC_CODE_DESC
-         ,substring(PHC_CODE_SHORT_DESC, 1, 50)
-         ,PRIM_LANG_CD
-         ,PRIM_LANG_DESC_TXT
-         ,PROG_AREA_CD
-         ,PROVIDERPHONE
-         ,PROVIDERNAME
-         ,PST_RECORD_STATUS_TIME
-         ,PST_RECORD_STATUS_CD
-         ,substring(RTRIM(LTRIM(RACE_CONCATENATED_TXT)), 1, 100)
-         ,substring(RTRIM(LTRIM(RACE_CONCATENATED_DESC_TXT)), 1, 500)
-         ,REGION_DISTRICT_CD
-         ,RECORD_STATUS_CD
-         ,REPORTERNAME
-         ,REPORTERPHONE
-         ,RPT_CNTY_CD
-         ,RPT_FORM_CMPLT_TIME
-         ,RPT_SOURCE_CD
-         ,RPT_SOURCE_DESC_TXT
-         ,RPT_TO_COUNTY_TIME
-         ,RPT_TO_STATE_TIME
-         ,SHARED_IND
-         ,STATE
-         ,STATE_CD
-         ,
-         --,STATE_CODE_SHORT_DESC_TXT
-        STATUS_CD
-         ,STREET_ADDR1
-         ,STREET_ADDR2
-         ,ELP_USE_CD
-         ,ZIP_CD
-         ,RTRIM(LTRIM(PATIENTNAME))
-         ,substring(JURISDICTION, 1, 50)
-         ,INVESTIGATIONSTARTDATE
-         ,PROGRAM_JURISDICTION_OID
-         ,REPORT_DATE
-         ,PERSON_PARENT_UID
-         ,PERSON_LOCAL_ID
-         ,SUB_ADDR_AS_OF_DATE
-         ,STATE_CASE_ID
-         ,LOCAL_ID
-         ,AGE_REPORTED_UNIT_DESC_TXT
-         ,BIRTH_GENDER_DESC_TXT
-         ,CASE_CLASS_DESC_TXT
-         ,CNTRY_DESC_TXT
-         ,CURR_SEX_DESC_TXT
-         ,INVESTIGATION_STATUS_DESC_TXT
-         ,OCCUPATION_DESC_TXT
-         ,OUTCOME_DESC_TXT
-         ,PAT_AGE_AT_ONSET_UNIT_DESC_TXT
-         ,PROG_AREA_DESC_TXT
-         ,RPT_CNTY_DESC_TXT
-         ,OUTBREAK_NAME_DESC
-         ,CONFIRMATION_METHOD_DESC_TXT
-         ,LASTUPDATE
-         ,PHCTXT
-         ,NOTITXT
-         ,NOTIFICATION_LOCAL_ID
-         ,NOTIFCURRENTSTATE
-         ,HOSPITALIZED_IND
-    FROM #TEMP_PHC_FACT WITH (NOLOCK)
-);
-
-SELECT @ROWCOUNT_NO = @@ROWCOUNT;
-
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @Batch_id
-        ,'PCHMartETL'
-        ,'NBS_ODSE.PublicHealthCaseFact'
-        ,'COMPLETED'
-        ,@PROC_STEP_NO
-        ,@PROC_STEP_NAME
-        ,@ROWCOUNT_NO
-    );
-
-COMMIT TRANSACTION;
-
-BEGIN TRANSACTION;
-
-		SET @Proc_Step_no = @Proc_Step_no + 1;
-		SET @Proc_Step_Name = 'Updating SubjectRaceInfo';
-
-INSERT INTO NBS_ODSE.DBO.SUBJECTRACEINFO (
-                                           PUBLIC_HEALTH_CASE_UID
-                                         ,MORBREPORT_UID
-                                         ,RACE_CD
-                                         ,RACE_CATEGORY_CD
-                                         ,RACE_DESC_TXT
-) (
-    SELECT PUBLIC_HEALTH_CASE_UID
-         ,0 AS MORBREPORT_UID
-         ,RACE_CD
-         ,RACE_CATEGORY_CD
-         ,RACE_DESC_TXT FROM NBS_ODSE.DBO.PERSON_RACE AS PR WITH (NOLOCK)
-			,#TEMP_PHC_FACT AS PF WITH (NOLOCK) WHERE PR.PERSON_UID = PF.PERSON_UID
-);
-SELECT @ROWCOUNT_NO = @@ROWCOUNT;
-IF OBJECT_ID('#TEMP_PHC_FACT') IS NOT NULL
-DROP TABLE #TEMP_PHC_FACT;
-
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @Batch_id
-        ,'PCHMartETL'
-        ,'NBS_ODSE.PublicHealthCaseFact'
-        ,'COMPLETED'
-        ,@Proc_Step_no
-        ,@Proc_Step_Name
-        ,@ROWCOUNT_NO
-    );
-
-COMMIT TRANSACTION;
-
-BEGIN TRANSACTION;
-
-		SET @Proc_Step_no = 999;
-		SET @Proc_Step_Name = 'SP_COMPLETE';
-
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[row_count]
-)
-VALUES (
-    @batch_id
-        ,'PCHMartETL'
-        ,'PCHMartETL'
-        ,'COMPLETE'
-        ,@Proc_Step_no
-        ,@Proc_Step_name
-        ,@RowCount_no
-    );
-
-COMMIT TRANSACTION;
-
--- EXEC [rdb_modern].[dbo].[sp_nbs_batch_complete] @type_code;
-
-Select 'SUCCESS'
 END TRY
-
 BEGIN CATCH
-IF @@TRANCOUNT > 0
-			ROLLBACK TRANSACTION;
 
-		DECLARE @ErrorNumber INT = ERROR_NUMBER();
-		DECLARE @ErrorLine INT = ERROR_LINE();
-		DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
-		DECLARE @ErrorSeverity INT = ERROR_SEVERITY();
-		DECLARE @ErrorState INT = ERROR_STATE();
+        IF @@TRANCOUNT > 0   ROLLBACK TRANSACTION;
 
-INSERT INTO [rdb_modern].[dbo].[job_flow_log] (
-                                                batch_id
-    ,[Dataflow_Name]
-    ,[package_Name]
-    ,[Status_Type]
-    ,[step_number]
-    ,[step_name]
-    ,[Error_Description]
-    ,[row_count]
-)
-VALUES (
-    @batch_id
-        ,'PCHMartETL'
-        ,'PCHMartETL'
-        ,'ERROR'
-        ,@Proc_Step_no
-        ,'ERROR - ' + @Proc_Step_name
-        ,'Step -' + CAST(@Proc_Step_no AS VARCHAR(3)) + ' -' + CAST(@ErrorMessage AS VARCHAR(500))
-        ,0
-    );
+    	DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
+        INSERT INTO [rdb_modern].[dbo].[job_flow_log]
+        (      batch_id
+            , [Dataflow_Name]
+            , [package_Name]
+            , [Status_Type]
+            , [step_number]
+            , [step_name]
+            , [row_count]
+            , [Msg_Description1])
+        VALUES (
+            @batch_id
+                ,'Investigation PRE-Processing Event'
+                ,'NBS_ODSE.sp_investigation_event'
+                ,'ERROR: ' + @ErrorMessage
+                ,0
+                ,LEFT ('Pre ID-' + @phc_id_list, 199)
+                ,0
+                ,LEFT (@phc_id_list, 199)
+            );
+        return @ErrorMessage;
 
-RETURN 'ERROR - ' + @ErrorMessage;
 END CATCH
+
 END;

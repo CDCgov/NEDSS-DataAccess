@@ -9,21 +9,21 @@ BEGIN
 
         INSERT INTO [rdb_modern].[dbo].[job_flow_log]
         (batch_id
-        ,[Dataflow_Name]
-        ,[package_Name]
-        ,[Status_Type]
-        ,[step_number]
-        ,[step_name]
-        ,[row_count]
-        ,[Msg_Description1])
+            ,[Dataflow_Name]
+            ,[package_Name]
+            ,[Status_Type]
+            ,[step_number]
+            ,[step_name]
+            ,[row_count]
+            ,[Msg_Description1])
         VALUES (@batch_id
-               ,'Provider PRE-Processing Event'
-               ,'NBS_ODSE.sp_provider_event'
-               ,'START'
-               ,0
-               ,LEFT('Pre ID-' + @user_id_list, 199)
-               ,0
-               ,LEFT(@user_id_list, 199));
+                ,'Provider PRE-Processing Event'
+                ,'NBS_ODSE.sp_provider_event'
+                ,'START'
+                ,0
+                ,LEFT('Pre ID-' + @user_id_list, 199)
+                ,0
+                ,LEFT(@user_id_list, 199));
 
         SELECT p.person_uid,
                p.person_parent_uid,
@@ -53,10 +53,10 @@ BEGIN
                    when p.last_chg_user_id > 0 then (select * from dbo.fn_get_user_name(p.last_chg_user_id))
                    end                                      as last_chg_user_name,
                nested.name                                  AS 'provider_name',
-               nested.address                               AS 'provider_address',
-               nested.phone                                 AS 'provider_telephone',
-               nested.email                                 AS 'provider_email',
-               nested.entity_id                             AS 'provider_entity'
+                nested.address                               AS 'provider_address',
+                nested.phone                                 AS 'provider_telephone',
+                nested.email                                 AS 'provider_email',
+                nested.entity_id                             AS 'provider_entity'
         FROM nbs_odse.dbo.Person p WITH (NOLOCK)
                  OUTER apply (SELECT *
                               FROM
@@ -64,9 +64,9 @@ BEGIN
                                   (SELECT (SELECT elp.cd                AS                [addr_elp_cd],
                                                   elp.use_cd            AS                [addr_elp_use_cd],
                                                   pl.postal_locator_uid as                [addr_pl_uid],
-                                                  STRING_ESCAPE(pl.street_addr1, 'json')  streetAddr1,
-                                                  STRING_ESCAPE(pl.street_addr2, 'json')  streetAddr2,
-                                                  STRING_ESCAPE(pl.city_desc_txt, 'json') city,
+                                                  LTRIM(RTRIM(SUBSTRING(STRING_ESCAPE(pl.street_addr1, 'json'),1,50))) as street_addr1,
+                                             	  LTRIM(RTRIM(SUBSTRING(STRING_ESCAPE(pl.street_addr2, 'json'),1,50))) as street_addr2,
+                                                  LTRIM(RTRIM(SUBSTRING(STRING_ESCAPE(pl.city_desc_txt, 'json'),1,50))) as city,
                                                   pl.zip_cd                               zip,
                                                   pl.cnty_cd                              cntyCd,
                                                   pl.state_cd                             state,
@@ -75,8 +75,8 @@ BEGIN
                                                   scc.code_desc_txt                       county,
                                                   pl.within_city_limits_ind               within_city_limits_ind,
                                                   cc.code_short_desc_txt                  country,
-                                                  elp.locator_desc_txt                    address_comments
-                                           FROM nbs_odse.dbo.Entity_locator_participation elp WITH (NOLOCK)
+                                  elp.locator_desc_txt                    address_comments
+                                 FROM nbs_odse.dbo.Entity_locator_participation elp WITH (NOLOCK)
                                                     LEFT OUTER JOIN nbs_odse.dbo.Postal_locator pl WITH (NOLOCK)
                                                                     ON elp.locator_uid = pl.postal_locator_uid
                                                     LEFT OUTER JOIN nbs_srte.dbo.State_code sc with (NOLOCK) ON sc.state_cd = pl.state_cd
@@ -92,7 +92,7 @@ BEGIN
                                   (SELECT (SELECT tl.tele_locator_uid AS                               [ph_tl_uid],
                                                   elp.cd              AS                               [ph_elp_cd],
                                                   elp.use_cd          AS                               [ph_elp_use_cd],
-                                                  REPLACE(REPLACE(tl.phone_nbr_txt, '-', ''), ' ', '') telephoneNbr,
+                                                  REPLACE(tl.phone_nbr_txt, ' ', '') 				   telephoneNbr,
                                                   tl.extension_txt                                     extensionTxt,
                                                   elp.locator_desc_txt                                 phone_comments
                                            FROM nbs_odse.dbo.Entity_locator_participation elp WITH (NOLOCK)
@@ -100,6 +100,7 @@ BEGIN
                                                          ON elp.locator_uid = tl.tele_locator_uid
                                            WHERE elp.entity_uid = p.person_uid
                                              AND elp.CLASS_CD = 'TELE'
+                                             AND elp.CD IN ('O', 'CP')
                                              AND elp.RECORD_STATUS_CD = 'ACTIVE'
                                              AND tl.phone_nbr_txt IS NOT NULL
                                            FOR json path, INCLUDE_NULL_VALUES) AS phone) AS phone,
@@ -113,9 +114,11 @@ BEGIN
                                                          ON elp.locator_uid = tl.tele_locator_uid
                                            WHERE elp.entity_uid = p.person_uid
                                              AND elp.class_cd = 'TELE'
+                                             AND elp.USE_CD='WP'
+                                             AND elp.CD='O'
                                              AND elp.RECORD_STATUS_CD = 'ACTIVE'
-                                             AND tl.email_address IS NOT NULL
-                                           FOR json path, INCLUDE_NULL_VALUES) AS email) AS email,
+                                    AND tl.email_address IS NOT NULL
+                     FOR json path, INCLUDE_NULL_VALUES) AS email) AS email,
                                   -- person names
                                   (SELECT (SELECT pn.person_uid      AS                                [pn_person_uid],
                                                   STRING_ESCAPE(REPLACE(pn.last_nm, '-', ' '), 'json') lastNm,
@@ -145,9 +148,8 @@ BEGIN
                                   (SELECT (SELECT ei.entity_uid,
                                                   ei.type_cd          typeCd,
                                                   ei.record_status_cd recordStatusCd,
-                                                  STRING_ESCAPE(
-                                                          REPLACE(REPLACE(ei.root_extension_txt, '-', ''), ' ', ''),
-                                                          'json')     rootExtensionTxt,
+                                                  STRING_ESCAPE(REPLACE(ei.root_extension_txt, ' ', ''),
+                                                                'json')      rootExtensionTxt,
                                                   ei.entity_id_seq,
                                                   ei.assigning_authority_cd
                                            FROM nbs_odse.dbo.entity_id ei WITH (NOLOCK)
@@ -158,45 +160,45 @@ BEGIN
           AND p.cd = 'PRV';
 
         INSERT INTO [rdb_modern].[dbo].[job_flow_log] (batch_id
-                                                      ,[Dataflow_Name]
-                                                      ,[package_Name]
-                                                      ,[Status_Type]
-                                                      ,[step_number]
-                                                      ,[step_name]
-                                                      ,[row_count]
-                                                      ,[Msg_Description1])
+            ,[Dataflow_Name]
+            ,[package_Name]
+            ,[Status_Type]
+            ,[step_number]
+            ,[step_name]
+            ,[row_count]
+            ,[Msg_Description1])
         VALUES (@batch_id
-               ,'Provider PRE-Processing Event'
-               ,'NBS_ODSE.sp_provider_event'
-               ,'COMPLETE'
-               ,0
-               ,LEFT('Pre ID-' + @user_id_list, 199)
-               ,0
-               ,LEFT(@user_id_list, 199));
+                ,'Provider PRE-Processing Event'
+                ,'NBS_ODSE.sp_provider_event'
+                ,'COMPLETE'
+                ,0
+                ,LEFT('Pre ID-' + @user_id_list, 199)
+                ,0
+                ,LEFT(@user_id_list, 199));
 
-    END TRY
-    BEGIN CATCH
+END TRY
+BEGIN CATCH
 
 
-        IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+    IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
 
         DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
         INSERT INTO [rdb_modern].[dbo].[job_flow_log] (batch_id
-                                                      ,[Dataflow_Name]
-                                                      ,[package_Name]
-                                                      ,[Status_Type]
-                                                      ,[step_number]
-                                                      ,[step_name]
-                                                      ,[row_count]
-                                                      ,[Msg_Description1])
+            ,[Dataflow_Name]
+            ,[package_Name]
+            ,[Status_Type]
+            ,[step_number]
+            ,[step_name]
+            ,[row_count]
+            ,[Msg_Description1])
         VALUES (@batch_id
-               ,'Provider PRE-Processing Event'
-               ,'NBS_ODSE.sp_provider_event'
-               ,'ERROR: ' + @ErrorMessage
-               ,0
-               ,LEFT('Pre ID-' + @user_id_list, 199)
-               ,0
-               ,LEFT(@user_id_list, 199));
+                ,'Provider PRE-Processing Event'
+                ,'NBS_ODSE.sp_provider_event'
+                ,'ERROR: ' + @ErrorMessage
+                ,0
+                ,LEFT('Pre ID-' + @user_id_list, 199)
+                ,0
+                ,LEFT(@user_id_list, 199));
         return @ErrorMessage;
 
     END CATCH

@@ -1,4 +1,4 @@
-CREATE OR ALTER PROCEDURE dbo.sp_nrt_investigation_postprocessing @id_list nvarchar(max),@debug bit = 'false'
+CREATE OR ALTER  PROCEDURE dbo.sp_nrt_investigation_postprocessing @id_list nvarchar(max),@debug bit = 'false'
 AS
 BEGIN
 
@@ -18,31 +18,31 @@ BEGIN
 
         INSERT INTO [dbo].[job_flow_log]
         (batch_id
-        ,[create_dttm]
-        ,[update_dttm]
-        ,[Dataflow_Name]
-        ,[package_Name]
-        ,[Status_Type]
-        ,[step_number]
-        ,[step_name]
-        ,[msg_description1]
-        ,[row_count])
+            ,[create_dttm]
+            ,[update_dttm]
+            ,[Dataflow_Name]
+            ,[package_Name]
+            ,[Status_Type]
+            ,[step_number]
+            ,[step_name]
+            ,[msg_description1]
+            ,[row_count])
         VALUES (@batch_id
-               ,@create_dttm
-               ,@update_dttm
-               ,@dataflow_name
-               ,@package_name
-               ,'START'
-               ,0
-               ,'SP_Start'
-               ,LEFT(@id_list, 500)
-               ,0);
+                ,@create_dttm
+                ,@update_dttm
+                ,@dataflow_name
+                ,@package_name
+                ,'START'
+                ,0
+                ,'SP_Start'
+                ,LEFT(@id_list, 500)
+                ,0);
 
         SET @proc_step_name = 'Create INVESTIGATION Temp table -' + LEFT(@id_list, 160);
         SET @proc_step_no = 1;
 
         /* Temp investigation table creation*/
-        select INVESTIGATION_KEY,
+        SELECT INVESTIGATION_KEY,
                public_health_case_uid          as CASE_UID,
                program_jurisdiction_oid        as CASE_OID,
                nrt.local_id                    as INV_LOCAL_ID,
@@ -121,7 +121,7 @@ BEGIN
                nrt.outbreak_name               as OUTBREAK_NAME_DESC
         into #temp_inv_table
         from dbo.nrt_investigation nrt
-                 left join dbo.investigation i on i.case_uid = nrt.public_health_case_uid
+                 left join dbo.investigation i with (nolock) on i.case_uid = nrt.public_health_case_uid
         where nrt.public_health_case_uid in (SELECT value FROM STRING_SPLIT(@id_list, ','));
 
         if @debug = 'true' select * from #temp_inv_table;
@@ -212,7 +212,7 @@ BEGIN
             [CONTACT_INFECTIOUS_TO_DATE]    = inv.CONTACT_INFECTIOUS_TO_DATE,
             [CONTACT_INV_STATUS]            = inv.CONTACT_INV_STATUS,
             [PROGRAM_AREA_DESCRIPTION]      = inv.PROGRAM_AREA_DESCRIPTION,
-            [ADD_TIME]                      = inv.ADD_TIME,
+            [ADD_TIME]                = inv.ADD_TIME,
             [LAST_CHG_TIME]                 = inv.LAST_CHG_TIME,
             [INVESTIGATION_ADDED_BY]        = inv.INVESTIGATION_ADDED_BY,
             [INVESTIGATION_LAST_UPDATED_BY] = inv.INVESTIGATION_LAST_UPDATED_BY,
@@ -223,29 +223,29 @@ BEGIN
             [LEGACY_CASE_ID]                = inv.LEGACY_CASE_ID,
             [OUTBREAK_NAME_DESC]            = inv.OUTBREAK_NAME_DESC
         from #temp_inv_table inv
-                 inner join dbo.investigation i on inv.case_uid = i.case_uid
+            inner join dbo.investigation i with (nolock) on inv.case_uid = i.case_uid
             and inv.investigation_key = i.investigation_key
             and i.investigation_key is not null;
 
         /* Logging */
         set @rowcount = @@rowcount
-        INSERT INTO [dbo].[job_flow_log]
-        (batch_id
-        ,[Dataflow_Name]
-        ,[package_Name]
-        ,[Status_Type]
-        ,[step_number]
-        ,[step_name]
-        ,[row_count]
-        ,[msg_description1])
-        VALUES (@batch_id
-               ,@dataflow_name
-               ,@package_name
-               ,'START'
-               ,@proc_step_no
-               ,@proc_step_name
-               ,@rowcount
-               ,LEFT(@id_list, 500));
+                INSERT INTO [dbo].[job_flow_log]
+                (batch_id
+                ,[Dataflow_Name]
+                ,[package_Name]
+                ,[Status_Type]
+                ,[step_number]
+                ,[step_name]
+                ,[row_count]
+                ,[msg_description1])
+                VALUES (@batch_id
+                       ,@dataflow_name
+                       ,@package_name
+                       ,'START'
+                       ,@proc_step_no
+                       ,@proc_step_name
+                       ,@rowcount
+                       ,LEFT(@id_list, 500));
 
 
         /* Investigation Insert Operation */
@@ -262,75 +262,75 @@ BEGIN
 
         insert into dbo.INVESTIGATION
         ([INVESTIGATION_KEY],
-         [CASE_OID],
-         [CASE_UID],
-         [INV_LOCAL_ID],
-         [INV_SHARE_IND],
-         [OUTBREAK_NAME],
-         [INVESTIGATION_STATUS],
-         [INV_CASE_STATUS],
-         [CASE_TYPE],
-         [INV_COMMENTS],
-         [JURISDICTION_CD],
-         [JURISDICTION_NM],
-         [EARLIEST_RPT_TO_PHD_DT],
-         [ILLNESS_ONSET_DT],
-         [ILLNESS_END_DT],
-         [INV_RPT_DT],
-         [INV_START_DT],
-         [RPT_SRC_CD_DESC],
-         [EARLIEST_RPT_TO_CNTY_DT],
-         [EARLIEST_RPT_TO_STATE_DT],
-         [CASE_RPT_MMWR_WK],
-         [CASE_RPT_MMWR_YR],
-         [DISEASE_IMPORTED_IND],
-         [IMPORT_FRM_CNTRY],
-         [IMPORT_FRM_STATE],
-         [IMPORT_FRM_CNTY],
-         [IMPORT_FRM_CITY],
-         [EARLIEST_RPT_TO_CDC_DT],
-         [RPT_SRC_CD],
-         [IMPORT_FRM_CNTRY_CD],
-         [IMPORT_FRM_STATE_CD],
-         [IMPORT_FRM_CNTY_CD],
-         [IMPORT_FRM_CITY_CD],
-         [DIAGNOSIS_DT],
-         [HSPTL_ADMISSION_DT],
-         [HSPTL_DISCHARGE_DT],
-         [HSPTL_DURATION_DAYS],
-         [OUTBREAK_IND],
-         [HSPTLIZD_IND],
-         [INV_STATE_CASE_ID],
-         [CITY_COUNTY_CASE_NBR],
-         [TRANSMISSION_MODE],
-         [RECORD_STATUS_CD],
-         [PATIENT_PREGNANT_IND],
-         [DIE_FRM_THIS_ILLNESS_IND],
-         [DAYCARE_ASSOCIATION_IND],
-         [FOOD_HANDLR_IND],
-         [INVESTIGATION_DEATH_DATE],
-         [PATIENT_AGE_AT_ONSET],
-         [PATIENT_AGE_AT_ONSET_UNIT],
-         [INV_ASSIGNED_DT],
-         [DETECTION_METHOD_DESC_TXT],
-         [ILLNESS_DURATION],
-         [ILLNESS_DURATION_UNIT],
-         [CONTACT_INV_COMMENTS],
-         [CONTACT_INV_PRIORITY],
-         [CONTACT_INFECTIOUS_FROM_DATE],
-         [CONTACT_INFECTIOUS_TO_DATE],
-         [CONTACT_INV_STATUS],
-         [PROGRAM_AREA_DESCRIPTION],
-         [ADD_TIME],
-         [LAST_CHG_TIME],
-         [INVESTIGATION_ADDED_BY],
-         [INVESTIGATION_LAST_UPDATED_BY],
-         [REFERRAL_BASIS],
-         [CURR_PROCESS_STATE],
-         [INV_PRIORITY_CD],
-         [COINFECTION_ID],
-         [LEGACY_CASE_ID],
-         [OUTBREAK_NAME_DESC])
+            [CASE_OID],
+            [CASE_UID],
+            [INV_LOCAL_ID],
+            [INV_SHARE_IND],
+            [OUTBREAK_NAME],
+            [INVESTIGATION_STATUS],
+            [INV_CASE_STATUS],
+            [CASE_TYPE],
+            [INV_COMMENTS],
+            [JURISDICTION_CD],
+            [JURISDICTION_NM],
+            [EARLIEST_RPT_TO_PHD_DT],
+            [ILLNESS_ONSET_DT],
+            [ILLNESS_END_DT],
+            [INV_RPT_DT],
+            [INV_START_DT],
+            [RPT_SRC_CD_DESC],
+            [EARLIEST_RPT_TO_CNTY_DT],
+            [EARLIEST_RPT_TO_STATE_DT],
+            [CASE_RPT_MMWR_WK],
+            [CASE_RPT_MMWR_YR],
+            [DISEASE_IMPORTED_IND],
+            [IMPORT_FRM_CNTRY],
+            [IMPORT_FRM_STATE],
+            [IMPORT_FRM_CNTY],
+            [IMPORT_FRM_CITY],
+            [EARLIEST_RPT_TO_CDC_DT],
+            [RPT_SRC_CD],
+            [IMPORT_FRM_CNTRY_CD],
+            [IMPORT_FRM_STATE_CD],
+            [IMPORT_FRM_CNTY_CD],
+            [IMPORT_FRM_CITY_CD],
+            [DIAGNOSIS_DT],
+            [HSPTL_ADMISSION_DT],
+            [HSPTL_DISCHARGE_DT],
+            [HSPTL_DURATION_DAYS],
+            [OUTBREAK_IND],
+            [HSPTLIZD_IND],
+            [INV_STATE_CASE_ID],
+            [CITY_COUNTY_CASE_NBR],
+            [TRANSMISSION_MODE],
+            [RECORD_STATUS_CD],
+            [PATIENT_PREGNANT_IND],
+            [DIE_FRM_THIS_ILLNESS_IND],
+            [DAYCARE_ASSOCIATION_IND],
+            [FOOD_HANDLR_IND],
+            [INVESTIGATION_DEATH_DATE],
+            [PATIENT_AGE_AT_ONSET],
+            [PATIENT_AGE_AT_ONSET_UNIT],
+            [INV_ASSIGNED_DT],
+            [DETECTION_METHOD_DESC_TXT],
+            [ILLNESS_DURATION],
+            [ILLNESS_DURATION_UNIT],
+            [CONTACT_INV_COMMENTS],
+            [CONTACT_INV_PRIORITY],
+            [CONTACT_INFECTIOUS_FROM_DATE],
+            [CONTACT_INFECTIOUS_TO_DATE],
+            [CONTACT_INV_STATUS],
+            [PROGRAM_AREA_DESCRIPTION],
+            [ADD_TIME],
+            [LAST_CHG_TIME],
+            [INVESTIGATION_ADDED_BY],
+            [INVESTIGATION_LAST_UPDATED_BY],
+            [REFERRAL_BASIS],
+            [CURR_PROCESS_STATE],
+            [INV_PRIORITY_CD],
+            [COINFECTION_ID],
+            [LEGACY_CASE_ID],
+            [OUTBREAK_NAME_DESC])
         select k.[d_INVESTIGATION_KEY] as INVESTIGATION_KEY,
                inv.CASE_OID,
                inv.CASE_UID,
@@ -402,7 +402,7 @@ BEGIN
                inv.LEGACY_CASE_ID,
                inv.OUTBREAK_NAME_DESC
         FROM #temp_inv_table inv
-                 join dbo.nrt_investigation_key k on inv.case_uid = k.case_uid
+                 join dbo.nrt_investigation_key k with (nolock) on inv.case_uid = k.case_uid
         where inv.investigation_key is null;
 
         COMMIT TRANSACTION;
@@ -440,8 +440,8 @@ BEGIN
                         cm.CONFIRMATION_METHOD_KEY
         into #temp_cm_table
         from dbo.nrt_investigation_confirmation nrt
-                 left join dbo.confirmation_method cm on cm.confirmation_method_cd = nrt.confirmation_method_cd
-                 left join dbo.investigation i on i.case_uid = nrt.public_health_case_uid
+                 left join dbo.confirmation_method cm with (nolock) on cm.confirmation_method_cd = nrt.confirmation_method_cd
+            left join dbo.investigation i with (nolock) on i.case_uid = nrt.public_health_case_uid
         where nrt.public_health_case_uid in (select value FROM STRING_SPLIT(@id_list, ','));
 
         if @debug = 'true' select * from #temp_cm_table;
@@ -451,20 +451,20 @@ BEGIN
         /*Update Operation for confirmation_method and confirmation_method_group*/
         update cm
         set cm.CONFIRMATION_METHOD_DESC = cmt.CONFIRMATION_METHOD_DESC_TXT
-        from #temp_cm_table cmt
-                 inner join dbo.confirmation_method cm
-                            on cmt.confirmation_method_key = cm.confirmation_method_key
-                                and cmt.CONFIRMATION_METHOD_KEY is not null;
+            from #temp_cm_table cmt
+                         inner join dbo.confirmation_method cm with (nolock)
+        on cmt.confirmation_method_key = cm.confirmation_method_key
+            and cmt.CONFIRMATION_METHOD_KEY is not null;
 
         update cmg
         set cmg.CONFIRMATION_DT = cmt.CONFIRMATION_DT
-        from #temp_cm_table cmt
-                 inner join dbo.confirmation_method_group cmg
-                            on cmt.investigation_key = cmg.investigation_key
-                                and cmt.confirmation_method_key = cmg.confirmation_method_key
-                                and cmt.CONFIRMATION_METHOD_KEY is not null;
+            from #temp_cm_table cmt
+                         inner join dbo.confirmation_method_group cmg with (nolock)
+        on cmt.investigation_key = cmg.investigation_key
+            and cmt.confirmation_method_key = cmg.confirmation_method_key
+            and cmt.CONFIRMATION_METHOD_KEY is not null;
 
-/*Logging*/
+        /*Logging*/
         SET @rowcount = @@rowcount
         INSERT INTO [dbo].[job_flow_log]
         (batch_id
@@ -503,18 +503,18 @@ BEGIN
         insert into dbo.confirmation_method(CONFIRMATION_METHOD_KEY,CONFIRMATION_METHOD_CD,CONFIRMATION_METHOD_DESC)
         select distinct cmk.D_CONFIRMATION_METHOD_KEY, cmt.confirmation_method_cd, cmt.CONFIRMATION_METHOD_DESC_TXT
         from #temp_cm_table cmt
-                 join dbo.nrt_confirmation_method_key cmk on cmk.confirmation_method_cd = cmt.confirmation_method_cd
+                 join dbo.nrt_confirmation_method_key cmk with (nolock) on cmk.confirmation_method_cd = cmt.confirmation_method_cd
         where cmt.CONFIRMATION_METHOD_KEY is null
           and not exists (select confirmation_method_cd
-                          from dbo.confirmation_method cd
-                          where cd.confirmation_method_cd = cmt.confirmation_method_cd);
+            from dbo.confirmation_method cd
+            where cd.confirmation_method_cd = cmt.confirmation_method_cd);
 
 
         insert into dbo.CONFIRMATION_METHOD_GROUP ([INVESTIGATION_KEY],[CONFIRMATION_METHOD_KEY],[CONFIRMATION_DT])
         select cmt.INVESTIGATION_KEY, cm.CONFIRMATION_METHOD_KEY, cmt.CONFIRMATION_DT
         from #temp_cm_table cmt
-                 left outer join dbo.confirmation_method cm on cmt.confirmation_method_cd = cm.confirmation_method_cd
-                 left outer join dbo.confirmation_method_group cmg on cmt.investigation_key = cmg.investigation_key
+                 left outer join dbo.confirmation_method cm with (nolock) on cmt.confirmation_method_cd = cm.confirmation_method_cd
+            left outer join dbo.confirmation_method_group cmg with (nolock) on cmt.investigation_key = cmg.investigation_key
         where cmg.investigation_key is null
           and cmg.confirmation_method_key is null;
 
@@ -542,29 +542,29 @@ BEGIN
 
 
         SET @proc_step_name = 'Get Topic for Datamart';
-        SET @proc_step_no = 5;
+                SET @proc_step_no = 5;
 
         INSERT INTO [dbo].[job_flow_log]
         (batch_id
-        ,[create_dttm]
-        ,[update_dttm]
-        ,[Dataflow_Name]
-        ,[package_Name]
-        ,[Status_Type]
-        ,[step_number]
-        ,[step_name]
-        ,[row_count]
-        ,[msg_description1])
+            ,[create_dttm]
+            ,[update_dttm]
+            ,[Dataflow_Name]
+            ,[package_Name]
+            ,[Status_Type]
+            ,[step_number]
+            ,[step_name]
+            ,[row_count]
+            ,[msg_description1])
         VALUES (@batch_id
-               ,current_timestamp
-               ,current_timestamp
-               ,@dataflow_name
-               ,@package_name
-               ,'COMPLETE'
-               ,@proc_step_no
-               ,@proc_step_name
-               ,0
-               ,LEFT(@id_list, 500));
+                ,current_timestamp
+                ,current_timestamp
+                ,@dataflow_name
+                ,@package_name
+                ,'COMPLETE'
+                ,@proc_step_no
+                ,@proc_step_name
+                ,0
+                ,LEFT(@id_list, 500));
 
 
         SELECT nrt.public_health_case_uid         AS public_health_case_uid,
@@ -575,11 +575,11 @@ BEGIN
                dtm.Datamart                       AS datamart,
                dtm.Stored_Procedure               AS stored_procedure
         FROM dbo.nrt_investigation nrt
-                 LEFT JOIN INVESTIGATION inv ON inv.CASE_UID = nrt.public_health_case_uid
-                 LEFT JOIN D_PATIENT pat ON pat.PATIENT_UID = nrt.patient_id
-                 LEFT JOIN dbo.nrt_datamart_metadata dtm ON dtm.condition_cd = nrt.cd
+                 LEFT JOIN INVESTIGATION inv with (nolock) ON inv.CASE_UID = nrt.public_health_case_uid
+            LEFT JOIN D_PATIENT pat with (nolock) ON pat.PATIENT_UID = nrt.patient_id
+            LEFT JOIN dbo.nrt_datamart_metadata dtm with (nolock) ON dtm.condition_cd = nrt.cd
         WHERE nrt.public_health_case_uid in
-              (SELECT value FROM STRING_SPLIT(@id_list, ','));
+            (SELECT value FROM STRING_SPLIT(@id_list, ','));
 
     END TRY
     BEGIN CATCH
@@ -592,25 +592,25 @@ BEGIN
         /* Logging */
         INSERT INTO [dbo].[job_flow_log]
         (batch_id
-        ,[create_dttm]
-        ,[update_dttm]
-        ,[Dataflow_Name]
-        ,[package_Name]
-        ,[Status_Type]
-        ,[step_number]
-        ,[step_name]
-        ,[row_count]
-        ,[msg_description1])
+            ,[create_dttm]
+            ,[update_dttm]
+            ,[Dataflow_Name]
+            ,[package_Name]
+            ,[Status_Type]
+            ,[step_number]
+            ,[step_name]
+            ,[row_count]
+            ,[msg_description1])
         VALUES (@batch_id
-               ,current_timestamp
-               ,current_timestamp
-               ,@dataflow_name
-               ,@package_name
-               ,'ERROR'
-               ,@Proc_Step_no
-               ,'Step -' + CAST(@Proc_Step_no AS VARCHAR(3)) + ' -' + CAST(@ErrorMessage AS VARCHAR(500))
-               ,0
-               ,LEFT(@id_list, 500));
+                ,current_timestamp
+                ,current_timestamp
+                ,@dataflow_name
+                ,@package_name
+                ,'ERROR'
+                ,@Proc_Step_no
+                ,'Step -' + CAST(@Proc_Step_no AS VARCHAR(3)) + ' -' + CAST(@ErrorMessage AS VARCHAR(500))
+                ,0
+                ,LEFT(@id_list, 500));
 
 
         return @ErrorMessage;
