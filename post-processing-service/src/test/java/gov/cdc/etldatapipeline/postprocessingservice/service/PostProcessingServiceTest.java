@@ -143,8 +143,8 @@ class PostProcessingServiceTest {
         assertTrue(postProcessingServiceMock.idCache.containsKey(topic));
 
         List<ILoggingEvent> logs = listAppender.list;
-        assertEquals(5, logs.size());
-        assertTrue(logs.get(4).getMessage().contains(PostProcessingService.SP_EXECUTION_COMPLETED));
+        assertEquals(7, logs.size());
+        assertTrue(logs.get(6).getMessage().contains(PostProcessingService.SP_EXECUTION_COMPLETED));
     }
 
     @Test
@@ -188,8 +188,8 @@ class PostProcessingServiceTest {
                 expectedRdbTableNames);
 
         List<ILoggingEvent> logs = listAppender.list;
-        assertEquals(7, logs.size());
-        assertTrue(logs.get(6).getMessage().contains(PostProcessingService.SP_EXECUTION_COMPLETED));
+        assertEquals(9, logs.size());
+        assertTrue(logs.get(8).getMessage().contains(PostProcessingService.SP_EXECUTION_COMPLETED));
     }
 
     @Test
@@ -199,7 +199,8 @@ class PostProcessingServiceTest {
         String orgTopic = "dummy_organization";
 
         String invTopic = "investigation";
-        String invKey = "{\"payload\":{\"public_health_case_uid\":123}}";
+        String invKey1 = "{\"payload\":{\"public_health_case_uid\":234}}";
+        String invKey2 = "{\"payload\":{\"public_health_case_uid\":235}}";
 
 
         String ntfKey1 = "{\"payload\":{\"notification_uid\":234}}";
@@ -210,7 +211,8 @@ class PostProcessingServiceTest {
         postProcessingServiceMock.postProcessMessage(orgTopic, orgKey2, orgKey2);
         postProcessingServiceMock.postProcessMessage(ntfTopic, ntfKey1, ntfKey1);
         postProcessingServiceMock.postProcessMessage(ntfTopic, ntfKey2, ntfKey2);
-        postProcessingServiceMock.postProcessMessage(invTopic, invKey, invKey);
+        postProcessingServiceMock.postProcessMessage(invTopic, invKey1, invKey1);
+        postProcessingServiceMock.postProcessMessage(invTopic, invKey2, invKey2);
 
         postProcessingServiceMock.processCachedIds();
 
@@ -252,7 +254,7 @@ class PostProcessingServiceTest {
         assertTrue(topicLogList.get(2).contains(patientTopic));
         assertTrue(topicLogList.get(3).contains(invTopic));
         assertTrue(topicLogList.get(4).contains(invTopic));
-        assertTrue(topicLogList.get(5).contains(notfTopic));
+        assertTrue(topicLogList.get(5).contains(invTopic));
     }
 
     @Test
@@ -315,7 +317,7 @@ class PostProcessingServiceTest {
 
         verify(investigationRepositoryMock, never()).executeStoredProcForPageBuilder(anyLong(), anyString());
         List<ILoggingEvent> logs = listAppender.list;
-        assertEquals(5, logs.size());
+        assertEquals(7, logs.size());
     }
 
     @Test

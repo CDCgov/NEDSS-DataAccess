@@ -147,17 +147,11 @@ public class PostProcessingService {
 
                         /* CNDIT-1584: Notifications has a dependency on Investigation and should be processed
                         together to eliminate timing issues.*/
-                        Optional<Entry<String, List<Long>>> notificationIds = sortedEntries.stream()
-                                .filter(k -> k.getKey().contains(Entity.NOTIFICATIONS.getName()))
-                                .findFirst();
-                        if (notificationIds.isPresent()) {
-                            processTopic(
-                                    notificationIds.get().getKey(),
-                                    Entity.NOTIFICATIONS,
-                                    notificationIds.get().getValue(),
-                                    notificationRepository::executeStoredProcForNotificationIds);
-                            idCache.put(notificationIds.get().getKey(), new ArrayList<>());
-                        }
+                        processTopic(
+                                keyTopic,
+                                Entity.NOTIFICATIONS,
+                                ids,
+                                notificationRepository::executeStoredProcForNotificationIds);
                         break;
                     case NOTIFICATIONS:
 //                        processTopic(keyTopic, entity, ids,

@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface NotificationRepository extends JpaRepository<NotificationStoredProc, Long> {
     @Procedure("sp_nrt_notification_postprocessing")
-    void executeStoredProcForNotificationIds(@Param("notificationUids") String notificationUids);
+    void executeStoredProcForNotificationIds(@Param("publicHealthCaseUids") String publicHealthCaseUids);
 }
