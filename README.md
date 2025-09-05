@@ -1,3 +1,17 @@
+# [DEPRECATED] NEDSS-DataAcess
+
+This repository is **deprecated** and no longer maintained.
+
+We have moved the development of Real Time Reporting to a new repository- [NEDSS-DataReporting]([https://github.com/your-org/new-repo](https://github.com/CDCgov/NEDSS-DataReporting))
+
+Please use the new repository for all future updates, issues, and contributions. This repository remains available for historical reference but is not receiving any further updates.
+
+
+---
+
+**Archived**: This repo may be archived soon to prevent confusion.
+
+
 # CDCgov GitHub Organization Open Source Project Template
 
 **Template for clearance: This project serves as a template to aid projects in starting up and moving through clearance procedures. To start, create a new repository and implement the required [open practices](open_practices.md), train on and agree to adhere to the organization's [rules of behavior](rules_of_behavior.md), and [send a request through the create repo form](https://forms.office.com/Pages/ResponsePage.aspx?id=aQjnnNtg_USr6NJ2cHf8j44WSiOI6uNOvdWse4I-C2NUNk43NzMwODJTRzA4NFpCUk1RRU83RTFNVi4u) using language from this template as a Guide.**
